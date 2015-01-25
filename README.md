@@ -9,7 +9,7 @@
 - Automatic deploys (i.e. by looking for VCS changes)
 - Workspace management (i.e. whatever your deploy command is may be generating local artifacts, those should be cleaned up)
 - Deploy queue (i.e. cramer queued sha XXX, armin queued sha YYY)
-
+- Support for at least Fabric-based (simple shell commands) and Heroku-based deploys.
 
 ## Heaven Inspiration
 
