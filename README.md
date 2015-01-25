@@ -9,8 +9,9 @@
 - Automatic deploys (i.e. by looking for VCS changes)
 - Workspace management (i.e. whatever your deploy command is may be generating local artifacts, those should be cleaned up)
 - Deploy queue (i.e. cramer queued sha XXX, armin queued sha YYY)
-- Support for at least Fabric-based (simple shell commands) and Heroku-based deploys.
+- Support for at least Fabric-based (simple shell commands) and Heroku-based deploys
 - Integration with GitHub status checks (i.e. did Circle CI pass on sha XXX)
+- Works behind-firewall (no inbound traffic)
 
 ## Heaven Inspiration
 
@@ -35,10 +36,9 @@ The logic for the endpoint would be a bit like this:
 def deploy(app, params):
     if not github.create_deployment(params):
         return 400, "reason"
+    enque_deployment()
 
-# listen for github webhooks suggesting the deployment was created
-# this allow other services to also create deployments
-def on_github_deployment(data):
+def deployment_task(data):
     clone_or_update_repo()
     run_deployment_command()
 ```
