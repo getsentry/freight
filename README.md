@@ -1,3 +1,17 @@
+# Deployment Service [name TBD]
+
+## Features
+
+- Multiple applications. All configuration is unique per application
+- Release state management (know what versions are active where, and provide a historical view)
+- Per-environment deployments (i.e. different versions on staging and production)
+- Environment locking (i.e. prevent people from deploying to an environment)
+- Automatic deploys (i.e. by looking for VCS changes)
+- Workspace management (i.e. whatever your deploy command is may be generating local artifacts, those should be cleaned up)
+
+
+## Heaven Inspiration
+
 The basis for this is modeled after Heaven, but we may want to take an alternative approach. GitHub shouldn't be hardcoded for the system to work, but rather the primary implementation will be GitHub (i.e. specific endpoints just for it).
 
 For a simple integration, it would work like the following:
