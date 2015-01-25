@@ -14,7 +14,9 @@ The logic for the endpoint would be a bit like this:
 ```
 # call out to GitHub and attempt to register a new deployment
 # this will fail if certain checks do not pass
-def deploy():
+
+# this is the deploy API endpoint
+def deploy(app, params):
     if not github.create_deployment(params):
         return 400, "reason"
 
