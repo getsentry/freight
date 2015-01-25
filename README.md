@@ -8,6 +8,7 @@
 - Environment locking (i.e. prevent people from deploying to an environment)
 - Automatic deploys (i.e. by looking for VCS changes)
 - Workspace management (i.e. whatever your deploy command is may be generating local artifacts, those should be cleaned up)
+- Deploy queue (i.e. cramer queued sha XXX, armin queued sha YYY)
 
 
 ## Heaven Inspiration
