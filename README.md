@@ -18,6 +18,8 @@
 
 ## Future Ideas
 
+The following could be considered v2 features.
+
 ### Machine-consistency service
 
 We could run a service on each machine that would check-in with the master. This would record the current version of the application. The service would be configured with a set of apps (their environment info, how to get app version). The service could also be aware of "how do I deploy a version" which could assist in pull-based deploys.
