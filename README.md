@@ -16,6 +16,12 @@
 - Hubot integration (starting deploys)
 - Slack integraiton (notifying when deploys start/finish/fail)
 
+## Future Ideas
+
+### Machine-consistency service
+
+We could run a service on each machine that would check-in with the master. This would record the current version of the application. The service would be configured with a set of apps (their environment info, how to get app version). The service could also be aware of "how do I deploy a version" which could assist in pull-based deploys.
+
 ## Heaven Inspiration
 
 The basis for this is modeled after Heaven, but we may want to take an alternative approach. GitHub shouldn't be hardcoded for the system to work, but rather the primary implementation will be GitHub (i.e. specific endpoints just for it).
