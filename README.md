@@ -13,6 +13,8 @@
 - Integration with GitHub status checks (i.e. did Circle CI pass on sha XXX)
 - Works behind-firewall (no inbound traffic)
 - API-accessible deploy logs
+- Hubot integration (starting deploys)
+- Slack integraiton (notifying when deploys start/finish/fail)
 
 ## Heaven Inspiration
 
