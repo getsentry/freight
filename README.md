@@ -12,6 +12,7 @@
 - Support for at least Fabric-based (simple shell commands) and Heroku-based deploys
 - Integration with GitHub status checks (i.e. did Circle CI pass on sha XXX)
 - Works behind-firewall (no inbound traffic)
+- API-accessible deploy logs
 
 ## Heaven Inspiration
 
