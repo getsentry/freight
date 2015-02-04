@@ -1,0 +1,27 @@
+sudo: false
+language: python
+services:
+  - postgresql
+  - redis-server
+python:
+  - "2.7"
+cache:
+  directories:
+    - node_modules
+    - .pip_download_cache
+    - "$HOME/virtualenv/python2.7.9"
+env:
+  global:
+    - PIP_DOWNLOAD_CACHE=".pip_download_cache"
+install:
+  - time make develop
+before_script:
+  - psql -c 'create database test_ds;' -U postgres
+script:
+  - bin/lint
+  - bin/test
+notifications:
+  irc:
+    channels: "irc.freenode.org#sentry"
+    on_success: change
+    on_failure: change

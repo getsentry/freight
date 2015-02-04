@@ -1,0 +1,3 @@
+#!/bin/bash -eux
+
+celery -A ds.app:celery worker $@

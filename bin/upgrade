@@ -1,0 +1,5 @@
+#!/bin/bash -eu
+
+createdb -E utf-8 ds || true
+
+alembic upgrade head

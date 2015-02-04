@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+
+from __future__ import absolute_import
+
+import os
+import subprocess
+import sys
+
+from tempfile import NamedTemporaryFile
+
+from ds.config import create_app, db
+from ds.models import Repository
+
+
+app = create_app()
+app_context = app.app_context()
+app_context.push()
+
+
+def get_repo(url):
+    repo = Repository.query.filter(
+        Repository.url == url,
+    ).first()
+    if not repo:
+        print("Repository not found")
+        sys.exit(1)
+
+    return repo
+
+repo_url = os.environ.get('DS_SSH_REPO')
+if not repo_url:
+    raise ValueError("No 'DS_SSH_REPO' in environment")
+
+repo = get_repo(repo_url)
+
+
+command = [
+    'ssh',
+    # Not supported in all ssh client versions
+    # '-o UserAuthorizedKeysFile=/dev/null',
+    '-o LogLevel=ERROR',
+    '-o StrictHostKeyChecking=no',
+    '-o UserKnownHostsFile=/dev/null',
+]
+command.append('--')
+command.extend(sys.argv[1:])
+
+sys.exit(subprocess.call(
+    command,
+    cwd=os.getcwd(),
+    env=os.environ,
+    stdout=sys.stdout,
+    stderr=sys.stderr,
+))

@@ -1,0 +1,14 @@
+.arcconfig
+.coverage
+.DS_Store
+.idea
+npm-debug.log
+*.db
+*.egg-info
+*.pyc
+/env
+/docs/_build/
+/htmlcov
+/node_modules
+/dist
+.vagrant
