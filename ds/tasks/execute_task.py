@@ -7,7 +7,7 @@ from flask import current_app
 
 from ds import providers, vcs
 from ds.config import celery
-from ds.models import App, Repository, Task
+from ds.models import App, Repository, Task, TaskStatus
 from ds.utils.workspace import Workspace
 
 
@@ -41,4 +41,17 @@ def execute_task(task_id):
     vcs.checkout(task.ref)
 
     workspace = Workspace(vcs.path)
-    provider.execute_task(workspace, task)
+    try:
+        provider.execute_task(workspace, task)
+    except Exception:
+        Task.query.filter(
+            Task.id == task_id,
+        ).update({
+            Task.status: TaskStatus.error,
+        })
+    else:
+        Task.query.filter(
+            Task.id == task_id,
+        ).update({
+            Task.status: TaskStatus.finished,
+        })
