@@ -29,7 +29,7 @@ class Fixtures(object):
     def create_task(self, app, user, **kwargs):
         kwargs.setdefault('provider', 'shell')
         kwargs.setdefault('name', 'deploy')
-        kwargs.setdefault('ref', uuid4().hex)
+        kwargs.setdefault('ref', 'master')
         kwargs.setdefault('sha', kwargs['ref'])
         kwargs.setdefault('data', {'provider_config': app.provider_config})
 
