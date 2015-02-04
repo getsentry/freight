@@ -60,7 +60,7 @@ class GitVcs(Vcs):
         self.run(['fetch', '--all', '-p'])
 
     def checkout(self, ref):
-        self.run(['reset' '--hard', ref])
+        self.run(['reset', '--hard', ref])
 
     def log(self, parent=None, offset=0, limit=100):
         cmd = ['log', '--date-order', '--pretty=format:%s' % (LOG_FORMAT,)]
