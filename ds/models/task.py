@@ -7,6 +7,14 @@ from ds.config import db
 from ds.db.types.json import JSONEncodedDict
 
 
+class TaskStatus(object):
+    unknown = 0
+    pending = 1
+    in_progress = 2
+    finished = 3
+    failed = 4
+
+
 class Task(db.Model):
     __tablename__ = 'task'
 
@@ -20,6 +28,7 @@ class Task(db.Model):
     sha = Column(String(40), nullable=False)
     environment = Column(String(64), nullable=False, default='production')
     provider = Column(String(64), nullable=False)
+    status = Column(Integer)
     data = Column(JSONEncodedDict)
     date_created = Column(DateTime, default=datetime.utcnow, nullable=False)
 
