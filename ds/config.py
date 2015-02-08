@@ -9,9 +9,11 @@ from flask import current_app
 from flask.ext.sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
 
+from ds.api.controller import APIController
 from ds.constants import PROJECT_ROOT
 
 
+api = APIController(prefix='/api/0')
 db = SQLAlchemy(session_options={})
 celery = Celery()
 sentry = Sentry(logging=True, level=logging.WARN)
@@ -104,6 +106,16 @@ def create_app(_read_config=True, **config):
     configure_sqlalchemy(app)
 
     return app
+
+
+def configure_api(app):
+    from ds.api.controller import APICatchall
+    from ds.api.task_index import TaskIndexApiView
+
+    api.init_app(app)
+    api.add_reosurce(TaskIndexApiView, '/tasks/')
+    # must be last
+    api.add_resource(APICatchall, '/<path:path>')
 
 
 def configure_celery(app):
