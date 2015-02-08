@@ -74,5 +74,6 @@ def db_session(request):
 @pytest.fixture(autouse=True)
 def clean_repo_root(request, session_config):
     repo_root = session_config['repo_root']
-    shutil.rmtree(repo_root)
+    if os.path.exists(repo_root):
+        shutil.rmtree(repo_root)
     os.makedirs(repo_root)
