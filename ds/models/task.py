@@ -15,6 +15,15 @@ class TaskStatus(object):
     failed = 4
 
 
+STATUS_LABELS = {
+    TaskStatus.unknown: 'unknown',
+    TaskStatus.pending: 'pending',
+    TaskStatus.in_progress: 'in_progress',
+    TaskStatus.finished: 'finished',
+    TaskStatus.failed: 'failed',
+}
+
+
 class Task(db.Model):
     __tablename__ = 'task'
 
@@ -35,3 +44,7 @@ class Task(db.Model):
     @property
     def provider_config(self):
         return self.data['provider_config']
+
+    @property
+    def status_label(self):
+        return STATUS_LABELS.get(self.status, 'unknown')

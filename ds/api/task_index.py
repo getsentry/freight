@@ -4,14 +4,16 @@ from flask_restful import reqparse
 
 from ds.config import db, redis
 from ds.api.base import ApiView
-from ds.models import App, Task, TaskStatus
+from ds.api.serializer import serialize
+from ds.models import App, Task, TaskStatus, User
 from ds.tasks import execute_task
 from ds.utils.redis import lock
 
 
 class TaskIndexApiView(ApiView):
     post_parser = reqparse.RequestParser()
-    post_parser.add_argument('app')
+    post_parser.add_argument('app', required=True)
+    post_parser.add_argument('user', required=True)
     post_parser.add_argument('env', default='production')
     post_parser.add_argument('ref')
 
@@ -36,6 +38,14 @@ class TaskIndexApiView(ApiView):
             return self.error('Invalid app')
 
         with lock(redis, 'task:create:{}'.format(app.id), timeout=5):
+            # TODO(dcramer): this needs to be a get_or_create pattern and
+            # ideally moved outside of the lock
+            user = User.query.filter(User.name == args.user).first()
+            if not user:
+                user = User(name=args.user)
+                db.session.add(user)
+                db.session.flush()
+
             if self._has_active_task(app, args.env):
                 return self.error(
                     message='Another task is already in progress for this app',
@@ -47,11 +57,16 @@ class TaskIndexApiView(ApiView):
                 environment=args.env,
                 # TODO(dcramer): ref should default based on app config
                 ref=args.ref,
+                # TODO(dcramer):
+                sha=args.ref,
                 status=TaskStatus.pending,
+                user_id=user.id,
+                provider=app.provider,
+                data={'provider_config': app.provider_config},
             )
             db.session.add(task)
             db.session.commit()
 
-            execute_task.delay(task_id=task.id)
+        execute_task.delay(task_id=task.id)
 
-        return self.respond({})
+        return self.respond(serialize(task))
