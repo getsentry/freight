@@ -62,7 +62,7 @@ The deployment command could be specific per application, and would be specified
     "sentry": {
         # the raw shell command that should run, with a few variables available
         "deploy": "fab -R {env} deploy:sha={sha}",
-        
+
         # we want a way to specify which deployment integration this is using
         "via": "github"
     }

@@ -10,22 +10,21 @@ from ds.config import db
 LINK_HEADER = '<{uri}&page={page}>; rel="{name}"'
 
 
-def error(message, http_code=400):
-    return {
-        'error': message,
-    }, http_code
-
-
-class APIView(Resource):
+class ApiView(Resource):
     def dispatch_request(self, *args, **kwargs):
         try:
-            response = super(APIView, self).dispatch_request(*args, **kwargs)
+            response = super(ApiView, self).dispatch_request(*args, **kwargs)
         except Exception:
             db.session.rollback()
             raise
         else:
             db.session.commit()
         return response
+
+    def error(self, message, status_code=400):
+        return self.respond({
+            'error': message,
+        }, status_code=status_code)
 
     def respond(self, context, status_code=200, links=None):
         response = Response(

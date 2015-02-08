@@ -5,6 +5,7 @@ __all__ = ['Fixtures']
 from uuid import uuid4
 
 from ds.config import db
+from ds.constants import PROJECT_ROOT
 from ds.models import App, Repository, Task, User
 
 
@@ -40,7 +41,7 @@ class Fixtures(object):
         return task
 
     def create_repo(self, **kwargs):
-        kwargs.setdefault('url', 'http://example.com/{0}'.format(uuid4().hex))
+        kwargs.setdefault('url', 'file:///' + PROJECT_ROOT)
         kwargs.setdefault('vcs', 'git')
 
         repo = Repository(**kwargs)

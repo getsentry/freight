@@ -6,16 +6,18 @@ import logging
 
 from celery import Celery
 from flask import current_app
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_redis import Redis
+from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
 
-from ds.api.controller import APIController
+from ds.api.controller import ApiController
 from ds.constants import PROJECT_ROOT
 
 
-api = APIController(prefix='/api/0')
+api = ApiController(prefix='/api/0')
 db = SQLAlchemy(session_options={})
 celery = Celery()
+redis = Redis()
 sentry = Sentry(logging=True, level=logging.WARN)
 
 
@@ -102,20 +104,23 @@ def create_app(_read_config=True, **config):
             app.config.from_pyfile(path, silent=True)
 
     configure_sentry(app)
+    configure_api(app)
     configure_celery(app)
+    configure_redis(app)
     configure_sqlalchemy(app)
 
     return app
 
 
 def configure_api(app):
-    from ds.api.controller import APICatchall
+    from ds.api.controller import ApiCatchall
     from ds.api.task_index import TaskIndexApiView
 
+    api.add_resource(TaskIndexApiView, '/tasks/')
+    # catchall should be the last resource
+    api.add_resource(ApiCatchall, '/<path:path>')
+    # init must be called after routes are registered
     api.init_app(app)
-    api.add_reosurce(TaskIndexApiView, '/tasks/')
-    # must be last
-    api.add_resource(APICatchall, '/<path:path>')
 
 
 def configure_celery(app):
@@ -132,6 +137,10 @@ def configure_celery(app):
         """
         db.session.commit()
         db.session.remove()
+
+
+def configure_redis(app):
+    redis.init_app(app)
 
 
 def configure_sentry(app):
