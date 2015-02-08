@@ -5,6 +5,7 @@ from flask_restful import reqparse
 from ds.config import db, redis
 from ds.api.base import ApiView
 from ds.models import App, Task, TaskStatus
+from ds.tasks import execute_task
 from ds.utils.redis import lock
 
 
@@ -46,8 +47,11 @@ class TaskIndexApiView(ApiView):
                 environment=args.env,
                 # TODO(dcramer): ref should default based on app config
                 ref=args.ref,
+                status=TaskStatus.pending,
             )
             db.session.add(task)
-            db.session.flush()
+            db.session.commit()
+
+            execute_task.delay(task_id=task.id)
 
         return self.respond({})
