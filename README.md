@@ -1,6 +1,12 @@
 # Deployment Service [name TBD]
 
-This project is a work in progress and is not yet intended to be production ready.
+**This project is a work in progress and is not yet intended to be production ready.**
+
+This service is intended to augment your existing deployment processes. It should improve on what you may already have, or help you fill in what you're missing.
+
+The overarching goal of teh system is to provide easy manual and automated deploys, with a consistent central view of the world.
+
+It's not designed to replace something like Heroku, or other PaaS services, but rather to work *with* your existing processes, no matter what they are.
 
 ## Features
 
