@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+import json
+
 from ds.models import TaskStatus
 from ds.testutils import TestCase
 
@@ -18,3 +20,5 @@ class TaskCreateTest(TestCase):
             'ref': 'master',
         })
         assert resp.status_code == 400
+        data = json.loads(resp.data)
+        assert data['error_name'] == 'locked'

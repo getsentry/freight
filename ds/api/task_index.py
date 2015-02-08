@@ -36,7 +36,10 @@ class TaskIndexApiView(ApiView):
 
         with lock(redis, 'task:create:{}'.format(app.id), timeout=5):
             if self._has_active_task(app, args.env):
-                return self.error('Another task is already in progress for this app')
+                return self.error(
+                    message='Another task is already in progress for this app',
+                    name='locked',
+                )
 
             task = Task(
                 app_id=app.id,

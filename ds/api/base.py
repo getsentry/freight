@@ -21,10 +21,14 @@ class ApiView(Resource):
             db.session.commit()
         return response
 
-    def error(self, message, status_code=400):
-        return self.respond({
+    def error(self, message, name=None, status_code=400):
+        context = {
             'error': message,
-        }, status_code=status_code)
+        }
+        if name:
+            context['error_name'] = name
+
+        return self.respond(context, status_code=status_code)
 
     def respond(self, context, status_code=200, links=None):
         response = Response(
