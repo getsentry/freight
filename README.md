@@ -1,5 +1,7 @@
 # Deployment Service [name TBD]
 
+This project is a work in progress and is not yet intended to be production ready.
+
 ## Features
 
 - Multiple applications. All configuration is unique per application
