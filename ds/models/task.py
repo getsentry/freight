@@ -14,6 +14,14 @@ class TaskStatus(object):
     finished = 3
     failed = 4
 
+    @classmethod
+    def get_label(cls, status):
+        return STATUS_LABELS[status]
+
+    @classmethod
+    def label_to_id(cls, label):
+        return STATUS_LABELS_REV[label]
+
 
 STATUS_LABELS = {
     TaskStatus.unknown: 'unknown',
@@ -21,6 +29,9 @@ STATUS_LABELS = {
     TaskStatus.in_progress: 'in_progress',
     TaskStatus.finished: 'finished',
     TaskStatus.failed: 'failed',
+}
+STATUS_LABELS_REV = {
+    v: k for k, v in STATUS_LABELS.items()
 }
 
 
