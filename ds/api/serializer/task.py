@@ -2,10 +2,11 @@ from __future__ import absolute_import
 
 from ds.models import Task
 
-from .base import register, Serializer
+from .base import Serializer
+from .manager import add
 
 
-@register(Task)
+@add(Task)
 class TaskSerializer(Serializer):
     def serialize(self, item, attrs):
         return {

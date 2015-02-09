@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
-from ds.utils.imports import import_submodules
+from .manager import serialize  # NOQA
 
-
-import_submodules(locals(), __name__, __path__)
+# TODO(dcramer): we cant seem to use import_submodules here as something is
+# wrong w/ the code that causes it to mess up the default_manager instance
+from . import task  # NOQA
