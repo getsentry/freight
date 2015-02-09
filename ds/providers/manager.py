@@ -2,6 +2,8 @@ from __future__ import absolute_import
 
 __all__ = ['ProviderManager']
 
+from ds.exceptions import InvalidProvider
+
 
 class ProviderManager(object):
     def __init__(self):
@@ -11,4 +13,8 @@ class ProviderManager(object):
         self.providers[name] = cls
 
     def get(self, name, **kwargs):
-        return self.providers.get(name)(**kwargs)
+        try:
+            cls = self.providers[name]
+        except KeyError:
+            raise InvalidProvider(name)
+        return cls(**kwargs)

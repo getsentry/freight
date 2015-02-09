@@ -14,3 +14,7 @@ class CommandError(Exception):
 
     def __str__(self):
         return self.__unicode__().encode('utf-8')
+
+
+class InvalidProvider(Exception):
+    pass
