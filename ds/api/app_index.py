@@ -7,10 +7,9 @@ from flask_restful import reqparse
 from ds import providers
 from ds.api.base import ApiView
 from ds.api.serializer import serialize
-from ds.config import db, redis
+from ds.config import db
 from ds.exceptions import InvalidProvider
 from ds.models import App, Repository
-from ds.utils.redis import lock
 
 
 class AppIndexApiView(ApiView):
@@ -59,24 +58,22 @@ class AppIndexApiView(ApiView):
                 )
             provider_config[option] = value
 
-        with lock(redis, 'app:create', timeout=5):
-            # TODO(dcramer): this needs to be a get_or_create pattern and
-            # ideally moved outside of the lock
-            repo = Repository.query.filter(
-                Repository.url == args.repository,
-            ).first()
-            if repo is None:
-                repo = Repository(url=args.repository, vcs='git')
-                db.session.add(repo)
-                db.session.flush()
+        # TODO(dcramer): this needs to be a get_or_create pattern
+        repo = Repository.query.filter(
+            Repository.url == args.repository,
+        ).first()
+        if repo is None:
+            repo = Repository(url=args.repository, vcs='git')
+            db.session.add(repo)
+            db.session.flush()
 
-            app = App(
-                name=args.name,
-                repository_id=repo.id,
-                provider=args.provider,
-                data={'provider_config': provider_config},
-            )
-            db.session.add(app)
-            db.session.commit()
+        app = App(
+            name=args.name,
+            repository_id=repo.id,
+            provider=args.provider,
+            data={'provider_config': provider_config},
+        )
+        db.session.add(app)
+        db.session.commit()
 
         return self.respond(serialize(app), status_code=201)
