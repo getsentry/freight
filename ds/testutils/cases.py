@@ -4,13 +4,16 @@ __all__ = ['TestCase']
 
 import unittest
 
-from flask import current_app as app
+from flask import current_app
 
+from .client import AuthenticatedTestClient
 from .fixtures import Fixtures
 
 
 class TestCase(unittest.TestCase, Fixtures):
     def setUp(self):
         # mock out mail
-        self.client = app.test_client()
+        self.client = AuthenticatedTestClient(
+            current_app, current_app.response_class
+        )
         super(TestCase, self).setUp()
