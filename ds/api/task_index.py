@@ -112,4 +112,4 @@ class TaskIndexApiView(ApiView):
 
         execute_task.delay(task_id=task.id)
 
-        return self.respond(serialize(task))
+        return self.respond(serialize(task), status_code=201)

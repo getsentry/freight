@@ -121,7 +121,7 @@ class TaskCreateTest(TaskIndexBase):
             'ref': 'master',
             'user': self.user.name,
         })
-        assert resp.status_code == 200
+        assert resp.status_code == 201
         data = json.loads(resp.data)
         assert data['id']
 
