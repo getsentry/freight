@@ -1,0 +1,6 @@
+{
+  "name": "Deploy Service",
+  "description": "A deploy service.",
+  "repository": "https://github.com/getsentry/ds",
+  "keywords": ["deploy"]
+}

@@ -1,0 +1,25 @@
+{
+  "name": "ds",
+  "version": "0.0.0",
+  "description": "**This project is a work in progress and is not yet intended to be production ready.**",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "prevalidate-app.json": "npm install",
+    "validate-app.json": "app.json validate"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/getsentry/ds.git"
+  },
+  "author": "David Cramer <dcramer@gmail.com> (https://github.com/dcramer)",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/getsentry/ds/issues"
+  },
+  "homepage": "https://github.com/getsentry/ds",
+  "devDependencies": {
+    "app.json": "^1.2.1"
+  }
+}
