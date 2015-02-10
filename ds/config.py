@@ -48,10 +48,14 @@ def create_app(_read_config=True, **config):
     # Utilized for sessions and other secrets
     # NOTE: This key is insecure and you should override it on the server
     app.config['SECRET_KEY'] = 't\xad\xe7\xff%\xd2.\xfe\x03\x02=\xec\xaf\\2+\xb8=\xf7\x8a\x9aLD\xb1'
+    if 'SECRET_KEY' in os.environ:
+        app.config['SECRET_KEY'] = os.environ['SECRET_KEY']
 
     # The api key to authorize end users against this system.
     # NOTE: This key is insecure and you should override it on the server
     app.config['API_KEY'] = '3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70'
+    if 'API_KEY' in os.environ:
+        app.config['API_KEY'] = os.environ['API_KEY']
 
     app.config['REPO_ROOT'] = '/tmp/ds-workspace/repos'
 
