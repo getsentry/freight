@@ -57,6 +57,9 @@ def create_app(_read_config=True, **config):
     if 'API_KEY' in os.environ:
         app.config['API_KEY'] = os.environ['API_KEY']
 
+    if 'REDISCLOUD_URL' in os.environ:
+        app.config['REDIS_URL'] = os.environ['REDISCLOUD_URL']
+
     app.config['WORKSPACE_ROOT'] = os.environ.get('WORKSPACE_ROOT', '/tmp')
 
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
