@@ -17,4 +17,5 @@ uwsgi \
 	--processes 2 \
 	--threads 2 \
 	--enable-threads \
+	--thunder-lock \
 	$options
