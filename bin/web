@@ -1,0 +1,18 @@
+#!/bin/bash -eux
+
+PORT=${PORT:-9000}
+
+if [ ! -z $VIRTUAL_ENV ]; then
+    options="--virtualenv $VIRTUAL_ENV"
+else
+    options=""
+fi
+
+uwsgi \
+    --http-socket 127.0.0.1:$PORT \
+    --wsgi-file ds/app.py \
+    --callable app \
+    --die-on-term \
+    --master \
+    --processes 4 \
+    $options

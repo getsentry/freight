@@ -44,6 +44,7 @@ install_requires = [
     'psycopg2>=2.5.1,<2.6.0',
     'raven>=5.1.1,<5.2.0',
     'redis>=2.10.3,<2.11.0',
+    'uwsgi>=2.0.9,<2.1.0',
 ]
 
 setup(
