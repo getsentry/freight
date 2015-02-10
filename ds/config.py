@@ -6,6 +6,7 @@ import logging
 
 from celery import Celery
 from flask import current_app
+from flask_heroku import Heroku
 from flask_redis import Redis
 from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
@@ -17,6 +18,7 @@ from ds.constants import PROJECT_ROOT
 api = ApiController(prefix='/api/0')
 db = SQLAlchemy(session_options={})
 celery = Celery()
+heroku = Heroku()
 redis = Redis()
 sentry = Sentry(logging=True, level=logging.WARN)
 
@@ -96,6 +98,8 @@ def create_app(_read_config=True, **config):
     app.config['SENTRY_INCLUDE_PATHS'] = [
         'ds',
     ]
+
+    heroku.init_app(app)
 
     app.config.update(config)
 

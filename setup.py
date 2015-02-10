@@ -39,6 +39,7 @@ install_requires = [
     'blinker>=1.3.0,<1.4.0',
     'celery>=3.1.17,<3.2.0',
     'flask>=0.10.1,<0.11.0',
+    'flask-heroku>=0.1.9,<0.2.0',
     'flask-sqlalchemy>=1.0,<1.1',
     'flask-restful>=0.3.1,<0.4.0',
     'psycopg2>=2.5.1,<2.6.0',
