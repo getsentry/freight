@@ -53,7 +53,7 @@ def retries(func=None, **kwargs):
             except retry_on as exc:
                 current.retry(
                     exc=exc,
-                    countdown=min(2 ** current.request.retries, 4)
+                    countdown=min(2 ** current.request.retries, 128)
                 )
         return _wrapped
     return wrapped
