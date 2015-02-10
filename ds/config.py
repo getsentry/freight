@@ -63,6 +63,8 @@ def create_app(_read_config=True, **config):
     app.config['SQLALCHEMY_POOL_SIZE'] = 60
     app.config['SQLALCHEMY_MAX_OVERFLOW'] = 20
 
+    app.config['BROKER_TRANSPORT'] = None
+
     app.config['CELERY_ACCEPT_CONTENT'] = ['json']
     app.config['CELERY_ACKS_LATE'] = True
     app.config['CELERY_DEFAULT_QUEUE'] = "default"
