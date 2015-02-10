@@ -10,7 +10,7 @@ fi
 
 uwsgi \
     --http-socket 127.0.0.1:$PORT \
-    --wsgi-file ds/app.py \
+    --module ds.app \
     --callable app \
     --die-on-term \
     --master \
