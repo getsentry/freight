@@ -2,5 +2,34 @@
   "name": "Deploy Service",
   "description": "A deploy service.",
   "repository": "https://github.com/getsentry/ds",
-  "keywords": ["deploy"]
+  "keywords": ["deploy"],
+  "env": {
+    "SECRET_KEY": {
+      "description": "A secret key for verifying the integrity of signed cookies.",
+      "generator": "secret"
+    },
+    "API_KEY": {
+      "description": "An API key used to communiate with the service.",
+      "generator": "secret"
+    }
+  },
+  "formation": [
+    {
+      "process": "web",
+      "quantity": 1,
+      "size": "1X"
+    },
+    {
+      "process": "worker",
+      "quantity": 1,
+      "size": "1X"
+    }
+  ],
+  "addons": [
+    "heroku-postgresql:hobby-dev",
+    "rediscloud"
+  ],
+  "scripts": {
+    "postdeploy": "bin/upgrade"
+  }
 }
