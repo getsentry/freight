@@ -20,7 +20,7 @@ def get_vcs_backend(repo):
     return vcs.get(repo.vcs, **kwargs)
 
 
-@celery.task(name='ds.execute_task')
+@celery.task(name='ds.execute_task', max_retries=None)
 @retries
 def execute_task(task_id):
     task = Task.query.filter(
