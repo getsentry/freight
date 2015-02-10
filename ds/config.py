@@ -57,7 +57,7 @@ def create_app(_read_config=True, **config):
     if 'API_KEY' in os.environ:
         app.config['API_KEY'] = os.environ['API_KEY']
 
-    app.config['REPO_ROOT'] = '/tmp/ds-workspace/repos'
+    app.config['REPO_ROOT'] = os.environ.get('REPO_ROOT', '/tmp/ds-workspace/repos')
 
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
     app.config['SQLALCHEMY_POOL_SIZE'] = 60
