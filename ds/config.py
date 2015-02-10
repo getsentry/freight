@@ -4,7 +4,6 @@ import flask
 import os
 import logging
 
-from celery import Celery
 from flask_heroku import Heroku
 from flask_redis import Redis
 from flask_sqlalchemy import SQLAlchemy
@@ -12,11 +11,12 @@ from raven.contrib.flask import Sentry
 
 from ds.api.controller import ApiController
 from ds.constants import PROJECT_ROOT
+from ds.tasks.context import ContextualCelery
 
 
 api = ApiController(prefix='/api/0')
 db = SQLAlchemy(session_options={})
-celery = Celery()
+celery = ContextualCelery()
 heroku = Heroku()
 redis = Redis()
 sentry = Sentry(logging=True, level=logging.WARN)
@@ -76,7 +76,7 @@ def create_app(_read_config=True, **config):
     )
 
     app.config['CELERY_IMPORTS'] = (
-        'ds.tasks',
+        'ds.tasks.execute_task',
     )
 
     app.config['CELERY_ROUTES'] = {
@@ -136,18 +136,7 @@ def configure_api(app):
 
 
 def configure_celery(app):
-    from celery.signals import task_postrun
-
-    celery.conf.update(app.config)
-
-    @task_postrun.connect
-    def cleanup_session(*args, **kwargs):
-        """
-        Emulate a request cycle for each task to ensure the session objects
-        get cleaned up as expected.
-        """
-        db.session.commit()
-        db.session.remove()
+    celery.init_app(app, db)
 
 
 def configure_redis(app):
