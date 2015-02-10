@@ -5,7 +5,6 @@ import os
 import logging
 
 from celery import Celery
-from flask import current_app
 from flask_heroku import Heroku
 from flask_redis import Redis
 from flask_sqlalchemy import SQLAlchemy
@@ -21,20 +20,6 @@ celery = Celery()
 heroku = Heroku()
 redis = Redis()
 sentry = Sentry(logging=True, level=logging.WARN)
-
-
-def patch_celery():
-    TaskBase = celery.Task
-
-    class ContextTask(TaskBase):
-        abstract = True
-
-        def __call__(self, *args, **kwargs):
-            with current_app.app_context():
-                return TaskBase.__call__(self, *args, **kwargs)
-    celery.Task = ContextTask
-
-patch_celery()
 
 
 def create_app(_read_config=True, **config):
