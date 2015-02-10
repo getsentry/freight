@@ -3,16 +3,17 @@
 PORT=${PORT:-9000}
 
 if [ -n "$VIRTUAL_ENV" ]; then
-    options="--virtualenv $VIRTUAL_ENV"
+	options="--virtualenv $VIRTUAL_ENV"
 else
-    options=""
+	options=""
 fi
 
 uwsgi \
-    --http-socket :$PORT \
-    --module ds.app \
-    --callable app \
-    --die-on-term \
-    --master \
-    --processes 4 \
-    $options
+	--http-socket :$PORT \
+	--module ds.app \
+	--callable app \
+	--die-on-term \
+	--master \
+	--processes 4 \
+	--enable-threads \
+	$options
