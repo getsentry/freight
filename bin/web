@@ -2,7 +2,7 @@
 
 PORT=${PORT:-9000}
 
-if [ ! -z $VIRTUAL_ENV ]; then
+if [ ! -z "$VIRTUAL_ENV" ]; then
     options="--virtualenv $VIRTUAL_ENV"
 else
     options=""
