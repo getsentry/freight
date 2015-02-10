@@ -9,7 +9,7 @@ else
 fi
 
 uwsgi \
-    --http-socket 127.0.0.1:$PORT \
+    --http-socket :$PORT \
     --module ds.app \
     --callable app \
     --die-on-term \
