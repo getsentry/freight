@@ -104,9 +104,11 @@ def create_app(_read_config=True, **config):
     heroku.init_app(app)
 
     # Set any remaining defaults that might not be present yet
-    app.config.setdefault('SENTRY_DSN', None)
-    app.config.setdefault('SQLALCHEMY_DATABASE_URI', 'postgresql:///ds')
-    app.config.setdefault('BROKER_URL', 'redis://localhost/0')
+    if not app.config.get('SQLALCHEMY_DATABASE_URI'):
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///ds'
+
+    if not app.config.get('BROKER_URL'):
+        app.config['BROKER_URL'] = 'redis://localhost/0'
 
     app.config.update(config)
 
