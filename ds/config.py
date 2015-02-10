@@ -60,13 +60,11 @@ def create_app(_read_config=True, **config):
     app.config['REPO_ROOT'] = '/tmp/ds-workspace/repos'
 
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///ds'
     app.config['SQLALCHEMY_POOL_SIZE'] = 60
     app.config['SQLALCHEMY_MAX_OVERFLOW'] = 20
 
     app.config['CELERY_ACCEPT_CONTENT'] = ['json']
     app.config['CELERY_ACKS_LATE'] = True
-    app.config['CELERY_BROKER_URL'] = 'redis://localhost/0'
     app.config['CELERY_DEFAULT_QUEUE'] = "default"
     app.config['CELERY_DEFAULT_EXCHANGE'] = "default"
     app.config['CELERY_DEFAULT_EXCHANGE_TYPE'] = "direct"
@@ -98,12 +96,17 @@ def create_app(_read_config=True, **config):
         },
     }
 
-    app.config['SENTRY_DSN'] = None
     app.config['SENTRY_INCLUDE_PATHS'] = [
         'ds',
     ]
 
+    # Pull in Heroku configuration
     heroku.init_app(app)
+
+    # Set any remaining defaults that might not be present yet
+    app.config.setdefault('SENTRY_DSN', None)
+    app.config.setdefault('SQLALCHEMY_DATABASE_URI', 'postgresql:///ds')
+    app.config.setdefault('BROKER_URL', 'redis://localhost/0')
 
     app.config.update(config)
 
@@ -143,7 +146,6 @@ def configure_api(app):
 def configure_celery(app):
     from celery.signals import task_postrun
 
-    celery.conf.update({'BROKER_URL': app.config['CELERY_BROKER_URL']})
     celery.conf.update(app.config)
 
     @task_postrun.connect
