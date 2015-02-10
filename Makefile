@@ -9,6 +9,12 @@ setup-git:
 	cd .git/hooks && ln -sf ../../hooks/* ./
 	@echo ""
 
+upgrade:
+	@echo "--> Creating default 'ds' database"
+	createdb -E utf-8 ds || true
+	@echo "--> Running migrations"
+	bin/upgrade
+
 update-submodules:
 	@echo "--> Updating git submodules"
 	git submodule init
