@@ -3,6 +3,8 @@ from __future__ import absolute_import
 import celery
 
 from celery import signals
+from celery.task import current
+from functools import wraps
 
 
 class ContextualCelery(celery.Celery):
@@ -27,3 +29,31 @@ class ContextualCelery(celery.Celery):
         self.conf.update(app.config)
         signals.task_prerun.connect(self.on_task_prerun)
         signals.task_postrun.connect(self.on_task_postrun)
+
+
+def retries(func=None, **kwargs):
+    """
+    Retry support for tasks. Must decorate **after** the celery.task helper.
+
+    >>> @celery.task
+    >>> @retries(on=(MyException,))
+    >>> def my_task():
+    >>>     pass
+    """
+    if func:
+        return retries()(func)
+
+    retry_on = kwargs.get('retry_on', (Exception, ))
+
+    def wrapped(func):
+        @wraps(func)
+        def _wrapped(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except retry_on as exc:
+                current.retry(
+                    exc=exc,
+                    countdown=min(2 ** current.request.retries, 4)
+                )
+        return _wrapped
+    return wrapped
