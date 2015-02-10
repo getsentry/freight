@@ -14,6 +14,7 @@ uwsgi \
 	--callable app \
 	--die-on-term \
 	--master \
-	--processes 4 \
+	--processes 2 \
+	--threads 2 \
 	--enable-threads \
 	$options
