@@ -41,7 +41,7 @@ class Fixtures(object):
         return task
 
     def create_repo(self, **kwargs):
-        kwargs.setdefault('url', 'file:///' + PROJECT_ROOT)
+        kwargs.setdefault('url', PROJECT_ROOT)
         kwargs.setdefault('vcs', 'git')
 
         repo = Repository(**kwargs)
