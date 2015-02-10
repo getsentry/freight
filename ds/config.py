@@ -11,7 +11,7 @@ from raven.contrib.flask import Sentry
 
 from ds.api.controller import ApiController
 from ds.constants import PROJECT_ROOT
-from ds.tasks.context import ContextualCelery
+from ds.tasks.base import ContextualCelery
 
 
 api = ApiController(prefix='/api/0')
