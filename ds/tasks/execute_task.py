@@ -47,7 +47,7 @@ def execute_task(task_id):
         Task.query.filter(
             Task.id == task_id,
         ).update({
-            Task.status: TaskStatus.error,
+            Task.status: TaskStatus.failed,
         })
     else:
         Task.query.filter(
