@@ -4,6 +4,7 @@
   "repository": "https://github.com/getsentry/ds",
   "keywords": ["deploy"],
   "env": {
+    "BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-multi.git",
     "SECRET_KEY": {
       "description": "A secret key for verifying the integrity of signed cookies.",
       "generator": "secret"
