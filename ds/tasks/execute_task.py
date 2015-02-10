@@ -3,6 +3,7 @@ from __future__ import absolute_import
 import logging
 import os
 
+from datetime import datetime
 from flask import current_app
 
 from ds import providers, vcs
@@ -33,6 +34,12 @@ def execute_task(task_id):
     app = App.query.filter(App.id == task.app_id).first()
     repo = Repository.query.filter(Repository.id == app.repository_id).first()
 
+    Task.query.filter(
+        Task.id == task_id,
+    ).update({
+        Task.date_started: datetime.utcnow(),
+    })
+
     provider = providers.get(task.provider)
     vcs = get_vcs_backend(repo)
 
@@ -50,10 +57,12 @@ def execute_task(task_id):
             Task.id == task_id,
         ).update({
             Task.status: TaskStatus.failed,
+            Task.date_finished: datetime.utcnow(),
         })
     else:
         Task.query.filter(
             Task.id == task_id,
         ).update({
             Task.status: TaskStatus.finished,
+            Task.date_finished: datetime.utcnow(),
         })

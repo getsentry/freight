@@ -51,6 +51,9 @@ class Task(db.Model):
     status = Column(Integer)
     data = Column(JSONEncodedDict)
     date_created = Column(DateTime, default=datetime.utcnow, nullable=False)
+    # represents the start of the task (or the last time it was attempted)
+    date_started = Column(DateTime)
+    date_finished = Column(DateTime)
 
     @property
     def provider_config(self):
