@@ -12,13 +12,17 @@ fileConfig(config.config_file_name)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
-from ds.app import app
-from ds.config import db
+from flask import current_app
+from ds.config import create_app, db
 
 import warnings
 from sqlalchemy.exc import SAWarning
 warnings.simplefilter("ignore", SAWarning)
 
+if not current_app:
+    app = create_app()
+else:
+    app = current_app
 app.app_context().push()
 target_metadata = db.metadata
 
