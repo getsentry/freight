@@ -14,6 +14,8 @@ from ds.constants import PROJECT_ROOT
 from ds.tasks.base import ContextualCelery
 
 
+logging.basicConfig(level=logging.WARN)
+
 api = ApiController(prefix='/api/0')
 db = SQLAlchemy(session_options={})
 celery = ContextualCelery()
