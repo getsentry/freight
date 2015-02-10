@@ -23,7 +23,7 @@ def session_config(request):
 
     return {
         'db_name': db_name,
-        'repo_root': '/tmp/ds-tests',
+        'workspace_root': '/tmp/ds-tests',
     }
 
 
@@ -33,7 +33,7 @@ def app(request, session_config):
         _read_config=False,
         TESTING=True,
         SQLALCHEMY_DATABASE_URI='postgresql:///' + session_config['db_name'],
-        REPO_ROOT=session_config['repo_root'],
+        WORKSPACE_ROOT=session_config['workspace_root'],
     )
     app_context = app.test_request_context()
     context = app_context.push()
@@ -72,8 +72,8 @@ def db_session(request):
 
 
 @pytest.fixture(autouse=True)
-def clean_repo_root(request, session_config):
-    repo_root = session_config['repo_root']
-    if os.path.exists(repo_root):
-        shutil.rmtree(repo_root)
-    os.makedirs(repo_root)
+def clean_workspace_root(request, session_config):
+    path = session_config['workspace_root']
+    if os.path.exists(path):
+        shutil.rmtree(path)
+    os.makedirs(path)

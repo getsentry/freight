@@ -13,7 +13,7 @@ from ds.utils.workspace import Workspace
 
 def get_vcs_backend(repo):
     kwargs = {
-        'path': os.path.join(current_app.config['REPO_ROOT'], str(repo.id)),
+        'path': os.path.join(current_app.config['REPO_ROOT'], 'ds-repo-{}'.format(repo.id)),
         'url': repo.url,
     }
     return vcs.get(repo.vcs, **kwargs)
