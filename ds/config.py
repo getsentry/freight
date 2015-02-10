@@ -11,7 +11,7 @@ from raven.contrib.flask import Sentry
 
 from ds.api.controller import ApiController
 from ds.constants import PROJECT_ROOT
-from ds.tasks.base import ContextualCelery
+from ds.utils.celery import ContextualCelery
 
 
 logging.basicConfig(level=logging.WARN)
@@ -78,7 +78,7 @@ def create_app(_read_config=True, **config):
     )
 
     app.config['CELERY_IMPORTS'] = (
-        'ds.tasks.execute_task',
+        'ds.tasks',
     )
 
     app.config['CELERY_ROUTES'] = {
