@@ -1,2 +1,2 @@
-web: bin/web
-worker: bin/worker -B
+web: bin/upgrade && bin/web
+worker: bin/upgrade && bin/worker -B
