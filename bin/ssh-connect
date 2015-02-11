@@ -36,17 +36,16 @@ repo = get_repo(repo_url)
 command = [
     'ssh',
     # Not supported in all ssh client versions
-    # '-o UserAuthorizedKeysFile=/dev/null',
-    '-o LogLevel=ERROR',
-    '-o StrictHostKeyChecking=no',
-    '-o UserKnownHostsFile=/dev/null',
+    # '-oUserAuthorizedKeysFile=/dev/null',
+    '-oLogLevel=ERROR',
+    '-oStrictHostKeyChecking=no',
+    '-oUserKnownHostsFile=/dev/null',
 ]
 
 if app.config['SSH_PRIVATE_KEY']:
     f = NamedTemporaryFile()
     f.write(app.config['SSH_PRIVATE_KEY'])
-    f.close()
-    command.append('-i {0}'.format(f.name))
+    command.append('-i{0}'.format(f.name))
 
 command.append('--')
 command.extend(sys.argv[1:])
