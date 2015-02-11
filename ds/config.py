@@ -54,6 +54,11 @@ def create_app(_read_config=True, **config):
 
     app.config['WORKSPACE_ROOT'] = os.environ.get('WORKSPACE_ROOT', '/tmp')
 
+    # Currently authentication requires Google
+    app.config['GOOGLE_CLIENT_ID'] = os.environ.get('GOOGLE_CLIENT_ID')
+    app.config['GOOGLE_CLIENT_SECRET'] = os.environ.get('GOOGLE_CLIENT_SECRET')
+    app.config['GOOGLE_DOMAIN'] = os.environ.get('GOOGLE_DOMAIN')
+
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
     app.config['SQLALCHEMY_POOL_SIZE'] = 60
     app.config['SQLALCHEMY_MAX_OVERFLOW'] = 20
@@ -123,6 +128,7 @@ def create_app(_read_config=True, **config):
     configure_celery(app)
     configure_redis(app)
     configure_sqlalchemy(app)
+    configure_web_routes(app)
 
     return app
 
@@ -151,9 +157,18 @@ def configure_redis(app):
 
 
 def configure_sentry(app):
+    from flask import session
     from raven.contrib.celery import register_signal, register_logger_signal
 
     sentry.init_app(app)
+
+    @app.before_request
+    def capture_user(*args, **kwargs):
+        if 'uid' in session:
+            sentry.client.user_context({
+                'id': session['uid'],
+                'email': session['email'],
+            })
 
     register_signal(sentry.client)
     register_logger_signal(sentry.client)
@@ -161,3 +176,29 @@ def configure_sentry(app):
 
 def configure_sqlalchemy(app):
     db.init_app(app)
+
+
+def configure_web_routes(app):
+    from ds.web.auth import AuthorizedView, LoginView, LogoutView
+    from ds.web.index import IndexView
+    from ds.web.static import StaticView
+
+    static_root = os.path.join(PROJECT_ROOT, 'dist')
+
+    app.add_url_rule(
+        '/static/<path:filename>',
+        view_func=StaticView.as_view('static', root=static_root))
+
+    app.add_url_rule(
+        '/auth/login/',
+        view_func=LoginView.as_view('login', authorized_url='authorized'))
+    app.add_url_rule(
+        '/auth/logout/',
+        view_func=LogoutView.as_view('logout', complete_url='index'))
+    app.add_url_rule(
+        '/auth/complete/',
+        view_func=AuthorizedView.as_view('authorized', authorized_url='authorized', complete_url='index'))
+
+    app.add_url_rule(
+        '/',
+        view_func=IndexView.as_view('index', login_url='login'))

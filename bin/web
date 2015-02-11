@@ -1,21 +1,36 @@
-#!/bin/bash -ex
+#!/usr/bin/env python
+from __future__ import absolute_import
 
-PORT=${PORT:-9000}
+import argparse
+import sys
 
-if [ -n "$VIRTUAL_ENV" ]; then
-	options="--virtualenv $VIRTUAL_ENV"
-else
-	options=""
-fi
 
-uwsgi \
-	--http-socket :$PORT \
-	--module ds.app \
-	--callable app \
-	--die-on-term \
-	--master \
-	--processes 2 \
-	--threads 2 \
-	--enable-threads \
-	--thunder-lock \
-	$options
+def main(argv=sys.argv[1:]):
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('--addr', default='localhost:5000')
+    parser.add_argument('--no-debug', dest='debug', action='store_false',
+                        default=True)
+
+    args = parser.parse_args(argv)
+
+    web(addr=args.addr, debug=args.debug)
+
+
+def web(addr, debug=True):
+    from ds.config import create_app
+
+    host, port = addr.split(':')
+    if not host:
+        host = '0.0.0.0'
+    port = int(port)
+    addr = '{0}:{1}'.format(host, port)
+
+    app = create_app(SERVER_NAME=addr, DEBUG=debug)
+
+    print("Listening on http://{0}".format(addr))
+    app.run(host, port)
+
+
+if __name__ == '__main__':
+    main()

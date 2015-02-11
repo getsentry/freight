@@ -43,6 +43,7 @@ install_requires = [
     'flask-sqlalchemy>=1.0,<1.1',
     'flask-redis>=0.0.6,<0.1.0',
     'flask-restful>=0.3.1,<0.4.0',
+    'oauth2client>=1.2,<1.3',
     'psycopg2>=2.5.1,<2.6.0',
     'raven>=5.1.1,<5.2.0',
     'redis>=2.10.3,<2.11.0',

@@ -7,12 +7,17 @@ from flask.ext.restful import Resource
 from urllib import quote
 
 from ds.config import db
+from ds.utils.auth import get_current_user
 
 LINK_HEADER = '<{uri}&page={page}>; rel="{name}"'
 
 
 class ApiView(Resource):
     def is_authorized(self):
+        current_user = get_current_user()
+        if current_user:
+            return True
+
         try:
             auth = request.headers['Authorization']
         except KeyError:

@@ -1,0 +1,24 @@
+<!doctype html>
+<html>
+  <head>
+    <base href="/">
+    <meta charset="utf-8">
+    <title>DS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% if SENTRY_PUBLIC_DSN %}
+      <script type="text/javascript" src="//cdn.ravenjs.com/1.1.16/jquery,native/raven.min.js"></script>
+      <script type="text/javascript">
+      // TODO(dcramer): implement whitelist urls
+      Raven.config('{{ SENTRY_PUBLIC_DSN }}').install();
+      </script>
+    {% endif %}
+    <link href="{{ url_for('static', filename='styles.js') }}" rel="stylesheet" />
+    <script>
+    window.APP_VERSION = '{{ VERSION }}';
+    </script>
+  </head>
+  <body>
+  </body>
+  <script src="{{ url_for('static', filename='vendor.js') }}"></script>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</html>
