@@ -17,7 +17,7 @@ class Fixtures(object):
         kwargs.setdefault('provider', 'shell')
         kwargs.setdefault('data', {
             'provider_config': {
-                'command': '/usr/bin/true',
+                'command': '/bin/echo helloworld',
             },
         })
 

@@ -25,6 +25,6 @@ class ExecuteTaskTestCase(TestCase):
 
         assert len(logchunks) == 1
         chunk = logchunks[0]
-        assert '>> Running /usr/bin/true' in chunk.text
+        assert ">> Running ['/bin/echo', 'helloworld']\n" in chunk.text
         assert chunk.offset == 0
         assert chunk.size == len(chunk.text)
