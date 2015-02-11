@@ -2,13 +2,13 @@ from __future__ import absolute_import
 
 import os
 
-from subprocess import PIPE, Popen
+from subprocess import Popen, STDOUT
 
 from ds.exceptions import CommandError
 
 
 class Workspace(object):
-    def __init__(self, path, logbuffer=PIPE):
+    def __init__(self, path, logbuffer):
         self.path = path
         self.logbuffer = logbuffer
 
@@ -22,7 +22,7 @@ class Workspace(object):
         kwargs['env'] = env
 
         kwargs['stdout'] = self.logbuffer
-        kwargs['stderr'] = self.logbuffer
+        kwargs['stderr'] = STDOUT
 
         self.logbuffer.write('>> Running {}\n'.format(command))
         proc = Popen(command, *args, **kwargs)
