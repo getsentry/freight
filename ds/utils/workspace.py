@@ -30,6 +30,8 @@ class Workspace(object):
             proc = Popen(command, *args, **kwargs)
         except OSError:
             self.logbuffer.write(traceback.format_exc())
+            raise
+
         (stdout, stderr) = proc.communicate()
         if proc.returncode != 0:
             raise CommandError(command, proc.returncode, stdout, stderr)
