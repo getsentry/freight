@@ -16,6 +16,7 @@ class LogBuffer(object):
         self.fp.flush()
 
     def close(self, force=False):
+        self.fp.flush()
         if force:
             self.fp.close()
 
@@ -23,8 +24,6 @@ class LogBuffer(object):
         self.fp.flush()
 
     def iter_chunks(self):
-        self.flush()
-
         chunk_size = self.chunk_size
         result = ''
         offset = 0
