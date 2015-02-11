@@ -12,7 +12,6 @@ from .fixtures import Fixtures
 
 class TestCase(unittest.TestCase, Fixtures):
     def setUp(self):
-        # mock out mail
         self.client = AuthenticatedTestClient(
             current_app, current_app.response_class
         )
