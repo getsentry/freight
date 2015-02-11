@@ -60,7 +60,7 @@ class Vcs(object):
         for key, value in self.get_default_env().iteritems():
             env.setdefault(key, value)
 
-        env.setdefault('CHANGES_SSH_REPO', self.url)
+        env.setdefault('DS_SSH_REPO', self.url)
 
         for key, value in kwargs.pop('env', {}):
             env[key] = value
