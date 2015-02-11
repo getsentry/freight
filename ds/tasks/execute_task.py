@@ -5,6 +5,7 @@ import os
 
 from datetime import datetime
 from flask import current_app
+from subprocess import STDOUT
 
 from ds import providers, vcs
 from ds.config import celery, db
@@ -51,7 +52,7 @@ def execute_task(task_id):
             current_app.config['WORKSPACE_ROOT'], 'ds-repo-{}'.format(repo.id)
         ),
         stdout=logbuffer,
-        stderr=logbuffer,
+        stderr=STDOUT,
     )
 
     try:
