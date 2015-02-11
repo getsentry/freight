@@ -11,7 +11,7 @@ class ShellProvider(Provider):
             'command': {'required': True},
         }
 
-    def execute_task(self, workspace, task):
+    def execute(self, workspace, task):
         command = task.provider_config['command'].format({
             'environment': task.environment,
             'sha': task.sha,

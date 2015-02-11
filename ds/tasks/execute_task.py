@@ -54,7 +54,7 @@ def execute_task(task_id):
         vcs_backend.checkout(task.ref)
 
         try:
-            provider.execute_task(workspace, task)
+            provider.execute(workspace, task)
         except Exception:
             task.status = TaskStatus.failed
         else:
