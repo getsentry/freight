@@ -53,6 +53,12 @@ class Workspace(object):
             (stdout, stderr) = proc.communicate()
         else:
             stdout, stderr = None, None
+            if self.stdout:
+                self.stdout.flush()
+                os.fsync(self.stdout)
+            if self.stderr:
+                self.stderr.flush()
+                os.fsync(self.stderr)
             proc.wait()
 
         if proc.returncode != 0:
