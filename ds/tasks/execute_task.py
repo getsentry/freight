@@ -5,6 +5,7 @@ import os
 
 from datetime import datetime
 from flask import current_app
+from threading import Thread
 
 from ds import providers, vcs
 from ds.config import celery, db
@@ -13,17 +14,18 @@ from ds.utils.workspace import Workspace
 from ds.utils.logbuffer import LogBuffer
 
 
-def write_logchunks(logbuffer, task_id):
-    offset = 0
-    for text in logbuffer:
-        db.session.add(LogChunk(
-            task_id=task_id,
-            text=text,
-            offset=offset,
-            size=len(text),
-        ))
-        offset += len(text)
-    logbuffer.close()
+def write_logchunks(app_context, logbuffer, task_id):
+    with app_context:
+        offset = 0
+        for text in logbuffer:
+            db.session.add(LogChunk(
+                task_id=task_id,
+                text=text,
+                offset=offset,
+                size=len(text),
+            ))
+            offset += len(text)
+        db.session.commit()
 
 
 @celery.task(name='ds.execute_task', max_retries=None)
@@ -44,7 +46,15 @@ def execute_task(task_id):
 
     provider = providers.get(task.provider)
 
+    LogChunk.query.filter(LogChunk.task_id == task.id).delete()
+
     logbuffer = LogBuffer()
+
+    logwriter_thread = Thread(
+        target=write_logchunks,
+        args=[current_app.app_context(), logbuffer, task_id],
+    )
+    logwriter_thread.start()
 
     workspace = Workspace(
         path=os.path.join(
@@ -76,5 +86,5 @@ def execute_task(task_id):
         task.date_finished = datetime.utcnow()
         db.session.add(task)
     finally:
-        write_logchunks(logbuffer, task_id)
-        db.session.commit()
+        logbuffer.close()
+        logwriter_thread.join()
