@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from datetime import datetime
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy.schema import Index
 
 from ds.config import db
 from ds.db.types.json import JSONEncodedDict
@@ -9,6 +10,9 @@ from ds.db.types.json import JSONEncodedDict
 
 class App(db.Model):
     __tablename__ = 'app'
+    __table_args__ = (
+        Index('idx_app_repository_id', 'repository_id'),
+    )
 
     id = Column(Integer, primary_key=True)
     repository_id = Column(Integer,

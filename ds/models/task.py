@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from datetime import datetime
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy.schema import Index
 
 from ds.config import db
 from ds.db.types.json import JSONEncodedDict
@@ -37,6 +38,10 @@ STATUS_LABELS_REV = {
 
 class Task(db.Model):
     __tablename__ = 'task'
+    __table_args__ = (
+        Index('idx_task_app_id', 'app_id'),
+        Index('idx_task_user_id', 'user_id'),
+    )
 
     id = Column(Integer, primary_key=True)
     app_id = Column(Integer, ForeignKey('app.id', ondelete="CASCADE"),
