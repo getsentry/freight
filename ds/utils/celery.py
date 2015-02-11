@@ -27,5 +27,5 @@ class ContextualCelery(celery.Celery):
 
     def task(self, *args, **kwargs):
         from ds.tasks.base import ExtendedTask
-        base = kwargs.get('base', ExtendedTask)
+        kwargs.setdefault('base', ExtendedTask)
         return super(ContextualCelery, self).task(*args, **kwargs)
