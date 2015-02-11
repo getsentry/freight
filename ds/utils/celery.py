@@ -3,8 +3,6 @@ from __future__ import absolute_import
 import celery
 
 from celery import signals
-from celery.task import current
-from functools import wraps
 
 
 class ContextualCelery(celery.Celery):
@@ -18,43 +16,19 @@ class ContextualCelery(celery.Celery):
 
     def on_task_postrun(self, *args, **kwargs):
         ctx = self.__flask_context.pop()
-        self.__sqla_db.session.commit()
-        self.__sqla_db.session.remove()
         ctx.pop()
 
-    def init_app(self, app, db):
+    def init_app(self, app):
         self.__flask_context = []
         self.__flask_app = app
-        self.__sqla_db = db
         self.conf.update(app.config)
         signals.task_prerun.connect(self.on_task_prerun)
         signals.task_postrun.connect(self.on_task_postrun)
 
+    def apply(self, name, *args, **kwargs):
+        return self.tasks[name](*args, **kwargs)
 
-def retries(func=None, **kwargs):
-    """
-    Retry support for tasks. Must decorate **after** the celery.task helper.
-
-    >>> @celery.task
-    >>> @retries(on=(MyException,))
-    >>> def my_task():
-    >>>     pass
-    """
-    if func:
-        return retries()(func)
-
-    retry_on = kwargs.get('retry_on', (Exception, ))
-
-    def wrapped(func):
-        @wraps(func)
-        def _wrapped(*args, **kwargs):
-            try:
-                return func(*args, **kwargs)
-            except retry_on as exc:
-                current.retry(
-                    exc=exc,
-                    countdown=min(2 ** current.request.retries, 128),
-                    throw=True,
-                )
-        return _wrapped
-    return wrapped
+    def task(self, *args, **kwargs):
+        from ds.tasks.base import ExtendedTask
+        base = kwargs.get('base', ExtendedTask)
+        return super(ContextualCelery, self).task(*args, **kwargs)

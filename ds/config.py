@@ -138,7 +138,7 @@ def configure_api(app):
 
 
 def configure_celery(app):
-    celery.init_app(app, db)
+    celery.init_app(app)
 
 
 def configure_redis(app):

@@ -2,11 +2,10 @@ from __future__ import absolute_import
 
 from flask_restful import reqparse
 
-from ds.config import db, redis
+from ds.config import celery, db, redis
 from ds.api.base import ApiView
 from ds.api.serializer import serialize
 from ds.models import App, Task, TaskStatus, User
-from ds.tasks import execute_task
 from ds.utils.redis import lock
 
 
@@ -110,6 +109,6 @@ class TaskIndexApiView(ApiView):
             db.session.add(task)
             db.session.commit()
 
-        execute_task.delay(task_id=task.id)
+        celery.send_task("ds.execute_task", [task.id])
 
         return self.respond(serialize(task), status_code=201)

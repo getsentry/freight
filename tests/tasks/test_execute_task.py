@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
+from ds.config import celery
 from ds.testutils import TestCase
-from ds.tasks import execute_task
 
 
 class ExecuteTaskTestCase(TestCase):
@@ -11,4 +11,5 @@ class ExecuteTaskTestCase(TestCase):
         app = self.create_app(repository=repo)
         task = self.create_task(app=app, user=user)
 
-        execute_task(task_id=task.id)
+        celery.apply("ds.execute_task", task_id=task.id)
+        # celery.send_task("ds.execute_task", [task.id])
