@@ -30,7 +30,8 @@ class Workspace(object):
         try:
             proc = Popen(command, *args, **kwargs)
         except OSError:
-            self.stderr.write(traceback.format_exc())
+            if self.stderr:
+                self.stderr.write(traceback.format_exc())
             raise
 
         if kwargs.get('capture'):
