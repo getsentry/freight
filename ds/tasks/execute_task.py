@@ -7,7 +7,7 @@ from datetime import datetime
 from flask import current_app
 
 from ds import providers, vcs
-from ds.config import celery
+from ds.config import celery, db
 from ds.models import App, Repository, Task, TaskStatus
 from ds.utils.workspace import Workspace
 
@@ -32,11 +32,9 @@ def run(task_id):
     app = App.query.filter(App.id == task.app_id).first()
     repo = Repository.query.filter(Repository.id == app.repository_id).first()
 
-    Task.query.filter(
-        Task.id == task_id,
-    ).update({
-        Task.date_started: datetime.utcnow(),
-    })
+    task.date_started = datetime.utcnow()
+    db.session.add(task)
+    db.session.commit()
 
     provider = providers.get(task.provider)
     vcs = get_vcs_backend(repo)
@@ -51,16 +49,9 @@ def run(task_id):
     try:
         provider.execute_task(workspace, task)
     except Exception:
-        Task.query.filter(
-            Task.id == task_id,
-        ).update({
-            Task.status: TaskStatus.failed,
-            Task.date_finished: datetime.utcnow(),
-        })
+        task.status = TaskStatus.failed
     else:
-        Task.query.filter(
-            Task.id == task_id,
-        ).update({
-            Task.status: TaskStatus.finished,
-            Task.date_finished: datetime.utcnow(),
-        })
+        task.status = TaskStatus.finished
+    task.date_finished = datetime.utcnow()
+    db.session.add(task)
+    db.session.commit()
