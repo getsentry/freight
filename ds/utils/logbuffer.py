@@ -13,6 +13,7 @@ class LogBuffer(object):
 
     def write(self, chunk):
         self.fp.write(chunk)
+        self.fp.flush()
 
     def close(self, force=False):
         if force:
