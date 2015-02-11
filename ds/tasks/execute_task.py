@@ -13,6 +13,19 @@ from ds.utils.workspace import Workspace
 from ds.utils.logbuffer import LogBuffer
 
 
+def write_logchunks(logbuffer, task_id):
+    offset = 0
+    for text in logbuffer:
+        db.session.add(LogChunk(
+            task_id=task_id,
+            text=text,
+            offset=offset,
+            size=len(text),
+        ))
+        offset += len(text)
+    logbuffer.close()
+
+
 @celery.task(name='ds.execute_task', max_retries=None)
 def execute_task(task_id):
     task = Task.query.filter(
@@ -63,11 +76,5 @@ def execute_task(task_id):
         task.date_finished = datetime.utcnow()
         db.session.add(task)
     finally:
-        for offset, text in logbuffer.iter_chunks():
-            db.session.add(LogChunk(
-                task_id=task_id,
-                text=text,
-                offset=offset,
-                size=len(text),
-            ))
+        write_logchunks(logbuffer, task_id)
         db.session.commit()
