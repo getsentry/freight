@@ -1,7 +1,5 @@
 from __future__ import absolute_import
 
-from celery.task import current
-
 from ds.config import celery, db
 
 
@@ -13,9 +11,9 @@ class ExtendedTask(celery.Task):
             rv = super(ExtendedTask, self).__call__(*args, **kwargs)
         except self.retry_on as exc:
             db.session.rollback()
-            current.retry(
+            self.retry(
                 exc=exc,
-                countdown=min(2 ** current.request.retries, 128),
+                countdown=min(2 ** self.request.retries, 128),
                 throw=True,
             )
         except:
