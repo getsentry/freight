@@ -26,7 +26,7 @@ def web(addr, debug=True):
     port = int(port)
     addr = '{0}:{1}'.format(host, port)
 
-    app = create_app(SERVER_NAME=addr, DEBUG=debug)
+    app = create_app(DEBUG=debug)
 
     print("Listening on http://{0}".format(addr))
     app.run(host, port)
