@@ -27,19 +27,18 @@ class LogBuffer(object):
         chunk_size = self.chunk_size
         result = ''
         offset = 0
-        with open(self.fp.name) as fp:
-            for chunk in fp:
-                result += chunk
-                while len(result) >= chunk_size:
-                    newline_pos = result.rfind('\n', 0, chunk_size)
-                    if newline_pos == -1:
-                        newline_pos = chunk_size
-                    else:
-                        newline_pos += 1
-                    yield (offset, result[:newline_pos])
-                    offset += newline_pos
-                    result = result[newline_pos:]
-            if result:
-                yield(offset, result)
-
+        self.fp.seek(0)
+        for chunk in self.fp:
+            result += chunk
+            while len(result) >= chunk_size:
+                newline_pos = result.rfind('\n', 0, chunk_size)
+                if newline_pos == -1:
+                    newline_pos = chunk_size
+                else:
+                    newline_pos += 1
+                yield (offset, result[:newline_pos])
+                offset += newline_pos
+                result = result[newline_pos:]
+        if result:
+            yield(offset, result)
         self.close(True)
