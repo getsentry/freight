@@ -32,5 +32,5 @@ class Workspace(object):
             self.logbuffer.write(traceback.format_exc())
         (stdout, stderr) = proc.communicate()
         if proc.returncode != 0:
-            raise CommandError(args[0], proc.returncode, stdout, stderr)
+            raise CommandError(command, proc.returncode, stdout, stderr)
         return stdout
