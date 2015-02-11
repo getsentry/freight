@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from ds.config import celery
-from ds.models import TaskStatus
+from ds.models import LogChunk, TaskStatus
 from ds.testutils import TestCase
 
 
@@ -18,3 +18,13 @@ class ExecuteTaskTestCase(TestCase):
         assert task.date_started is not None
         assert task.date_finished is not None
         assert task.status == TaskStatus.finished
+
+        logchunks = list(LogChunk.query.filter(
+            LogChunk.task_id == task.id,
+        ).order_by(LogChunk.offset.asc()))
+
+        assert len(logchunks) == 1
+        chunk = logchunks[0]
+        assert '>> Running /usr/bin/true' in chunk.text
+        assert chunk.offset == 0
+        assert chunk.size == len(chunk.text)

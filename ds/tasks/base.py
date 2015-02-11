@@ -22,5 +22,3 @@ class ExtendedTask(celery.Task):
         else:
             db.session.commit()
             return rv
-        finally:
-            db.session.remove()

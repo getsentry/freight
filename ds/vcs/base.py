@@ -3,8 +3,6 @@ from __future__ import absolute_import
 import os
 import os.path
 
-from subprocess import Popen, PIPE
-
 from ds.constants import PROJECT_ROOT
 from ds.exceptions import CommandError
 
@@ -41,42 +39,34 @@ class BufferParser(object):
 class Vcs(object):
     ssh_connect_path = os.path.join(PROJECT_ROOT, 'bin', 'ssh-connect')
 
-    def __init__(self, path, url, username=None):
-        self.path = path
+    def __init__(self, workspace, url, username=None):
         self.url = url
         self.username = username
+        self.workspace = workspace
 
         self._path_exists = None
+
+    @property
+    def path(self):
+        return self.workspace.path
 
     def get_default_env(self):
         return {}
 
-    def run(self, *args, **kwargs):
-        if self.exists():
-            kwargs.setdefault('cwd', self.path)
+    def run(self, command, *args, **kwargs):
+        if not self.exists():
+            kwargs.setdefault('cwd', None)
 
-        env = os.environ.copy()
-
+        env = kwargs.pop('env', {})
         for key, value in self.get_default_env().iteritems():
             env.setdefault(key, value)
-
         env.setdefault('DS_SSH_REPO', self.url)
-
-        for key, value in kwargs.pop('env', {}):
-            env[key] = value
-
         kwargs['env'] = env
-        kwargs['stdout'] = PIPE
-        kwargs['stderr'] = PIPE
 
-        proc = Popen(*args, **kwargs)
-        (stdout, stderr) = proc.communicate()
-        if proc.returncode != 0:
-            raise CommandError(args[0], proc.returncode, stdout, stderr)
-        return stdout
+        return self.workspace.run(command, *args, **kwargs)
 
     def exists(self):
-        return os.path.exists(self.path)
+        return os.path.exists(self.workspace.path)
 
     def clone(self):
         raise NotImplementedError
