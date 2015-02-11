@@ -6,7 +6,7 @@ from ds.config import celery, db
 
 
 class ExtendedTask(celery.Task):
-    retry_on = ()
+    retry_on = (Exception, )
 
     def __call__(self, *args, **kwargs):
         try:
