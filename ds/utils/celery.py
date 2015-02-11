@@ -6,9 +6,6 @@ from celery import signals
 
 
 class ContextualCelery(celery.Celery):
-    def __init__(self, *args, **kwargs):
-        super(ContextualCelery, self).__init__(*args, **kwargs)
-
     def on_task_prerun(self, *args, **kwargs):
         ctx = self.__flask_app.app_context()
         ctx.push()
