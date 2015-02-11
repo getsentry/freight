@@ -47,7 +47,7 @@ def create_app(_read_config=True, **config):
     # The private key to use when cloning repositories
     # TODO(dcramer): this should support an on-disk option, as well as be
     # possible to override per repo
-    app.config['SSH_PRIVATE_KEY'] = os.environ.get('SSH_PRIVATE_KEY')
+    app.config['SSH_PRIVATE_KEY'] = os.environ.get('SSH_PRIVATE_KEY', '').replace("\\n", "\n")
 
     if 'REDISCLOUD_URL' in os.environ:
         app.config['REDIS_URL'] = os.environ['REDISCLOUD_URL']
