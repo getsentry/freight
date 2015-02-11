@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import os
+import traceback
 
 from subprocess import Popen, PIPE
 
@@ -25,7 +26,10 @@ class Workspace(object):
         kwargs['stderr'] = self.logbuffer
 
         self.logbuffer.write('>> Running {}\n'.format(command))
-        proc = Popen(command, *args, **kwargs)
+        try:
+            proc = Popen(command, *args, **kwargs)
+        except OSError:
+            self.logbuffer.write(traceback.format_exc())
         (stdout, stderr) = proc.communicate()
         if proc.returncode != 0:
             raise CommandError(args[0], proc.returncode, stdout, stderr)
