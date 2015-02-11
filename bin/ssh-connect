@@ -45,6 +45,8 @@ command = [
 if app.config['SSH_PRIVATE_KEY']:
     f = NamedTemporaryFile()
     f.write(app.config['SSH_PRIVATE_KEY'])
+    f.flush()
+
     command.append('-i{0}'.format(f.name))
 
 command.append('--')
