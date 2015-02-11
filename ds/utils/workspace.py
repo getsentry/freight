@@ -3,15 +3,16 @@ from __future__ import absolute_import
 import os
 import traceback
 
-from subprocess import Popen, PIPE
+from subprocess import Popen
 
 from ds.exceptions import CommandError
 
 
 class Workspace(object):
-    def __init__(self, path, logbuffer=PIPE):
+    def __init__(self, path, stdout=None, stderr=None):
         self.path = path
-        self.logbuffer = logbuffer
+        self.stdout = stdout
+        self.stderr = stderr
 
     def run(self, command, *args, **kwargs):
         kwargs.setdefault('cwd', self.path)
@@ -22,17 +23,22 @@ class Workspace(object):
 
         kwargs['env'] = env
 
-        kwargs['stdout'] = self.logbuffer
-        kwargs['stderr'] = self.logbuffer
+        kwargs['stdout'] = self.stdout
+        kwargs['stderr'] = self.stderr
 
-        self.logbuffer.write('>> Running {}\n'.format(command))
+        self.stdout.write('>> Running {}\n'.format(command))
         try:
             proc = Popen(command, *args, **kwargs)
         except OSError:
-            self.logbuffer.write(traceback.format_exc())
+            self.stderr.write(traceback.format_exc())
             raise
 
-        (stdout, stderr) = proc.communicate()
+        if kwargs.get('capture'):
+            (stdout, stderr) = proc.communicate()
+        else:
+            stdout, stderr = None, None
+            proc.wait()
+
         if proc.returncode != 0:
             raise CommandError(command, proc.returncode, stdout, stderr)
         return stdout

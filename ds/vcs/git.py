@@ -75,7 +75,7 @@ class GitVcs(Vcs):
         else:
             cmd.append(parent)
 
-        result = self.run(cmd)
+        result = self.run(cmd, capture=True)
         for chunk in BufferParser(result, '\x02'):
             (sha, author, author_date, committer, committer_date,
              parents, message) = chunk.split('\x01')

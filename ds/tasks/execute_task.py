@@ -37,7 +37,8 @@ def execute_task(task_id):
         path=os.path.join(
             current_app.config['WORKSPACE_ROOT'], 'ds-repo-{}'.format(repo.id)
         ),
-        logbuffer=logbuffer,
+        stdout=logbuffer,
+        stderr=logbuffer,
     )
 
     try:
