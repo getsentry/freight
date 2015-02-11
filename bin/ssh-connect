@@ -33,7 +33,6 @@ if not repo_url:
 
 repo = get_repo(repo_url)
 
-
 command = [
     'ssh',
     # Not supported in all ssh client versions
@@ -42,6 +41,13 @@ command = [
     '-o StrictHostKeyChecking=no',
     '-o UserKnownHostsFile=/dev/null',
 ]
+
+if app.config['SSH_PRIVATE_KEY']:
+    f = NamedTemporaryFile()
+    f.write(app.config['SSH_PRIVATE_KEY'])
+    f.close()
+    command.append('-i {0}'.format(f.name))
+
 command.append('--')
 command.extend(sys.argv[1:])
 

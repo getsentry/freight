@@ -44,6 +44,11 @@ def create_app(_read_config=True, **config):
     if 'API_KEY' in os.environ:
         app.config['API_KEY'] = os.environ['API_KEY']
 
+    # The private key to use when cloning repositories
+    # TODO(dcramer): this should support an on-disk option, as well as be
+    # possible to override per repo
+    app.config['SSH_PRIVATE_KEY'] = os.environ.get('SSH_PRIVATE_KEY')
+
     if 'REDISCLOUD_URL' in os.environ:
         app.config['REDIS_URL'] = os.environ['REDISCLOUD_URL']
 

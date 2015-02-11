@@ -12,6 +12,9 @@
     "API_KEY": {
       "description": "An API key used to communiate with the service.",
       "generator": "secret"
+    },
+    "SSH_PRIVATE_KEY": {
+      "description": "A private key to use when cloning repositories"
     }
   },
   "formation": [
