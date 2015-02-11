@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 import logging
 import os
+import traceback
 
 from datetime import datetime
 from flask import current_app
@@ -55,6 +56,9 @@ def execute_task(task_id):
 
         try:
             provider.execute_task(workspace, task)
+        except OSError:
+            logbuffer.write(traceback.format_exc())
+            task.status = TaskStatus.failed
         except Exception:
             task.status = TaskStatus.failed
         else:
