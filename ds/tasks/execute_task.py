@@ -64,7 +64,6 @@ def execute_task(task_id):
     try:
         provider.execute(workspace, task)
     except Exception:
-        print('here')
         task.status = TaskStatus.failed
     else:
         task.status = TaskStatus.finished
