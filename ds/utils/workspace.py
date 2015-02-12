@@ -4,16 +4,38 @@ import os
 import shlex
 import traceback
 
-from subprocess import Popen
+from subprocess import PIPE, Popen, STDOUT
+from time import sleep
 
 from ds.exceptions import CommandError
 
 
 class Workspace(object):
-    def __init__(self, path, stdout=None, stderr=None):
+    def __init__(self, path, on_log_chunk=None, chunk_size=4096):
         self.path = path
-        self.stdout = stdout
-        self.stderr = stderr
+        self.on_log_chunk = on_log_chunk
+        self.chunk_size = chunk_size
+
+    def _flush_output(self, proc):
+        chunk_size = self.chunk_size
+        on_log_chunk = self.on_log_chunk
+        result = ''
+        while proc.poll() is None:
+            for chunk in proc.stdout:
+                result += chunk
+                while len(result) >= chunk_size:
+                    newline_pos = result.rfind('\n', 0, chunk_size)
+                    if newline_pos == -1:
+                        newline_pos = chunk_size
+                    else:
+                        newline_pos += 1
+                    on_log_chunk(result[:newline_pos])
+                    result = result[newline_pos:]
+            sleep(0.1)
+
+        result += (proc.stdout.read() + '')
+        if result:
+            on_log_chunk(result)
 
     def whereis(self, program, env):
         for path in env.get('PATH', '').split(':'):
@@ -34,32 +56,29 @@ class Workspace(object):
 
         kwargs['env'] = env
 
-        kwargs['stdout'] = self.stdout
-        kwargs['stderr'] = self.stderr
+        if self.on_log_chunk:
+            kwargs['stderr'] = STDOUT
+            kwargs['stdout'] = PIPE
 
-        self.stdout.write('>> Running {}\n'.format(command))
+        msg = '>> Running {}\n'.format(command)
+        if self.on_log_chunk:
+            self.on_log_chunk(msg)
+
         try:
             proc = Popen(command, *args, **kwargs)
         except OSError:
             if not self.whereis(env, command[0]):
-                if self.stderr:
-                    self.stderr.write('Command not found: {}'.format(command[0]))
+                error = 'Command not found: {}'.format(command[0])
             else:
-                if self.stderr:
-                    self.stderr.write(traceback.format_exc())
+                error = traceback.format_exc()
+            if self.on_log_chunk:
+                self.on_log_chunk(error)
             raise
 
-        if kwargs.get('capture'):
-            (stdout, stderr) = proc.communicate()
+        if self.on_log_chunk:
+            self._flush_output(proc)
         else:
-            stdout, stderr = None, None
             proc.wait()
 
-            if self.stdout:
-                self.stdout.flush()
-            if self.stderr:
-                self.stderr.flush()
-
         if proc.returncode != 0:
-            raise CommandError(command, proc.returncode, stdout, stderr)
-        return stdout
+            raise CommandError(command, proc.returncode)

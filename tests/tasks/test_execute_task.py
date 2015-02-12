@@ -23,8 +23,6 @@ class ExecuteTaskTestCase(TestCase):
             LogChunk.task_id == task.id,
         ).order_by(LogChunk.offset.asc()))
 
-        assert len(logchunks) == 1
-        chunk = logchunks[0]
-        assert ">> Running ['/bin/echo', 'helloworld']\n" in chunk.text
-        assert chunk.offset == 0
-        assert chunk.size == len(chunk.text)
+        assert len(logchunks) >= 1
+        all_text = ''.join(c.text for c in logchunks)
+        assert ">> Running ['/bin/echo', 'helloworld']\n" in all_text

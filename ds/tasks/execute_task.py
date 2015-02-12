@@ -5,27 +5,11 @@ import os
 
 from datetime import datetime
 from flask import current_app
-from threading import Thread
 
 from ds import providers, vcs
 from ds.config import celery, db
 from ds.models import App, LogChunk, Repository, Task, TaskStatus
 from ds.utils.workspace import Workspace
-from ds.utils.logbuffer import LogBuffer
-
-
-def write_logchunks(app_context, logbuffer, task_id):
-    with app_context:
-        offset = 0
-        for text in logbuffer:
-            db.session.add(LogChunk(
-                task_id=task_id,
-                text=text,
-                offset=offset,
-                size=len(text),
-            ))
-            offset += len(text)
-        db.session.commit()
 
 
 @celery.task(name='ds.execute_task', max_retries=None)
@@ -48,43 +32,41 @@ def execute_task(task_id):
 
     LogChunk.query.filter(LogChunk.task_id == task.id).delete()
 
-    logbuffer = LogBuffer()
+    log_offset = [0]
 
-    logwriter_thread = Thread(
-        target=write_logchunks,
-        args=[current_app.app_context(), logbuffer, task_id],
-    )
-    logwriter_thread.start()
+    def save_log_chunk(text):
+        db.session.add(LogChunk(
+            task_id=task_id,
+            text=text,
+            offset=log_offset[0],
+            size=len(text),
+        ))
+        log_offset[0] += len(text)
 
     workspace = Workspace(
         path=os.path.join(
             current_app.config['WORKSPACE_ROOT'], 'ds-repo-{}'.format(repo.id)
         ),
-        stdout=logbuffer,
-        stderr=logbuffer,
+        on_log_chunk=save_log_chunk,
     )
 
+    vcs_backend = vcs.get(
+        repo.vcs,
+        url=repo.url,
+        workspace=workspace,
+    )
+    if vcs_backend.exists():
+        vcs_backend.update()
+    else:
+        vcs_backend.clone()
+    vcs_backend.checkout(task.ref)
+
     try:
-        vcs_backend = vcs.get(
-            repo.vcs,
-            url=repo.url,
-            workspace=workspace,
-        )
-
-        if vcs_backend.exists():
-            vcs_backend.update()
-        else:
-            vcs_backend.clone()
-        vcs_backend.checkout(task.ref)
-
-        try:
-            provider.execute(workspace, task)
-        except Exception:
-            task.status = TaskStatus.failed
-        else:
-            task.status = TaskStatus.finished
-        task.date_finished = datetime.utcnow()
-        db.session.add(task)
-    finally:
-        logbuffer.close()
-        logwriter_thread.join()
+        provider.execute(workspace, task)
+    except Exception:
+        print('here')
+        task.status = TaskStatus.failed
+    else:
+        task.status = TaskStatus.finished
+    task.date_finished = datetime.utcnow()
+    db.session.add(task)
