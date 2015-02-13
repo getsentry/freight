@@ -41,6 +41,7 @@ def execute_task(task_id):
             offset=log_offset[0],
             size=len(text),
         ))
+        db.session.flush()
         log_offset[0] += len(text)
 
     workspace = Workspace(
