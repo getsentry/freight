@@ -6,7 +6,7 @@ DS
 :copyright: (c) 2015 GetSentry LLC
 :license: Apache 2.0, see LICENSE for more details.
 """
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import os.path
 

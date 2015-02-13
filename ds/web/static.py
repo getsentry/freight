@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from flask import current_app as app
 from flask.helpers import send_from_directory

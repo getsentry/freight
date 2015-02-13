@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import flask
 import os
@@ -185,18 +185,18 @@ def configure_web_routes(app):
 
     app.add_url_rule(
         '/static/<path:filename>',
-        view_func=StaticView.as_view('static', root=static_root))
+        view_func=StaticView.as_view(b'static', root=static_root))
 
     app.add_url_rule(
         '/auth/login/',
-        view_func=LoginView.as_view('login', authorized_url='authorized'))
+        view_func=LoginView.as_view(b'login', authorized_url='authorized'))
     app.add_url_rule(
         '/auth/logout/',
-        view_func=LogoutView.as_view('logout', complete_url='index'))
+        view_func=LogoutView.as_view(b'logout', complete_url='index'))
     app.add_url_rule(
         '/auth/complete/',
-        view_func=AuthorizedView.as_view('authorized', authorized_url='authorized', complete_url='index'))
+        view_func=AuthorizedView.as_view(b'authorized', authorized_url='authorized', complete_url='index'))
 
     app.add_url_rule(
         '/',
-        view_func=IndexView.as_view('index', login_url='login'))
+        view_func=IndexView.as_view(b'index', login_url='login'))
