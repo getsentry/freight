@@ -1,7 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
-import sys
 
 from subprocess import Popen
 from time import sleep, time
@@ -29,8 +28,6 @@ class TaskRunner(object):
         # level so we *always* get full/correct logs
         self._process = Popen(
             args=['bin/run-task', str(self.task_id)],
-            stdout=sys.stdout,
-            stderr=sys.stderr,
             cwd=PROJECT_ROOT,
         )
         self._started = time()
