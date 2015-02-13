@@ -22,7 +22,7 @@ class Workspace(object):
         result = ''
         while True:
             is_running = proc.poll() is None
-            chunk = proc.stdout.read()
+            chunk = proc.stdout.read(chunk_size)
             if not (is_running or chunk):
                 break
 
@@ -36,7 +36,7 @@ class Workspace(object):
                         newline_pos += 1
                     on_log_chunk(result[:newline_pos])
                     result = result[newline_pos:]
-                chunk = proc.stdout.read()
+                chunk = proc.stdout.read(chunk_size)
             sleep(0.1)
 
         if result:
