@@ -72,7 +72,7 @@ class Workspace(object):
         try:
             proc = Popen(command, *args, **kwargs)
         except OSError:
-            if not self.whereis(env, command[0]):
+            if not self.whereis(command[0], env):
                 error = 'Command not found: {}'.format(command[0])
             else:
                 error = traceback.format_exc()
