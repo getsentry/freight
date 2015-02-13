@@ -20,8 +20,13 @@ class Workspace(object):
         chunk_size = self.chunk_size
         on_log_chunk = self.on_log_chunk
         result = ''
-        while proc.poll() is None:
-            for chunk in proc.stdout:
+        while True:
+            is_running = proc.poll() is None
+            chunk = proc.stdout.read()
+            if not (is_running or chunk):
+                break
+
+            while chunk:
                 result += chunk
                 while len(result) >= chunk_size:
                     newline_pos = result.rfind('\n', 0, chunk_size)
@@ -31,9 +36,9 @@ class Workspace(object):
                         newline_pos += 1
                     on_log_chunk(result[:newline_pos])
                     result = result[newline_pos:]
+                chunk = proc.stdout.read()
             sleep(0.1)
 
-        result += (proc.stdout.read() + '')
         if result:
             on_log_chunk(result)
 
@@ -76,9 +81,9 @@ class Workspace(object):
             raise
 
         if self.on_log_chunk:
+            proc.stdout.flush()
             self._flush_output(proc)
-        else:
-            proc.wait()
+        proc.wait()
 
         if proc.returncode != 0:
             raise CommandError(command, proc.returncode)
