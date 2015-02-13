@@ -1,73 +1,46 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
-import os
+import sys
 
-from datetime import datetime
-from flask import current_app
+from subprocess import Popen
+from time import sleep, time
 
-from ds import providers, vcs
-from ds.config import celery, db
-from ds.models import App, LogChunk, Repository, Task, TaskStatus
-from ds.utils.workspace import Workspace
+from ds.config import celery
+from ds.constants import PROJECT_ROOT
 
 
 @celery.task(name='ds.execute_task', max_retries=None)
 def execute_task(task_id):
-    task = Task.query.filter(
-        Task.id == task_id
-    ).first()
-    if not task:
-        logging.warn('Received ExecuteTask with missing Task(id=%s)', task_id)
-        return
+    taskrunner = TaskRunner(task_id)
+    taskrunner.start()
+    taskrunner.wait()
 
-    app = App.query.filter(App.id == task.app_id).first()
-    repo = Repository.query.filter(Repository.id == app.repository_id).first()
 
-    task.date_started = datetime.utcnow()
-    db.session.add(task)
-    db.session.commit()
+class TaskRunner(object):
+    def __init__(self, task_id, timeout=300):
+        self.task_id = task_id
+        self.timeout = timeout
+        self._process = None
+        self._started = None
 
-    provider = providers.get(task.provider)
+    def start(self):
+        # TODO(dcramer): we should probably move the log capture up to this
+        # level so we *always* get full/correct logs
+        self._process = Popen(
+            args=['bin/run-task', str(self.task_id)],
+            stdout=sys.stdout,
+            stderr=sys.stderr,
+            cwd=PROJECT_ROOT,
+        )
+        self._started = time()
 
-    LogChunk.query.filter(LogChunk.task_id == task.id).delete()
-
-    log_offset = [0]
-
-    def save_log_chunk(text):
-        db.session.add(LogChunk(
-            task_id=task_id,
-            text=text,
-            offset=log_offset[0],
-            size=len(text),
-        ))
-        db.session.commit()
-        log_offset[0] += len(text)
-
-    workspace = Workspace(
-        path=os.path.join(
-            current_app.config['WORKSPACE_ROOT'], 'ds-repo-{}'.format(repo.id)
-        ),
-        on_log_chunk=save_log_chunk,
-    )
-
-    vcs_backend = vcs.get(
-        repo.vcs,
-        url=repo.url,
-        workspace=workspace,
-    )
-    if vcs_backend.exists():
-        vcs_backend.update()
-    else:
-        vcs_backend.clone()
-    vcs_backend.checkout(task.ref)
-
-    try:
-        provider.execute(workspace, task)
-    except Exception as exc:
-        current_app.logger.exception(unicode(exc))
-        task.status = TaskStatus.failed
-    else:
-        task.status = TaskStatus.finished
-    task.date_finished = datetime.utcnow()
-    db.session.add(task)
+    def wait(self):
+        assert self._process is not None, 'TaskRunner not started'
+        while self._process.poll() is None:
+            if time() > self._started + self.timeout:
+                logging.error('Process exceeding time limit Task(id=%s)', self.task_id)
+                self._process.terminate()
+            if self._process.poll() is None:
+                sleep(0.1)
+        return self._process.returncode

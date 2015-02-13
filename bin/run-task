@@ -1,0 +1,82 @@
+#!/usr/bin/env python
+
+from __future__ import absolute_import, unicode_literals
+
+import logging
+import os
+import sys
+
+from datetime import datetime
+from flask import current_app
+
+from ds import providers, vcs
+from ds.config import create_app, db
+from ds.models import App, LogChunk, Repository, Task, TaskStatus
+from ds.utils.workspace import Workspace
+
+
+def main(task_id):
+    task = Task.query.filter(
+        Task.id == task_id
+    ).first()
+    if not task:
+        raise ValueError('Task(id=%s) not found' % task_id)
+
+    app = App.query.filter(App.id == task.app_id).first()
+    repo = Repository.query.filter(Repository.id == app.repository_id).first()
+
+    task.date_started = datetime.utcnow()
+    db.session.add(task)
+    db.session.commit()
+
+    provider = providers.get(task.provider)
+
+    LogChunk.query.filter(LogChunk.task_id == task.id).delete()
+
+    log_offset = [0]
+
+    def save_log_chunk(text):
+        sys.stdout.write(text)
+        db.session.add(LogChunk(
+            task_id=task_id,
+            text=text,
+            offset=log_offset[0],
+            size=len(text),
+        ))
+        db.session.commit()
+        log_offset[0] += len(text)
+
+    workspace = Workspace(
+        path=os.path.join(
+            current_app.config['WORKSPACE_ROOT'], 'ds-repo-{}'.format(repo.id)
+        ),
+        on_log_chunk=save_log_chunk,
+    )
+
+    vcs_backend = vcs.get(
+        repo.vcs,
+        url=repo.url,
+        workspace=workspace,
+    )
+    if vcs_backend.exists():
+        vcs_backend.update()
+    else:
+        vcs_backend.clone()
+    vcs_backend.checkout(task.ref)
+
+    try:
+        provider.execute(workspace, task)
+    except Exception as exc:
+        current_app.logger.exception(unicode(exc))
+        task.status = TaskStatus.failed
+    else:
+        task.status = TaskStatus.finished
+    task.date_finished = datetime.utcnow()
+    db.session.add(task)
+    db.session.commit()
+
+
+if __name__ == '__main__':
+    app = create_app()
+    with app.app_context():
+        main(sys.argv[1])
