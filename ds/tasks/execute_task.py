@@ -64,7 +64,7 @@ def execute_task(task_id):
     try:
         provider.execute(workspace, task)
     except Exception as exc:
-        execute_task.get_logger().exception(unicode(exc))
+        current_app.logger.exception(unicode(exc))
         task.status = TaskStatus.failed
     else:
         task.status = TaskStatus.finished
