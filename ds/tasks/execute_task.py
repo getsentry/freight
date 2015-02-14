@@ -10,6 +10,7 @@ from threading import Thread
 from time import sleep, time
 
 from ds import notifiers
+from ds.notifiers import NotifierEvent
 from ds.config import celery, db
 from ds.constants import PROJECT_ROOT
 from ds.models import LogChunk, Task, TaskStatus
@@ -23,6 +24,8 @@ def execute_task(task_id):
     if not task:
         logging.warning('ExecuteTask fired with missing Task(id=%s)', task_id)
         return
+
+    send_task_notifications(task, NotifierEvent.TASK_STARTED)
 
     provider_config = task.provider_config
 
@@ -42,14 +45,18 @@ def execute_task(task_id):
     db.session.expire(task)
     db.session.refresh(task)
 
-    send_task_notifications(task)
+    send_task_notifications(task, NotifierEvent.TASK_FINISHED)
 
 
-def send_task_notifications(task):
+def send_task_notifications(task, event):
     for data in task.notifiers:
         notifier = notifiers.get(data['type'])
+        config = data.get('config', {})
+        if not notifier.should_send(task, config, event):
+            continue
+
         try:
-            notifier.send(task, data.get('config', {}))
+            notifier.send(task, config, event)
         except Exception as exc:
             logging.exception('%s notifier failed to send Task(id=%s)', data['type'], task.id)
 

@@ -5,9 +5,9 @@ __all__ = ['SlackNotifier']
 import json
 import requests
 
-from ds.models import TaskStatus
+from ds.models import App, TaskStatus
 
-from .base import Notifier
+from .base import Notifier, NotifierEvent
 
 
 class SlackNotifier(Notifier):
@@ -21,29 +21,27 @@ class SlackNotifier(Notifier):
             return '#d20f2a'
         return '#2788ce'
 
-    def send(self, task, config):
+    def send(self, task, config, event):
         webhook_url = config['webhook_url']
 
-        title = "Task '{task_name}' of '{ref}' {status_label}".format(
-            task_name=task.name,
-            ref=task.ref,
-            status_label=task.status_label
-        )
+        app = App.query.get(task.app_id)
+
+        params = {
+            'app_name': app.name,
+            'task_name': task.name,
+            'env': task.environment,
+            'ref': task.ref,
+            'status_label': task.status_label,
+        }
+
+        if event == NotifierEvent.TASK_STARTED:
+            title = "[{app_name}] Executing '{task_name}' of {ref} on {env}".format(**params)
+        else:
+            title = "[{app_name}] '{task_name}' on {env} {status_label}".format(**params)
 
         payload = {
             'parse': 'none',
             'text': title,
-            'attachments': [{
-                'color': self.color_for_status(task.status),
-                'fields': [{
-                    'title': 'Details',
-                    'value': 'Sha: {sha}\nEnv: {env}'.format(
-                        sha=task.sha,
-                        env=task.environment,
-                    ),
-                    'short': False,
-                }]
-            }]
         }
 
         values = {'payload': json.dumps(payload)}
