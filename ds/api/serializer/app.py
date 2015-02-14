@@ -14,4 +14,5 @@ class AppSerializer(Serializer):
             'name': item.name,
             'provider': item.provider,
             'provider_config': item.provider_config,
+            'notifiers': item.notifiers,
         }
