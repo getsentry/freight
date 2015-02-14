@@ -32,9 +32,7 @@ def main(task_id):
     provider = providers.get(task.provider)
 
     workspace = Workspace(
-        path=os.path.join(
-            current_app.config['WORKSPACE_ROOT'], 'ds-repo-{}'.format(repo.id)
-        ),
+        path=repo.get_path(),
     )
 
     vcs_backend = vcs.get(
