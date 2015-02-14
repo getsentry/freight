@@ -37,7 +37,7 @@ command = [
     'ssh',
     # Not supported in all ssh client versions
     # '-oUserAuthorizedKeysFile=/dev/null',
-    '-oLogLevel=ERROR',
+    '-oLogLevel={}'.format(app.config['LOG_LEVEL']),
     '-oStrictHostKeyChecking=no',
     '-oUserKnownHostsFile=/dev/null',
 ]

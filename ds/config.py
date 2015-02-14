@@ -23,10 +23,7 @@ sentry = Sentry(logging=True, level=logging.WARN)
 
 
 def configure_logging(app):
-    if app.config['DEBUG']:
-        app.logger.setLevel(logging.INFO)
-    else:
-        app.logger.setLevel(logging.ERROR)
+    app.logger.setLevel(getattr(logging, app.config['LOG_LEVEL']))
 
 
 def create_app(_read_config=True, **config):
@@ -60,6 +57,8 @@ def create_app(_read_config=True, **config):
     app.config['WORKSPACE_ROOT'] = os.environ.get('WORKSPACE_ROOT', '/tmp')
 
     app.config['DEFAULT_TIMEOUT'] = int(os.environ.get('DEFAULT_TIMEOUT', 300))
+
+    app.config['LOG_LEVEL'] = os.environ.get('LOG_LEVEL', 'INFO' if config.get('DEBUG') else 'ERROR')
 
     # Currently authentication requires Google
     app.config['GOOGLE_CLIENT_ID'] = os.environ.get('GOOGLE_CLIENT_ID')
