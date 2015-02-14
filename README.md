@@ -61,9 +61,14 @@ Here we're passing basic available variables into our ``bin/fab`` tool, which is
 ```bash
 #!/bin/bash
 
+# Usage: bin/fab [arguments]
+# Wrapper around Fabric which ensures any required dependencies are installed.
+
 pip install fabric pytz
 fab $@
 ```
+
+**Note:** This file is not part of DS, but rather it's referencing a path relative to your repository root.
 
 Now we can create a new deploy task:
 
