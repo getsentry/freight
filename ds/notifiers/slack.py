@@ -16,11 +16,6 @@ class SlackNotifier(Notifier):
             'webhook_url': {'required': True},
         }
 
-    def color_for_status(self, status):
-        if status == TaskStatus.failed:
-            return '#d20f2a'
-        return '#2788ce'
-
     def send(self, task, config, event):
         webhook_url = config['webhook_url']
 
