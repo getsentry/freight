@@ -68,6 +68,7 @@ class LogReporter(Thread):
         self.cur_offset = 0
         self.active = True
         Thread.__init__(self)
+        self.daemon = True
 
     def save_chunk(self, text):
         # we also want to pipe this to stdout
@@ -141,21 +142,20 @@ class TaskRunner(object):
             stdout=PIPE,
             stderr=STDOUT
         )
-        self._logthread = LogReporter(
+        self._logreporter = LogReporter(
             app_context=current_app.app_context(),
             task_id=self.task.id,
             process=self._process,
         )
-        self._logthread.daemon = True
-        self._logthread.start()
+        self._logreporter.start()
 
     def _timeout(self):
         logging.error('Task(id=%s) exceeded time limit of %ds', self.task.id, self.timeout)
 
-        self._process.stderr.write('Process exceeded time limit of %ds', self.timeout)
         self._process.terminate()
+        self._logreporter.terminate()
 
-        self._logthread.terminate()
+        self._logreporter.save_chunk('Process exceeded time limit of %ds\n', self.timeout)
 
         # TODO(dcramer): ideally we could just send the signal to the subprocess
         # so it can still manage the failure state
@@ -172,5 +172,5 @@ class TaskRunner(object):
             if self._process.poll() is None:
                 sleep(0.1)
         self.active = False
-        self._logthread.join()
+        self._logreporter.join()
         return self._process.returncode
