@@ -9,6 +9,11 @@ from tempfile import NamedTemporaryFile
 class Provider(object):
     name = None
 
+    def get_default_options(self):
+        return {
+            'timeout': {},
+        }
+
     def get_options(self):
         return {}
 

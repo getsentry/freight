@@ -3,6 +3,7 @@ from __future__ import absolute_import, unicode_literals
 import json
 
 from flask_restful import reqparse
+from itertools import chain
 
 from ds import notifiers, providers
 from ds.api.base import ApiView
@@ -50,7 +51,9 @@ class AppIndexApiView(ApiView):
             return self.error('Invalid provider', name='invalid_provider')
 
         provider_config = {}
-        for option, option_values in provider.get_options().items():
+        all_options = chain(provider.get_default_options().items(),
+                            provider.get_options().items())
+        for option, option_values in all_options:
             value = args.provider_config.get(option)
             if option_values.get('required') and not value:
                 return self.error(
@@ -68,7 +71,9 @@ class AppIndexApiView(ApiView):
                                   name='invalid_notifier')
 
             config = data.get('config', {})
-            for option, option_values in notifier.get_options().items():
+            all_options = chain(notifier.get_default_options().items(),
+                                notifier.get_options().items())
+            for option, option_values in all_options:
                 value = config.get(option)
                 if option_values.get('required') and not value:
                     return self.error(

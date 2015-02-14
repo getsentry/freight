@@ -11,6 +11,13 @@ class NotifierEvent(object):
 class Notifier(object):
     DEFAULT_EVENTS = [NotifierEvent.TASK_STARTED, NotifierEvent.TASK_FINISHED]
 
+    def get_default_options(self):
+        return {
+            # TODO(dcramer): we want to support events, but we need validators
+            # before that can happen to avoid magical constants
+            # 'events': {},
+        }
+
     def get_options(self):
         return {}
 

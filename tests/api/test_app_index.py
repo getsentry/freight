@@ -51,7 +51,7 @@ class AppCreateTest(AppIndexBase):
         resp = self.client.post(self.path, data={
             'name': 'foobar',
             'provider': 'shell',
-            'provider_config': '{"command": "/usr/bin/true"}',
+            'provider_config': '{"command": "/usr/bin/true", "timeout": 50}',
             'notifiers': '[{"type": "slack", "config": {"webhook_url": "https://example.com"}}]',
             'repository': 'git@example.com:repo-name.git',
         })
@@ -62,7 +62,7 @@ class AppCreateTest(AppIndexBase):
         app = App.query.get(data['id'])
         assert app.name == 'foobar'
         assert app.provider == 'shell'
-        assert app.provider_config == {'command': '/usr/bin/true'}
+        assert app.provider_config == {'command': '/usr/bin/true', 'timeout': 50}
         assert app.notifiers == [
             {'type': 'slack', 'config': {'webhook_url': 'https://example.com'}},
         ]
