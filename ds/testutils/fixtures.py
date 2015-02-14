@@ -37,7 +37,7 @@ class Fixtures(object):
         kwargs.setdefault('provider', 'shell')
         kwargs.setdefault('name', 'deploy')
         kwargs.setdefault('ref', 'master')
-        kwargs.setdefault('sha', kwargs['ref'])
+        kwargs.setdefault('sha', uuid4().hex)
         kwargs.setdefault('data', {'provider_config': app.provider_config})
 
         task = Task(app_id=app.id, user_id=user.id, **kwargs)
