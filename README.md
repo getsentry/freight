@@ -56,7 +56,7 @@ The important part here is our provider configuration:
 }
 ```
 
-Here we're passing basic available variables into our ``bin/fab`` tool, which is simply a wrapper around Fabric that ensures dependencies are available:
+The command we're passing is simply a wrapper around Fabric:
 
 ```bash
 #!/bin/bash
