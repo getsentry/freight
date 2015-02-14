@@ -155,7 +155,7 @@ class TaskRunner(object):
         self._process.terminate()
         self._logreporter.terminate()
 
-        self._logreporter.save_chunk('Process exceeded time limit of %ds\n', self.timeout)
+        self._logreporter.save_chunk('Process exceeded time limit of %ds\n' % self.timeout)
 
         # TODO(dcramer): ideally we could just send the signal to the subprocess
         # so it can still manage the failure state
