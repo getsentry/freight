@@ -100,8 +100,6 @@ class TaskIndexApiView(ApiView):
                 name=TaskName.deploy,
                 # TODO(dcramer): ref should default based on app config
                 ref=args.ref,
-                # TODO(dcramer):
-                sha=args.ref,
                 status=TaskStatus.pending,
                 user_id=user.id,
                 provider=app.provider,

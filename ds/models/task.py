@@ -62,7 +62,7 @@ class Task(db.Model):
                      nullable=False)
     name = Column(String(128), nullable=False, default=TaskName.deploy)
     ref = Column(String(128), nullable=False)
-    sha = Column(String(40), nullable=False)
+    sha = Column(String(40))
     environment = Column(String(64), nullable=False, default='production')
     provider = Column(String(64), nullable=False)
     status = Column(Integer)
