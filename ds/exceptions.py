@@ -18,3 +18,7 @@ class CommandError(Exception):
 
 class InvalidProvider(Exception):
     pass
+
+
+class InvalidNotifier(Exception):
+    pass

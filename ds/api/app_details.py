@@ -4,11 +4,11 @@ import json
 
 from flask_restful import reqparse
 
-from ds import providers
+from ds import notifiers, providers
 from ds.api.base import ApiView
 from ds.api.serializer import serialize
 from ds.config import db
-from ds.exceptions import InvalidProvider
+from ds.exceptions import InvalidNotifier, InvalidProvider
 from ds.models import App, Repository
 
 
@@ -18,6 +18,7 @@ class AppDetailsApiView(ApiView):
     post_parser.add_argument('repository')
     post_parser.add_argument('provider')
     post_parser.add_argument('provider_config', type=json.loads)
+    post_parser.add_argument('notifiers', type=json.loads)
 
     def put(self, app_id):
         """
@@ -54,6 +55,26 @@ class AppDetailsApiView(ApiView):
                     )
                 new_provider_config[option] = value
             app.data['provider_config'] = new_provider_config
+
+        if args.notifiers is not None:
+            new_notifiers = []
+            for data in args.notifiers:
+                try:
+                    notifier = notifiers.get(data['type'])
+                except InvalidNotifier:
+                    return self.error('Invalid notifier: {}'.format(data['type']),
+                                      name='invalid_notifier')
+
+                config = data.get('config', {})
+                for option, option_values in notifier.get_options().items():
+                    value = config.get(option)
+                    if option_values.get('required') and not value:
+                        return self.error(
+                            message='Missing required notifier option: %s' % (option,),
+                            name='invalid_notifier_config',
+                        )
+                    new_notifiers.append({'type': data['type'], 'config': config})
+            app.data['notifiers'] = new_notifiers
 
         if args.name:
             app.name = args.name

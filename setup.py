@@ -31,6 +31,7 @@ tests_require = [
     'pytest-cov>=1.6,<1.7',
     'pytest-timeout>=0.3,<0.4',
     'pytest-xdist>=1.9,<1.10',
+    'responses>=0.3.0,<0.4.0',
 ]
 
 
@@ -47,6 +48,7 @@ install_requires = [
     'psycopg2>=2.5.1,<2.6.0',
     'raven>=5.1.1,<5.2.0',
     'redis>=2.10.3,<2.11.0',
+    'requests>=2.5.1,<2.6.0',
     'uwsgi>=2.0.9,<2.1.0',
 ]
 

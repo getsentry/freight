@@ -104,7 +104,10 @@ class TaskIndexApiView(ApiView):
                 status=TaskStatus.pending,
                 user_id=user.id,
                 provider=app.provider,
-                data={'provider_config': app.provider_config},
+                data={
+                    'provider_config': app.provider_config,
+                    'notifiers': app.data.get('notifiers', []),
+                },
             )
             db.session.add(task)
             db.session.commit()

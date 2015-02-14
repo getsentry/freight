@@ -130,6 +130,8 @@ class TaskCreateTest(TaskIndexBase):
         assert task.app_id == self.app.id
         assert task.ref == 'master'
         assert task.user_id == self.user.id
+        assert task.provider_config == self.app.provider_config
+        assert task.notifiers == self.app.notifiers
 
     def test_locked(self):
         task = self.create_task(

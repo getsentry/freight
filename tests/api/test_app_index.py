@@ -52,6 +52,7 @@ class AppCreateTest(AppIndexBase):
             'name': 'foobar',
             'provider': 'shell',
             'provider_config': '{"command": "/usr/bin/true"}',
+            'notifiers': '[{"type": "slack", "config": {"webhook_url": "https://example.com"}}]',
             'repository': 'git@example.com:repo-name.git',
         })
         assert resp.status_code == 201
@@ -62,6 +63,9 @@ class AppCreateTest(AppIndexBase):
         assert app.name == 'foobar'
         assert app.provider == 'shell'
         assert app.provider_config == {'command': '/usr/bin/true'}
+        assert app.notifiers == [
+            {'type': 'slack', 'config': {'webhook_url': 'https://example.com'}},
+        ]
 
     def test_invalid_provider(self):
         resp = self.client.post(self.path, data={
@@ -84,3 +88,27 @@ class AppCreateTest(AppIndexBase):
         assert resp.status_code == 400
         data = json.loads(resp.data)
         assert data['error_name'] == 'invalid_provider_config'
+
+    def test_invalid_notifier(self):
+        resp = self.client.post(self.path, data={
+            'name': 'foobar',
+            'provider': 'shell',
+            'provider_config': '{"command": "/usr/bin/true"}',
+            'notifiers': '[{"type": "dummy"}]',
+            'repository': 'git@example.com:repo-name.git',
+        })
+        assert resp.status_code == 400
+        data = json.loads(resp.data)
+        assert data['error_name'] == 'invalid_notifier'
+
+    def test_invalid_notifier_config(self):
+        resp = self.client.post(self.path, data={
+            'name': 'foobar',
+            'provider': 'shell',
+            'provider_config': '{"command": "/usr/bin/true"}',
+            'notifiers': '[{"type": "slack", "config": {}}]',
+            'repository': 'git@example.com:repo-name.git',
+        })
+        assert resp.status_code == 400
+        data = json.loads(resp.data)
+        assert data['error_name'] == 'invalid_notifier_config'

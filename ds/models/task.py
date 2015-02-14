@@ -61,8 +61,12 @@ class Task(db.Model):
     date_finished = Column(DateTime)
 
     @property
+    def notifiers(self):
+        return self.data.get('notifiers', [])
+
+    @property
     def provider_config(self):
-        return self.data['provider_config']
+        return self.data.get('provider_config', {})
 
     @property
     def status_label(self):

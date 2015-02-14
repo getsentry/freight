@@ -4,11 +4,11 @@ import json
 
 from flask_restful import reqparse
 
-from ds import providers
+from ds import notifiers, providers
 from ds.api.base import ApiView
 from ds.api.serializer import serialize
 from ds.config import db
-from ds.exceptions import InvalidProvider
+from ds.exceptions import InvalidNotifier, InvalidProvider
 from ds.models import App, Repository
 
 
@@ -36,6 +36,7 @@ class AppIndexApiView(ApiView):
     post_parser.add_argument('repository', required=True)
     post_parser.add_argument('provider', required=True)
     post_parser.add_argument('provider_config', default='{}', type=json.loads)
+    post_parser.add_argument('notifiers', default='[]', type=json.loads)
 
     def post(self):
         """
@@ -58,6 +59,24 @@ class AppIndexApiView(ApiView):
                 )
             provider_config[option] = value
 
+        notifiers_config = []
+        for data in args.notifiers:
+            try:
+                notifier = notifiers.get(data['type'])
+            except InvalidNotifier:
+                return self.error('Invalid notifier: {}'.format(data['type']),
+                                  name='invalid_notifier')
+
+            config = data.get('config', {})
+            for option, option_values in notifier.get_options().items():
+                value = config.get(option)
+                if option_values.get('required') and not value:
+                    return self.error(
+                        message='Missing required notifier option: %s' % (option,),
+                        name='invalid_notifier_config',
+                    )
+                notifiers_config.append({'type': data['type'], 'config': config})
+
         # TODO(dcramer): this needs to be a get_or_create pattern
         repo = Repository.query.filter(
             Repository.url == args.repository,
@@ -71,7 +90,10 @@ class AppIndexApiView(ApiView):
             name=args.name,
             repository_id=repo.id,
             provider=args.provider,
-            data={'provider_config': provider_config},
+            data={
+                'provider_config': provider_config,
+                'notifiers': notifiers_config,
+            },
         )
         db.session.add(app)
         db.session.commit()

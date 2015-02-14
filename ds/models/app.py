@@ -24,5 +24,9 @@ class App(db.Model):
     date_created = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     @property
+    def notifiers(self):
+        return self.data.get('notifiers', [])
+
+    @property
     def provider_config(self):
-        return self.data['provider_config']
+        return self.data.get('provider_config', {})

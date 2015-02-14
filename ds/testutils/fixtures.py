@@ -19,6 +19,12 @@ class Fixtures(object):
             'provider_config': {
                 'command': '/bin/echo helloworld',
             },
+            'notifiers': [
+                {
+                    'type': 'slack',
+                    'config': {'webhook_url': 'https://example.com'},
+                },
+            ],
         })
 
         app = App(repository_id=repository.id, **kwargs)

@@ -9,6 +9,7 @@ from subprocess import PIPE, Popen, STDOUT
 from threading import Thread
 from time import sleep, time
 
+from ds import notifiers
 from ds.config import celery, db
 from ds.constants import PROJECT_ROOT
 from ds.models import LogChunk, Task, TaskStatus
@@ -36,6 +37,21 @@ def execute_task(task_id):
     )
     taskrunner.start()
     taskrunner.wait()
+
+    # reload the task from the database due to subprocess changes
+    db.session.expire(task)
+    db.session.refresh(task)
+
+    send_task_notifications(task)
+
+
+def send_task_notifications(task):
+    for data in task.notifiers:
+        notifier = notifiers.get(data['type'])
+        try:
+            notifier.send(data.get('config', {}))
+        except Exception as exc:
+            logging.exception('%s notifier failed to send Task(id=%s)', data['type'], task.id)
 
 
 class LogReporter(Thread):
