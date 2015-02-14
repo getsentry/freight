@@ -18,9 +18,7 @@ from ds.models import LogChunk, Task, TaskStatus
 
 @celery.task(name='ds.execute_task', max_retries=None)
 def execute_task(task_id):
-    task = Task.query.filter(
-        Task.id == task_id
-    ).first()
+    task = Task.query.get(task_id)
     if not task:
         logging.warning('ExecuteTask fired with missing Task(id=%s)', task_id)
         return

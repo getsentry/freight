@@ -16,9 +16,7 @@ from ds.utils.workspace import Workspace
 
 
 def main(task_id):
-    task = Task.query.filter(
-        Task.id == task_id
-    ).first()
+    task = Task.query.get(task_id)
     if not task:
         raise ValueError('Task(id=%s) not found' % task_id)
 
