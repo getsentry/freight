@@ -152,12 +152,12 @@ class TaskRunner(object):
         self._logthread.start()
 
     def _timeout(self):
+        logging.error('Task(id=%s) exceeded time limit of %ds', self.task.id, self.timeout)
+
         self._process.stderr.write('Process exceeded time limit of %ds', self.timeout)
         self._process.terminate()
 
         self._logthread.terminate()
-
-        logging.error('Task(id=%s) exceeded time limit of %ds', self.task.id, self.timeout)
 
         # TODO(dcramer): ideally we could just send the signal to the subprocess
         # so it can still manage the failure state
