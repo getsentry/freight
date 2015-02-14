@@ -7,7 +7,7 @@ from flask_restful import reqparse
 from ds import notifiers, providers
 from ds.api.base import ApiView
 from ds.api.serializer import serialize
-from ds.config import db
+from ds.config import celery, db
 from ds.exceptions import InvalidNotifier, InvalidProvider
 from ds.models import App, Repository
 
@@ -94,3 +94,15 @@ class AppDetailsApiView(ApiView):
         db.session.commit()
 
         return self.respond(serialize(app))
+
+    def delete(self, app_id):
+        """
+        Delete an app.
+        """
+        app = App.query.get(app_id)
+        if app is None:
+            return self.error('Invalid app', name='invalid_resource', status_code=404)
+
+        celery.send_task("ds.delete_object", kwargs={'model': 'App', 'app_id': app.id})
+
+        return self.respond({"id": str(app.id)})

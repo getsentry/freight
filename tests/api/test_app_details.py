@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import json
+import mock
 
 from ds.models import App
 from ds.testutils import TestCase
@@ -79,3 +80,13 @@ class AppUpdateTest(AppDetailsBase):
         assert resp.status_code == 400
         data = json.loads(resp.data)
         assert data['error_name'] == 'invalid_notifier_config'
+
+
+class AppDeleteTest(AppDetailsBase):
+    @mock.patch('ds.config.celery.send_task')
+    def test_simple(self, mock_send_task):
+        self.create_task(app=self.app, user=self.user)
+        resp = self.client.delete(self.path)
+        assert resp.status_code == 200
+
+        mock_send_task.assert_called_once_with('ds.delete_object', kwargs={'model': 'App', 'app_id': self.app.id})

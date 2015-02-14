@@ -27,6 +27,7 @@ ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__)))
 
 tests_require = [
     'flake8>=2.1.0,<2.2.0',
+    'mock>=1.0.1,<1.1.0',
     'pytest>=2.5.0,<2.6.0',
     'pytest-cov>=1.6,<1.7',
     'pytest-timeout>=0.3,<0.4',
