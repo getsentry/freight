@@ -2,7 +2,7 @@ from __future__ import absolute_import, unicode_literals
 
 from datetime import datetime
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
-from sqlalchemy.schema import Index
+from sqlalchemy.schema import Index, UniqueConstraint
 
 from ds.config import db
 from ds.db.types.json import JSONEncodedDict
@@ -53,11 +53,13 @@ class Task(db.Model):
     __table_args__ = (
         Index('idx_task_app_id', 'app_id'),
         Index('idx_task_user_id', 'user_id'),
+        UniqueConstraint('app_id', 'environment', 'number', name='unq_task_number'),
     )
 
     id = Column(Integer, primary_key=True)
     app_id = Column(Integer, ForeignKey('app.id', ondelete="CASCADE"),
                     nullable=False)
+    number = Column(Integer, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id', ondelete="CASCADE"),
                      nullable=False)
     name = Column(String(128), nullable=False, default=TaskName.deploy)

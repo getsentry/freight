@@ -6,7 +6,7 @@ from uuid import uuid4
 
 from ds.config import db
 from ds.constants import PROJECT_ROOT
-from ds.models import App, Repository, Task, User
+from ds.models import App, Repository, Task, TaskSequence, User
 
 
 class Fixtures(object):
@@ -37,10 +37,16 @@ class Fixtures(object):
         kwargs.setdefault('provider', 'shell')
         kwargs.setdefault('name', 'deploy')
         kwargs.setdefault('ref', 'master')
+        kwargs.setdefault('environment', 'production')
         kwargs.setdefault('sha', uuid4().hex)
         kwargs.setdefault('data', {'provider_config': app.provider_config})
 
-        task = Task(app_id=app.id, user_id=user.id, **kwargs)
+        task = Task(
+            app_id=app.id,
+            user_id=user.id,
+            number=TaskSequence.get_clause(app.id, kwargs['environment']),
+            **kwargs
+        )
         db.session.add(task)
         db.session.commit()
 
