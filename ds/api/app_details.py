@@ -98,7 +98,14 @@ class AppDetailsApiView(ApiView):
         db.session.add(app)
         db.session.commit()
 
-        return self.respond(serialize(app))
+        context = serialize(app)
+        context.update({
+            'provider': app.provider,
+            'provider_config': app.provider_config,
+            'notifiers': app.notifiers,
+        })
+
+        return self.respond(context)
 
     def delete(self, app_id):
         """

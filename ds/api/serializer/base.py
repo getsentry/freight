@@ -12,3 +12,8 @@ class Serializer(object):
 
     def serialize(self, item, attrs):
         return {}
+
+    def format_datetime(self, datetime):
+        if not datetime:
+            return
+        return datetime.strftime('%Y-%m-%dT%H:%M:%S.%fZ')

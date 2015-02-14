@@ -12,7 +12,4 @@ class AppSerializer(Serializer):
         return {
             'id': str(item.id),
             'name': item.name,
-            'provider': item.provider,
-            'provider_config': item.provider_config,
-            'notifiers': item.notifiers,
         }

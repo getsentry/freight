@@ -15,3 +15,8 @@ class TaskSerializerTest(TestCase):
         result = serialize(task)
         assert result['id'] == str(task.id)
         assert result['status'] == 'pending'
+        assert result['ref'] == task.ref
+        assert result['sha'] == task.sha
+        assert result['environment'] == task.environment
+        assert result['app']['id'] == str(app.id)
+        assert result['app']['name'] == app.name
