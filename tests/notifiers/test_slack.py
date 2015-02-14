@@ -7,6 +7,7 @@ from urlparse import parse_qs
 
 from ds import notifiers
 from ds.notifiers import NotifierEvent
+from ds.models import TaskStatus
 from ds.testutils import TestCase
 
 
@@ -16,7 +17,11 @@ class SlackNotifierBase(TestCase):
         self.user = self.create_user()
         self.repo = self.create_repo()
         self.app = self.create_app(repository=self.repo)
-        self.task = self.create_task(app=self.app, user=self.user)
+        self.task = self.create_task(
+            app=self.app,
+            user=self.user,
+            status=TaskStatus.finished,
+        )
 
 
 class SlackNotifierTest(SlackNotifierBase):
@@ -36,7 +41,7 @@ class SlackNotifierTest(SlackNotifierBase):
         # TODO(dcramer): we probably shouldnt hardcode this, but it'll do for now
         assert payload == {
             'parse': 'none',
-            'text': "[{}] 'deploy' on production unknown (took {}s)".format(
+            'text': "Successfully deployed {} to production ({}s)".format(
                 self.app.name, self.task.duration),
         }
 
@@ -56,5 +61,5 @@ class SlackNotifierTest(SlackNotifierBase):
         # TODO(dcramer): we probably shouldnt hardcode this, but it'll do for now
         assert payload == {
             'parse': 'none',
-            'text': "[{}] Executing 'deploy' of master on production".format(self.app.name),
+            'text': "Deploying {} (master) to production".format(self.app.name),
         }
