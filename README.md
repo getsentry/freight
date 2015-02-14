@@ -34,47 +34,56 @@ The following could be considered v2 features.
 
 We could run a service on each machine that would check-in with the master. This would record the current version of the application. The service would be configured with a set of apps (their environment info, how to get app version). The service could also be aware of "how do I deploy a version" which could assist in pull-based deploys.
 
-## Heaven Inspiration
+## An Example Fabric Configuration
 
-The basis for this is modeled after Heaven, but we may want to take an alternative approach. GitHub shouldn't be hardcoded for the system to work, but rather the primary implementation will be GitHub (i.e. specific endpoints just for it).
+Our example will use the [http://pythonhosted.org/curlish/](Curlish) utility and the local server with its default key:
 
-For a simple integration, it would work like the following:
-
-```
-POST /api/0/:app/deploy
-    ?[sha=:sha]
-    &[force=true]
-    &[env=:environment]
-```
-
-The logic for the endpoint would be a bit like this:
-
-```
-# call out to GitHub and attempt to register a new deployment
-# this will fail if certain checks do not pass
-
-# this is the deploy API endpoint
-def deploy(app, params):
-    if not github.create_deployment(params):
-        return 400, "reason"
-    enque_deployment()
-
-def deployment_task(data):
-    clone_or_update_repo()
-    run_deployment_command()
+```bash
+curlish http://localhost:5000/api/0/apps/ \
+    -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70' \
+    -X POST \
+    -J repository=git@github.com:my-organization/example.git \
+    -J name=example \
+    -J provider=shell \
+    -J provider_config='{"command": "bin/fab -a -i {ssh_key} -R {environment} {task}:branch_name={ref}"}' \
 ```
 
+The important part here is our provider configuration:
 
-The deployment command could be specific per application, and would be specified via the application configuration:
-
-```
+```json
 {
-    "sentry": {
-        # the raw shell command that should run, with a few variables available
-        "deploy": "fab -R {env} deploy:sha={sha}",
-
-        # we want a way to specify which deployment integration this is using
-        "via": "github"
-    }
+    "command": "bin/fab -a -i {ssh_key} -R {environment} {task}:branch_name={ref}"
 }
 ```
+
+Here we're passing basic available variables into our ``bin/fab`` tool, which is simply a wrapper around Fabric that ensures dependencies are available:
+
+```bash
+#!/bin/bash
+
+pip install fabric pytz
+fab $@
+```
+
+Now we can create a new deploy task:
+
+```bash
+curlish http://localhost:5000/api/0/tasks/ \
+    -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70'
+    -X POST \
+    -J app=example \
+    -J ref=master \
+    -J task=deploy \
+    -J user="user@example.com"
+```
+
+In our response we'll get back the task summary which simply notes its pending and gives you it's ID:
+
+```json
+{
+  "id": "1",
+  "status": "pending"
+}
+```
+
+In the future you will be able to poll the logs via the API, as well as the task status.
