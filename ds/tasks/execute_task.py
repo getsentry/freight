@@ -172,4 +172,5 @@ class TaskRunner(object):
             if self._process.poll() is None:
                 sleep(0.1)
         self.active = False
+        self._logthread.join()
         return self._process.returncode
