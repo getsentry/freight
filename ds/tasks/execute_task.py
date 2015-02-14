@@ -49,7 +49,7 @@ def send_task_notifications(task):
     for data in task.notifiers:
         notifier = notifiers.get(data['type'])
         try:
-            notifier.send(data.get('config', {}))
+            notifier.send(task, data.get('config', {}))
         except Exception as exc:
             logging.exception('%s notifier failed to send Task(id=%s)', data['type'], task.id)
 
