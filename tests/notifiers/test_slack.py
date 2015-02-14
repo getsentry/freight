@@ -36,7 +36,8 @@ class SlackNotifierTest(SlackNotifierBase):
         # TODO(dcramer): we probably shouldnt hardcode this, but it'll do for now
         assert payload == {
             'parse': 'none',
-            'text': "[{}] 'deploy' on production unknown".format(self.app.name),
+            'text': "[{}] 'deploy' on production unknown (took {}s)".format(
+                self.app.name, self.task.duration),
         }
 
     @responses.activate

@@ -71,3 +71,9 @@ class Task(db.Model):
     @property
     def status_label(self):
         return STATUS_LABELS.get(self.status, 'unknown')
+
+    @property
+    def duration(self):
+        if not self.date_finished:
+            return
+        return (self.date_finished - self.date_started).total_seconds()

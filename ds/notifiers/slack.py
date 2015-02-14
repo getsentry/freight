@@ -32,12 +32,13 @@ class SlackNotifier(Notifier):
             'env': task.environment,
             'ref': task.ref,
             'status_label': task.status_label,
+            'duration': task.duration,
         }
 
         if event == NotifierEvent.TASK_STARTED:
             title = "[{app_name}] Executing '{task_name}' of {ref} on {env}".format(**params)
         else:
-            title = "[{app_name}] '{task_name}' on {env} {status_label}".format(**params)
+            title = "[{app_name}] '{task_name}' on {env} {status_label} (took {duration}s)".format(**params)
 
         payload = {
             'parse': 'none',
