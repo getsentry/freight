@@ -5,7 +5,7 @@ from flask_restful import reqparse
 from ds.config import celery, db, redis
 from ds.api.base import ApiView
 from ds.api.serializer import serialize
-from ds.models import App, Task, TaskStatus, User
+from ds.models import App, Task, TaskName, TaskStatus, User
 from ds.utils.redis import lock
 
 
@@ -97,6 +97,7 @@ class TaskIndexApiView(ApiView):
             task = Task(
                 app_id=app.id,
                 environment=args.env,
+                name=TaskName.deploy,
                 # TODO(dcramer): ref should default based on app config
                 ref=args.ref,
                 # TODO(dcramer):

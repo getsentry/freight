@@ -8,6 +8,18 @@ from ds.config import db
 from ds.db.types.json import JSONEncodedDict
 
 
+class TaskName(object):
+    deploy = 'deploy'
+
+    @classmethod
+    def get_label(cls, status):
+        return status
+
+    @classmethod
+    def label_to_id(cls, label):
+        return getattr(cls, label)
+
+
 class TaskStatus(object):
     unknown = 0
     pending = 1
@@ -48,7 +60,7 @@ class Task(db.Model):
                     nullable=False)
     user_id = Column(Integer, ForeignKey('user.id', ondelete="CASCADE"),
                      nullable=False)
-    name = Column(String(128), nullable=False, default='deploy')
+    name = Column(String(128), nullable=False, default=TaskName.deploy)
     ref = Column(String(128), nullable=False)
     sha = Column(String(40), nullable=False)
     environment = Column(String(64), nullable=False, default='production')
