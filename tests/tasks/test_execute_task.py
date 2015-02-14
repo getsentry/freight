@@ -1,19 +1,22 @@
 from __future__ import absolute_import, unicode_literals
 
-from ds.config import celery
+from ds.config import celery, db
 from ds.models import LogChunk, TaskStatus
-from ds.testutils import TestCase
+from ds.testutils import TransactionTestCase
 
 
-class ExecuteTaskTestCase(TestCase):
+class ExecuteTaskTestCase(TransactionTestCase):
     def test_simple(self):
         user = self.create_user()
         repo = self.create_repo()
         app = self.create_app(repository=repo)
-        task = self.create_task(app=app, user=user)
+        task = self.create_task(app=app, user=user, sha=None)
+        db.session.commit()
 
         celery.apply("ds.execute_task", task_id=task.id)
         # celery.send_task("ds.execute_task", [task.id])
+
+        db.session.expire_all()
 
         assert task.date_started is not None
         assert task.date_finished is not None
