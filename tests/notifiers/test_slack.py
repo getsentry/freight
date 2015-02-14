@@ -56,5 +56,5 @@ class SlackNotifierTest(SlackNotifierBase):
         # TODO(dcramer): we probably shouldnt hardcode this, but it'll do for now
         assert payload == {
             'parse': 'none',
-            'text': "[{}] Executing 'deploy' of master ({}) on production".format(self.app.name, self.task.sha[:12]),
+            'text': "[{}] Executing 'deploy' of master on production".format(self.app.name),
         }
