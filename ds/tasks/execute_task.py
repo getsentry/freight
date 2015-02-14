@@ -1,7 +1,9 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
+import sys
 
+from datetime import datetime
 from flask import current_app
 from subprocess import PIPE, Popen, STDOUT
 from threading import Thread
@@ -9,7 +11,7 @@ from time import sleep, time
 
 from ds.config import celery, db
 from ds.constants import PROJECT_ROOT
-from ds.models import LogChunk, Task
+from ds.models import LogChunk, Task, TaskStatus
 
 
 @celery.task(name='ds.execute_task', max_retries=None)
@@ -29,7 +31,7 @@ def execute_task(task_id):
     ).delete()
 
     taskrunner = TaskRunner(
-        task_id=task_id,
+        task=task,
         timeout=provider_config.get('timeout', current_app.config['DEFAULT_TIMEOUT']),
     )
     taskrunner.start()
@@ -47,6 +49,9 @@ class LogReporter(Thread):
         Thread.__init__(self)
 
     def save_chunk(self, text):
+        # we also want to pipe this to stdout
+        sys.stdout.write(text)
+
         text_len = len(text)
         db.session.add(LogChunk(
             task_id=self.task_id,
@@ -54,6 +59,8 @@ class LogReporter(Thread):
             offset=self.cur_offset,
             size=text_len,
         ))
+
+        # we commit immediately to ensure the API can stream logs
         db.session.commit()
         self.cur_offset += text_len
 
@@ -93,8 +100,8 @@ class LogReporter(Thread):
 
 
 class TaskRunner(object):
-    def __init__(self, task_id, timeout=300):
-        self.task_id = task_id
+    def __init__(self, task, timeout=300):
+        self.task = task
         self.timeout = timeout
         self.active = False
         self._logthread = None
@@ -108,26 +115,39 @@ class TaskRunner(object):
         self.active = True
         self._started = time()
         self._process = Popen(
-            args=['bin/run-task', str(self.task_id)],
+            args=['bin/run-task', str(self.task.id)],
             cwd=PROJECT_ROOT,
             stdout=PIPE,
             stderr=STDOUT
         )
         self._logthread = LogReporter(
             app_context=current_app.app_context(),
-            task_id=self.task_id,
+            task_id=self.task.id,
             process=self._process,
         )
         self._logthread.daemon = True
         self._logthread.start()
 
+    def _timeout(self):
+        self._process.stderr.write('Process exceeded time limit of %ds', self.timeout)
+        self._process.terminate()
+
+        self._logthread.terminate()
+
+        logging.error('Task(id=%s) exceeded time limit of %ds', self.task.id, self.timeout)
+
+        # TODO(dcramer): ideally we could just send the signal to the subprocess
+        # so it can still manage the failure state
+        self.task.status = TaskStatus.failed
+        self.task.date_finished = datetime.utcnow()
+        db.session.add(self.task)
+        db.session.commit()
+
     def wait(self):
         assert self._process is not None, 'TaskRunner not started'
         while self.active and self._process.poll() is None:
             if self.timeout and time() > self._started + self.timeout:
-                logging.error('Process exceeding time limit Task(id=%s)', self.task_id)
-                self._process.terminate()
-                self._logthread.terminate()
+                self._timeout()
             if self._process.poll() is None:
                 sleep(0.1)
         self.active = False
