@@ -28,7 +28,7 @@ class AppDetailsApiView(ApiView):
 
         app = App.query.get(app_id)
         if app is None:
-            return self.error('Invalid app', name='invalid_app')
+            return self.error('Invalid app', name='invalid_resource', status_code=404)
 
         if args.provider:
             try:

@@ -77,7 +77,7 @@ class TaskIndexApiView(ApiView):
 
         app = App.query.filter(App.name == args.app).first()
         if not app:
-            return self.error('Invalid app')
+            return self.error('Invalid app', name='invalid_resource', status_code=404)
 
         with lock(redis, 'task:create:{}'.format(app.id), timeout=5):
             # TODO(dcramer): this needs to be a get_or_create pattern and
