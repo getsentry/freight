@@ -11,10 +11,10 @@ class ShellProvider(Provider):
             'command': {'required': True},
         }
 
-    def execute(self, workspace, task):
+    def get_command(self, task):
         ssh_key = self.get_ssh_key()
 
-        command = task.provider_config['command'].format(
+        return task.provider_config['command'].format(
             environment=task.environment,
             sha=task.sha,
             ref=task.ref,
@@ -22,4 +22,6 @@ class ShellProvider(Provider):
             ssh_key=ssh_key.name if ssh_key else '~/.ssh/id_rsa',
         )
 
+    def execute(self, workspace, task):
+        command = self.get_command(task)
         return workspace.run(command)
