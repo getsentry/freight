@@ -18,5 +18,6 @@ class TaskSerializerTest(TestCase):
         assert result['ref'] == task.ref
         assert result['sha'] == task.sha
         assert result['environment'] == task.environment
+        assert result['number'] == task.number
         assert result['app']['id'] == str(app.id)
         assert result['app']['name'] == app.name

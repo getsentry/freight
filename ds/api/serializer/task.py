@@ -33,6 +33,7 @@ class TaskSerializer(Serializer):
             'environment': item.environment,
             'sha': item.sha,
             'ref': item.ref,
+            'number': item.number,
             'status': item.status_label,
             'dateCreated': self.format_datetime(item.date_created),
             'dateStarted': self.format_datetime(item.date_started),
