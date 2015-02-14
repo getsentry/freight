@@ -22,6 +22,13 @@ redis = Redis()
 sentry = Sentry(logging=True, level=logging.WARN)
 
 
+def configure_logging(app):
+    if app.config['DEBUG']:
+        app.logger.setLevel(logging.INFO)
+    else:
+        app.logger.setLevel(logging.ERROR)
+
+
 def create_app(_read_config=True, **config):
     from kombu import Queue
 
@@ -51,6 +58,8 @@ def create_app(_read_config=True, **config):
         app.config['REDIS_URL'] = os.environ['REDISCLOUD_URL']
 
     app.config['WORKSPACE_ROOT'] = os.environ.get('WORKSPACE_ROOT', '/tmp')
+
+    app.config['DEFAULT_TIMEOUT'] = int(os.environ.get('DEFAULT_TIMEOUT', 300))
 
     # Currently authentication requires Google
     app.config['GOOGLE_CLIENT_ID'] = os.environ.get('GOOGLE_CLIENT_ID')
@@ -121,6 +130,7 @@ def create_app(_read_config=True, **config):
             path = os.path.normpath(os.path.expanduser('~/.ds/ds.conf.py'))
             app.config.from_pyfile(path, silent=True)
 
+    configure_logging(app)
     configure_sentry(app)
     configure_api(app)
     configure_celery(app)

@@ -1,46 +1,20 @@
 from __future__ import absolute_import, unicode_literals
 
+import logging
 import os
 import shlex
+import sys
 import traceback
 
 from subprocess import PIPE, Popen, STDOUT
-from time import sleep
 
 from ds.exceptions import CommandError
 
 
 class Workspace(object):
-    def __init__(self, path, on_log_chunk=None, chunk_size=4096):
+    def __init__(self, path):
         self.path = path
-        self.on_log_chunk = on_log_chunk
-        self.chunk_size = chunk_size
-
-    def _flush_output(self, proc):
-        chunk_size = self.chunk_size
-        on_log_chunk = self.on_log_chunk
-        result = ''
-        while True:
-            is_running = proc.poll() is None
-            chunk = proc.stdout.read(chunk_size)
-            if not (is_running or chunk):
-                break
-
-            while chunk:
-                result += chunk
-                while len(result) >= chunk_size:
-                    newline_pos = result.rfind('\n', 0, chunk_size)
-                    if newline_pos == -1:
-                        newline_pos = chunk_size
-                    else:
-                        newline_pos += 1
-                    on_log_chunk(result[:newline_pos])
-                    result = result[newline_pos:]
-                chunk = proc.stdout.read(chunk_size)
-            sleep(0.1)
-
-        if result:
-            on_log_chunk(result)
+        self.log = logging.getLogger('workspace')
 
     def whereis(self, program, env):
         for path in env.get('PATH', '').split(':'):
@@ -49,7 +23,15 @@ class Workspace(object):
                 return os.path.join(path, program)
         return None
 
-    def run(self, command, *args, **kwargs):
+    def _get_writer(self, pipe):
+        if not isinstance(pipe, int):
+            pipe = pipe.fileno()
+        return os.fdopen(pipe, 'w')
+
+    def _run_process(self, command, *args, **kwargs):
+        stdout = kwargs.get('stdout', sys.stdout)
+        stderr = kwargs.get('stderr', sys.stderr)
+
         kwargs.setdefault('cwd', self.path)
 
         if isinstance(command, basestring):
@@ -61,28 +43,31 @@ class Workspace(object):
 
         kwargs['env'] = env
 
-        if self.on_log_chunk:
-            kwargs['stderr'] = STDOUT
-            kwargs['stdout'] = PIPE
-
-        msg = '>> Running {}\n'.format(command)
-        if self.on_log_chunk:
-            self.on_log_chunk(msg)
-
+        self.log.info('>> Running {}'.format(command))
         try:
             proc = Popen(command, *args, **kwargs)
         except OSError as exc:
             if not self.whereis(command[0], env):
-                error = 'Command not found: {}'.format(command[0])
+                msg = 'ERROR: Command not found: {}'.format(command[0])
             else:
-                error = traceback.format_exc()
-            if self.on_log_chunk:
-                self.on_log_chunk(error)
-            raise
+                msg = traceback.format_exc()
+            raise CommandError(command, 1, stdout=None, stderr=msg)
 
-        if self.on_log_chunk:
-            proc.stdout.flush()
-            self._flush_output(proc)
+        return proc
+
+    def capture(self, command, *args, **kwargs):
+        kwargs['stdout'] = PIPE
+        kwargs['stderr'] = STDOUT
+        proc = self._run_process(command, *args, **kwargs)
+        (stdout, stderr) = proc.communicate()
+
+        if proc.returncode != 0:
+            raise CommandError(command, proc.returncode, stdout, stderr)
+
+        return stdout
+
+    def run(self, command, *args, **kwargs):
+        proc = self._run_process(command, *args, **kwargs)
         proc.wait()
 
         if proc.returncode != 0:

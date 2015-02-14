@@ -11,31 +11,6 @@ class UnknownRevision(CommandError):
     pass
 
 
-class BufferParser(object):
-    def __init__(self, fp, delim):
-        self.fp = fp
-        self.delim = delim
-
-    def __iter__(self):
-        chunk_buffer = []
-        for chunk in self.fp:
-            while chunk.find(self.delim) != -1:
-                d_pos = chunk.find(self.delim)
-
-                chunk_buffer.append(chunk[:d_pos])
-
-                yield ''.join(chunk_buffer)
-                chunk_buffer = []
-
-                chunk = chunk[d_pos + 1:]
-
-            if chunk:
-                chunk_buffer.append(chunk)
-
-        if chunk_buffer:
-            yield ''.join(chunk_buffer)
-
-
 class Vcs(object):
     ssh_connect_path = os.path.join(PROJECT_ROOT, 'bin', 'ssh-connect')
 
@@ -53,7 +28,7 @@ class Vcs(object):
     def get_default_env(self):
         return {}
 
-    def run(self, command, *args, **kwargs):
+    def run(self, command, capture=False, *args, **kwargs):
         if not self.exists():
             kwargs.setdefault('cwd', None)
 
@@ -63,7 +38,15 @@ class Vcs(object):
         env.setdefault('DS_SSH_REPO', self.url)
         kwargs['env'] = env
 
-        return self.workspace.run(command, *args, **kwargs)
+        if capture:
+            handler = self.workspace.capture
+        else:
+            handler = self.workspace.run
+
+        rv = handler(command, *args, **kwargs)
+        if isinstance(rv, basestring):
+            return rv.strip()
+        return rv
 
     def exists(self):
         return os.path.exists(self.workspace.path)
@@ -77,35 +60,11 @@ class Vcs(object):
     def checkout(self, ref):
         raise NotImplementedError
 
-    def log(self, parent=None, offset=0, limit=100):
+    def describe(self, ref):
         """
-        Gets the commit log for the repository.
-
-        :param parent: Parent at which revision search begins.
-        :param offset: An offset into the results at which to begin.
-        :param limit: The maximum number of results to return.
-        :return: A list of <RevisionResult> matching the given criteria.
+        Given a `ref` return the fully qualified version.
         """
         raise NotImplementedError
 
     def get_default_revision(self):
         raise NotImplementedError
-
-
-class RevisionResult(object):
-    def __init__(self, id, message, author, author_date, committer=None,
-                 committer_date=None):
-        self.id = id
-        self.message = message
-        self.author = author
-        self.author_date = author_date
-        self.committer = committer or author
-        self.committer_date = committer_date or author_date
-
-    def __repr__(self):
-        return '<%s: id=%r author=%r subject=%r>' % (
-            type(self).__name__, self.id, self.author, self.subject)
-
-    @property
-    def subject(self):
-        return self.message.splitlines()[0]

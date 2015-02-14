@@ -31,26 +31,10 @@ def main(task_id):
 
     provider = providers.get(task.provider)
 
-    LogChunk.query.filter(LogChunk.task_id == task.id).delete()
-
-    log_offset = [0]
-
-    def save_log_chunk(text):
-        sys.stdout.write(text)
-        db.session.add(LogChunk(
-            task_id=task_id,
-            text=text,
-            offset=log_offset[0],
-            size=len(text),
-        ))
-        db.session.commit()
-        log_offset[0] += len(text)
-
     workspace = Workspace(
         path=os.path.join(
             current_app.config['WORKSPACE_ROOT'], 'ds-repo-{}'.format(repo.id)
         ),
-        on_log_chunk=save_log_chunk,
     )
 
     vcs_backend = vcs.get(
@@ -62,7 +46,13 @@ def main(task_id):
         vcs_backend.update()
     else:
         vcs_backend.clone()
-    vcs_backend.checkout(task.ref)
+
+    if not task.sha:
+        task.sha = vcs_backend.describe(task.ref)
+        db.session.add(task)
+        db.session.commit()
+
+    vcs_backend.checkout(task.sha)
 
     try:
         provider.execute(workspace, task)
@@ -77,6 +67,11 @@ def main(task_id):
 
 
 if __name__ == '__main__':
+    # add workspace explicit handler
+    logger = logging.getLogger('workspace')
+    logger.addHandler(logging.StreamHandler())
+    logger.setLevel(logging.INFO)
+
     app = create_app()
     with app.app_context():
         main(sys.argv[1])

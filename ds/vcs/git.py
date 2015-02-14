@@ -2,15 +2,9 @@ from __future__ import absolute_import, unicode_literals
 
 __all__ = ['GitVcs']
 
-from datetime import datetime
 from urlparse import urlparse
 
-from .base import (
-    Vcs, RevisionResult, BufferParser, CommandError, UnknownRevision
-)
-
-
-LOG_FORMAT = '%H\x01%an <%ae>\x01%at\x01%cn <%ce>\x01%ct\x01%P\x01%B\x02'
+from .base import Vcs, CommandError, UnknownRevision
 
 
 class GitVcs(Vcs):
@@ -62,35 +56,6 @@ class GitVcs(Vcs):
     def checkout(self, ref):
         self.run(['reset', '--hard', ref])
 
-    def log(self, parent=None, offset=0, limit=100):
-        cmd = ['log', '--date-order', '--pretty=format:%s' % (LOG_FORMAT,)]
-
-        if offset:
-            cmd.append('--skip=%d' % (offset,))
-        if limit:
-            cmd.append('--max-count=%d' % (limit,))
-
-        if not parent:
-            cmd.append('--all')
-        else:
-            cmd.append(parent)
-
-        result = self.run(cmd, capture=True)
-        for chunk in BufferParser(result, '\x02'):
-            (sha, author, author_date, committer, committer_date,
-             parents, message) = chunk.split('\x01')
-
-            # sha may have a trailing newline due to git log adding it
-            sha = sha.lstrip('\n')
-
-            author_date = datetime.utcfromtimestamp(float(author_date))
-            committer_date = datetime.utcfromtimestamp(float(committer_date))
-
-            yield RevisionResult(
-                id=sha,
-                author=author,
-                committer=committer,
-                author_date=author_date,
-                committer_date=committer_date,
-                message=message,
-            )
+    def describe(self, ref):
+        return self.run(['describe', '--always', '--abbrev=0', ref],
+                        capture=True)
