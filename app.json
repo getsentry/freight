@@ -13,6 +13,7 @@
       "description": "An API key used to communiate with the service.",
       "generator": "secret"
     },
+    "DEFAULT_TIMEOUT": "300",
     "SSH_PRIVATE_KEY": {
       "description": "A private key to use when cloning repositories"
     }
