@@ -144,10 +144,12 @@ def configure_api(app):
     from ds.api.controller import ApiCatchall
     from ds.api.app_details import AppDetailsApiView
     from ds.api.app_index import AppIndexApiView
+    from ds.api.task_details import TaskDetailsApiView
     from ds.api.task_index import TaskIndexApiView
 
     api.add_resource(AppDetailsApiView, '/apps/<app_id>/')
     api.add_resource(AppIndexApiView, '/apps/')
+    api.add_resource(TaskDetailsApiView, '/tasks/<task_id>/')
     api.add_resource(TaskIndexApiView, '/tasks/')
     # catchall should be the last resource
     api.add_resource(ApiCatchall, '/<path:path>')
