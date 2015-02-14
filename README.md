@@ -36,7 +36,7 @@ We could run a service on each machine that would check-in with the master. This
 
 ## An Example Fabric Configuration
 
-Our example will use the [http://pythonhosted.org/curlish/](Curlish) utility and the local server with its default key:
+Our example will use the [Curlish](http://pythonhosted.org/curlish/) utility and the local server with its default key:
 
 ```bash
 curlish http://localhost:5000/api/0/apps/ \
