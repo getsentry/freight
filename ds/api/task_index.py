@@ -67,6 +67,7 @@ class TaskIndexApiView(ApiView):
     post_parser.add_argument('user', required=True)
     post_parser.add_argument('env', default='production')
     post_parser.add_argument('ref')
+    post_parser.add_argument('force', default=False)
 
     def post(self):
         """
@@ -88,7 +89,7 @@ class TaskIndexApiView(ApiView):
                 db.session.add(user)
                 db.session.flush()
 
-            if self._has_active_task(app, args.env):
+            if not args.force and self._has_active_task(app, args.env):
                 return self.error(
                     message='Another task is already in progress for this app',
                     name='locked',
@@ -105,6 +106,7 @@ class TaskIndexApiView(ApiView):
                 user_id=user.id,
                 provider=app.provider,
                 data={
+                    'force': args.force,
                     'provider_config': app.provider_config,
                     'notifiers': app.data.get('notifiers', []),
                 },
