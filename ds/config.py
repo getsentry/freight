@@ -23,7 +23,7 @@ sentry = Sentry(logging=True, level=logging.WARN)
 
 
 def configure_logging(app):
-    app.logger.setLevel(getattr(logging, app.config['LOG_LEVEL']))
+    logging.getLogger().setLevel(getattr(logging, app.config['LOG_LEVEL']))
 
 
 def create_app(_read_config=True, **config):
@@ -146,11 +146,13 @@ def configure_api(app):
     from ds.api.app_index import AppIndexApiView
     from ds.api.task_details import TaskDetailsApiView
     from ds.api.task_index import TaskIndexApiView
+    from ds.api.task_log import TaskLogApiView
 
-    api.add_resource(AppDetailsApiView, '/apps/<app_id>/')
     api.add_resource(AppIndexApiView, '/apps/')
-    api.add_resource(TaskDetailsApiView, '/tasks/<task_id>/')
+    api.add_resource(AppDetailsApiView, '/apps/<app_id>/')
     api.add_resource(TaskIndexApiView, '/tasks/')
+    api.add_resource(TaskDetailsApiView, '/tasks/<task_id>/')
+    api.add_resource(TaskLogApiView, '/tasks/<task_id>/log/')
     # catchall should be the last resource
     api.add_resource(ApiCatchall, '/<path:path>')
     # init must be called after routes are registered
