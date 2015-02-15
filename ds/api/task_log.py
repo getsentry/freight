@@ -53,7 +53,6 @@ class TaskLogApiView(ApiView):
 
         logchunks = list(queryset)
 
-        print vars(logchunks[-1])
         if logchunks:
             next_offset = logchunks[-1].offset + logchunks[-1].size
         else:
