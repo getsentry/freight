@@ -1,6 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
-from flask_restful import reqparse
+from flask_restful import reqparse, inputs
 
 from ds.config import celery, db, redis
 from ds.api.base import ApiView
@@ -67,7 +67,7 @@ class TaskIndexApiView(ApiView):
     post_parser.add_argument('user', required=True)
     post_parser.add_argument('env', default='production')
     post_parser.add_argument('ref')
-    post_parser.add_argument('force', default=False)
+    post_parser.add_argument('force', default=False, type=inputs.boolean)
 
     def post(self):
         """
