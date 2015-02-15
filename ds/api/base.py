@@ -3,13 +3,13 @@ from __future__ import absolute_import, unicode_literals
 import json
 
 from flask import current_app, request, Response
-from flask.ext.restful import Resource
+from flask_restful import Resource
 from urllib import quote
 
 from ds.config import db
 from ds.utils.auth import get_current_user
 
-LINK_HEADER = '<{uri}&page={page}>; rel="{name}"'
+LINK_HEADER = '<{uri}&cursor={cursor}>; rel="{name}"'
 
 
 class ApiView(Resource):
@@ -73,55 +73,55 @@ class ApiView(Resource):
 
         return response
 
-    def make_links(self, current_page, has_next_page=None):
-        links = []
-        if current_page > 1:
-            links.append(('previous', current_page - 1))
-
-        if has_next_page:
-            links.append(('next', current_page + 1))
-
+    def build_cursor_link(self, name, cursor):
         querystring = u'&'.join(
             u'{0}={1}'.format(quote(k), quote(v))
             for k, v in request.args.iteritems()
-            if k != 'page'
+            if k != 'cursor'
         )
+        base_url = request.base_url
         if querystring:
-            base_url = '{0}?{1}'.format(request.base_url, querystring)
+            base_url = '{0}?{1}'.format(base_url, querystring)
         else:
-            base_url = request.base_url + '?'
+            base_url = base_url + '?'
 
-        link_values = []
-        for name, page_no in links:
-            link_values.append(LINK_HEADER.format(
-                uri=base_url,
-                page=page_no,
-                name=name,
-            ))
-        return link_values
+        return LINK_HEADER.format(
+            uri=base_url,
+            cursor=str(cursor),
+            name=name,
+        )
 
-    def paginate(self, seq, max_per_page=100, on_results=None, **kwargs):
-        page = int(request.args.get('page', 1))
-        per_page = int(request.args.get('per_page', 25) or 0)
-        if max_per_page:
-            assert per_page <= max_per_page
-        assert page > 0
+    def make_links(self, current_page, has_next_page=None):
+        links = []
+        if current_page > 1:
+            links.append((self.build_cursor_link('previous', current_page - 1)))
 
-        if per_page:
-            offset = (page - 1) * per_page
-            result = list(seq[offset:offset + per_page + 1])
+        if has_next_page:
+            links.append((self.build_cursor_link('next', current_page + 1)))
+
+        return links
+
+    def paginate(self, seq, max_limit=100, on_results=None, **kwargs):
+        cursor = int(request.args.get('cursor', 1))
+        limit = int(request.args.get('limit', 25) or 0)
+        if max_limit:
+            assert limit <= max_limit
+
+        if cursor:
+            offset = (cursor - 1) * limit
+            result = list(seq[offset:offset + cursor + 1])
         else:
             offset = 0
             page = 1
             result = list(seq)
 
         links = self.make_links(
-            current_page=page,
-            has_next_page=per_page and len(result) > per_page,
+            current_page=cursor,
+            has_next_page=limit and len(result) > limit,
         )
 
-        if per_page:
-            result = result[:per_page]
+        if limit:
+            result = result[:limit]
 
         if on_results:
             result = on_results(result)
