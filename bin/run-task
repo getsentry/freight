@@ -24,6 +24,7 @@ def main(task_id):
     repo = Repository.query.filter(Repository.id == app.repository_id).first()
 
     task.date_started = datetime.utcnow()
+    task.status = TaskStatus.in_progress
     db.session.add(task)
     db.session.commit()
 
