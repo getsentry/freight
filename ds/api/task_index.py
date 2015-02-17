@@ -66,7 +66,7 @@ class TaskIndexApiView(ApiView):
     post_parser.add_argument('app', required=True)
     post_parser.add_argument('user', required=True)
     post_parser.add_argument('env', default='production')
-    post_parser.add_argument('ref')
+    post_parser.add_argument('ref', default='master')
     post_parser.add_argument('force', default=False, type=inputs.boolean)
 
     def post(self):
