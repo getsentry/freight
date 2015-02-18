@@ -91,7 +91,7 @@ class TaskIndexApiView(ApiView):
 
             if not args.force and self._has_active_task(app, args.env):
                 return self.error(
-                    message='Another task is already in progress for this app',
+                    message='Another task is already in progress for this app/environment',
                     name='locked',
                 )
 
