@@ -92,3 +92,8 @@ In our response we'll get back the task summary which simply notes its pending a
 ```
 
 In the future you will be able to poll the logs via the API, as well as the task status.
+
+## See Also
+
+- [freight-cli](https://github.com/getsentry/freight-cli)
+- [hubot-freight](https://github.com/getsentry/hubot-freight)
