@@ -40,6 +40,7 @@ class Workspace(object):
 
         if isinstance(command, basestring):
             command = shlex.split(command)
+        command = map(str, command)
 
         env = os.environ.copy()
         for key, value in kwargs.pop('env', {}).iteritems():
