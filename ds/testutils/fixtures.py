@@ -6,7 +6,7 @@ from uuid import uuid4
 
 from ds.config import db
 from ds.constants import PROJECT_ROOT
-from ds.models import App, Repository, Task, TaskSequence, User
+from ds.models import App, Repository, Task, TaskSequence, TaskStatus, User
 
 
 class Fixtures(object):
@@ -39,6 +39,7 @@ class Fixtures(object):
         kwargs.setdefault('ref', 'master')
         kwargs.setdefault('environment', 'production')
         kwargs.setdefault('sha', uuid4().hex)
+        kwargs.setdefault('status', TaskStatus.in_progress)
         kwargs.setdefault('data', {'provider_config': app.provider_config})
 
         task = Task(
