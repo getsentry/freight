@@ -52,14 +52,14 @@ curlish http://localhost:5000/api/0/apps/ \
     -J repository=git@github.com:my-organization/example.git \
     -J name=example \
     -J provider=shell \
-    -J provider_config='{"command": "bin/fab -a -i {ssh_key} -R {environment} {task}:branch_name={ref}"}' \
+    -J provider_config='{"command": "bin/fab -a -i {ssh_key} -R {environment} {task}:sha={sha}"}' \
 ```
 
 The important part here is our provider configuration:
 
 ```json
 {
-    "command": "bin/fab -a -i {ssh_key} -R {environment} {task}:branch_name={ref}"
+    "command": "bin/fab -a -i {ssh_key} -R {environment} {task}:sha={sha}"
 }
 ```
 
