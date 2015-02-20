@@ -3,18 +3,22 @@ from __future__ import absolute_import, unicode_literals
 import logging
 import os
 import shlex
+import shutil
 import sys
 import traceback
 
+from flask import current_app
 from subprocess import PIPE, Popen, STDOUT
+from uuid import uuid1
 
 from ds.exceptions import CommandError
 
 
 class Workspace(object):
+    log = logging.getLogger('workspace')
+
     def __init__(self, path):
         self.path = path
-        self.log = logging.getLogger('workspace')
 
     def whereis(self, program, env):
         for path in env.get('PATH', '').split(':'):
@@ -72,3 +76,14 @@ class Workspace(object):
 
         if proc.returncode != 0:
             raise CommandError(command, proc.returncode)
+
+    def remove(self):
+        shutil.rmtree(self.path)
+
+
+class TemporaryWorkspace(Workspace):
+    def __init__(self):
+        self.path = os.path.join(
+            current_app.config['WORKSPACE_ROOT'],
+            'ds-workspace-{}'.format(uuid1().hex),
+        )

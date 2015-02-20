@@ -12,7 +12,7 @@ from flask import current_app
 from ds import providers, vcs
 from ds.config import create_app, db
 from ds.models import App, LogChunk, Repository, Task, TaskStatus
-from ds.utils.workspace import Workspace
+from ds.utils.workspace import TemporaryWorkspace, Workspace
 
 
 def main(task_id):
@@ -30,37 +30,31 @@ def main(task_id):
 
     provider = providers.get(task.provider)
 
-    workspace = Workspace(
+    repo_home = Workspace(
         path=repo.get_path(),
     )
-
-    vcs_backend = vcs.get(
-        repo.vcs,
-        url=repo.url,
-        workspace=workspace,
-    )
-    if vcs_backend.exists():
-        vcs_backend.update()
-    else:
-        vcs_backend.clone()
-
-    if not task.sha:
-        task.sha = vcs_backend.describe(task.ref)
-        db.session.add(task)
-        db.session.commit()
-
-    vcs_backend.checkout(task.sha)
+    workspace = TemporaryWorkspace()
 
     try:
-        provider.execute(workspace, task)
-    except Exception as exc:
-        current_app.logger.exception(unicode(exc))
-        task.status = TaskStatus.failed
-    else:
-        task.status = TaskStatus.finished
-    task.date_finished = datetime.utcnow()
-    db.session.add(task)
-    db.session.commit()
+        vcs_backend = vcs.get(
+            repo.vcs,
+            url=repo.url,
+            workspace=repo_home,
+        )
+        vcs_backend.checkout(task.sha, workspace)
+
+        try:
+            provider.execute(workspace, task)
+        except Exception as exc:
+            current_app.logger.exception(unicode(exc))
+            task.status = TaskStatus.failed
+        else:
+            task.status = TaskStatus.finished
+        task.date_finished = datetime.utcnow()
+        db.session.add(task)
+        db.session.commit()
+    finally:
+        workspace.remove()
 
 
 if __name__ == '__main__':

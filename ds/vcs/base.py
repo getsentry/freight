@@ -28,8 +28,11 @@ class Vcs(object):
     def get_default_env(self):
         return {}
 
-    def run(self, command, capture=False, *args, **kwargs):
-        if not self.exists():
+    def run(self, command, capture=False, workspace=None, *args, **kwargs):
+        if workspace is None:
+            workspace = self.workspace
+
+        if not self.exists(workspace=workspace):
             kwargs.setdefault('cwd', None)
 
         env = kwargs.pop('env', {})
@@ -39,17 +42,19 @@ class Vcs(object):
         kwargs['env'] = env
 
         if capture:
-            handler = self.workspace.capture
+            handler = workspace.capture
         else:
-            handler = self.workspace.run
+            handler = workspace.run
 
         rv = handler(command, *args, **kwargs)
         if isinstance(rv, basestring):
             return rv.strip()
         return rv
 
-    def exists(self):
-        return os.path.exists(self.workspace.path)
+    def exists(self, workspace=None):
+        if workspace is None:
+            workspace = self.workspace
+        return os.path.exists(workspace.path)
 
     def clone(self):
         raise NotImplementedError

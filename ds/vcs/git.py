@@ -2,6 +2,8 @@ from __future__ import absolute_import, unicode_literals
 
 __all__ = ['GitVcs']
 
+import os
+
 from urlparse import urlparse
 
 from .base import Vcs, CommandError, UnknownRevision
@@ -48,13 +50,20 @@ class GitVcs(Vcs):
             raise
 
     def clone(self):
-        self.run(['clone', self.remote_url, self.path])
+        self.run(['clone', '--mirror', self.remote_url, self.path])
 
     def update(self):
-        self.run(['fetch', '--all', '-p'])
+        # in case we have a non-mirror checkout, wipe it out
+        if os.path.exists(os.path.join(self.workspace.path, '.git')):
+            self.run(['rm', '-rf', self.workspace.path])
+            self.clone()
+        else:
+            self.run(['fetch', '--all', '-p'])
 
-    def checkout(self, ref):
-        self.run(['reset', '--hard', ref])
+    def checkout(self, ref, new_workspace):
+        self.run(['clone', self.workspace.path, new_workspace.path],
+                 workspace=new_workspace)
+        self.run(['reset', '--hard', ref], workspace=new_workspace)
 
     def describe(self, ref):
         return self.run(['describe', '--always', '--abbrev=0', ref],
