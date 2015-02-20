@@ -10,27 +10,34 @@ It's not designed to replace something like Heroku, or other PaaS services, but 
 
 [![Deploy on Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
-## Features
+## Current Features
 
-- Multiple applications. All configuration is unique per application
-- Release state management (know what versions are active where, and provide a historical view)
-- Per-environment deployments (i.e. different versions on staging and production)
-- Environment locking (i.e. prevent people from deploying to an environment)
-- Automatic deploys (i.e. by looking for VCS changes)
-- Workspace management (i.e. whatever your deploy command is may be generating local artifacts, those should be cleaned up)
-- Deploy queue (i.e. cramer queued sha XXX, armin queued sha YYY)
-- Support for at least Fabric-based (simple shell commands) and Heroku-based deploys
-- Integration with GitHub status checks (i.e. did Circle CI pass on sha XXX)
 - Works behind-firewall (no inbound traffic)
+- Multiple applications. All configuration is unique per application
+- Per-environment deployments (i.e. different versions on staging and production)
+- Workspace management (i.e. whatever your deploy command is may be generating local artifacts, those should be cleaned up)
+- Support for at least Fabric-based (simple shell commands) and Heroku-based deploys
 - API-accessible deploy logs
 - Hubot integration (starting deploys)
 - Slack integraiton (notifying when deploys start/finish/fail)
 
-## Future Ideas
+## Roadmap
 
-The following could be considered v2 features.
+### V0
 
-### Machine-consistency service
+- Release state management (know what versions are active where, and provide a historical view)
+- Environment locking (i.e. prevent people from deploying to an environment)
+- Automatic deploys (i.e. by looking for VCS changes)
+- Integration with GitHub status checks (i.e. did Circle CI pass on sha XXX)
+- A GUI to manage deploys as well as view logs
+
+### V1
+
+- Deploy queue (i.e. cramer queued sha XXX, armin queued sha YYY)
+
+### V2 and Beyond
+
+#### Machine-consistency service
 
 We could run a service on each machine that would check-in with the master. This would record the current version of the application. The service would be configured with a set of apps (their environment info, how to get app version). The service could also be aware of "how do I deploy a version" which could assist in pull-based deploys.
 
