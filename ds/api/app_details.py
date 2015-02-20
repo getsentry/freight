@@ -14,18 +14,18 @@ from ds.models import App, Repository
 
 
 class AppDetailsApiView(ApiView):
-    post_parser = reqparse.RequestParser()
-    post_parser.add_argument('name')
-    post_parser.add_argument('repository')
-    post_parser.add_argument('provider')
-    post_parser.add_argument('provider_config', type=json.loads)
-    post_parser.add_argument('notifiers', type=json.loads)
+    put_parser = reqparse.RequestParser()
+    put_parser.add_argument('name')
+    put_parser.add_argument('repository')
+    put_parser.add_argument('provider')
+    put_parser.add_argument('provider_config', type=json.loads)
+    put_parser.add_argument('notifiers', type=json.loads)
 
     def put(self, app_id):
         """
         Update an app.
         """
-        args = self.post_parser.parse_args()
+        args = self.put_parser.parse_args()
 
         app = App.query.get(app_id)
         if app is None:
