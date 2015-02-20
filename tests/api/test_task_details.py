@@ -2,6 +2,8 @@ from __future__ import absolute_import, unicode_literals
 
 import json
 
+from ds.config import db
+from ds.models import TaskStatus
 from ds.testutils import TestCase
 
 
@@ -21,3 +23,14 @@ class TaskDetailsTest(TaskDetailsBase):
         assert resp.status_code == 200
         data = json.loads(resp.data)
         assert data['id'] == str(self.task.id)
+
+
+class TaskUpdateTest(TaskDetailsBase):
+    def test_simple(self):
+        resp = self.client.put(self.path, data={'status': 'cancelled'})
+        assert resp.status_code == 200
+        data = json.loads(resp.data)
+        assert data['id'] == str(self.task.id)
+        db.session.expire(self.task)
+        db.session.refresh(self.task)
+        assert self.task.status == TaskStatus.cancelled

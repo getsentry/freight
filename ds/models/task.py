@@ -26,6 +26,7 @@ class TaskStatus(object):
     in_progress = 2
     finished = 3
     failed = 4
+    cancelled = 5
 
     @classmethod
     def get_label(cls, status):
@@ -42,6 +43,7 @@ STATUS_LABELS = {
     TaskStatus.in_progress: 'in_progress',
     TaskStatus.finished: 'finished',
     TaskStatus.failed: 'failed',
+    TaskStatus.cancelled: 'cancelled',
 }
 STATUS_LABELS_REV = {
     v: k for k, v in STATUS_LABELS.items()
@@ -67,7 +69,7 @@ class Task(db.Model):
     sha = Column(String(40))
     environment = Column(String(64), nullable=False, default='production')
     provider = Column(String(64), nullable=False)
-    status = Column(Integer)
+    status = Column(Integer, nullable=False)
     data = Column(JSONEncodedDict)
     date_created = Column(DateTime, default=datetime.utcnow, nullable=False)
     # represents the start of the task (or the last time it was attempted)

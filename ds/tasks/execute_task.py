@@ -164,11 +164,35 @@ class TaskRunner(object):
         db.session.add(self.task)
         db.session.commit()
 
+    def _cancel(self):
+        logging.error('Task(id=%s) was cancelled', self.task.id)
+
+        self._process.terminate()
+        self._logreporter.terminate()
+
+        self._logreporter.save_chunk('Task was cancelled\n')
+
+        # TODO(dcramer): ideally we could just send the signal to the subprocess
+        # so it can still manage the failure state
+        self.task.date_finished = datetime.utcnow()
+        db.session.add(self.task)
+        db.session.commit()
+
+    def _is_cancelled(self):
+        cur_status = db.session.query(
+            Task.status,
+        ).filter(
+            Task.id == self.task.id,
+        ).scalar()
+        return cur_status == TaskStatus.cancelled
+
     def wait(self):
         assert self._process is not None, 'TaskRunner not started'
         while self.active and self._process.poll() is None:
             if self.timeout and time() > self._started + self.timeout:
                 self._timeout()
+            if self._is_cancelled():
+                self._cancel()
             if self._process.poll() is None:
                 sleep(0.1)
         self.active = False
