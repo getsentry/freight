@@ -2,11 +2,15 @@ from __future__ import absolute_import, unicode_literals
 
 from flask_restful import reqparse, inputs
 
+from ds import vcs
 from ds.config import celery, db, redis
 from ds.api.base import ApiView
 from ds.api.serializer import serialize
-from ds.models import App, Task, TaskName, TaskSequence, TaskStatus, User
+from ds.models import (
+    App, Repository, Task, TaskName, TaskSequence, TaskStatus, User
+)
 from ds.utils.redis import lock
+from ds.utils.workspace import Workspace
 
 
 class TaskIndexApiView(ApiView):
@@ -80,6 +84,29 @@ class TaskIndexApiView(ApiView):
         if not app:
             return self.error('Invalid app', name='invalid_resource', status_code=404)
 
+        repo = Repository.query.get(app.repository_id)
+
+        workspace = Workspace(
+            path=repo.get_path(),
+        )
+
+        vcs_backend = vcs.get(
+            repo.vcs,
+            url=repo.url,
+            workspace=workspace,
+        )
+
+        with lock(redis, 'repo:update:{}'.format(repo.id)):
+            if vcs_backend.exists():
+                vcs_backend.update()
+            else:
+                vcs_backend.clone()
+
+            try:
+                sha = vcs_backend.describe(args.ref)
+            except vcs.UnknownRevision:
+                return self.error('Invalid ref', name='invalid_ref', status_code=400)
+
         with lock(redis, 'task:create:{}'.format(app.id), timeout=5):
             # TODO(dcramer): this needs to be a get_or_create pattern and
             # ideally moved outside of the lock
@@ -102,6 +129,7 @@ class TaskIndexApiView(ApiView):
                 name=TaskName.deploy,
                 # TODO(dcramer): ref should default based on app config
                 ref=args.ref,
+                sha=sha,
                 status=TaskStatus.pending,
                 user_id=user.id,
                 provider=app.provider,

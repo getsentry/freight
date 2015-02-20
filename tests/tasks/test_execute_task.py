@@ -10,7 +10,7 @@ class ExecuteTaskTestCase(TransactionTestCase):
         user = self.create_user()
         repo = self.create_repo()
         app = self.create_app(repository=repo)
-        task = self.create_task(app=app, user=user, sha=None)
+        task = self.create_task(app=app, user=user)
         db.session.commit()
 
         celery.apply("ds.execute_task", task_id=task.id)
