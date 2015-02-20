@@ -10,8 +10,9 @@ from datetime import datetime
 from flask import current_app
 
 from ds import providers, vcs
-from ds.config import create_app, db
+from ds.config import create_app, db, redis
 from ds.models import App, LogChunk, Repository, Task, TaskStatus
+from ds.utils.redis import lock
 from ds.utils.workspace import TemporaryWorkspace, Workspace
 
 
@@ -33,14 +34,20 @@ def main(task_id):
     repo_home = Workspace(
         path=repo.get_path(),
     )
+
+
+    vcs_backend = vcs.get(
+        repo.vcs,
+        url=repo.url,
+        workspace=repo_home,
+    )
+
+    with lock(redis, 'repo:update:{}'.format(repo.id)):
+        vcs_backend.clone_or_update()
+
     workspace = TemporaryWorkspace()
 
     try:
-        vcs_backend = vcs.get(
-            repo.vcs,
-            url=repo.url,
-            workspace=repo_home,
-        )
         vcs_backend.checkout(task.sha, workspace)
 
         try:

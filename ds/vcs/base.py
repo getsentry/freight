@@ -56,6 +56,12 @@ class Vcs(object):
             workspace = self.workspace
         return os.path.exists(workspace.path)
 
+    def clone_or_update(self):
+        if self.exists():
+            self.update()
+        else:
+            self.clone()
+
     def clone(self):
         raise NotImplementedError
 

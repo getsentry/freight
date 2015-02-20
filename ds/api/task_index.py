@@ -97,15 +97,12 @@ class TaskIndexApiView(ApiView):
         )
 
         with lock(redis, 'repo:update:{}'.format(repo.id)):
-            if vcs_backend.exists():
-                vcs_backend.update()
-            else:
-                vcs_backend.clone()
+            vcs_backend.clone_or_update()
 
-            try:
-                sha = vcs_backend.describe(args.ref)
-            except vcs.UnknownRevision:
-                return self.error('Invalid ref', name='invalid_ref', status_code=400)
+        try:
+            sha = vcs_backend.describe(args.ref)
+        except vcs.UnknownRevision:
+            return self.error('Invalid ref', name='invalid_ref', status_code=400)
 
         with lock(redis, 'task:create:{}'.format(app.id), timeout=5):
             # TODO(dcramer): this needs to be a get_or_create pattern and
