@@ -43,6 +43,13 @@ def execute_task(task_id):
     db.session.expire(task)
     db.session.refresh(task)
 
+    if task.status in (TaskStatus.pending, TaskStatus.in_progress):
+        logging.error('Task(id=%s) did not finish cleanly', task.id)
+        task.status = TaskStatus.failed
+        task.date_finished = datetime.utcnow()
+        db.session.add(task)
+        db.session.commit()
+
     send_task_notifications(task, NotifierEvent.TASK_FINISHED)
 
 
