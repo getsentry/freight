@@ -78,7 +78,8 @@ class Workspace(object):
             raise CommandError(command, proc.returncode)
 
     def remove(self):
-        shutil.rmtree(self.path)
+        if os.path.exists(self.path):
+            shutil.rmtree(self.path)
 
 
 class TemporaryWorkspace(Workspace):
