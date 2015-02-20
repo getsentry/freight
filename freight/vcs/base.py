@@ -38,7 +38,7 @@ class Vcs(object):
         env = kwargs.pop('env', {})
         for key, value in self.get_default_env().iteritems():
             env.setdefault(key, value)
-        env.setdefault('DS_SSH_REPO', self.url)
+        env.setdefault('FREIGHT_SSH_REPO', self.url)
         kwargs['env'] = env
 
         if capture:

@@ -27,9 +27,9 @@ def get_repo(url):
 
     return repo
 
-repo_url = os.environ.get('DS_SSH_REPO')
+repo_url = os.environ.get('FREIGHT_SSH_REPO')
 if not repo_url:
-    raise ValueError("No 'DS_SSH_REPO' in environment")
+    raise ValueError("No 'FREIGHT_SSH_REPO' in environment")
 
 repo = get_repo(repo_url)
 

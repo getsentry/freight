@@ -8,7 +8,7 @@ var App = React.createClass({
     return (
       <div className="container">
         <div className="page-header">
-          <h1>DS</h1>
+          <h1>Freight</h1>
         </div>
         <ul>
           <li><Link to="overview">Overview</Link></li>
