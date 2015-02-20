@@ -12,7 +12,7 @@ down_revision = None
 
 from alembic import op
 import sqlalchemy as sa
-import ds
+import freight
 
 
 def upgrade():
@@ -21,7 +21,7 @@ def upgrade():
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('url', sa.String(length=200), nullable=False),
         sa.Column('vcs', sa.String(length=64), nullable=False),
-        sa.Column('data', ds.db.types.json.JSONEncodedDict(), nullable=True),
+        sa.Column('data', freight.db.types.json.JSONEncodedDict(), nullable=True),
         sa.Column('date_created', sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('url')
@@ -40,7 +40,7 @@ def upgrade():
         sa.Column('repository_id', sa.Integer(), nullable=False),
         sa.Column('name', sa.String(length=200), nullable=False),
         sa.Column('provider', sa.String(length=64), nullable=True),
-        sa.Column('data', ds.db.types.json.JSONEncodedDict(), nullable=True),
+        sa.Column('data', freight.db.types.json.JSONEncodedDict(), nullable=True),
         sa.Column('date_created', sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(['repository_id'], ['repository.id'], ondelete='CASCADE'),
         sa.PrimaryKeyConstraint('id'),
@@ -56,7 +56,7 @@ def upgrade():
         sa.Column('sha', sa.String(length=40), nullable=False),
         sa.Column('environment', sa.String(length=64), nullable=False),
         sa.Column('provider', sa.String(length=64), nullable=False),
-        sa.Column('data', ds.db.types.json.JSONEncodedDict(), nullable=True),
+        sa.Column('data', freight.db.types.json.JSONEncodedDict(), nullable=True),
         sa.Column('date_created', sa.DateTime(), nullable=False),
         sa.ForeignKeyConstraint(['app_id'], ['app.id'], ondelete='CASCADE'),
         sa.ForeignKeyConstraint(['user_id'], ['user.id'], ondelete='CASCADE'),

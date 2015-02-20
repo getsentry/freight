@@ -1,6 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
-from ds.testutils import TestCase
+from freight.testutils import TestCase
 
 
 class CatchallTest(TestCase):

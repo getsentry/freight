@@ -3,8 +3,8 @@ from __future__ import absolute_import, unicode_literals
 import json
 import mock
 
-from ds.models import App
-from ds.testutils import TestCase
+from freight.models import App
+from freight.testutils import TestCase
 
 
 class AppDetailsBase(TestCase):
@@ -83,10 +83,10 @@ class AppUpdateTest(AppDetailsBase):
 
 
 class AppDeleteTest(AppDetailsBase):
-    @mock.patch('ds.config.celery.send_task')
+    @mock.patch('freight.config.celery.send_task')
     def test_simple(self, mock_send_task):
         self.create_task(app=self.app, user=self.user)
         resp = self.client.delete(self.path)
         assert resp.status_code == 200
 
-        mock_send_task.assert_called_once_with('ds.delete_object', kwargs={'model': 'App', 'app_id': self.app.id})
+        mock_send_task.assert_called_once_with('freight.delete_object', kwargs={'model': 'App', 'app_id': self.app.id})

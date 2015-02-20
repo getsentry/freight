@@ -2,8 +2,8 @@ from __future__ import absolute_import, unicode_literals
 
 import json
 
-from ds.models import Task, TaskStatus
-from ds.testutils import TestCase
+from freight.models import Task, TaskStatus
+from freight.testutils import TestCase
 
 
 class TaskIndexBase(TestCase):

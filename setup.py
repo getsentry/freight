@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 """
-DS
-==
+Freight
+=======
+
+A deploy service.
 
 :copyright: (c) 2015 GetSentry LLC
 :license: Apache 2.0, see LICENSE for more details.
@@ -54,11 +56,11 @@ install_requires = [
 ]
 
 setup(
-    name='ds',
+    name='freight',
     version='0.0.0',
     author='David Cramer',
     author_email='dcramer@gmail.com',
-    url='https://github.com/getsentry/ds',
+    url='https://github.com/getsentry/freight',
     description='A deployment service',
     long_description=open('README.md').read(),
     packages=find_packages(exclude=['tests']),

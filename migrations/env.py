@@ -13,7 +13,7 @@ fileConfig(config.config_file_name)
 # add your model's MetaData object here
 # for 'autogenerate' support
 from flask import current_app
-from ds.config import create_app, db
+from freight.config import create_app, db
 
 import warnings
 from sqlalchemy.exc import SAWarning
@@ -27,7 +27,7 @@ app.app_context().push()
 target_metadata = db.metadata
 
 # force registration of models
-import ds.models  # NOQA
+import freight.models  # NOQA
 
 
 def run_migrations():

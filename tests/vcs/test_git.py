@@ -2,13 +2,13 @@ from __future__ import absolute_import
 
 from subprocess import check_call
 
-from ds.testutils import TestCase
-from ds.utils.workspace import Workspace
-from ds.vcs.git import GitVcs
+from freight.testutils import TestCase
+from freight.utils.workspace import Workspace
+from freight.vcs.git import GitVcs
 
 
 class GitVcsTest(TestCase):
-    root = '/tmp/ds-git-test'
+    root = '/tmp/freight-git-test'
     path = '%s/clone' % (root,)
     remote_path = '%s/remote' % (root,)
     url = 'file://%s' % (remote_path,)

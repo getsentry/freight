@@ -9,8 +9,8 @@ import sys
 
 from tempfile import NamedTemporaryFile
 
-from ds.config import create_app, db
-from ds.models import Repository
+from freight.config import create_app, db
+from freight.models import Repository
 
 app = create_app()
 app_context = app.app_context()

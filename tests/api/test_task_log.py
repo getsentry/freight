@@ -2,9 +2,9 @@ from __future__ import absolute_import, unicode_literals
 
 import json
 
-from ds.config import db
-from ds.models import LogChunk
-from ds.testutils import TestCase
+from freight.config import db
+from freight.models import LogChunk
+from freight.testutils import TestCase
 
 
 class TaskLogBase(TestCase):

@@ -9,11 +9,11 @@ import sys
 from datetime import datetime
 from flask import current_app
 
-from ds import providers, vcs
-from ds.config import create_app, db, redis
-from ds.models import App, LogChunk, Repository, Task, TaskStatus
-from ds.utils.redis import lock
-from ds.utils.workspace import TemporaryWorkspace, Workspace
+from freight import providers, vcs
+from freight.config import create_app, db, redis
+from freight.models import App, LogChunk, Repository, Task, TaskStatus
+from freight.utils.redis import lock
+from freight.utils.workspace import TemporaryWorkspace, Workspace
 
 
 def main(task_id):

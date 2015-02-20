@@ -5,10 +5,10 @@ import responses
 
 from urlparse import parse_qs
 
-from ds import notifiers
-from ds.notifiers import NotifierEvent
-from ds.models import TaskStatus
-from ds.testutils import TestCase
+from freight import notifiers
+from freight.notifiers import NotifierEvent
+from freight.models import TaskStatus
+from freight.testutils import TestCase
 
 
 class SlackNotifierBase(TestCase):

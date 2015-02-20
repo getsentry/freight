@@ -1,4 +1,4 @@
-# Deployment Service [name TBD]
+# Freight
 
 **This project is a work in progress and is not yet intended to be production ready.**
 
@@ -8,7 +8,7 @@ The overarching goal of the system is to provide easy manual and automated deplo
 
 It's not designed to replace something like Heroku, or other PaaS services, but rather to work *with* your existing processes, no matter what they are.
 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+[![Deploy on Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
 ## Features
 

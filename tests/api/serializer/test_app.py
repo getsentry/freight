@@ -1,7 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
-from ds.api.serializer import serialize
-from ds.testutils import TestCase
+from freight.api.serializer import serialize
+from freight.testutils import TestCase
 
 
 class TaskSerializerTest(TestCase):

@@ -2,8 +2,8 @@ from __future__ import absolute_import, unicode_literals
 
 import json
 
-from ds.models import App
-from ds.testutils import TestCase
+from freight.models import App
+from freight.testutils import TestCase
 
 
 class AppIndexBase(TestCase):

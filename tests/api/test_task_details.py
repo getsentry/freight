@@ -2,9 +2,9 @@ from __future__ import absolute_import, unicode_literals
 
 import json
 
-from ds.config import db
-from ds.models import TaskStatus
-from ds.testutils import TestCase
+from freight.config import db
+from freight.models import TaskStatus
+from freight.testutils import TestCase
 
 
 class TaskDetailsBase(TestCase):

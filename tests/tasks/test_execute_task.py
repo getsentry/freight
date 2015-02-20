@@ -1,10 +1,10 @@
 from __future__ import absolute_import, unicode_literals
 
-from ds import vcs
-from ds.config import celery, db
-from ds.models import LogChunk, TaskStatus
-from ds.testutils import TransactionTestCase
-from ds.utils.workspace import Workspace
+from freight import vcs
+from freight.config import celery, db
+from freight.models import LogChunk, TaskStatus
+from freight.testutils import TransactionTestCase
+from freight.utils.workspace import Workspace
 
 
 class ExecuteTaskTestCase(TransactionTestCase):
@@ -31,8 +31,7 @@ class ExecuteTaskTestCase(TransactionTestCase):
         else:
             vcs_backend.clone()
 
-        celery.apply("ds.execute_task", task_id=task.id)
-        # celery.send_task("ds.execute_task", [task.id])
+        celery.apply("freight.execute_task", task_id=task.id)
 
         db.session.expire_all()
 

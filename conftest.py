@@ -6,12 +6,12 @@ import subprocess
 from alembic import command
 from alembic.config import Config
 
-from ds.config import create_app, db
-from ds.constants import PROJECT_ROOT
+from freight.config import create_app, db
+from freight.constants import PROJECT_ROOT
 
 ALEMBIC_CONFIG = Config(os.path.join(PROJECT_ROOT, 'alembic.ini'))
 
-os.environ['DS_CONF'] = os.path.join(PROJECT_ROOT, 'tests', 'config.py')
+os.environ['FREIGHT_CONF'] = os.path.join(PROJECT_ROOT, 'tests', 'config.py')
 
 
 @pytest.fixture(autouse=True, scope='session')
@@ -26,13 +26,14 @@ def app(request):
 def clean_workspace_root(request, app):
     path = app.config['WORKSPACE_ROOT']
     if os.path.exists(path):
+        print('Cleaning up workspace root: {}'.format(path))
         shutil.rmtree(path)
     os.makedirs(path)
 
 
 @pytest.fixture(scope='session', autouse=True)
 def reset_database(request, app):
-    db_name = 'test_ds'
+    db_name = 'test_freight'
 
     db.session.close_all()
 

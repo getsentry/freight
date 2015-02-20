@@ -1,7 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 
-from ds import providers
-from ds.testutils import TestCase
+from freight import providers
+from freight.testutils import TestCase
 
 
 class ShellProviderBase(TestCase):

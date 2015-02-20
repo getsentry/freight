@@ -1,8 +1,8 @@
 from __future__ import absolute_import, unicode_literals
 
-from ds.config import celery, db
-from ds.models import App, Task
-from ds.testutils import TestCase
+from freight.config import celery, db
+from freight.models import App, Task
+from freight.testutils import TestCase
 
 
 class DeleteObjectTest(TestCase):
@@ -12,7 +12,7 @@ class DeleteObjectTest(TestCase):
         app = self.create_app(repository=repo)
         task = self.create_task(app=app, user=user)
 
-        celery.apply("ds.delete_object", model='App', object_id=app.id)
+        celery.apply("freight.delete_object", model='App', object_id=app.id)
 
         db.session.expire_all()
 

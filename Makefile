@@ -1,7 +1,7 @@
 develop: update-submodules setup-git
 	@echo "--> Installing dependencies"
 	pip install -e .
-	pip install "file://`pwd`#egg=ds[test]"
+	pip install "file://`pwd`#egg=freight[test]"
 
 setup-git:
 	@echo "--> Installing git hooks"
@@ -10,8 +10,8 @@ setup-git:
 	@echo ""
 
 upgrade:
-	@echo "--> Creating default 'ds' database"
-	createdb -E utf-8 ds || true
+	@echo "--> Creating default 'freight' database"
+	createdb -E utf-8 freight || true
 	@echo "--> Running migrations"
 	bin/upgrade
 

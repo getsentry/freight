@@ -1,5 +1,5 @@
 {
-  "name": "ds",
+  "name": "freight",
   "version": "0.0.0",
   "description": "**This project is a work in progress and is not yet intended to be production ready.**",
   "directories": {
@@ -8,19 +8,19 @@
   "scripts": {
     "prevalidate-app.json": "npm install",
     "prestart": "npm install",
-    "start": "webpack-dev-server --content-base ds-frontend/",
+    "start": "webpack-dev-server --content-base freight-frontend/",
     "validate-app.json": "app.json validate"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/getsentry/ds.git"
+    "url": "https://github.com/getsentry/freight.git"
   },
   "author": "David Cramer <dcramer@gmail.com> (https://github.com/dcramer)",
   "license": "Apache 2.0",
   "bugs": {
-    "url": "https://github.com/getsentry/ds/issues"
+    "url": "https://github.com/getsentry/freight/issues"
   },
-  "homepage": "https://github.com/getsentry/ds",
+  "homepage": "https://github.com/getsentry/freight",
   "dependencies": {
     "bootstrap": "~3.3.0",
     "bundle-loader": "^0.5.0",

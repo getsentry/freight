@@ -18,7 +18,7 @@ def main(argv=sys.argv[1:]):
 
 
 def web(addr, debug=True):
-    from ds.config import create_app
+    from freight.config import create_app
 
     host, port = addr.split(':')
     if not host:
