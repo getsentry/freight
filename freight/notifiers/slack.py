@@ -33,7 +33,7 @@ class SlackNotifier(Notifier):
         }
 
         if event == NotifierEvent.TASK_STARTED:
-            title = "[{app_name}/{env}] Starting deploy #{number} ({ref})".format(**params)
+            title = "[{app_name}/{env}] Starting deploy #{number} ({sha})".format(**params)
         elif task.status == TaskStatus.failed:
             title = "[{app_name}/{env}] Failed to deploy {ref} after {duration}s".format(**params)
         elif task.status == TaskStatus.cancelled:
