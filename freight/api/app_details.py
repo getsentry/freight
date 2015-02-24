@@ -76,6 +76,7 @@ class AppDetailsApiView(ApiView):
             'provider': app.provider,
             'provider_config': app.provider_config,
             'notifiers': app.notifiers,
+            'checks': app.checks,
         })
 
         return self.respond(context)
