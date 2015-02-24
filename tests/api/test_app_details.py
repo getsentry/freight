@@ -68,7 +68,7 @@ class AppUpdateTest(AppDetailsBase):
         })
         assert resp.status_code == 400
         data = json.loads(resp.data)
-        assert data['error_name'] == 'invalid_provider_config'
+        assert data['error_name'] == 'invalid_provider'
 
     def test_invalid_notifier(self):
         resp = self.client.put(self.path, data={
@@ -84,7 +84,7 @@ class AppUpdateTest(AppDetailsBase):
         })
         assert resp.status_code == 400
         data = json.loads(resp.data)
-        assert data['error_name'] == 'invalid_config'
+        assert data['error_name'] == 'invalid_notifier'
 
     def test_invalid_check(self):
         resp = self.client.put(self.path, data={
@@ -100,7 +100,7 @@ class AppUpdateTest(AppDetailsBase):
         })
         assert resp.status_code == 400
         data = json.loads(resp.data)
-        assert data['error_name'] == 'invalid_config'
+        assert data['error_name'] == 'invalid_check'
 
 
 class AppDeleteTest(AppDetailsBase):

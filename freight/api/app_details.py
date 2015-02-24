@@ -3,71 +3,17 @@ from __future__ import absolute_import, unicode_literals
 import json
 
 from flask_restful import reqparse
-from itertools import chain
 
-from freight import checks, notifiers, providers
 from freight.api.base import ApiView
 from freight.api.serializer import serialize
+from freight.checks.utils import parse_checks_config
 from freight.config import celery, db
-from freight.exceptions import ApiError, InvalidNotifier, InvalidProvider
 from freight.models import App, Repository
+from freight.notifiers.utils import parse_notifiers_config
+from freight.providers.utils import parse_provider_config
 
 
 class AppDetailsApiView(ApiView):
-    def _parse_checks(self, value):
-        result = []
-        for data in value:
-            try:
-                instance = checks.get(data['type'])
-            except KeyError:
-                raise ApiError(
-                    message='Invalid check: {}'.format(data['type']),
-                    name='invalid_check',
-                )
-
-            config = data.get('config', {})
-            all_options = chain(instance.get_default_options().items(),
-                                instance.get_options().items())
-            for option, option_values in all_options:
-                value = config.get(option)
-                if option_values.get('required') and not value:
-                    raise ApiError(
-                        message='Missing required option for "{}" check: {}'.format(data['type'], option),
-                        name='invalid_config',
-                    )
-            result.append({
-                'type': data['type'],
-                'config': config,
-            })
-        return result
-
-    def _parse_notifiers(self, value):
-        result = []
-        for data in value:
-            try:
-                instance = notifiers.get(data['type'])
-            except InvalidNotifier:
-                raise ApiError(
-                    message='Invalid notifier: {}'.format(data['type']),
-                    name='invalid_notifier',
-                )
-
-            config = data.get('config', {})
-            all_options = chain(instance.get_default_options().items(),
-                                instance.get_options().items())
-            for option, option_values in all_options:
-                value = config.get(option)
-                if option_values.get('required') and not value:
-                    raise ApiError(
-                        message='Missing required notifier option: %s' % (option,),
-                        name='invalid_config',
-                    )
-            result.append({
-                'type': data['type'],
-                'config': config,
-            })
-        return result
-
     put_parser = reqparse.RequestParser()
     put_parser.add_argument('name')
     put_parser.add_argument('repository')
@@ -86,39 +32,27 @@ class AppDetailsApiView(ApiView):
         if app is None:
             return self.error('Invalid app', name='invalid_resource', status_code=404)
 
-        if args.provider:
-            try:
-                provider = providers.get(args.provider)
-            except InvalidProvider:
-                return self.error('Invalid provider', name='invalid_provider')
-            app.provider = args.provider
-        else:
-            provider = providers.get(app.provider)
-
-        if args.provider_config is not None or args.provider:
-            if args.provider_config is not None:
-                cur_provider_config = args.provider_config
+        if args.provider or args.provider_config:
+            if args.provider is not None:
+                provider = args.provider
             else:
-                cur_provider_config = app.provider_config
+                provider = app.provider
 
-            new_provider_config = {}
-            all_options = chain(provider.get_default_options().items(),
-                                provider.get_options().items())
-            for option, option_values in all_options:
-                value = cur_provider_config.get(option)
-                if option_values.get('required') and not value:
-                    return self.error(
-                        message='Missing required provider option: %s' % (option,),
-                        name='invalid_provider_config',
-                    )
-                new_provider_config[option] = value
-            app.data['provider_config'] = new_provider_config
+            if args.provider_config is not None:
+                provider_config = args.provider_config
+            else:
+                provider_config = app.provider_config
+
+            app.provider = provider
+            app.data['provider_config'] = parse_provider_config(
+                provider, provider_config
+            )
 
         if args.notifiers is not None:
-            app.data['notifiers'] = self._parse_notifiers(args.notifiers)
+            app.data['notifiers'] = parse_notifiers_config(args.notifiers)
 
         if args.checks is not None:
-            app.data['checks'] = self._parse_checks(args.checks)
+            app.data['checks'] = parse_checks_config(args.checks)
 
         if args.name:
             app.name = args.name
