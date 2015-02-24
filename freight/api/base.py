@@ -7,6 +7,7 @@ from flask_restful import Resource
 from urllib import quote
 
 from freight.config import db
+from freight.exceptions import ApiError
 from freight.utils.auth import get_current_user
 
 LINK_HEADER = '<{uri}&cursor={cursor}>; rel="{name}"'
@@ -45,6 +46,13 @@ class ApiView(Resource):
 
         try:
             response = super(ApiView, self).dispatch_request(*args, **kwargs)
+        except ApiError as e:
+            return self.error(
+                message=e.message,
+                name=e.name,
+                status_code=e.status_code,
+            )
+
         except Exception:
             db.session.rollback()
             raise

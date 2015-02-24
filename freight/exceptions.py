@@ -1,6 +1,18 @@
 from __future__ import absolute_import, unicode_literals
 
 
+class ApiError(Exception):
+    def __init__(self, message, name=None, status_code=400):
+        self.message = message
+        self.name = name
+        self.status_code = status_code
+        super(ApiError, self).__init__(message)
+
+
+class CheckFailed(Exception):
+    pass
+
+
 class CommandError(Exception):
     def __init__(self, cmd, retcode, stdout=None, stderr=None):
         self.cmd = cmd
@@ -16,9 +28,13 @@ class CommandError(Exception):
         return self.__unicode__().encode('utf-8')
 
 
-class InvalidProvider(Exception):
+class InvalidProvider(KeyError):
     pass
 
 
-class InvalidNotifier(Exception):
+class InvalidNotifier(KeyError):
+    pass
+
+
+class InvalidCheck(KeyError):
     pass

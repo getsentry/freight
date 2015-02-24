@@ -5,21 +5,49 @@ import json
 from flask_restful import reqparse
 from itertools import chain
 
-from freight import notifiers, providers
+from freight import checks, notifiers, providers
 from freight.api.base import ApiView
 from freight.api.serializer import serialize
 from freight.config import celery, db
-from freight.exceptions import InvalidNotifier, InvalidProvider
+from freight.exceptions import ApiError, InvalidNotifier, InvalidProvider
 from freight.models import App, Repository
 
 
 class AppDetailsApiView(ApiView):
+    def _parse_checks(self, value):
+        result = []
+        for data in value:
+            try:
+                instance = checks.get(data['type'])
+            except KeyError:
+                raise ApiError(
+                    message='Invalid check: {}'.format(data['type']),
+                    name='invalid_check',
+                )
+
+            config = data.get('config', {})
+            all_options = chain(instance.get_default_options().items(),
+                                instance.get_options().items())
+            for option, option_values in all_options:
+                value = config.get(option)
+                if option_values.get('required') and not value:
+                    raise ApiError(
+                        message='Missing required option for "{}" check: {}'.format(data['type'], option),
+                        name='invalid_config',
+                    )
+            result.append({
+                'type': data['type'],
+                'config': config,
+            })
+        return result
+
     put_parser = reqparse.RequestParser()
     put_parser.add_argument('name')
     put_parser.add_argument('repository')
     put_parser.add_argument('provider')
     put_parser.add_argument('provider_config', type=json.loads)
     put_parser.add_argument('notifiers', type=json.loads)
+    put_parser.add_argument('checks', type=json.loads)
 
     def put(self, app_id):
         """
@@ -80,6 +108,9 @@ class AppDetailsApiView(ApiView):
                         )
                     new_notifiers.append({'type': data['type'], 'config': config})
             app.data['notifiers'] = new_notifiers
+
+        if args.checks is not None:
+            app.data['checks'] = self._parse_checks(args.checks)
 
         if args.name:
             app.name = args.name

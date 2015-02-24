@@ -24,6 +24,10 @@ class App(db.Model):
     date_created = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     @property
+    def checks(self):
+        return self.data.get('checks', [])
+
+    @property
     def notifiers(self):
         return self.data.get('notifiers', [])
 

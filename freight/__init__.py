@@ -5,7 +5,7 @@ import subprocess
 
 try:
     VERSION = __import__('pkg_resources') \
-        .get_distribution('ds').version
+        .get_distribution('freight').version
 except Exception:
     VERSION = 'unknown'
 

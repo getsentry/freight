@@ -23,6 +23,7 @@ class AppUpdateTest(AppDetailsBase):
             'provider': 'shell',
             'provider_config': '{"command": "/usr/bin/true", "timeout": 50}',
             'notifiers': '[{"type": "slack", "config": {"webhook_url": "https://example.com"}}]',
+            'checks': '[{"type": "github", "config": {"contexts": ["travisci"], "repo": "getsentry/freight"}}]',
             'repository': 'git@example.com:repo-name.git',
         })
         assert resp.status_code == 200
@@ -36,6 +37,10 @@ class AppUpdateTest(AppDetailsBase):
         assert app.notifiers == [
             {'type': 'slack', 'config': {'webhook_url': 'https://example.com'}},
         ]
+
+        assert len(app.checks) == 1
+        assert app.checks[0]['type'] == 'github'
+        assert app.checks[0]['config'] == {'contexts': ['travisci'], 'repo': 'getsentry/freight'}
 
     def test_no_params(self):
         resp = self.client.put(self.path)
@@ -80,6 +85,22 @@ class AppUpdateTest(AppDetailsBase):
         assert resp.status_code == 400
         data = json.loads(resp.data)
         assert data['error_name'] == 'invalid_notifier_config'
+
+    def test_invalid_check(self):
+        resp = self.client.put(self.path, data={
+            'checks': '[{"type": "dummy"}]',
+        })
+        assert resp.status_code == 400
+        data = json.loads(resp.data)
+        assert data['error_name'] == 'invalid_check'
+
+    def test_invalid_check_config(self):
+        resp = self.client.put(self.path, data={
+            'checks': '[{"type": "github", "config": {}}]',
+        })
+        assert resp.status_code == 400
+        data = json.loads(resp.data)
+        assert data['error_name'] == 'invalid_config'
 
 
 class AppDeleteTest(AppDetailsBase):

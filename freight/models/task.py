@@ -77,6 +77,10 @@ class Task(db.Model):
     date_finished = Column(DateTime)
 
     @property
+    def checks(self):
+        return self.data.get('checks', [])
+
+    @property
     def notifiers(self):
         return self.data.get('notifiers', [])
 
