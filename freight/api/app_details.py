@@ -106,7 +106,7 @@ class AppDetailsApiView(ApiView):
                             message='Missing required notifier option: %s' % (option,),
                             name='invalid_notifier_config',
                         )
-                    new_notifiers.append({'type': data['type'], 'config': config})
+                new_notifiers.append({'type': data['type'], 'config': config})
             app.data['notifiers'] = new_notifiers
 
         if args.checks is not None:

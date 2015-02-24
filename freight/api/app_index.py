@@ -80,7 +80,7 @@ class AppIndexApiView(ApiView):
                         message='Missing required notifier option: %s' % (option,),
                         name='invalid_notifier_config',
                     )
-                notifiers_config.append({'type': data['type'], 'config': config})
+            notifiers_config.append({'type': data['type'], 'config': config})
 
         # TODO(dcramer): this needs to be a get_or_create pattern
         repo = Repository.query.filter(
