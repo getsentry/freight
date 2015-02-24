@@ -20,7 +20,7 @@ class GitHubContextCheck(Check):
             'repo': {'required': True},
         }
 
-    def check(self, task, config):
+    def check(self, app, sha, config):
         token = current_app.config['GITHUB_TOKEN']
         if not token:
             # TODO(dcramer): error/log this
@@ -36,14 +36,14 @@ class GitHubContextCheck(Check):
         url = '{api_root}/repos/{repo}/commits/{ref}/statuses'.format(
             api_root=api_root,
             repo=repo,
-            ref=task.sha,
+            ref=sha,
         )
 
-        headers = [
-            ('User-Agent', 'freight/{}'.format(freight.VERSION)),
-            ('Accepts', 'application/json'),
-            ('Authorization', 'token {}'.format(token)),
-        ]
+        headers = {
+            'User-Agent': 'freight/{}'.format(freight.VERSION),
+            'Accepts': 'application/json',
+            'Authorization': 'token {}'.format(token),
+        }
 
         resp = requests.get(url, headers=headers)
 
@@ -52,3 +52,7 @@ class GitHubContextCheck(Check):
                 continue
             if data['state'] != 'success':
                 raise CheckFailed('{} context is {}'.format(data['context'], data['state']))
+            contexts.remove(data['context'])
+
+        if contexts:
+            raise CheckFailed('{} context was not found'.format(iter(contexts).next()))

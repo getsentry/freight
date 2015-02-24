@@ -11,5 +11,5 @@ class Check(object):
     def get_options(self):
         return {}
 
-    def check(self, task, config):
+    def check(self, app, sha, config):
         raise NotImplementedError
