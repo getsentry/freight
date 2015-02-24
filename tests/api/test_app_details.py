@@ -84,7 +84,7 @@ class AppUpdateTest(AppDetailsBase):
         })
         assert resp.status_code == 400
         data = json.loads(resp.data)
-        assert data['error_name'] == 'invalid_notifier_config'
+        assert data['error_name'] == 'invalid_config'
 
     def test_invalid_check(self):
         resp = self.client.put(self.path, data={

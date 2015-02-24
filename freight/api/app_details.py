@@ -41,6 +41,33 @@ class AppDetailsApiView(ApiView):
             })
         return result
 
+    def _parse_notifiers(self, value):
+        result = []
+        for data in value:
+            try:
+                instance = notifiers.get(data['type'])
+            except InvalidNotifier:
+                raise ApiError(
+                    message='Invalid notifier: {}'.format(data['type']),
+                    name='invalid_notifier',
+                )
+
+            config = data.get('config', {})
+            all_options = chain(instance.get_default_options().items(),
+                                instance.get_options().items())
+            for option, option_values in all_options:
+                value = config.get(option)
+                if option_values.get('required') and not value:
+                    raise ApiError(
+                        message='Missing required notifier option: %s' % (option,),
+                        name='invalid_config',
+                    )
+            result.append({
+                'type': data['type'],
+                'config': config,
+            })
+        return result
+
     put_parser = reqparse.RequestParser()
     put_parser.add_argument('name')
     put_parser.add_argument('repository')
@@ -88,26 +115,7 @@ class AppDetailsApiView(ApiView):
             app.data['provider_config'] = new_provider_config
 
         if args.notifiers is not None:
-            new_notifiers = []
-            for data in args.notifiers:
-                try:
-                    notifier = notifiers.get(data['type'])
-                except InvalidNotifier:
-                    return self.error('Invalid notifier: {}'.format(data['type']),
-                                      name='invalid_notifier')
-
-                config = data.get('config', {})
-                all_options = chain(notifier.get_default_options().items(),
-                                    notifier.get_options().items())
-                for option, option_values in all_options:
-                    value = config.get(option)
-                    if option_values.get('required') and not value:
-                        return self.error(
-                            message='Missing required notifier option: %s' % (option,),
-                            name='invalid_notifier_config',
-                        )
-                new_notifiers.append({'type': data['type'], 'config': config})
-            app.data['notifiers'] = new_notifiers
+            app.data['notifiers'] = self._parse_notifiers(args.notifiers)
 
         if args.checks is not None:
             app.data['checks'] = self._parse_checks(args.checks)
