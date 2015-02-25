@@ -71,7 +71,7 @@ def create_app(_read_config=True, **config):
     #     -X POST \
     #     -J scopes='repo' \
     #     -J note='freight'
-    app.config['GITHUB_TOKEN'] = os.eniron.get('GITHUB_TOKEN')
+    app.config['GITHUB_TOKEN'] = os.environ.get('GITHUB_TOKEN')
     app.config['GITHUB_API_ROOT'] = 'https://api.github.com'
 
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
