@@ -20,6 +20,7 @@ It's not designed to replace something like Heroku, or other PaaS services, but 
 - API-accessible deploy logs
 - Hubot integration (starting deploys)
 - Slack integraiton (notifying when deploys start/finish/fail)
+- Integration with GitHub status checks (i.e. did Circle CI pass on sha XXX)
 
 ## Roadmap
 
@@ -28,7 +29,6 @@ It's not designed to replace something like Heroku, or other PaaS services, but 
 - Release state management (know what versions are active where, and provide a historical view)
 - Environment locking (i.e. prevent people from deploying to an environment)
 - Automatic deploys (i.e. by looking for VCS changes)
-- Integration with GitHub status checks (i.e. did Circle CI pass on sha XXX)
 - A GUI to manage deploys as well as view logs
 
 ### V1
