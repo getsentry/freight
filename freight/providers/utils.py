@@ -23,7 +23,7 @@ def parse_provider_config(type, config):
         value = config.get(option)
         if option_values.get('required') and not value:
             raise ApiError(
-                message='Missing required option "{}" for provider: {}'.format(type, option),
+                message='Missing required option "{}" for provider: {}'.format(option, type),
                 name='invalid_provider',
             )
         result[option] = value

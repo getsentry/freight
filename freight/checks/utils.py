@@ -25,7 +25,7 @@ def parse_checks_config(value):
             value = config.get(option)
             if option_values.get('required') and not value:
                 raise ApiError(
-                    message='Missing required option "{}" for check: {}'.format(data['type'], option),
+                    message='Missing required option "{}" for check: {}'.format(option, data['type']),
                     name='invalid_check',
                 )
         result.append({

@@ -25,7 +25,7 @@ def parse_notifiers_config(value):
             value = config.get(option)
             if option_values.get('required') and not value:
                 raise ApiError(
-                    message='Missing required option "{}" for notifier: {}'.format(data['type'], option),
+                    message='Missing required option "{}" for notifier: {}'.format(option, data['type']),
                     name='invalid_notifier',
                 )
         result.append({
