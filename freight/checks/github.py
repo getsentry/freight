@@ -23,8 +23,7 @@ class GitHubContextCheck(Check):
     def check(self, app, sha, config):
         token = current_app.config['GITHUB_TOKEN']
         if not token:
-            # TODO(dcramer): error/log this
-            return
+            raise CheckFailed('GITHUB_TOKEN is not set')
 
         api_root = (
             config.get('api_root') or current_app.config['GITHUB_API_ROOT']
