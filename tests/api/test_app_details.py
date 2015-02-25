@@ -16,6 +16,14 @@ class AppDetailsBase(TestCase):
         super(AppDetailsBase, self).setUp()
 
 
+class AppDetailsTest(AppDetailsBase):
+    def test_simple(self):
+        resp = self.client.get(self.path)
+        assert resp.status_code == 200
+        data = json.loads(resp.data)
+        assert data['id'] == str(self.app.id)
+
+
 class AppUpdateTest(AppDetailsBase):
     def test_simple(self):
         resp = self.client.put(self.path, data={

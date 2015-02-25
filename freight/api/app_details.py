@@ -14,6 +14,21 @@ from freight.providers.utils import parse_provider_config
 
 
 class AppDetailsApiView(ApiView):
+    def get(self, app_id):
+        app = App.query.get(app_id)
+        if app is None:
+            return self.error('Invalid app', name='invalid_resource', status_code=404)
+
+        context = serialize(app)
+        context.update({
+            'provider': app.provider,
+            'provider_config': app.provider_config,
+            'notifiers': app.notifiers,
+            'checks': app.checks,
+        })
+
+        return self.respond(context)
+
     put_parser = reqparse.RequestParser()
     put_parser.add_argument('name')
     put_parser.add_argument('repository')
