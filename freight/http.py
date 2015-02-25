@@ -5,7 +5,9 @@ __all__ = ['build_session', 'delete', 'get', 'post', 'put']
 import freight
 import requests
 
-USER_AGENT = 'freight/{}'.format(freight.VERSION),
+USER_AGENT = 'freight/{version} (https://github.com/getsentry/freight)'.format(
+    version=freight.VERSION,
+),
 
 
 def build_session():
