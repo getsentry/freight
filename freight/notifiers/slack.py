@@ -3,8 +3,8 @@ from __future__ import absolute_import, unicode_literals
 __all__ = ['SlackNotifier']
 
 import json
-import requests
 
+from freight import http
 from freight.models import App, TaskStatus
 
 from .base import Notifier, NotifierEvent
@@ -50,4 +50,4 @@ class SlackNotifier(Notifier):
 
         values = {'payload': json.dumps(payload)}
 
-        requests.post(webhook_url, values)
+        http.post(webhook_url, values)
