@@ -65,6 +65,12 @@ def create_app(_read_config=True, **config):
     app.config['GOOGLE_CLIENT_SECRET'] = os.environ.get('GOOGLE_CLIENT_SECRET')
     app.config['GOOGLE_DOMAIN'] = os.environ.get('GOOGLE_DOMAIN')
 
+    # Generate a GitHub token via Curl:
+    # curlish https://api.github.com/authorizations \
+    #     -u your-username \
+    #     -X POST \
+    #     -J scopes='repo' \
+    #     -J note='freight'
     app.config['GITHUB_TOKEN'] = os.eniron.get('GITHUB_TOKEN')
     app.config['GITHUB_API_ROOT'] = 'https://api.github.com'
 
