@@ -105,15 +105,16 @@ class TaskIndexApiView(ApiView):
         except vcs.UnknownRevision:
             return self.error('Invalid ref', name='invalid_ref', status_code=400)
 
-        for check_config in app.checks:
-            check = checks.get(check_config['type'])
-            try:
-                check.check(app, sha, check_config['config'])
-            except CheckFailed as e:
-                return self.error(
-                    message=unicode(e),
-                    name='check_failed',
-                )
+        if not args.force:
+            for check_config in app.checks:
+                check = checks.get(check_config['type'])
+                try:
+                    check.check(app, sha, check_config['config'])
+                except CheckFailed as e:
+                    return self.error(
+                        message=unicode(e),
+                        name='check_failed',
+                    )
 
         with lock(redis, 'task:create:{}'.format(app.id), timeout=5):
             # TODO(dcramer): this needs to be a get_or_create pattern and
