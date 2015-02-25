@@ -65,7 +65,7 @@ def create_app(_read_config=True, **config):
     app.config['GOOGLE_CLIENT_SECRET'] = os.environ.get('GOOGLE_CLIENT_SECRET')
     app.config['GOOGLE_DOMAIN'] = os.environ.get('GOOGLE_DOMAIN')
 
-    app.config['GITHUB_TOKEN'] = None
+    app.config['GITHUB_TOKEN'] = os.eniron.get('GITHUB_TOKEN')
     app.config['GITHUB_API_ROOT'] = 'https://api.github.com'
 
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
