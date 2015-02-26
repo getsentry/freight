@@ -126,7 +126,7 @@ def create_app(_read_config=True, **config):
 
     # Set any remaining defaults that might not be present yet
     if not app.config.get('SQLALCHEMY_DATABASE_URI'):
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///ds'
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///freight'
 
     if not app.config.get('BROKER_URL'):
         app.config['BROKER_URL'] = 'redis://localhost/0'
