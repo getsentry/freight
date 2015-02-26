@@ -117,7 +117,7 @@ class ApiView(Resource):
 
         if cursor:
             offset = (cursor - 1) * limit
-            result = list(seq[offset:offset + cursor + 1])
+            result = list(seq[offset:offset + limit + 1])
         else:
             offset = 0
             page = 1
