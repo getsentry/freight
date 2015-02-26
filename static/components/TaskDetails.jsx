@@ -89,8 +89,11 @@ var TaskDetails = React.createClass({
 
     return (
       <div>
-        <h2>{task.app.name}/{task.environment} #{task.number}</h2>
-        <dl>
+        <div className="page-header">
+          <h2>{task.app.name}/{task.environment} #{task.number}</h2>
+        </div>
+
+        <dl className="flat">
           <dt>Status:</dt>
           <dd>{task.status}</dd>
           <dt>Created:</dt>

@@ -2,15 +2,48 @@
 @import "./bootstrap-variables.less";
 
 a,
-a:focus,
-a:visited,
 a:active,
-a:hover {
+a:focus,
+a:hover,
+a:visited {
     color: #79589F;
 }
 
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 300;
+}
+
+h1 {
+  font-size: 32px;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+h3 {
+  font-size: 20px;
+}
+
+
+h1, h2, h3, h4, h5, h6,
+p, table, ul, dl form,
+.page-header {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.page-header {
+    h1, h2, h3 {
+        margin-bottom: 0;
+    }
+}
+
 .nav-pills > li.active > a,
-.nav-pills > li.active > a:hover {
+.nav-pills > li.active > a:active,
+.nav-pills > li.active > a:hover,
+.nav-pills > li.active > a:focus,
+.nav-pills > li.active > a:visited {
     background-color: #79589F;
 }
 
@@ -32,7 +65,31 @@ a:hover {
 
         h3 {
             font-size: 12pt;
-            margin: 0 0 5px;
+            margin: 0;
         }
+    }
+}
+
+dl.flat {
+    display: block;
+    position: relative;
+    padding-left: 110px;
+    margin-top: 0;
+
+    > dt,
+    > dd {
+        line-height: 1.6em;
+        min-height: 1.6em;
+    }
+
+    > dt {
+        font-weight: normal;
+        color: #666;
+    }
+
+    > dt {
+        position: absolute;
+        left: 0;
+        width: 100px;
     }
 }
