@@ -12,7 +12,7 @@
       Raven.config('{{ SENTRY_PUBLIC_DSN }}').install();
       </script>
     {% endif %}
-    <link href="{{ url_for('static', filename='styles.js') }}" rel="stylesheet" />
+    <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet" />
     <script>
     window.APP_VERSION = '{{ VERSION }}';
     </script>
