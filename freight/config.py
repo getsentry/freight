@@ -8,6 +8,7 @@ from flask_heroku import Heroku
 from flask_redis import Redis
 from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
+from werkzeug.contrib.fixers import ProxyFix
 
 from freight.api.controller import ApiController
 from freight.constants import PROJECT_ROOT
@@ -116,6 +117,9 @@ def create_app(_read_config=True, **config):
     app.config['SENTRY_INCLUDE_PATHS'] = [
         'ds',
     ]
+
+    # We don't support non-proxied installs
+    app.wsgi_app = ProxyFix(app.wsgi_app)
 
     # Pull in Heroku configuration
     heroku.init_app(app)
