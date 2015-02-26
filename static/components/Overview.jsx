@@ -21,7 +21,7 @@ var Overview = React.createClass({
         this.setState({
           loading: false,
           activeTasks: data
-        })
+        });
       }
     });
 
@@ -30,7 +30,7 @@ var Overview = React.createClass({
         this.setState({
           loading: false,
           previousTasks: data
-        })
+        });
       }
     });
   },

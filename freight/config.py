@@ -223,6 +223,6 @@ def configure_web_routes(app):
         '/auth/complete/',
         view_func=AuthorizedView.as_view(b'authorized', authorized_url='authorized', complete_url='index'))
 
-    app.add_url_rule(
-        '/',
-        view_func=IndexView.as_view(b'index', login_url='login'))
+    index_view = IndexView.as_view(b'index', login_url='login')
+    app.add_url_rule('/', view_func=index_view)
+    app.add_url_rule('/<path:path>', view_func=index_view)
