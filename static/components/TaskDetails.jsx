@@ -114,7 +114,7 @@ var TaskDetails = React.createClass({
 
         <h3>Log</h3>
 
-        <div ref="log" />
+        <div className="log" ref="log" />
       </div>
     );
   }
