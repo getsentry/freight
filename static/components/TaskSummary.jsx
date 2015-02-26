@@ -19,6 +19,9 @@ var TaskSummary = React.createClass({
         {task.dateStarted &&
           <small>Started <TimeSince date={task.dateStarted} /></small>
         }
+        {task.dateFinished &&
+          <small>&mdash; Finished <TimeSince date={task.dateFinished} /></small>
+        }
       </div>
     );
   }
