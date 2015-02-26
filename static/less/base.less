@@ -1,2 +1,38 @@
 @import "./bootstrap-overrides.less";
 @import "./bootstrap-variables.less";
+
+a,
+a:focus,
+a:visited,
+a:active,
+a:hover {
+    color: #79589F;
+}
+
+.nav-pills > li.active > a,
+.nav-pills > li.active > a:hover {
+    background-color: #79589F;
+}
+
+.task-list {
+    padding-left: 0;
+    list-style: none;
+
+    > li {
+        padding: 10px 8px;
+        border: 1px solid #eee;
+        border-bottom-width: 0;
+
+        &:last-child {
+            border-bottom-width: 1px;
+        }
+
+        &:hover {
+        }
+
+        h3 {
+            font-size: 12pt;
+            margin: 0 0 5px;
+        }
+    }
+}

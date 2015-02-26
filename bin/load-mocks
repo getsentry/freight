@@ -1,0 +1,52 @@
+#!/usr/bin/env python
+
+from __future__ import absolute_import, unicode_literals
+
+from freight.config import create_app
+app = create_app()
+
+app_context = app.app_context()
+app_context.push()
+
+from freight.models import Repository, App, User
+from freight.testutils.fixtures import Fixtures
+
+fixtures = Fixtures()
+
+
+def main():
+    repo = Repository.query.filter(
+        Repository.url == 'https://github.com/getsentry/freight.git'
+    ).first()
+    if not repo:
+        repo = fixtures.create_repo(
+            url='https://github.com/getsentry/freight.git',
+        )
+
+    app = App.query.filter(
+        App.name == 'freight',
+    ).first()
+    if not app:
+        app = fixtures.create_app(
+            repository=repo,
+            name='freight',
+            provider='dummy',
+        )
+
+    user = User.query.filter(
+        User.name == 'Freight',
+    ).first()
+    if not user:
+        user = fixtures.create_user(
+            name='Freight',
+        )
+
+    task = fixtures.create_task(
+        app=app,
+        user=user,
+        environment='production',
+    )
+
+
+if __name__ == '__main__':
+    main()

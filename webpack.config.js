@@ -14,6 +14,7 @@ module.exports = {
     "app": "./main",
     "vendor": [
       "jquery",
+      "moment",
       "react/addons",
       "react-router"
     ]

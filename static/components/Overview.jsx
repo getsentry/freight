@@ -42,7 +42,7 @@ var Overview = React.createClass({
 
     var activeTaskNodes = this.state.activeTasks.map((task) => {
       return (
-        <li>
+        <li key={task.id}>
           <TaskSummary task={task} />
         </li>
       );
@@ -50,7 +50,7 @@ var Overview = React.createClass({
 
     var previousTaskNodes = this.state.previousTasks.map((task) => {
       return (
-        <li>
+        <li key={task.id}>
           <TaskSummary task={task} />
         </li>
       );
@@ -60,7 +60,7 @@ var Overview = React.createClass({
       <div>
         <h2>Active Tasks</h2>
         {activeTaskNodes.length ?
-          <ul>
+          <ul className="task-list">
             {activeTaskNodes}
           </ul>
         :
@@ -69,7 +69,7 @@ var Overview = React.createClass({
 
         <h2>Task History</h2>
         {previousTaskNodes.length ?
-          <ul>
+          <ul className="task-list">
             {previousTaskNodes}
           </ul>
         :
