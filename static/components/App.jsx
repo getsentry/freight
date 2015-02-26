@@ -1,19 +1,21 @@
 /** @jsx React.DOM */
 
 var React = require('react');
-var {Link} = require('react-router');
+var Router = require('react-router');
+
+var ListLink = require('./ListLink');
 
 var App = React.createClass({
-  render: function() {
+  render() {
     return (
       <div className="container">
         <div className="page-header">
           <h1>Freight</h1>
         </div>
-        <ul>
-          <li><Link to="overview">Overview</Link></li>
+        <ul className="nav nav-pills">
+          <ListLink to="overview">Overview</ListLink>
         </ul>
-        <this.props.activeRouteHandler />
+        <Router.RouteHandler />
       </div>
     );
   }

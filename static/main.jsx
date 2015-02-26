@@ -1,15 +1,20 @@
 /** @jsx React.DOM */
 
 var React = require('react');
-var {DefaultRoute, Route, Routes} = require('react-router');
+var Router = require('react-router');
+var {DefaultRoute, Route} = Router;
 
-var App = require('./App');
-var Overview = require('./Overview');
+var App = require('./components/App');
+var Overview = require('./components/Overview');
+var TaskDetails = require('./components/TaskDetails');
 
-React.renderComponent((
-  <Routes>
-    <Route path="/" handler={App}>
-      <DefaultRoute name="overview" handler={Overview} />
-    </Route>
-  </Routes>
-), document.body);
+var routes = (
+  <Route path="/" name="app" handler={App}>
+    <DefaultRoute name="overview" handler={Overview} />
+    <Route path="/tasks/<task_id>/" name="taskDetails" handler={TaskDetails} />
+  </Route>
+);
+
+Router.run(routes, Router.HistoryLocation, (Handler) => {
+  React.render(<Handler/>, document.body);
+});

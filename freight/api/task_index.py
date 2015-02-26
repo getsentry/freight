@@ -29,7 +29,7 @@ class TaskIndexApiView(ApiView):
     get_parser.add_argument('user', location='args')
     get_parser.add_argument('env', location='args')
     get_parser.add_argument('ref', location='args')
-    get_parser.add_argument('status', location='args')
+    get_parser.add_argument('status', location='args', action='append')
 
     def get(self):
         """
@@ -60,8 +60,8 @@ class TaskIndexApiView(ApiView):
             qs_filters.append(Task.ref == args.ref)
 
         if args.status:
-            status = TaskStatus.label_to_id(args.status)
-            qs_filters.append(Task.status == status)
+            status_list = map(TaskStatus.label_to_id, args.status)
+            qs_filters.append(Task.status.in_(status_list))
 
         task_qs = Task.query.filter(*qs_filters).order_by(Task.id.desc())
 

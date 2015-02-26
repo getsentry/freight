@@ -12,7 +12,11 @@ module.exports = {
   entry: {
     "styles": "./less/base.less",
     "app": "./main",
-    "vendor": ["react", "react-router"]
+    "vendor": [
+      "jquery",
+      "react/addons",
+      "react-router"
+    ]
   },
   module: {
     loaders: [
@@ -39,8 +43,12 @@ module.exports = {
     new ExtractTextPlugin("styles.css", {
       allChunks: true
     }),
-    new webpack.optimize.CommonsChunkPlugin("vendor", "vendor.js")
-    // watchLess
+    new webpack.optimize.CommonsChunkPlugin("vendor", "vendor.js"),
+    new webpack.optimize.DedupePlugin(),
+    new webpack.ProvidePlugin({
+        $: 'jquery',
+        jQuery: 'jquery',
+    })
   ],
   resolve: {
     modulesDirectories: ["node_modules"],

@@ -2,8 +2,8 @@
 
 var React = require('react');
 
-var Overview = React.createClass({
-  render: function() {
+var TaskDetails = React.createClass({
+  render() {
     return (
       <div>
         Stuff
@@ -12,4 +12,4 @@ var Overview = React.createClass({
   }
 });
 
-module.exports = Overview;
+module.exports = TaskDetails;

@@ -2,4 +2,4 @@
 
 npm install
 alembic upgrade head
-webpack
+webpack -p
