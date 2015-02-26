@@ -4,11 +4,14 @@ var React = require('react');
 
 var api = require('../api');
 
+var TaskSummary = require('./TaskSummary');
+
 var Overview = React.createClass({
   getInitialState() {
     return {
       loading: true,
-      activeTasks: []
+      activeTasks: [],
+      previousTasks: []
     };
   },
 
@@ -20,7 +23,16 @@ var Overview = React.createClass({
           activeTasks: data
         })
       }
-    })
+    });
+
+    api.request('/tasks/?status=finished&status=failed&status=cancelled', {
+      success: (data) => {
+        this.setState({
+          loading: false,
+          previousTasks: data
+        })
+      }
+    });
   },
 
   render() {
@@ -28,10 +40,18 @@ var Overview = React.createClass({
       return <div className="loading" />;
     }
 
-    var taskNodes = this.state.activeTasks.map((task) => {
+    var activeTaskNodes = this.state.activeTasks.map((task) => {
       return (
         <li>
-          <h3>{task.app.name}/{task.environment}#{task.number}</h3>
+          <TaskSummary task={task} />
+        </li>
+      );
+    });
+
+    var previousTaskNodes = this.state.previousTasks.map((task) => {
+      return (
+        <li>
+          <TaskSummary task={task} />
         </li>
       );
     });
@@ -39,9 +59,22 @@ var Overview = React.createClass({
     return (
       <div>
         <h2>Active Tasks</h2>
-        <ul>
-          {taskNodes}
-        </ul>
+        {activeTaskNodes.length ?
+          <ul>
+            {activeTaskNodes}
+          </ul>
+        :
+          <p>There are no active tasks.</p>
+        }
+
+        <h2>Task History</h2>
+        {previousTaskNodes.length ?
+          <ul>
+            {previousTaskNodes}
+          </ul>
+        :
+          <p>There are no historical tasks.</p>
+        }
       </div>
     );
   }

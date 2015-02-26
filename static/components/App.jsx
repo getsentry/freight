@@ -10,11 +10,11 @@ var App = React.createClass({
     return (
       <div className="container">
         <div className="page-header">
+          <ul className="nav nav-pills pull-right">
+            <ListLink to="overview">Home</ListLink>
+          </ul>
           <h1>Freight</h1>
         </div>
-        <ul className="nav nav-pills">
-          <ListLink to="overview">Overview</ListLink>
-        </ul>
         <Router.RouteHandler />
       </div>
     );
