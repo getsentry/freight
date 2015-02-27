@@ -119,8 +119,8 @@ header {
                 background-size: 30px 30px;
                 background-image: linear-gradient(135deg, rgba(230, 227, 236, .7) 25%, transparent 25%,
                                     transparent 50%, rgba(230, 227, 236, .7) 50%, rgba(230, 227, 236, .7) 75%,
-                                    transparent 75%, transparent);            
-                
+                                    transparent 75%, transparent);
+
                 -webkit-animation: animate-stripes 2s linear infinite;
             }
         }
@@ -175,11 +175,13 @@ dl.flat {
 }
 
 .log {
+    padding: 5px;
+    background: @light;
+
     .line {
         font-family: monospace, serif;
         font-size: 0.9em;
         white-space: pre-wrap;
-        background: @light;
-        padding: 5px;
+        line-height: 20px;
     }
 }
