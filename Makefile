@@ -1,5 +1,6 @@
 develop: update-submodules setup-git
 	@echo "--> Installing dependencies"
+	npm install
 	pip install -e .
 	pip install "file://`pwd`#egg=freight[test]"
 
