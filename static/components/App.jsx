@@ -9,11 +9,11 @@ var App = React.createClass({
   render() {
     return (
       <div>
-        <nav className="navbar navbar-default navbar-static-top">
+        <header>
           <div className="container">
-            <Link to="overview" className="navbar-brand">Freight</Link>
+            <h1><Link to="overview">Freight</Link></h1>
           </div>
-        </nav>
+        </header>
         <div className="container">
           <RouteHandler />
         </div>

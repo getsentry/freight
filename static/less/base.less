@@ -1,16 +1,30 @@
 @import "./bootstrap-overrides.less";
 @import "./bootstrap-variables.less";
 
+// Colors
+
+@dark:      #3E3947;
+@light:     #F7F7F8;
+@blue:      #4FCFD1;
+@purple:    #9F83CF;
+@green:     #4DD191;
+@red:       #DC5656;
+
+body {
+    color: @dark;
+    font-family: "Avenir Next", "Avenir", "Helvetica Neue", sans-serif;
+}
+
 a,
 a:active,
 a:focus,
 a:hover,
 a:visited {
-    color: #79589F;
+    color: @purple;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 300;
+  font-weight: 500;
 }
 
 h1 {
@@ -30,13 +44,35 @@ h1, h2, h3, h4, h5, h6,
 p, table, ul, dl form,
 .page-header, .log {
     margin-top: 0;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+}
+
+header {
+    padding: 30px 0;
+    border-bottom: 1px solid darken(@light, 3%);
+    margin-bottom: 30px;
+
+    h1 {
+        margin: 0;
+        a {
+            background: url(../img/freight-logo.png);
+            background-size: 130px 31px;
+            text-indent: -9999em;
+            display: block;
+            width: 130px;
+            height: 31px;
+        }
+    }
 }
 
 .page-header {
     h1, h2, h3 {
         margin-bottom: 0;
     }
+}
+
+.container {
+    max-width: 760px;
 }
 
 .nav-pills > li.active > a,
@@ -52,13 +88,11 @@ p, table, ul, dl form,
     list-style: none;
 
     > li {
-        padding: 10px 8px;
-        border: 1px solid #eee;
-        border-bottom-width: 0;
-
-        &:last-child {
-            border-bottom-width: 1px;
-        }
+        padding: 15px;
+        background: @light;
+        margin-bottom: 3px;
+        border-radius: 4px;
+        overflow: hidden;
 
         &:hover {
         }
@@ -67,6 +101,52 @@ p, table, ul, dl form,
             font-size: 12pt;
             margin: 0;
         }
+    }
+
+    &.active {
+        li {
+            position: relative;
+            z-index: 2;
+
+            .progress {
+                display: block;
+                position: absolute;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                z-index: -1;
+
+                background-size: 30px 30px;
+                background-image: linear-gradient(135deg, rgba(230, 227, 236, .7) 25%, transparent 25%,
+                                    transparent 50%, rgba(230, 227, 236, .7) 50%, rgba(230, 227, 236, .7) 75%,
+                                    transparent 75%, transparent);            
+                
+                -webkit-animation: animate-stripes 2s linear infinite;
+            }
+        }
+    }
+}
+
+@-webkit-keyframes animate-stripes {
+    0% {background-position: 0 0;} 100% {background-position: 60px 0;}
+}
+
+.stat {
+    background: @light;
+    border-radius: 4px;
+    margin-bottom: 25px;
+    padding: 15px 15px .1px;
+
+    h5 {
+        color: lighten(@dark, 40%);
+        font-weight: 500;
+        margin: 0;
+    }
+
+    p {
+        font-size: 20px;
+        margin: 10px 0 14px;
+        font-weight: 500;
     }
 }
 
@@ -99,5 +179,7 @@ dl.flat {
         font-family: monospace, serif;
         font-size: 0.9em;
         white-space: pre-wrap;
+        background: @light;
+        padding: 5px;
     }
 }

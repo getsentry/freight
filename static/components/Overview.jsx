@@ -41,8 +41,12 @@ var Overview = React.createClass({
     }
 
     var activeTaskNodes = this.state.activeTasks.map((task) => {
+      var style = {
+        width: "60%"
+      };
       return (
         <li key={task.id}>
+          <span className="progress" style={style}/>
           <TaskSummary task={task} />
         </li>
       );
@@ -60,7 +64,7 @@ var Overview = React.createClass({
       <div>
         <h2>Active Tasks</h2>
         {activeTaskNodes.length ?
-          <ul className="task-list">
+          <ul className="task-list active">
             {activeTaskNodes}
           </ul>
         :

@@ -89,28 +89,46 @@ var TaskDetails = React.createClass({
 
     return (
       <div>
-        <div className="page-header">
-          <h2>{task.app.name}/{task.environment} #{task.number}</h2>
-        </div>
+        <h2>{task.app.name}/{task.environment} #{task.number}</h2>
 
-        <dl className="flat">
-          <dt>Status:</dt>
-          <dd>{task.status}</dd>
-          <dt>Created:</dt>
-          <dd><TimeSince date={task.dateCreated} /></dd>
-          <dt>Started:</dt>
-          <dd>{task.dateStarted ?
-            <TimeSince date={task.dateStarted} />
-          :
-            <span>&mdash;</span>
-          }</dd>
-          <dt>Finished:</dt>
-          <dd>{task.dateFinished ?
-            <span><TimeSince date={task.dateFinished} /> ({task.duration}s)</span>
-          :
-            <span>&mdash;</span>
-          }</dd>
-        </dl>
+        <div className="row detail-summary">
+          <div className="col-sm-3">
+            <div className="stat">
+              <h5>Status</h5>
+              <p>{task.status}</p>
+            </div>
+          </div>
+          <div className="col-sm-3">
+            <div className="stat">
+              <h5>Created</h5>
+              <p><TimeSince date={task.dateCreated} /></p>
+            </div>
+          </div>
+          <div className="col-sm-3">
+            <div className="stat">
+              <h5>Started</h5>
+              <p>
+                {task.dateStarted ?
+                  <TimeSince date={task.dateStarted} />
+                :
+                  <span>&mdash;</span>
+                }
+              </p>
+            </div>
+          </div>
+          <div className="col-sm-3">
+            <div className="stat">
+              <h5>Finished</h5>
+              <p>
+                {task.dateFinished ?
+                  <span><TimeSince date={task.dateFinished} /> ({task.duration}s)</span>
+                :
+                  <span>&mdash;</span>
+                }
+              </p>
+            </div>
+          </div>
+        </div>
 
         <h3>Log</h3>
 
