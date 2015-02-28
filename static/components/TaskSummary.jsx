@@ -24,8 +24,10 @@ var TaskSummary = React.createClass({
         <div className="meta">
           {task.dateFinished ?
             <small>Finished <TimeSince date={task.dateFinished} /> &mdash; <Duration seconds={task.duration} className="duration" /></small>
-          : (task.dateStarted &&
+          : (task.dateStarted ?
             <small>Started <TimeSince date={task.dateStarted} /></small>
+          :
+            <small>Created <TimeSince date={task.dateCreated} /></small>
           )}
         </div>
       </div>
