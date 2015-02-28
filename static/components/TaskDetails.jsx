@@ -61,13 +61,7 @@ var TaskDetails = React.createClass({
   },
 
   taskInProgress(task) {
-    var status = task.status;
-    switch(status) {
-      case 'pending':
-      case 'in_progress':
-        return true;
-    }
-    return false;
+    return task.status == 'in_progress' || task.status == 'pending';
   },
 
   pollLog() {

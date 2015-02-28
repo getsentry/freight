@@ -2,16 +2,48 @@
 
 var React = require('react');
 var {Link} = require('react-router');
+var joinClasses = require("react/lib/joinClasses");
 
 var Duration = require('./Duration');
 var TimeSince = require('./TimeSince');
 
+var Progress = React.createClass({
+  propTypes: {
+    value: React.PropTypes.number.isRequired,
+  },
+
+  render() {
+    return (
+      <span className="progress" style={{width: this.props.value + '%'}} />
+    );
+  }
+});
+
 var TaskSummary = React.createClass({
+  taskInProgress(task) {
+    return task.status == 'in_progress' || task.status == 'pending';
+  },
+
+  getEstimatedProgress(task) {
+    var started = new Date(task.dateStarted).getTime();
+    if (!started) {
+      return 0;
+    }
+
+    var now = Math.max(new Date().getTime(), started);
+    return parseInt(Math.min((now - started) / 1000 / task.estimatedDuration * 100, 95), 10);
+  },
+
   render() {
     var task = this.props.task;
+    var className = 'task';
+    if (this.taskInProgress(task)) {
+      className += ' active';
+    }
 
     return (
-      <div>
+      <div className={joinClasses(this.props.className, className)}>
+        <Progress value={this.getEstimatedProgress(task)} />
         <h3>
           <Link to="taskDetails" params={{taskId: task.id}}>
             {task.app.name}/{task.environment} #{task.number}

@@ -1,6 +1,9 @@
 from __future__ import absolute_import, unicode_literals
 
-from freight.models import App, Task
+from freight.config import db
+from freight.models import App, Task, TaskStatus
+
+from sqlalchemy.sql import func
 
 from .base import Serializer
 from .manager import add
@@ -16,9 +19,23 @@ class TaskSerializer(Serializer):
             )
         }
 
+        estimatedDurations = dict(db.session.query(
+            Task.app_id,
+            func.avg(Task.date_finished - Task.date_started),
+        ).filter(
+            Task.status == TaskStatus.finished,
+        ).group_by(Task.app_id))
+
         attrs = {}
         for item in item_list:
-            attrs[item] = {'app': apps[item.app_id]}
+            estimatedDuration = estimatedDurations.get(item.app_id)
+            if estimatedDuration:
+                estimatedDuration = estimatedDuration.total_seconds()
+
+            attrs[item] = {
+                'app': apps[item.app_id],
+                'estimatedDuration': estimatedDuration,
+            }
         return attrs
 
     def serialize(self, item, attrs):
@@ -36,6 +53,7 @@ class TaskSerializer(Serializer):
             'number': item.number,
             'status': item.status_label,
             'duration': item.duration,
+            'estimatedDuration': item.duration or attrs['estimatedDuration'],
             'dateCreated': self.format_datetime(item.date_created),
             'dateStarted': self.format_datetime(item.date_started),
             'dateFinished': self.format_datetime(item.date_finished),

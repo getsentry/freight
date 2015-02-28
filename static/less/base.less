@@ -107,10 +107,13 @@ header {
 
     > li {
         .clearfix();
+        margin-bottom: 3px;
 
+    }
+
+    .task {
         padding: 15px;
         background: @light;
-        margin-bottom: 3px;
         border-radius: 4px;
 
         h3 {
@@ -132,12 +135,10 @@ header {
         .meta {
             margin-top: 5px;
         }
-    }
 
-    &.active {
-        li {
-            position: relative;
+        &.active {
             z-index: 2;
+            position: relative;
 
             .progress {
                 display: block;
