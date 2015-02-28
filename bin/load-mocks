@@ -8,10 +8,13 @@ app = create_app()
 app_context = app.app_context()
 app_context.push()
 
+import loremipsum
+
 from datetime import datetime, timedelta
 from uuid import uuid4
 
-from freight.models import App, Task, TaskStatus, Repository, User
+from freight.config import db
+from freight.models import App, LogChunk, Task, TaskStatus, Repository, User
 from freight.testutils.fixtures import Fixtures
 
 fixtures = Fixtures()
@@ -61,6 +64,18 @@ def main():
         date_started=datetime.utcnow() - timedelta(minutes=3),
         date_finished=datetime.utcnow(),
     )
+
+    offset = 0
+    for line in loremipsum.get_sentences(100):
+        line = line + '\n'
+        db.session.add(LogChunk(
+            task_id=task.id,
+            text=line,
+            size=len(line),
+            offset=offset,
+        ))
+        offset += len(line)
+    db.session.commit()
 
     task = fixtures.create_task(
         app=app,

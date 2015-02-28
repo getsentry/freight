@@ -47,10 +47,20 @@ p, table, ul, dl form,
     margin-bottom: 30px;
 }
 
+body {
+    padding-top: 119px;
+}
+
 header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
     padding: 30px 0;
+    height: 89px;
     border-bottom: 1px solid darken(@light, 3%);
-    margin-bottom: 30px;
+    background: #fff;
+    z-index: 1000;
 
     h1 {
         margin: 0;
@@ -81,6 +91,14 @@ header {
 .nav-pills > li.active > a:focus,
 .nav-pills > li.active > a:visited {
     background-color: #79589F;
+}
+
+.btn-active,
+.btn-active:hover,
+.btn-active:focus {
+    border-color: #79589F;
+    background-color: #79589F;
+    color: #fff;
 }
 
 .task-list {
@@ -145,57 +163,56 @@ header {
     0% {background-position: 0 0;} 100% {background-position: 60px 0;}
 }
 
-.stat {
-    background: @light;
-    border-radius: 4px;
-    margin-bottom: 25px;
-    padding: 15px 15px .1px;
 
-    h5 {
-        color: lighten(@dark, 40%);
-        font-weight: 500;
-        margin: 0;
-    }
+.task-details {
+    padding-bottom: 100px;
 
-    p {
-        font-size: 20px;
-        margin: 10px 0 14px;
-        font-weight: 500;
-    }
-}
-
-dl.flat {
-    display: block;
-    position: relative;
-    padding-left: 110px;
-    margin-top: 0;
-
-    > dt,
-    > dd {
-        line-height: 1.6em;
-        min-height: 1.6em;
-    }
-
-    > dt {
-        font-weight: normal;
-        color: #666;
-    }
-
-    > dt {
-        position: absolute;
+    .task-footer {
+        background: #fff;
+        position: fixed;
         left: 0;
-        width: 100px;
+        right: 0;
+        bottom: 0;
+        padding: 0 20px;
+        line-height: 55px;
+        height: 60px;
+        border-top: 1px solid #eee;
+
+        h2 {
+            font-size: 16pt;
+            line-height: 60px;
+            display: inline-block;
+        }
     }
-}
 
-.log {
-    padding: 5px;
-    background: @light;
+    .stat {
+        background: @light;
+        border-radius: 4px;
+        margin-bottom: 25px;
+        padding: 15px 15px .1px;
 
-    .line {
-        font-family: monospace, serif;
-        font-size: 0.9em;
-        white-space: pre-wrap;
-        line-height: 20px;
+        h5 {
+            color: lighten(@dark, 40%);
+            font-weight: 500;
+            margin: 0;
+        }
+
+        p {
+            font-size: 20px;
+            margin: 10px 0 14px;
+            font-weight: 500;
+        }
+    }
+
+    .task-log {
+        padding: 5px;
+        background: @light;
+
+        .line {
+            font-family: monospace, serif;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            line-height: 20px;
+        }
     }
 }
