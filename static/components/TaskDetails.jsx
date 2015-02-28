@@ -13,7 +13,6 @@ var TaskDetails = React.createClass({
   getInitialState() {
     return {
       loading: true,
-      logLoading: true,
       task: null,
       logNextOffset: 0,
       liveScroll: false
@@ -78,12 +77,7 @@ var TaskDetails = React.createClass({
         if (data.text !== "") {
           this.updateBuildLog(data);
           this.setState({
-            logLoading: false,
             logNextOffset: data.nextOffset
-          });
-        } else if (this.state.logLoading) {
-          this.setState({
-            logLoading: false,
           });
         }
         if (this.taskInProgress()) {
@@ -148,11 +142,7 @@ var TaskDetails = React.createClass({
 
         <h3>Log</h3>
 
-        {this.state.logLoading ?
-          <div className="loading" />
-        :
-          <div className="log" ref="log" />
-        }
+        <div className="log" ref="log" />
       </div>
     );
   }
