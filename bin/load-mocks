@@ -48,6 +48,7 @@ def main():
         Task.status.in_([TaskStatus.in_progress, TaskStatus.pending]),
     ).update({
         'status': TaskStatus.finished,
+        'date_finished': datetime.utcnow(),
     }, synchronize_session=False)
 
     task = fixtures.create_task(
