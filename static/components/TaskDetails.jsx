@@ -4,10 +4,11 @@ var React = require('react');
 var Router = require('react-router');
 
 var api = require('../api');
+var PollingMixin = require('../mixins/polling');
 var TimeSince = require('./TimeSince');
 
 var TaskDetails = React.createClass({
-  mixins: [Router.State],
+  mixins: [PollingMixin, Router.State],
 
   getInitialState() {
     return {
@@ -20,7 +21,7 @@ var TaskDetails = React.createClass({
   },
 
   componentWillMount() {
-    api.request('/tasks/' + this.getParams().taskId + '/', {
+    api.request(this.getPollingUrl(), {
       success: (data) => {
         this.setState({
           loading: false,
@@ -28,6 +29,16 @@ var TaskDetails = React.createClass({
         });
         this.pollLog();
       }
+    });
+  },
+
+  getPollingUrl() {
+    return '/tasks/' + this.getParams().taskId + '/';
+  },
+
+  pollingReceiveData(data) {
+    this.setState({
+      task: data
     });
   },
 

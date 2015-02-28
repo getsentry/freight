@@ -4,35 +4,43 @@ var React = require('react');
 
 var api = require('../api');
 
+var PollingMixin = require('../mixins/polling');
 var TaskSummary = require('./TaskSummary');
 
+
 var Overview = React.createClass({
+  mixins: [PollingMixin],
+
   getInitialState() {
     return {
       loading: true,
-      activeTasks: [],
-      previousTasks: []
+      tasks: []
     };
   },
 
   componentWillMount() {
-    api.request('/tasks/?status=in_progress&status=pending', {
+    api.request(this.getPollingUrl(), {
       success: (data) => {
         this.setState({
           loading: false,
-          activeTasks: data
+          tasks: data
         });
       }
     });
+  },
 
-    api.request('/tasks/?status=finished&status=failed&status=cancelled', {
-      success: (data) => {
-        this.setState({
-          loading: false,
-          previousTasks: data
-        });
-      }
+  getPollingUrl() {
+    return '/tasks/';
+  },
+
+  pollingReceiveData(data) {
+    this.setState({
+      tasks: data
     });
+  },
+
+  taskInProgress(task) {
+    return task.status == 'in_progress' || task.status == 'pending';
   },
 
   render() {
@@ -40,7 +48,9 @@ var Overview = React.createClass({
       return <div className="loading" />;
     }
 
-    var activeTaskNodes = this.state.activeTasks.map((task) => {
+    var activeTaskNodes = this.state.tasks.filter((task) => {
+      return this.taskInProgress(task);
+    }).map((task) => {
       var style = {
         width: "60%"
       };
@@ -52,7 +62,9 @@ var Overview = React.createClass({
       );
     });
 
-    var previousTaskNodes = this.state.previousTasks.map((task) => {
+    var previousTaskNodes = this.state.tasks.filter((task) => {
+      return !this.taskInProgress(task);
+    }).map((task) => {
       return (
         <li key={task.id}>
           <TaskSummary task={task} />
