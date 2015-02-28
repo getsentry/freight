@@ -15,13 +15,16 @@ var TaskSummary = React.createClass({
           <Link to="taskDetails" params={{taskId: task.id}}>
             {task.app.name}/{task.environment} #{task.number}
           </Link>
+          <span className="ref">{task.sha.substr(0, 7)}</span>
         </h3>
-        {task.dateStarted &&
-          <small>Started <TimeSince date={task.dateStarted} /></small>
-        }
-        {task.dateFinished &&
-          <small>&mdash; Finished <TimeSince date={task.dateFinished} /></small>
-        }
+        <div className="meta">
+          {task.dateStarted &&
+            <small>Started <TimeSince date={task.dateStarted} /></small>
+          }
+          {task.dateFinished &&
+            <small> &mdash; Finished <TimeSince date={task.dateFinished} /></small>
+          }
+        </div>
       </div>
     );
   }
