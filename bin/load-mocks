@@ -8,7 +8,10 @@ app = create_app()
 app_context = app.app_context()
 app_context.push()
 
-from freight.models import Repository, App, User
+from datetime import datetime, timedelta
+from uuid import uuid4
+
+from freight.models import App, Task, TaskStatus, Repository, User
 from freight.testutils.fixtures import Fixtures
 
 fixtures = Fixtures()
@@ -41,11 +44,33 @@ def main():
             name='Freight',
         )
 
+    Task.query.filter(
+        Task.status.in_([TaskStatus.in_progress, TaskStatus.pending]),
+    ).update({
+        'status': TaskStatus.finished,
+    }, synchronize_session=False)
+
     task = fixtures.create_task(
         app=app,
         user=user,
+        sha=uuid4().hex,
+        ref='master',
         environment='production',
+        status=TaskStatus.finished,
+        date_started=datetime.utcnow() - timedelta(minutes=3),
+        date_finished=datetime.utcnow(),
     )
+
+    task = fixtures.create_task(
+        app=app,
+        user=user,
+        sha=uuid4().hex,
+        ref='master',
+        environment='production',
+        status=TaskStatus.in_progress,
+        date_started=datetime.utcnow(),
+    )
+
 
 
 if __name__ == '__main__':
