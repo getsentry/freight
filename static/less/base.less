@@ -88,6 +88,8 @@ header {
     list-style: none;
 
     > li {
+        .clearfix();
+
         padding: 15px;
         background: @light;
         margin-bottom: 3px;
@@ -96,9 +98,16 @@ header {
         h3 {
             font-size: 12pt;
             margin: 0;
+            display: inline-block;
+        }
 
-            > .ref {
-                float: right;
+        .ref {
+            float: right;
+            text-align: right;
+
+            .sha {
+                font-size: 12pt;
+                margin-bottom: 5px;
             }
         }
 

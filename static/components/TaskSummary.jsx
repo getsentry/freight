@@ -3,6 +3,7 @@
 var React = require('react');
 var {Link} = require('react-router');
 
+var Duration = require('./Duration');
 var TimeSince = require('./TimeSince');
 
 var TaskSummary = React.createClass({
@@ -15,15 +16,17 @@ var TaskSummary = React.createClass({
           <Link to="taskDetails" params={{taskId: task.id}}>
             {task.app.name}/{task.environment} #{task.number}
           </Link>
-          <span className="ref">{task.sha.substr(0, 7)}</span>
         </h3>
+        <div className="ref">
+          <div className="sha">{task.sha.substr(0, 7)}</div>
+          {task.ref}
+        </div>
         <div className="meta">
-          {task.dateStarted &&
+          {task.dateFinished ?
+            <small>Finished <TimeSince date={task.dateFinished} /> &mdash; <Duration seconds={task.duration} className="duration" /></small>
+          : (task.dateStarted &&
             <small>Started <TimeSince date={task.dateStarted} /></small>
-          }
-          {task.dateFinished &&
-            <small> &mdash; Finished <TimeSince date={task.dateFinished} /></small>
-          }
+          )}
         </div>
       </div>
     );
