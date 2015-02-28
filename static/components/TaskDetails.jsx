@@ -12,6 +12,7 @@ var TaskDetails = React.createClass({
   getInitialState() {
     return {
       loading: true,
+      logLoading: true,
       task: null,
       logNextOffset: 0,
       liveScroll: false
@@ -25,10 +26,9 @@ var TaskDetails = React.createClass({
           loading: false,
           task: data
         });
+        this.pollLog();
       }
     });
-
-    this.pollLog();
   },
 
   updateBuildLog(data) {
@@ -60,14 +60,19 @@ var TaskDetails = React.createClass({
   },
 
   pollLog() {
-    var url = '/tasks/' + this.getParams().taskId + '/log/?offset=' + this.state.logNextOffset;
+    var url = '/tasks/' + this.state.task.id + '/log/?offset=' + this.state.logNextOffset;
 
     api.request(url, {
       success: (data) => {
         if (data.text !== "") {
           this.updateBuildLog(data);
           this.setState({
+            logLoading: false,
             logNextOffset: data.nextOffset
+          });
+        } else if (this.state.logLoading) {
+          this.setState({
+            logLoading: false,
           });
         }
         if (this.taskInProgress()) {
@@ -132,7 +137,11 @@ var TaskDetails = React.createClass({
 
         <h3>Log</h3>
 
-        <div className="log" ref="log" />
+        {this.state.logLoading ?
+          <div className="loading" />
+        :
+          <div className="log" ref="log" />
+        }
       </div>
     );
   }
