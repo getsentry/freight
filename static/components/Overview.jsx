@@ -70,7 +70,7 @@ var Overview = React.createClass({
 
     return (
       <div>
-        <h2>Active Tasks</h2>
+        <h2>Active Deploys</h2>
         {activeTaskNodes.length ?
           <ul className="task-list">
             {activeTaskNodes}
@@ -79,7 +79,7 @@ var Overview = React.createClass({
           <p>There are no active tasks.</p>
         }
 
-        <h2>Task History</h2>
+        <h2>Deploy History</h2>
         {previousTaskNodes.length ?
           <ul className="task-list">
             {previousTaskNodes}
