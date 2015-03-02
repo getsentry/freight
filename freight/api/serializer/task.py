@@ -1,9 +1,10 @@
 from __future__ import absolute_import, unicode_literals
 
+from datetime import datetime, timedelta
+from sqlalchemy.sql import func
+
 from freight.config import db
 from freight.models import App, Task, TaskStatus
-
-from sqlalchemy.sql import func
 
 from .base import Serializer
 from .manager import add
@@ -23,6 +24,7 @@ class TaskSerializer(Serializer):
             Task.app_id,
             func.avg(Task.date_finished - Task.date_started),
         ).filter(
+            Task.date_finished > datetime.utcnow() - timedelta(days=7),
             Task.status == TaskStatus.finished,
         ).group_by(Task.app_id))
 
