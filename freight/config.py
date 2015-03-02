@@ -22,7 +22,6 @@ celery = ContextualCelery()
 heroku = Heroku()
 redis = Redis()
 sentry = Sentry(logging=True, level=logging.WARN)
-sslify = SSLify(None)
 
 
 def configure_logging(app):
@@ -125,7 +124,10 @@ def create_app(_read_config=True, **config):
 
     # Pull in Heroku configuration
     heroku.init_app(app)
-    sslify.init_app(app)
+
+    if 'DYNO' in os.environ:
+        # XXX: the released version of flask-sslify does not support init_app
+        SSLify(app)
 
     # Set any remaining defaults that might not be present yet
     if not app.config.get('SQLALCHEMY_DATABASE_URI'):
