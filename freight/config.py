@@ -6,6 +6,7 @@ import logging
 
 from flask_heroku import Heroku
 from flask_redis import Redis
+from flask_sslify import SSLify
 from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
 from werkzeug.contrib.fixers import ProxyFix
@@ -21,6 +22,7 @@ celery = ContextualCelery()
 heroku = Heroku()
 redis = Redis()
 sentry = Sentry(logging=True, level=logging.WARN)
+sslify = SSLify(None)
 
 
 def configure_logging(app):
@@ -123,6 +125,7 @@ def create_app(_read_config=True, **config):
 
     # Pull in Heroku configuration
     heroku.init_app(app)
+    sslify.init_app(app)
 
     # Set any remaining defaults that might not be present yet
     if not app.config.get('SQLALCHEMY_DATABASE_URI'):
