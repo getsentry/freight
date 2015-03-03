@@ -64,7 +64,7 @@ setup(
     author_email='dcramer@gmail.com',
     url='https://github.com/getsentry/freight',
     description='A deployment service',
-    long_description=open('README.md').read(),
+    long_description=open('README.rst').read(),
     packages=find_packages(exclude=['tests']),
     zip_safe=False,
     install_requires=install_requires,
