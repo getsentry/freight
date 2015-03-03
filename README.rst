@@ -70,22 +70,22 @@ If you're using a configuration file you'll need to pass it with `FREIGHT_CONF` 
 
 The following values should be configured:
 
-``GOOGLE_CLIENT_ID``
+GOOGLE_CLIENT_ID
   The client ID for the Google application.
 
-``GOOGLE_CLIENT_SECRET``
+GOOGLE_CLIENT_SECRET
   The client ID for the Google application.
 
-``GOOGLE_DOMAIN``
+GOOGLE_DOMAIN
   The Google Apps domain to restrict authentication to.
 
-``SENTRY_DSN``
+SENTRY_DSN
   A DSN value from Sentry.
 
-``SSH_PRIVATE_KEY``
+SSH_PRIVATE_KEY
   The SSH private key required for cloning repositories (newlines replaced with \n). This will also be made available to providers as a file-system resource.
 
-``DEFAULT_TIMEOUT``
+DEFAULT_TIMEOUT
   The default timeout for deploys.
 
 
