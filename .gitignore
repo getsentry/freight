@@ -8,6 +8,8 @@ npm-debug.log
 *.pyc
 /env
 /docs/_build/
+/docs/html/
+/docs/doctrees/
 /htmlcov
 /node_modules
 /dist
