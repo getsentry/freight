@@ -65,16 +65,20 @@ FREIGHT_CONF=/tmp/freight.conf.py bin/web
 
 The following values should be configured:
 
-- `GOOGLE_CLIENT_ID`
-- `GOOGLE_CLIENT_SECRET`
-- `GOOGLE_DOMAIN`
-  The Google Apps domain to restrict authentication to.
-- `SENTRY_DSN`
-  A DSN value from Sentry.
-- `SSH_PRIVATE_KEY`
-  The SSH private key required for cloning repositories (newlines replaced with \n). This will also be made available to providers as a file-system resource.
-- `DEFAULT_TIMEOUT`
-  The default timeout for deploys.
+<dl>
+    <dt>`GOOGLE_CLIENT_ID`</dt>
+    <dd></dd>
+    <dt>`GOOGLE_CLIENT_SECRET`</dt>
+    <dd></dd>
+    <dt>`GOOGLE_DOMAIN`</dt>
+    <dd>The Google Apps domain to restrict authentication to.</dd>
+    <dt>`SENTRY_DSN`</dt>
+    <dd>A DSN value from Sentry.</dd>
+    <dt>`SSH_PRIVATE_KEY`</dt>
+    <dd>The SSH private key required for cloning repositories (newlines replaced with \n). This will also be made available to providers as a file-system resource.</dd>
+    <dt>`DEFAULT_TIMEOUT`</dt>
+    <dd>The default timeout for deploys.</dd>
+</dl>
 
 ## An Example Fabric Configuration
 
