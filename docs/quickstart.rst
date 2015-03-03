@@ -50,13 +50,16 @@ If you're using a configuration file you'll need to pass it with ``FREIGHT_CONF`
 
 The following values should be configured:
 
-API_KEY
+.. option:: API_KEY
+
   The API key clients will use to communicate with Freight.
 
-SSH_PRIVATE_KEY
+.. option:: SSH_PRIVATE_KEY
+
   The SSH private key required for cloning repositories (newlines replaced with \n). This will also be made available to providers as a file-system resource.
 
-DEFAULT_TIMEOUT
+.. option:: DEFAULT_TIMEOUT
+
   The default timeout for deploys.
 
 Google Authentication
@@ -64,13 +67,16 @@ Google Authentication
 
 The frontend currently only supports authenticating with Google. You'll need a `Google Developer <https://console.developers.google.com/>`_ account in order to create an OAuth2 `webserver application <https://developers.google.com/accounts/docs/OAuth2WebServer>`_.
 
-GOOGLE_CLIENT_ID
+.. option:: GOOGLE_CLIENT_ID
+
   The client ID for the Google application.
 
-GOOGLE_CLIENT_SECRET
+.. option:: GOOGLE_CLIENT_SECRET
+
   The client ID for the Google application.
 
-GOOGLE_DOMAIN
+.. option:: GOOGLE_DOMAIN
+
   The Google Apps domain to restrict authentication to.
 
 
@@ -89,9 +95,12 @@ To integrate GitHub context checks you'll need to generate an API token:
 
 The following configuration is available:
 
-GITHUB_TOKEN
+.. option:: GITHUB_TOKEN
+
   The generated API token.
-GITHUB_API_ROOT
+
+.. option:: GITHUB_API_ROOT
+
   The base URL for the API. Defaults to ``https://api.github.com``
 
 
@@ -100,7 +109,8 @@ Sentry Reporting
 
 Support exists for reporting internal errors to an upstream `Sentry <https://getsentry.com>`_ server.
 
-SENTRY_DSN
+.. option:: SENTRY_DSN
+
   A DSN value from Sentry.
 
 
