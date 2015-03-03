@@ -89,6 +89,27 @@ DEFAULT_TIMEOUT
   The default timeout for deploys.
 
 
+GitHub
+~~~~~~
+
+To integrate GitHub context checks you'll need to generate an API token:
+
+.. code-block:: bash
+
+  curlish https://api.github.com/authorizations \
+      -u your-username \
+      -X POST \
+      -J scopes='repo' \
+      -J note='freight'
+
+The following configuration is available:
+
+GITHUB_TOKEN
+  The generated API token.
+GITHUB_API_ROOT
+  The base URL for the API. Defaults to ``https://api.github.com``
+
+
 An Example Fabric Configuration
 ===============================
 
