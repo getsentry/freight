@@ -37,6 +37,20 @@ It's not designed to replace something like Heroku, or other PaaS services, but 
 
 ### V2 and Beyond
 
+## Setup
+
+In order to get Freight running you'll need a couple things:
+
+- A [Google Developer](https://console.developers.google.com/) account in order to create an OAUTH2 [webserver application](https://developers.google.com/accounts/docs/OAuth2WebServer).
+- A [Sentry](http://getsentry.com) account.
+
+### Environmental variables you'll need to set:
+
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+- `SENTRY_DSN`
+
+
 #### Machine-consistency service
 
 We could run a service on each machine that would check-in with the master. This would record the current version of the application. The service would be configured with a set of apps (their environment info, how to get app version). The service could also be aware of "how do I deploy a version" which could assist in pull-based deploys.
