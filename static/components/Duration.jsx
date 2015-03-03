@@ -22,7 +22,7 @@ var Duration = React.createClass({
     } else if (value > 10000) {
       result = Math.round(value / 1000) + ' sec';
     } else if (value > 1000) {
-      result = round(value / 1000) + ' sec';
+      result = Math.round(value / 1000) + ' sec';
     } else {
       result = Math.round(value) + ' ms';
     }
