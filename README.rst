@@ -55,7 +55,7 @@ Setup
 In order to get Freight running you'll need a couple things:
 
 - A `Google Developer <https://console.developers.google.com/>`_ account in order to create an OAuth2 `webserver application <https://developers.google.com/accounts/docs/OAuth2WebServer>`_.
-- A `Sentry` <http://getsentry.com>`_ account.
+- A `Sentry <http://getsentry.com>`_ account.
 
 Configuration
 ~~~~~~~~~~~~~
