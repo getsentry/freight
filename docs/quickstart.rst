@@ -7,13 +7,34 @@ The easiest way to get started is to run Freight on Heroku:
   :alt: Deploy
   :target: https://heroku.com/deploy
 
+Requirements
+------------
 
-Otherwise, you'll need the following services available:
+.. note:: Freight is designed to support behind-firewall installation. However, this guide does not yet cover all required configuration.
+
+If you're not using Heroku, you'll need to ensure a few server dependencies:
 
 - Redis (or any `Celery <http://http://www.celeryproject.org/>`_) compatible broker)
 - PostgreSQL
+- Python 2.7
+- Node.js
 
-.. note:: Freight is designed to support behind-firewall installation. However, this guide does not yet cover all required configuration.
+Dependencies
+------------
+
+Freight contains dependencies both from Python (for the API and workers) and JavaScript (for the frontend). We recommend using a virtualenv, but we're not going to cover that in our quickstart guide.
+
+Start by installing Python dependencies:
+
+.. code-block:: bash
+
+  python setup.py develop
+
+And then install the JavaScript dependencies:
+
+.. code-block:: bash
+
+  npm install
 
 
 Configuration
@@ -28,6 +49,9 @@ If you're using a configuration file you'll need to pass it with ``FREIGHT_CONF`
   FREIGHT_CONF=/tmp/freight.conf.py bin/web
 
 The following values should be configured:
+
+API_KEY
+  The API key clients will use to communicate with Freight.
 
 SSH_PRIVATE_KEY
   The SSH private key required for cloning repositories (newlines replaced with \n). This will also be made available to providers as a file-system resource.
@@ -80,10 +104,43 @@ SENTRY_DSN
   A DSN value from Sentry.
 
 
-An Example Fabric Configuration
--------------------------------
+Bootstrap the Database
+----------------------
 
-Our example will use the `Curlish <http://pythonhosted.org/curlish/>`_ utility and the local server with its default key:
+.. note:: If you're on Heroku, you can skip this step.
+
+If you haven't already, create a new database for Freight:
+
+.. code-block:: bash
+
+  createdb -E utf-8 freight
+
+Now apply Freight's migrations:
+
+
+.. code-block:: bash
+
+  bin/upgrade
+
+
+Webserver
+---------
+
+At this point you should have a working installation. To test this, launch the webserver:
+
+.. code-block:: bash
+
+  bin/web
+
+You should then be able to access the frontend: http://localhost:5000
+
+
+Creating an Application
+-----------------------
+
+.. note:: Our examples will use the `Curlish <http://pythonhosted.org/curlish/>`_ utility and the local server with its default key.
+
+With the webserver online, you should be able to access the API. The first thing you'll need to do is create an application:
 
 .. code-block:: bash
 
@@ -95,6 +152,8 @@ Our example will use the `Curlish <http://pythonhosted.org/curlish/>`_ utility a
       -J provider=shell \
       -J provider_config='{"command": "bin/fab -a -i {ssh_key} -R {environment} {task}:sha={sha}"}'
 
+We've created a new application named "example" using the shell provider.
+
 The important part here is our provider configuration:
 
 .. code-block:: json
@@ -102,7 +161,6 @@ The important part here is our provider configuration:
   {
       "command": "bin/fab -a -i {ssh_key} -R {environment} {task}:sha={sha}"
   }
-
 
 The command we're passing is simply a wrapper around Fabric:
 
@@ -116,10 +174,13 @@ The command we're passing is simply a wrapper around Fabric:
   pip install fabric pytz
   fab $@
 
+.. note:: This bin/fab file is not part of Freight, but rather it's referencing a path relative to your repository root.
 
-.. note:: This file is not part of Freight, but rather it's referencing a path relative to your repository root.
 
-Now we can create a new deploy task:
+Creating a new Deploy
+---------------------
+
+Once we've configured our application we can create a new deploy:
 
 .. code-block:: bash
 
@@ -140,4 +201,30 @@ In our response we'll get back the task summary which simply notes its pending a
     "status": "pending"
   }
 
-You can now query the API for the given task, or simply load up the web UI.
+
+Monitoring a Deploy
+-------------------
+
+While Freight intends to provide a feature-rich frontend, it's fundamentally an API-driven application.
+
+For example, to get the status of a deploy:
+
+
+.. code-block:: bash
+
+  curlish http://localhost:5000/api/0/tasks/1/ \
+      -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70'
+
+Additionally you can access the logs via the API:
+
+.. code-block:: bash
+
+    curlish http://localhost:5000/api/0/tasks/1/log/?offset=-1&limit=1000 \
+      -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70'
+
+
+Next Steps
+----------
+
+We've gone through the basics of creating an application and firing off a deploy. Two important pieces that aren't yet covered in the quickstart include pre-deploy checks and notifications. To learn more about those, we recommend diving into the code.
+
