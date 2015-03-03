@@ -37,23 +37,39 @@ It's not designed to replace something like Heroku, or other PaaS services, but 
 
 ### V2 and Beyond
 
+#### Machine-consistency service
+
+We could run a service on each machine that would check-in with the master. This would record the current version of the application. The service would be configured with a set of apps (their environment info, how to get app version). The service could also be aware of "how do I deploy a version" which could assist in pull-based deploys.
+
 ## Setup
 
 In order to get Freight running you'll need a couple things:
 
-- A [Google Developer](https://console.developers.google.com/) account in order to create an OAUTH2 [webserver application](https://developers.google.com/accounts/docs/OAuth2WebServer).
+- A [Google Developer](https://console.developers.google.com/) account in order to create an OAuth2 [webserver application](https://developers.google.com/accounts/docs/OAuth2WebServer).
 - A [Sentry](http://getsentry.com) account.
 
-### Environmental variables you'll need to set:
+### Configuration
+
+Configuration can be managed either via a Python file, or selectively via environment variables. Generally there are sane defaults available where appropriate, though many things are install-specific.
+
+If you're using a configuration file you'll need to pass it with `FREIGHT_CONF` environment variable:
+
+```
+FREIGHT_CONF=/tmp/freight.conf.py bin/web
+```
+
+The following values should be configured:
 
 - `GOOGLE_CLIENT_ID`
 - `GOOGLE_CLIENT_SECRET`
+- `GOOGLE_DOMAIN`
+  The Google Apps domain to restrict authentication to.
 - `SENTRY_DSN`
-
-
-#### Machine-consistency service
-
-We could run a service on each machine that would check-in with the master. This would record the current version of the application. The service would be configured with a set of apps (their environment info, how to get app version). The service could also be aware of "how do I deploy a version" which could assist in pull-based deploys.
+  A DSN value from Sentry.
+- `SSH_PRIVATE_KEY`
+  The SSH private key required for cloning repositories (newlines replaced with \n). This will also be made available to providers as a file-system resource.
+- `DEFAULT_TIMEOUT`
+  The default timeout for deploys.
 
 ## An Example Fabric Configuration
 

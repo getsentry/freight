@@ -13,6 +13,12 @@
       "description": "An API key used to communiate with the service.",
       "generator": "secret"
     },
+    "GOOGLE_CLIENT_ID": "",
+    "GOOGLE_CLIENT_SECRET": "",
+    "GOOGLE_DOMAIN": {
+      "description": "The Google Apps domain you wish to restrict login to"
+    },
+    "SENTRY_DSN": "",
     "DEFAULT_TIMEOUT": "300",
     "LOG_LEVEL": "INFO",
     "SSH_PRIVATE_KEY": {
