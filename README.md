@@ -48,6 +48,11 @@ In order to get Freight running you'll need a couple things:
 - A [Google Developer](https://console.developers.google.com/) account in order to create an OAuth2 [webserver application](https://developers.google.com/accounts/docs/OAuth2WebServer).
 - A [Sentry](http://getsentry.com) account.
 
+You'll also need a couple of services:
+
+- Redis (or any [Celery](http://http://www.celeryproject.org/) compatible broker)
+- PostgreSQL
+
 ### Configuration
 
 Configuration can be managed either via a Python file, or selectively via environment variables. Generally there are sane defaults available where appropriate, though many things are install-specific.
