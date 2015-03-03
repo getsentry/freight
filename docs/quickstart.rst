@@ -21,9 +21,9 @@ Configuration
 
 Configuration can be managed either via a Python file, or selectively via environment variables. Generally there are sane defaults available where appropriate, though many things are install-specific.
 
-If you're using a configuration file you'll need to pass it with `FREIGHT_CONF` environment variable:
+If you're using a configuration file you'll need to pass it with ``FREIGHT_CONF`` environment variable:
 
-.. code-block: bash
+.. code-block:: bash
 
   FREIGHT_CONF=/tmp/freight.conf.py bin/web
 
@@ -85,7 +85,7 @@ An Example Fabric Configuration
 
 Our example will use the `Curlish <http://pythonhosted.org/curlish/>`_ utility and the local server with its default key:
 
-.. code-block: bash
+.. code-block:: bash
 
   curlish http://localhost:5000/api/0/apps/ \
       -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70' \
@@ -97,7 +97,7 @@ Our example will use the `Curlish <http://pythonhosted.org/curlish/>`_ utility a
 
 The important part here is our provider configuration:
 
-.. code-block: json
+.. code-block:: json
 
   {
       "command": "bin/fab -a -i {ssh_key} -R {environment} {task}:sha={sha}"
@@ -106,7 +106,7 @@ The important part here is our provider configuration:
 
 The command we're passing is simply a wrapper around Fabric:
 
-.. code-block: bash
+.. code-block:: bash
 
   #!/bin/bash
 
@@ -121,7 +121,7 @@ The command we're passing is simply a wrapper around Fabric:
 
 Now we can create a new deploy task:
 
-.. code-block: bash
+.. code-block:: bash
 
   curlish http://localhost:5000/api/0/tasks/ \
       -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70'
@@ -133,7 +133,7 @@ Now we can create a new deploy task:
 
 In our response we'll get back the task summary which simply notes its pending and gives you it's ID:
 
-.. code-block: json
+.. code-block:: json
 
   {
     "id": "1",
