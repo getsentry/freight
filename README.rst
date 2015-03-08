@@ -23,7 +23,7 @@ Current Features
 - Support for at least Fabric-based (simple shell commands) and Heroku-based deploys
 - API-accessible deploy logs
 - Hubot integration (starting deploys)
-- Slack integraiton (notifying when deploys start/finish/fail)
+- Slack integration (notifying when deploys start/finish/fail)
 - Integration with GitHub status checks (i.e. did Circle CI pass on sha XXX)
 
 Roadmap
