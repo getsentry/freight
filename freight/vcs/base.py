@@ -65,7 +65,7 @@ class Vcs(object):
     def clone(self):
         raise NotImplementedError
 
-    def coppy(self):
+    def coppy(self, new_workspace):
         raise NotImplementedError
 
     def update(self):
