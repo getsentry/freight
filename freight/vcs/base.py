@@ -65,6 +65,9 @@ class Vcs(object):
     def clone(self):
         raise NotImplementedError
 
+    def coppy(self, new_workspace):
+        raise NotImplementedError
+
     def update(self):
         raise NotImplementedError
 
@@ -75,6 +78,9 @@ class Vcs(object):
         """
         Given a `ref` return the fully qualified version.
         """
+        raise NotImplementedError
+
+    def get_hash_last_commit(self):
         raise NotImplementedError
 
     def get_default_revision(self):

@@ -52,6 +52,10 @@ class GitVcs(Vcs):
     def clone(self):
         self.run(['clone', '--mirror', self.remote_url, self.path])
 
+    def coppy(self, new_workspace):
+        self.run(['clone', self.workspace.path, new_workspace.path],
+                 workspace=new_workspace)
+
     def update(self):
         # in case we have a non-mirror checkout, wipe it out
         if os.path.exists(os.path.join(self.workspace.path, '.git')):
@@ -63,8 +67,11 @@ class GitVcs(Vcs):
     def checkout(self, ref, new_workspace):
         self.run(['clone', self.workspace.path, new_workspace.path],
                  workspace=new_workspace)
-        self.run(['reset', '--hard', ref], workspace=new_workspace)
+        self.run(['checkout' , ref], workspace=new_workspace)
 
     def describe(self, ref):
         return self.run(['describe', '--always', '--abbrev=0', ref],
                         capture=True)
+
+    def get_hash_last_commit(self):
+        return self.run(['rev-parse', 'HEAD'], capture=True)

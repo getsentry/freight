@@ -101,7 +101,7 @@ class TaskIndexApiView(ApiView):
             vcs_backend.clone_or_update()
 
         try:
-            sha = vcs_backend.describe(args.ref)
+            sha = vcs_backend.get_hash_last_commit()
         except vcs.UnknownRevision:
             return self.error('Invalid ref', name='invalid_ref', status_code=400)
 
