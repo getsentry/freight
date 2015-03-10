@@ -77,5 +77,8 @@ class Vcs(object):
         """
         raise NotImplementedError
 
+    def get_hash_last_commit(self):
+        raise NotImplementedError
+
     def get_default_revision(self):
         raise NotImplementedError
