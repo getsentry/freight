@@ -67,7 +67,7 @@ class GitVcs(Vcs):
     def checkout(self, ref, new_workspace):
         self.run(['clone', self.workspace.path, new_workspace.path],
                  workspace=new_workspace)
-        self.run(['reset', '--hard', ref], workspace=new_workspace)
+        self.run(['checkout' , ref], workspace=new_workspace)
 
     def describe(self, ref):
         return self.run(['describe', '--always', '--abbrev=0', ref],

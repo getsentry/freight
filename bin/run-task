@@ -48,7 +48,7 @@ def main(task_id):
     workspace = TemporaryWorkspace()
 
     try:
-        vcs_backend.coppy(workspace)
+        vcs_backend.checkout(task.ref, workspace)
 
         try:
             provider.execute(workspace, task)
