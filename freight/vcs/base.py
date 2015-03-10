@@ -65,6 +65,9 @@ class Vcs(object):
     def clone(self):
         raise NotImplementedError
 
+    def coppy(self):
+        raise NotImplementedError
+
     def update(self):
         raise NotImplementedError
 
