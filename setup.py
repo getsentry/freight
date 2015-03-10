@@ -55,7 +55,7 @@ install_requires = [
     'redis>=2.10.3,<2.11.0',
     'requests>=2.5.1,<2.6.0',
     'uwsgi>=2.0.9,<2.1.0',
-    'fabric=1.8.5'
+    'fabric==1.8.5'
 ]
 
 setup(
