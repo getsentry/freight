@@ -23,6 +23,10 @@ def execute_task(task_id):
         logging.warning('ExecuteTask fired with missing Task(id=%s)', task_id)
         return
 
+    if task.status not in (TaskStatus.pending, TaskStatus.in_progress):
+        logging.warning('ExecuteTask fired with finished Task(id=%s)', task_id)
+        return
+
     send_task_notifications(task, NotifierEvent.TASK_STARTED)
 
     provider_config = task.provider_config
