@@ -50,7 +50,7 @@ p, table, ul, dl form,
 }
 
 body {
-    padding-top: 119px;
+    padding-top: 69px;
 }
 
 header {
@@ -58,14 +58,16 @@ header {
     top: 0;
     left: 0;
     right: 0;
-    padding: 30px 0;
-    height: 89px;
-    background: @dark;
+    padding: 10px 0;
+    height: 49px;
+    background: @light;
     border-bottom: 1px solid @lessDark;
     z-index: 1000;
 
     h1 {
+        display: inline-block;
         margin: 0;
+        vertical-align: middle;
         a {
             background: url(../img/freight-logo.png);
             background-size: 122px 28px;
@@ -74,6 +76,14 @@ header {
             width: 122px;
             height: 28px;
         }
+    }
+
+    h2 {
+        color: @lessDark;
+        font-size: 20px;
+        vertical-align: middle;
+        display: inline-block;
+        margin: 5px 0 0 10px;
     }
 }
 
@@ -101,6 +111,22 @@ header {
     border-color: #79589F;
     background-color: #79589F;
     color: #fff;
+}
+
+.btn-default {
+  background-color: @lessDark;
+  border-color: @lessDark;
+  color: @light;
+
+  &:hover, &.btn-active {
+    background-color: lighten(@lessDark, 10%);
+    border-color: lighten(@lessDark, 10%);
+    color: @light;
+  }
+}
+
+.btn input[type=checkbox] {
+  margin-right: 5px;
 }
 
 .task-list {
@@ -168,7 +194,7 @@ header {
 
 
 .task-details {
-    padding-bottom: 90px;
+    padding-bottom: 70px;
 
     .task-footer {
         background: @dark;
@@ -178,15 +204,9 @@ header {
         right: 0;
         bottom: 0;
         padding: 0 20px;
-        line-height: 55px;
-        height: 60px;
+        line-height: 45px;
+        height: 50px;
         border-top: 1px solid @lessDark;
-
-        h2 {
-            font-size: 16pt;
-            line-height: 60px;
-            display: inline-block;
-        }
     }
 
     .task-log {

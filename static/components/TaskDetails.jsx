@@ -11,6 +11,10 @@ var TimeSince = require('./TimeSince');
 var TaskDetails = React.createClass({
   mixins: [PollingMixin, Router.State],
 
+  contextTypes: {
+    setHeading: React.PropTypes.func,
+  },
+
   getInitialState() {
     return {
       loading: true,
@@ -20,9 +24,14 @@ var TaskDetails = React.createClass({
     };
   },
 
+  componentWillUnmount() {
+    this.context.setHeading(null);
+  },
+
   componentWillMount() {
     api.request(this.getPollingUrl(), {
       success: (data) => {
+        this.context.setHeading(this.getTaskLabel(data));
         this.setState({
           loading: false,
           task: data,
@@ -35,6 +44,10 @@ var TaskDetails = React.createClass({
 
   getPollingUrl() {
     return '/tasks/' + this.getParams().taskId + '/';
+  },
+
+  getTaskLabel(task) {
+    return task.app.name + '/' + task.environment + '#' + task.number;
   },
 
   pollingReceiveData(data) {
@@ -99,7 +112,7 @@ var TaskDetails = React.createClass({
 
     var task = this.state.task;
 
-    var liveScrollClassName = "btn btn-default";
+    var liveScrollClassName = "btn btn-default btn-sm";
     if (this.state.liveScroll) {
       liveScrollClassName += " btn-active";
     }
@@ -115,8 +128,6 @@ var TaskDetails = React.createClass({
 
         <div className="task-footer">
           <div className="container">
-            <h2>{task.app.name}/{task.environment} #{task.number}</h2>
-
             <div className="pull-right">
               <a className={liveScrollClassName}
                  onClick={this.toggleLiveScroll}>
