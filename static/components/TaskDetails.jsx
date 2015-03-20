@@ -91,7 +91,7 @@ var TaskDetails = React.createClass({
         }
         if (this.state.loading) {
           this.setState({
-            loading: false,
+            loading: false
           });
         }
         if (this.taskInProgress(this.state.task)) {
