@@ -83,11 +83,11 @@ var TaskDetails = React.createClass({
     api.request(url, {
       success: (data) => {
         if (data.text !== "") {
-          this.updateBuildLog(data);
           this.setState({
             loading: false,
             logNextOffset: data.nextOffset
           });
+          this.updateBuildLog(data);
         }
         if (this.state.loading) {
           this.setState({
