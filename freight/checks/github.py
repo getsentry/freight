@@ -6,9 +6,12 @@ __all__ = ['GitHubContextCheck']
 from flask import current_app
 
 from freight import http
-from freight.exceptions import CheckFailed
+from freight.exceptions import CheckFailed, CheckPending
 
 from .base import Check
+
+ERR_CHECK = '{} context is {}'
+ERR_MISSING_CONTEXT = '{} context was not found'
 
 
 class GitHubContextCheck(Check):
@@ -47,9 +50,11 @@ class GitHubContextCheck(Check):
         for data in resp.json():
             if data['context'] not in contexts:
                 continue
-            if data['state'] != 'success':
-                raise CheckFailed('{} context is {}'.format(data['context'], data['state']))
+            if data['state'] == 'pending':
+                raise CheckPending(ERR_CHECK.format(data['context'], data['state']))
+            elif data['state'] != 'success':
+                raise CheckFailed(ERR_CHECK.format(data['context'], data['state']))
             contexts.remove(data['context'])
 
         if contexts:
-            raise CheckFailed('{} context was not found'.format(iter(contexts).next()))
+            raise CheckFailed(ERR_MISSING_CONTEXT.format(iter(contexts).next()))

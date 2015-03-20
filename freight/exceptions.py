@@ -13,6 +13,10 @@ class CheckFailed(Exception):
     pass
 
 
+class CheckPending(CheckFailed):
+    pass
+
+
 class CommandError(Exception):
     def __init__(self, cmd, retcode, stdout=None, stderr=None):
         self.cmd = cmd
