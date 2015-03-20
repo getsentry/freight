@@ -33,7 +33,6 @@ var TaskDetails = React.createClass({
       success: (data) => {
         this.context.setHeading(this.getTaskLabel(data));
         this.setState({
-          loading: false,
           task: data,
           liveScroll: this.taskInProgress(data)
         });
@@ -86,7 +85,13 @@ var TaskDetails = React.createClass({
         if (data.text !== "") {
           this.updateBuildLog(data);
           this.setState({
+            loading: false,
             logNextOffset: data.nextOffset
+          });
+        }
+        if (this.state.loading) {
+          this.setState({
+            loading: false,
           });
         }
         if (this.taskInProgress(this.state.task)) {
