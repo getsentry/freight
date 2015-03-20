@@ -106,7 +106,12 @@ var TaskDetails = React.createClass({
 
     return (
       <div className="task-details">
-        <div className="task-log" ref="log" />
+        <div className="task-log">
+          <div ref="log" />
+          {this.taskInProgress(task) &&
+            <div className="loading-icon" />
+          }
+        </div>
 
         <div className="task-footer">
           <div className="container">
