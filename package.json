@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/getsentry/freight",
   "dependencies": {
+    "ansi_up": "^1.1.3",
     "bootstrap": "~3.3.0",
     "bundle-loader": "^0.5.3",
     "css-loader": "^0.9.1",

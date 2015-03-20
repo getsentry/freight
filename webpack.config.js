@@ -13,6 +13,7 @@ module.exports = {
     "styles": "./less/base.less",
     "app": "./main",
     "vendor": [
+      "ansi_up",
       "jquery",
       "moment",
       "react/addons",

@@ -1,5 +1,6 @@
 /** @jsx React.DOM */
 
+var ansi_up = require('ansi_up');
 var React = require('react');
 var Router = require('react-router');
 
@@ -49,7 +50,7 @@ var TaskDetails = React.createClass({
     data.text.split('\n').forEach((line) => {
       var div = document.createElement('div');
       div.className = 'line';
-      div.innerHTML = line;
+      div.innerHTML = ansi_up.ansi_to_html(line);
       frag.appendChild(div);
     });
 

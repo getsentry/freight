@@ -75,6 +75,17 @@ def main():
             offset=offset,
         ))
         offset += len(line)
+
+    # add a colored line for ansi tests
+    line = '\033[1;33;40m 33;40  \033[1;33;41m 33;41  \033[1;33;42m 33;42  \033[1;33;43m 33;43  \033[1;33;44m 33;44  \033[1;33;45m 33;45  \033[1;33;46m 33;46  \033[1m\033[0\n\n\033[1;33;42m >> Deploy OK\n'
+    db.session.add(LogChunk(
+        task_id=task.id,
+        text=line,
+        size=len(line),
+        offset=offset,
+    ))
+    offset += len(line)
+
     db.session.commit()
 
     task = fixtures.create_task(
