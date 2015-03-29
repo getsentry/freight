@@ -5,7 +5,7 @@ import responses
 import pytest
 
 from freight import checks
-from freight.exceptions import CheckFailed
+from freight.exceptions import CheckFailed, CheckPending
 from freight.testutils import TestCase
 
 
@@ -22,7 +22,7 @@ class GitHubContextCheckTest(GitHubCheckBase):
     def test_not_passing(self):
         body = json.dumps([
             {
-                "state": "pending",
+                "state": "failed",
                 "context": "travisci",
             }
         ])
@@ -33,6 +33,23 @@ class GitHubContextCheckTest(GitHubCheckBase):
         config = {'contexts': ['travisci'], 'repo': 'getsentry/freight'}
 
         with pytest.raises(CheckFailed):
+            self.check.check(self.app, 'abcdefg', config)
+
+    @responses.activate
+    def test_not_finished(self):
+        body = json.dumps([
+            {
+                "state": "pending",
+                "context": "travisci",
+            }
+        ])
+
+        responses.add(responses.GET, 'https://api.github.com/repos/getsentry/freight/commits/abcdefg/statuses',
+                      body=body)
+
+        config = {'contexts': ['travisci'], 'repo': 'getsentry/freight'}
+
+        with pytest.raises(CheckPending):
             self.check.check(self.app, 'abcdefg', config)
 
     @responses.activate

@@ -160,6 +160,10 @@ class TaskRunner(object):
         )
         self._logreporter.start()
 
+    # TODO(dcramer): currently this is the sum of checks + job time which
+    # isnt ideal. We either could move checks into execute_task and have a new
+    # timeout just for them, or assume this timeout includes both and likely
+    # still add another timeout for checks
     def _timeout(self):
         logging.error('Task(id=%s) exceeded time limit of %ds', self.task.id, self.timeout)
 

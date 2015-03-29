@@ -9,11 +9,61 @@ import sys
 from datetime import datetime
 from flask import current_app
 
-from freight import providers, vcs
+from freight import checks, providers, vcs
 from freight.config import create_app, db, redis
 from freight.models import App, LogChunk, Repository, Task, TaskStatus
 from freight.utils.redis import lock
 from freight.utils.workspace import TemporaryWorkspace, Workspace
+
+INFO_CHECK_FINISHED = 'Check has has passed: {check}'
+
+INFO_CHECK_PENDING = 'Waiting on check {check}:\n  {message}'
+
+ERR_CHECK_FAILED = 'Task cancelled due to failing check {check}:\n  {message}'
+
+
+def checks_are_passing(app, task):
+    if not task.checks:
+        return True
+
+    announced_checks = set()
+    finished_checks = set()
+    pending_checks = True
+    while pending_checks:
+        for check_config in task.checks:
+            if check_config['type'] in finished_checks:
+                continue
+
+            check = checks.get(check_config['type'])
+            try:
+                check.check(app, task.sha, check_config['config'])
+
+            except CheckPending as e:
+                if check_config['type'] not in announced_checks:
+                    sys.stdout.write(INFO_CHECK_PENDING.format(
+                        check=check_config['type'],
+                        message=unicode(e),
+                    ))
+                    announced_checks.add(check_config['type'])
+                pending_checks = True
+
+            except CheckError as e:
+                sys.stderr.write(ERR_CHECK_FAILED.format(
+                    check=check_config['type'],
+                    message=unicode(e),
+                ))
+                return False
+
+            else:
+                finished_checks.add(check_config['type'])
+
+                sys.stdout.write(INFO_CHECK_FINISHED.format(
+                    check=check_config['type'],
+                ))
+
+        if pending_checks:
+            sleep(5)
+    return True
 
 
 def main(task_id):
@@ -28,6 +78,13 @@ def main(task_id):
     task.status = TaskStatus.in_progress
     db.session.add(task)
     db.session.commit()
+
+    if not task.was_forced and not checks_are_passing(app, task):
+        task.status = TaskStatus.failed
+        task.date_finished = datetime.utcnow()
+        db.session.add(task)
+        db.session.commit()
+        return
 
     provider = providers.get(task.provider)
 

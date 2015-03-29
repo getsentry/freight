@@ -77,6 +77,10 @@ class Task(db.Model):
     date_finished = Column(DateTime)
 
     @property
+    def was_forced(self):
+        return self.data.get('force', False)
+
+    @property
     def checks(self):
         return self.data.get('checks', [])
 
