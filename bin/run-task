@@ -28,13 +28,9 @@ def checks_are_passing(app, task):
         return True
 
     announced_checks = set()
-    finished_checks = set()
-    pending_checks = True
+    pending_checks = set(task.checks)
     while pending_checks:
-        for check_config in task.checks:
-            if check_config['type'] in finished_checks:
-                continue
-
+        for check_config in set(pending_checks):
             check = checks.get(check_config['type'])
             try:
                 check.check(app, task.sha, check_config['config'])
@@ -46,7 +42,6 @@ def checks_are_passing(app, task):
                         message=unicode(e),
                     ))
                     announced_checks.add(check_config['type'])
-                pending_checks = True
 
             except CheckError as e:
                 sys.stderr.write(ERR_CHECK_FAILED.format(
@@ -56,7 +51,7 @@ def checks_are_passing(app, task):
                 return False
 
             else:
-                finished_checks.add(check_config['type'])
+                pending_checks.remove(check_config['type'])
 
                 sys.stdout.write(INFO_CHECK_FINISHED.format(
                     check=check_config['type'],
