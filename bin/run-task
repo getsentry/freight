@@ -16,11 +16,11 @@ from freight.models import App, Repository, Task, TaskStatus
 from freight.utils.redis import lock
 from freight.utils.workspace import TemporaryWorkspace, Workspace
 
-INFO_CHECK_FINISHED = 'Check has has passed: {check}'
+INFO_CHECK_FINISHED = 'Check has has passed: {check}\n'
 
-INFO_CHECK_PENDING = 'Waiting on check {check}:\n  {message}'
+INFO_CHECK_PENDING = 'Waiting on check {check}:\n  {message}\n'
 
-ERR_CHECK_FAILED = 'Task cancelled due to failing check {check}:\n  {message}'
+ERR_CHECK_FAILED = 'Task cancelled due to failing check {check}:\n  {message}\n'
 
 
 def checks_are_passing(app, task):
