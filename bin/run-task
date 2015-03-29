@@ -3,15 +3,16 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
-import os
 import sys
 
 from datetime import datetime
 from flask import current_app
+from time import sleep
 
 from freight import checks, providers, vcs
 from freight.config import create_app, db, redis
-from freight.models import App, LogChunk, Repository, Task, TaskStatus
+from freight.exceptions import CheckError, CheckPending
+from freight.models import App, Repository, Task, TaskStatus
 from freight.utils.redis import lock
 from freight.utils.workspace import TemporaryWorkspace, Workspace
 
@@ -91,7 +92,6 @@ def main(task_id):
     repo_home = Workspace(
         path=repo.get_path(),
     )
-
 
     vcs_backend = vcs.get(
         repo.vcs,
