@@ -28,10 +28,13 @@ def checks_are_passing(app, task):
     if not task.checks:
         return True
 
+    checks_with_ids = dict(enumerate(task.checks))
+
     announced_checks = set()
-    pending_checks = set(task.checks)
+    pending_checks = set(checks_with_ids.keys())
     while pending_checks:
-        for check_config in set(pending_checks):
+        for check_id in set(pending_checks):
+            check_config = checks_with_ids[check_id]
             check = checks.get(check_config['type'])
             try:
                 check.check(app, task.sha, check_config['config'])
@@ -52,7 +55,7 @@ def checks_are_passing(app, task):
                 return False
 
             else:
-                pending_checks.remove(check_config['type'])
+                pending_checks.remove(check_id)
 
                 sys.stdout.write(INFO_CHECK_FINISHED.format(
                     check=check_config['type'],
