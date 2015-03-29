@@ -52,9 +52,7 @@ var Overview = React.createClass({
       return this.taskInProgress(task);
     }).map((task) => {
       return (
-        <li key={task.id}>
-          <TaskSummary task={task} />
-        </li>
+        <TaskSummary key={task.id} task={task} />
       );
     });
 
@@ -62,9 +60,7 @@ var Overview = React.createClass({
       return !this.taskInProgress(task);
     }).map((task) => {
       return (
-        <li key={task.id}>
-          <TaskSummary task={task} />
-        </li>
+        <TaskSummary key={task.id} task={task} />
       );
     });
 

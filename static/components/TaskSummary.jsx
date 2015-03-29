@@ -1,7 +1,8 @@
 /** @jsx React.DOM */
 
 var React = require('react');
-var {Link} = require('react-router');
+var Router = require('react-router');
+var Link = Router.Link;
 var joinClasses = require("react/lib/joinClasses");
 
 var Duration = require('./Duration');
@@ -20,6 +21,11 @@ var Progress = React.createClass({
 });
 
 var TaskSummary = React.createClass({
+  mixins: [
+    Router.Navigation,
+    Router.State
+  ],
+
   taskInProgress(task) {
     return task.status == 'in_progress' || task.status == 'pending';
   },
@@ -49,6 +55,14 @@ var TaskSummary = React.createClass({
     }
   },
 
+  gotoTask(e) {
+    if (e) {
+      e.preventDefault();
+    }
+
+    this.transitionTo('taskDetails', {taskId: this.props.task.id});
+  },
+
   render() {
     var task = this.props.task;
     var className = 'task';
@@ -64,12 +78,11 @@ var TaskSummary = React.createClass({
     }
 
     return (
-      <div className={joinClasses(this.props.className, className)}>
+      <li className={joinClasses(this.props.className, className)}
+           onClick={this.gotoTask}>
         <Progress value={this.getEstimatedProgress(task)} />
         <h3>
-          <Link to="taskDetails" params={{taskId: task.id}}>
-            {task.app.name}/{task.environment} #{task.number}
-          </Link>
+          {task.app.name}/{task.environment} #{task.number}
         </h3>
         <div className="ref">
           <div className="sha">{task.sha.substr(0, 7)}</div>
@@ -84,7 +97,7 @@ var TaskSummary = React.createClass({
             <small>Created <TimeSince date={task.dateCreated} /></small>
           )}
         </div>
-      </div>
+      </li>
     );
   }
 });
