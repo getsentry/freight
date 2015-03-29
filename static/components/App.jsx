@@ -3,8 +3,6 @@
 var React = require('react');
 var {Link, RouteHandler} = require('react-router');
 
-var ListLink = require('./ListLink');
-
 var App = React.createClass({
   childContextTypes: {
     setHeading: React.PropTypes.func
