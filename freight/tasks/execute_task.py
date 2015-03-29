@@ -151,7 +151,7 @@ class TaskRunner(object):
             args=['bin/run-task', str(self.task.id)],
             cwd=PROJECT_ROOT,
             stdout=PIPE,
-            stderr=STDOUT
+            stderr=STDOUT,
         )
         self._logreporter = LogReporter(
             app_context=current_app.app_context(),

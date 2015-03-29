@@ -43,6 +43,7 @@ class Workspace(object):
         command = map(str, command)
 
         env = os.environ.copy()
+        env['PYTHONUNBUFFERED'] = '1'
         for key, value in kwargs.pop('env', {}).iteritems():
             env[key] = value
 
