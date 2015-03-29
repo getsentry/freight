@@ -4,6 +4,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import logging
+import os
 import sys
 
 from datetime import datetime
@@ -125,6 +126,10 @@ if __name__ == '__main__':
     logger = logging.getLogger('workspace')
     logger.addHandler(logging.StreamHandler())
     logger.setLevel(logging.INFO)
+
+    # remove buffering on stdout/stderr
+    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+    sys.stderr = os.fdopen(sys.stderr.fileno(), 'w', 0)
 
     app = create_app()
     with app.app_context():
