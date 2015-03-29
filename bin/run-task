@@ -29,7 +29,7 @@ def checks_are_passing(app, task):
         return True
 
     announced_checks = set()
-    pending_checks = set(task.checks.keys())
+    pending_checks = set(task.checks)
     while pending_checks:
         for check_config in set(pending_checks):
             check = checks.get(check_config['type'])
