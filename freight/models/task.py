@@ -98,6 +98,6 @@ class Task(db.Model):
 
     @property
     def duration(self):
-        if not self.date_finished:
+        if not (self.date_finished and self.date_started):
             return
         return float('%.2f' % (self.date_finished - self.date_started).total_seconds())
