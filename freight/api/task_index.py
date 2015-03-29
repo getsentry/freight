@@ -6,7 +6,7 @@ from freight import checks, vcs
 from freight.api.base import ApiView
 from freight.api.serializer import serialize
 from freight.config import celery, db, redis
-from freight.exceptions import CheckFailed
+from freight.exceptions import CheckError, CheckPending
 from freight.models import (
     App, Repository, Task, TaskName, TaskSequence, TaskStatus, User
 )
@@ -110,7 +110,9 @@ class TaskIndexApiView(ApiView):
                 check = checks.get(check_config['type'])
                 try:
                     check.check(app, sha, check_config['config'])
-                except CheckFailed as e:
+                except CheckPending:
+                    pass
+                except CheckError as e:
                     return self.error(
                         message=unicode(e),
                         name='check_failed',
