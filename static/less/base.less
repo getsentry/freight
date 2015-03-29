@@ -129,6 +129,14 @@ header {
   margin-right: 5px;
 }
 
+.section {
+  .section-header h2 {
+    text-transform: uppercase;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+}
+
 .task-list {
     padding-left: 0;
     list-style: none;
@@ -164,6 +172,16 @@ header {
             margin-top: 5px;
         }
 
+        &.finished {
+          border-left: 8px solid #3ED33E;
+          &.cancelled {
+            border-left-color: #7B7B7B;
+          }
+          &.failed {
+            border-left-color: #D33E3E;
+          }
+        }
+
         &.active {
             z-index: 2;
             position: relative;
@@ -178,8 +196,8 @@ header {
                 border-radius: 4px;
 
                 background-size: 30px 30px;
-                background-image: linear-gradient(135deg, rgba(230, 227, 236, .7) 25%, transparent 25%,
-                                    transparent 50%, rgba(230, 227, 236, .7) 50%, rgba(230, 227, 236, .7) 75%,
+                background-image: linear-gradient(135deg, rgba(63, 56, 74, .7) 25%, transparent 25%,
+                                    transparent 50%, rgba(63, 56, 74, .7) 50%, rgba(63, 56, 74, .7) 75%,
                                     transparent 75%, transparent);
 
                 -webkit-animation: animate-stripes 2s linear infinite;

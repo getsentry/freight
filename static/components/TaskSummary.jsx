@@ -34,11 +34,33 @@ var TaskSummary = React.createClass({
     return parseInt(Math.min((now - started) / 1000 / task.estimatedDuration * 100, 95), 10);
   },
 
+  getStatusLabel(task) {
+    switch (task.status) {
+      case 'cancelled':
+        return 'Cancelled';
+      case 'failed':
+        return 'Failed';
+      case 'finished':
+        return 'Finished';
+      case 'pending':
+        return 'Pending';
+      case 'in_progress':
+        return 'In progress';
+    }
+  },
+
   render() {
     var task = this.props.task;
     var className = 'task';
     if (this.taskInProgress(task)) {
       className += ' active';
+    } else {
+      className += ' finished';
+    }
+    if (task.status === 'failed') {
+      className += ' failed';
+    } else if (task.status === 'cancelled') {
+      className += ' cancelled';
     }
 
     return (
@@ -55,7 +77,7 @@ var TaskSummary = React.createClass({
         </div>
         <div className="meta">
           {task.dateFinished ?
-            <small>Finished <TimeSince date={task.dateFinished} /> &mdash; <Duration seconds={task.duration} className="duration" /></small>
+            <small>{this.getStatusLabel(task)} <TimeSince date={task.dateFinished} /> &mdash; <Duration seconds={task.duration} className="duration" /></small>
           : (task.dateStarted ?
             <small>Started <TimeSince date={task.dateStarted} /></small>
           :

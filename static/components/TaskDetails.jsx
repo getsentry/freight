@@ -5,6 +5,7 @@ var React = require('react');
 var Router = require('react-router');
 
 var api = require('../api');
+var Duration = require('./Duration');
 var PollingMixin = require('../mixins/polling');
 var TimeSince = require('./TimeSince');
 
@@ -110,6 +111,21 @@ var TaskDetails = React.createClass({
     });
   },
 
+  getStatusLabel(task) {
+    switch (task.status) {
+      case 'cancelled':
+        return 'Cancelled';
+      case 'failed':
+        return 'Failed';
+      case 'finished':
+        return 'Finished';
+      case 'pending':
+        return 'Pending';
+      case 'in_progress':
+        return 'In progress';
+    }
+  },
+
   render() {
     if (this.state.loading) {
       return <div className="loading" />;
@@ -133,6 +149,15 @@ var TaskDetails = React.createClass({
 
         <div className="task-footer">
           <div className="container">
+            <span className="task-status">
+              {task.dateFinished ?
+                <small>{this.getStatusLabel(task)} <TimeSince date={task.dateFinished} /> &mdash; <Duration seconds={task.duration} className="duration" /></small>
+              : (task.dateStarted ?
+                <small>Started <TimeSince date={task.dateStarted} /></small>
+              :
+                <small>Created <TimeSince date={task.dateCreated} /></small>
+              )}
+            </span>
             <div className="pull-right">
               <a className={liveScrollClassName}
                  onClick={this.toggleLiveScroll}>

@@ -70,23 +70,31 @@ var Overview = React.createClass({
 
     return (
       <div>
-        <h2>Active Deploys</h2>
-        {activeTaskNodes.length ?
-          <ul className="task-list">
-            {activeTaskNodes}
-          </ul>
-        :
-          <p>There are no active tasks.</p>
-        }
+        <div className="section">
+          <div className="section-header">
+            <h2>Active Deploys</h2>
+          </div>
+          {activeTaskNodes.length ?
+            <ul className="task-list">
+              {activeTaskNodes}
+            </ul>
+          :
+            <p>There are no active tasks.</p>
+          }
+        </div>
 
-        <h2>Deploy History</h2>
-        {previousTaskNodes.length ?
-          <ul className="task-list">
-            {previousTaskNodes}
-          </ul>
-        :
-          <p>There are no historical tasks.</p>
-        }
+        <div className="section">
+          <div className="section-header">
+            <h2>Deploy History</h2>
+          </div>
+          {previousTaskNodes.length ?
+            <ul className="task-list">
+              {previousTaskNodes}
+            </ul>
+          :
+            <p>There are no historical tasks.</p>
+          }
+        </div>
       </div>
     );
   }
