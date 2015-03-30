@@ -30,7 +30,7 @@ def lock(conn, lock_key, timeout=3, expire=None, nowait=False):
             sleep(delay)
             attempt += 1
 
-    current_app.logger.info('Acquiring lock on %s', lock_key)
+    current_app.logger.debug('Acquiring lock on %s', lock_key)
 
     if not got_lock:
         raise UnableToGetLock('Unable to fetch lock on %s' % (lock_key,))
@@ -38,7 +38,7 @@ def lock(conn, lock_key, timeout=3, expire=None, nowait=False):
     try:
         yield
     finally:
-        current_app.logger.info('Releasing lock on %s', lock_key)
+        current_app.logger.debug('Releasing lock on %s', lock_key)
 
         try:
             conn.delete(lock_key)

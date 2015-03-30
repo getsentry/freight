@@ -17,8 +17,10 @@ from freight.exceptions import CommandError
 class Workspace(object):
     log = logging.getLogger('workspace')
 
-    def __init__(self, path):
+    def __init__(self, path, log=None):
         self.path = path
+        if log is not None:
+            self.log = log
 
     def whereis(self, program, env):
         for path in env.get('PATH', '').split(':'):
@@ -49,7 +51,7 @@ class Workspace(object):
 
         kwargs['env'] = env
 
-        self.log.info('>> Running {}'.format(command))
+        self.log.info('Running {}'.format(command))
         try:
             proc = Popen(command, *args, **kwargs)
         except OSError as exc:
@@ -85,8 +87,9 @@ class Workspace(object):
 
 
 class TemporaryWorkspace(Workspace):
-    def __init__(self):
-        self.path = os.path.join(
+    def __init__(self, *args, **kwargs):
+        path = os.path.join(
             current_app.config['WORKSPACE_ROOT'],
             'freight-workspace-{}'.format(uuid1().hex),
         )
+        super(TemporaryWorkspace, self).__init__(path, *args, **kwargs)

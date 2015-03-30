@@ -45,4 +45,4 @@ class ExecuteTaskTestCase(TransactionTestCase):
 
         assert len(logchunks) >= 1
         all_text = ''.join(c.text for c in logchunks)
-        assert ">> Running ['/bin/echo', 'helloworld']\n" in all_text
+        assert ">> Running ['/bin/echo', 'helloworld']" in all_text

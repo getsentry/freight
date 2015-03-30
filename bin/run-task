@@ -15,17 +15,18 @@ from freight import checks, providers, vcs
 from freight.config import create_app, db, redis
 from freight.exceptions import CheckError, CheckPending
 from freight.models import App, Repository, Task, TaskStatus
+from freight.utils.logging import ColoredFormatter
 from freight.utils.redis import lock
 from freight.utils.workspace import TemporaryWorkspace, Workspace
 
-INFO_CHECK_FINISHED = '>> Check has has passed: {check}\n'
+INFO_CHECK_FINISHED = 'Check has has passed: {check}'
 
-INFO_CHECK_PENDING = '>> Waiting on check {check}:\n  {message}\n'
+INFO_CHECK_PENDING = 'Waiting on check {check}:\n  {message}'
 
-ERR_CHECK_FAILED = '>> Task cancelled due to failing check {check}:\n  {message}\n'
+ERR_CHECK_FAILED = 'Task cancelled due to failing check {check}:\n  {message}'
 
 
-def checks_are_passing(app, task):
+def checks_are_passing(app, task, log):
     if not task.checks:
         return True
 
@@ -42,14 +43,14 @@ def checks_are_passing(app, task):
 
             except CheckPending as e:
                 if check_config['type'] not in announced_checks:
-                    sys.stdout.write(INFO_CHECK_PENDING.format(
+                    log.info(INFO_CHECK_PENDING.format(
                         check=check_config['type'],
                         message=unicode(e),
                     ))
                     announced_checks.add(check_config['type'])
 
             except CheckError as e:
-                sys.stderr.write(ERR_CHECK_FAILED.format(
+                log.error(ERR_CHECK_FAILED.format(
                     check=check_config['type'],
                     message=unicode(e),
                 ))
@@ -58,7 +59,7 @@ def checks_are_passing(app, task):
             else:
                 pending_checks.remove(check_id)
 
-                sys.stdout.write(INFO_CHECK_FINISHED.format(
+                log.info(INFO_CHECK_FINISHED.format(
                     check=check_config['type'],
                 ))
 
@@ -67,7 +68,7 @@ def checks_are_passing(app, task):
     return True
 
 
-def main(task_id):
+def main(task_id, log):
     task = Task.query.get(task_id)
     if not task:
         raise ValueError('Task(id=%s) not found' % task_id)
@@ -80,7 +81,7 @@ def main(task_id):
     db.session.add(task)
     db.session.commit()
 
-    if not task.was_forced and not checks_are_passing(app, task):
+    if not task.was_forced and not checks_are_passing(app, task, log):
         task.status = TaskStatus.failed
         task.date_finished = datetime.utcnow()
         db.session.add(task)
@@ -91,6 +92,7 @@ def main(task_id):
 
     repo_home = Workspace(
         path=repo.get_path(),
+        log=log,
     )
 
     vcs_backend = vcs.get(
@@ -102,7 +104,7 @@ def main(task_id):
     with lock(redis, 'repo:update:{}'.format(repo.id)):
         vcs_backend.clone_or_update()
 
-    workspace = TemporaryWorkspace()
+    workspace = TemporaryWorkspace(log=log)
 
     try:
         vcs_backend.checkout(task.sha, workspace)
@@ -123,9 +125,12 @@ def main(task_id):
 
 if __name__ == '__main__':
     # add workspace explicit handler
-    logger = logging.getLogger('workspace')
-    logger.addHandler(logging.StreamHandler())
-    logger.setLevel(logging.INFO)
+    handler = logging.StreamHandler()
+    handler.setFormatter(ColoredFormatter('>> %(message)s'))
+
+    log = logging.getLogger('freight')
+    log.addHandler(handler)
+    log.setLevel(logging.INFO)
 
     # remove buffering on stdout/stderr
     sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
@@ -133,4 +138,4 @@ if __name__ == '__main__':
 
     app = create_app()
     with app.app_context():
-        main(sys.argv[1])
+        main(sys.argv[1], log)
