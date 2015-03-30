@@ -25,6 +25,7 @@ Current Features
 - Hubot integration (starting deploys)
 - Slack integration (notifying when deploys start/finish/fail)
 - Integration with GitHub status checks (i.e. did Circle CI pass on sha XXX)
+- A GUI to get an overview of deploy status and history
 
 Roadmap
 =======
@@ -35,7 +36,7 @@ V0
 - Release state management (know what versions are active where, and provide a historical view)
 - Environment locking (i.e. prevent people from deploying to an environment)
 - Automatic deploys (i.e. by looking for VCS changes)
-- A GUI to manage deploys as well as view logs
+- Actions within the GUI (deploy, cancel)
 
 V1
 ~~
