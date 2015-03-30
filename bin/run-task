@@ -19,7 +19,7 @@ from freight.utils.logging import ColoredFormatter
 from freight.utils.redis import lock
 from freight.utils.workspace import TemporaryWorkspace, Workspace
 
-INFO_CHECK_FINISHED = 'Check has has passed: {check}'
+INFO_CHECK_FINISHED = 'Check has passed: {check}'
 
 INFO_CHECK_PENDING = 'Waiting on check {check}:\n  {message}'
 
