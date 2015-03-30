@@ -115,15 +115,18 @@ class LogReporter(Thread):
             if not (is_running or chunk):
                 break
 
+            last_write = time()
+            flush_time = 3  # seconds
             while self.active and chunk:
                 result += chunk
-                while len(result) >= chunk_size:
+                while len(result) >= chunk_size or (time() - last_write) > flush_time:
                     newline_pos = result.rfind('\n', 0, chunk_size)
                     if newline_pos == -1:
                         newline_pos = chunk_size
                     else:
                         newline_pos += 1
                     self.save_chunk(result[:newline_pos])
+                    last_write = time()
                     result = result[newline_pos:]
                 chunk = proc.stdout.read(1)
             sleep(0.1)
