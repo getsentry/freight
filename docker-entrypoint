@@ -5,6 +5,8 @@ if [ ! -e venv/bin/activate ]; then
 fi
 source venv/bin/activate
 python setup.py develop
-npm install
-npm run postinstall
+if [ "$1" == "bin/web" ]; then
+  npm install
+  npm run postinstall
+fi
 exec "$@"
