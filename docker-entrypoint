@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+if [ ! -e venv/bin/activate ]; then
+  virtualenv venv
+fi
+source venv/bin/activate
+python setup.py develop
+npm install
+npm run postinstall
+exec "$@"
