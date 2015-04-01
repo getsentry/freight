@@ -1,0 +1,21 @@
+redis:
+  image: redis:latest
+  command: redis-server --appendonly yes
+
+db:
+  image: postgres:latest
+  environment:
+    POSTGRES_USER: freight
+  env_file: .env
+
+web:
+  build: .
+  links:
+    - redis:redis
+    - db:db
+  environment:
+    PYTHONUNBUFFERED: 1
+  env_file: .env
+  ports:
+    - 5000:5000
+
