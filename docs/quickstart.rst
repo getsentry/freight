@@ -66,6 +66,7 @@ Google Authentication
 ~~~~~~~~~~~~~~~~~~~~~
 
 The frontend currently only supports authenticating with Google. You'll need a `Google Developer <https://console.developers.google.com/>`_ account in order to create an OAuth2 `webserver application <https://developers.google.com/accounts/docs/OAuth2WebServer>`_.
+Set its *Redirect URI* to `$HOST/auth/complete/`.
 
 .. option:: GOOGLE_CLIENT_ID
 
