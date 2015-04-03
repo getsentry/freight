@@ -157,6 +157,7 @@ var TaskDetails = React.createClass({
               :
                 <small>Created <TimeSince date={task.dateCreated} /></small>
               )}
+              <small> &mdash; by {task.user.name}</small>
             </span>
             <div className="pull-right">
               <a className={liveScrollClassName}

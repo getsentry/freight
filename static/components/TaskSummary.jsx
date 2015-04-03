@@ -96,6 +96,7 @@ var TaskSummary = React.createClass({
           :
             <small>Created <TimeSince date={task.dateCreated} /></small>
           )}
+          <small> &mdash; by {task.user.name}</small>
         </div>
       </li>
     );
