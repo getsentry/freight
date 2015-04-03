@@ -6,3 +6,4 @@ from .manager import serialize  # NOQA
 # wrong w/ the code that causes it to mess up the default_manager instance
 from . import app  # NOQA
 from . import task  # NOQA
+from . import user  # NOQA
