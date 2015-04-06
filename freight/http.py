@@ -42,4 +42,4 @@ def absolute_uri(path):
     base = current_app.config['FREIGHT_URL']
     if path.startswith(('http:', 'http:')):
         return path
-    return '{}/{}'.format(base, path)
+    return '{}{}'.format(base, path)
