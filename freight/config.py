@@ -53,6 +53,8 @@ def create_app(_read_config=True, **config):
     # possible to override per repo
     app.config['SSH_PRIVATE_KEY'] = os.environ.get('SSH_PRIVATE_KEY', '').replace("\\n", "\n")
 
+    app.config['FREIGHT_URL'] = os.environ.get('FREIGHT_URL', '').rstrip('/')
+
     if 'REDISCLOUD_URL' in os.environ:
         app.config['REDIS_URL'] = os.environ['REDISCLOUD_URL']
 

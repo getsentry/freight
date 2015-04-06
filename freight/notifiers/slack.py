@@ -30,16 +30,17 @@ class SlackNotifier(Notifier):
             'sha': task.sha[:7] if task.sha else task.ref,
             'status_label': task.status_label,
             'duration': task.duration,
+            'link': http.absolute_uri('/tasks/{}/'.format(task.id)),
         }
 
         if event == NotifierEvent.TASK_STARTED:
-            title = "[{app_name}/{env}] Starting deploy #{number} ({sha})".format(**params)
+            title = "[{app_name}/{env}] Starting deploy <{link}|#{number}> ({sha})".format(**params)
         elif task.status == TaskStatus.failed:
-            title = "[{app_name}/{env}] Failed to deploy {sha} after {duration}s".format(**params)
+            title = "[{app_name}/{env}] Failed to deploy <{link}|#{number}> ({sha}) after {duration}s".format(**params)
         elif task.status == TaskStatus.cancelled:
-            title = "[{app_name}/{env}] Deploy of {sha} was cancelled after {duration}s".format(**params)
+            title = "[{app_name}/{env}] Deploy <{link}|#{number}> ({sha}) was cancelled after {duration}s".format(**params)
         elif task.status == TaskStatus.finished:
-            title = "[{app_name}/{env}] Successfully deployed #{number} ({sha}) after {duration}s".format(**params)
+            title = "[{app_name}/{env}] Successfully deployed <{link}|#{number}> ({sha}) after {duration}s".format(**params)
         else:
             raise NotImplementedError(task.status)
 
