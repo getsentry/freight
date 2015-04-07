@@ -8,6 +8,7 @@ from freight.api.base import ApiView
 from freight.api.serializer import serialize
 from freight.checks.utils import parse_checks_config
 from freight.config import celery, db
+from freight.environments.utils import parse_environments_config
 from freight.models import App, Repository
 from freight.notifiers.utils import parse_notifiers_config
 from freight.providers.utils import parse_provider_config
@@ -25,6 +26,7 @@ class AppDetailsApiView(ApiView):
             'provider_config': app.provider_config,
             'notifiers': app.notifiers,
             'checks': app.checks,
+            'environments': app.environments,
         })
 
         return self.respond(context)
@@ -36,6 +38,7 @@ class AppDetailsApiView(ApiView):
     put_parser.add_argument('provider_config', type=json.loads)
     put_parser.add_argument('notifiers', type=json.loads)
     put_parser.add_argument('checks', type=json.loads)
+    put_parser.add_argument('environments', type=json.loads)
 
     def put(self, app_id):
         """
@@ -68,6 +71,9 @@ class AppDetailsApiView(ApiView):
 
         if args.checks is not None:
             app.data['checks'] = parse_checks_config(args.checks)
+
+        if args.environments is not None:
+            app.data['environments'] = parse_environments_config(args.environments)
 
         if args.name:
             app.name = args.name

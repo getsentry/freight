@@ -71,7 +71,7 @@ class TaskIndexApiView(ApiView):
     post_parser.add_argument('app', required=True)
     post_parser.add_argument('user', required=True)
     post_parser.add_argument('env', default='production')
-    post_parser.add_argument('ref', default='master')
+    post_parser.add_argument('ref')
     post_parser.add_argument('force', default=False, type=inputs.boolean)
 
     def post(self):
@@ -100,8 +100,10 @@ class TaskIndexApiView(ApiView):
         with lock(redis, 'repo:update:{}'.format(repo.id)):
             vcs_backend.clone_or_update()
 
+        ref = app.get_default_ref(args.env)
+
         try:
-            sha = vcs_backend.describe(args.ref)
+            sha = vcs_backend.describe(ref)
         except vcs.UnknownRevision:
             return self.error('Invalid ref', name='invalid_ref', status_code=400)
 
@@ -139,7 +141,7 @@ class TaskIndexApiView(ApiView):
                 number=TaskSequence.get_clause(app.id, args.env),
                 name=TaskName.deploy,
                 # TODO(dcramer): ref should default based on app config
-                ref=args.ref,
+                ref=ref,
                 sha=sha,
                 status=TaskStatus.pending,
                 user_id=user.id,

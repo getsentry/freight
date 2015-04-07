@@ -55,6 +55,7 @@ class AppCreateTest(AppIndexBase):
             'notifiers': '[{"type": "slack", "config": {"webhook_url": "https://example.com"}}]',
             'checks': '[{"type": "github", "config": {"contexts": ["travisci"], "repo": "getsentry/freight"}}]',
             'repository': 'git@example.com:repo-name.git',
+            'environments': '{"staging": {"default_ref": "develop"}}',
         })
         assert resp.status_code == 201
         data = json.loads(resp.data)
@@ -70,6 +71,8 @@ class AppCreateTest(AppIndexBase):
         assert len(app.checks) == 1
         assert app.checks[0]['type'] == 'github'
         assert app.checks[0]['config'] == {'contexts': ['travisci'], 'repo': 'getsentry/freight'}
+        assert len(app.environments) == 1
+        assert app.environments['staging'] == {'default_ref': 'develop'}
 
     def test_invalid_provider(self):
         resp = self.client.post(self.path, data={
@@ -140,3 +143,26 @@ class AppCreateTest(AppIndexBase):
         assert resp.status_code == 400
         data = json.loads(resp.data)
         assert data['error_name'] == 'invalid_check'
+
+    def test_invalid_environments_type(self):
+        resp = self.client.post(self.path, data={
+            'name': 'foobar',
+            'provider': 'shell',
+            'provider_config': '{"command": "/usr/bin/true"}',
+            'repository': 'git@example.com:repo-name.git',
+            'environments': '[{"type": "github", "config": {}}]',
+        })
+        assert resp.status_code == 400
+        data = json.loads(resp.data)
+        assert data['error_name'] == 'invalid_environment'
+
+        resp = self.client.post(self.path, data={
+            'name': 'foobar',
+            'provider': 'shell',
+            'provider_config': '{"command": "/usr/bin/true"}',
+            'repository': 'git@example.com:repo-name.git',
+            'environments': '{"foo": []}',
+        })
+        assert resp.status_code == 400
+        data = json.loads(resp.data)
+        assert data['error_name'] == 'invalid_environment'

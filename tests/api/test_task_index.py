@@ -149,3 +149,18 @@ class TaskCreateTest(TaskIndexBase):
         assert resp.status_code == 400
         data = json.loads(resp.data)
         assert data['error_name'] == 'locked'
+
+    def test_default_ref(self):
+        resp = self.client.post(self.path, data={
+            'env': 'staging',
+            'app': self.app.name,
+            'user': self.user.name,
+        })
+        assert resp.status_code == 201
+        data = json.loads(resp.data)
+        assert data['id']
+
+        task = Task.query.get(data['id'])
+        assert task.environment == 'staging'
+        assert task.app_id == self.app.id
+        assert task.ref == 'HEAD'

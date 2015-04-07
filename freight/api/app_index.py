@@ -8,6 +8,7 @@ from freight.api.base import ApiView
 from freight.api.serializer import serialize
 from freight.checks.utils import parse_checks_config
 from freight.config import db
+from freight.environments.utils import parse_environments_config
 from freight.models import App, Repository
 from freight.notifiers.utils import parse_notifiers_config
 from freight.providers.utils import parse_provider_config
@@ -39,6 +40,7 @@ class AppIndexApiView(ApiView):
     post_parser.add_argument('provider_config', type=json.loads)
     post_parser.add_argument('notifiers', type=json.loads)
     post_parser.add_argument('checks', type=json.loads)
+    post_parser.add_argument('environments', type=json.loads)
 
     def post(self):
         """
@@ -51,6 +53,8 @@ class AppIndexApiView(ApiView):
         checks_config = parse_checks_config(args.checks or [])
 
         notifiers_config = parse_notifiers_config(args.notifiers or [])
+
+        environments_config = parse_environments_config(args.environments or {})
 
         # TODO(dcramer): this needs to be a get_or_create pattern
         repo = Repository.query.filter(
@@ -69,6 +73,7 @@ class AppIndexApiView(ApiView):
                 'provider_config': provider_config,
                 'notifiers': notifiers_config,
                 'checks': checks_config,
+                'environments': environments_config,
             },
         )
         db.session.add(app)
