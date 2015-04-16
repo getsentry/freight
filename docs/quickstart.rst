@@ -56,7 +56,7 @@ The following values should be configured:
 
 .. option:: SSH_PRIVATE_KEY
 
-  The SSH private key required for cloning repositories (newlines replaced with \n). This will also be made available to providers as a file-system resource.
+  The SSH private key required for cloning repositories (newlines replaced with ``\n``). This will also be made available to providers as a file-system resource.
 
 .. option:: DEFAULT_TIMEOUT
 
