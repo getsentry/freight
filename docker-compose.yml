@@ -15,8 +15,6 @@ web:
     - db:db
   environment:
     PYTHONUNBUFFERED: 1
-    REDISCLOUD_URL: redis://redis:6379
-    SQLALCHEMY_DATABASE_URI: postgresql://db/freight    
   env_file: .env
   ports:
     - 5000:5000
@@ -31,8 +29,6 @@ worker:
     - db:db
   environment:
     PYTHONUNBUFFERED: 1
-    REDISCLOUD_URL: redis://redis:6379
-    SQLALCHEMY_DATABASE_URI: postgresql://db/freight
   env_file: .env
   volumes:
     - /root/.docker:/root/.docker
