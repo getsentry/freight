@@ -14,7 +14,7 @@ Requirements
 
 If you're not using Heroku, you'll need to ensure a few server dependencies:
 
-- Redis (or any `Celery <http://http://www.celeryproject.org/>`_) compatible broker)
+- Redis (or any `Celery <http://http://www.celeryproject.org/>`_ compatible broker)
 - PostgreSQL
 - Python 2.7
 - Node.js
