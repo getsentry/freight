@@ -21,11 +21,12 @@ var TaskDetails = React.createClass({
       loading: true,
       task: null,
       logNextOffset: 0,
-      liveScroll: false
+      liveScroll: true
     };
   },
 
   componentWillUnmount() {
+    window.removeEventListener('scroll', this.onScroll, false);
     this.context.setHeading(null);
   },
 
@@ -35,11 +36,31 @@ var TaskDetails = React.createClass({
         this.context.setHeading(this.getTaskLabel(data));
         this.setState({
           task: data,
-          liveScroll: this.taskInProgress(data)
         });
         this.pollLog();
       }
     });
+    this.lastScrollPos = 0;
+  },
+
+  componentDidMount() {
+    window.addEventListener('scroll', this.onScroll, false);
+  },
+
+  componentDidUpdate() {
+    if (this.state.liveScroll) {
+      this.scrollLog();
+    }
+  },
+
+  onScroll(event) {
+    var scrollTop = document.body.scrollTop;
+    if (scrollTop < this.lastScrollPos) {
+      this.setState({liveScroll: false});
+    } else if (scrollTop + window.innerHeight == document.body.scrollHeight) {
+      this.setState({liveScroll: true});
+    }
+    this.lastScrollPos = scrollTop;
   },
 
   getPollingUrl() {
@@ -70,8 +91,12 @@ var TaskDetails = React.createClass({
     this.refs.log.getDOMNode().appendChild(frag);
 
     if (this.state.liveScroll) {
-      window.scrollTo(0, document.body.scrollHeight);
+      this.scrollLog();
     }
+  },
+
+  scrollLog() {
+    window.scrollTo(0, document.body.scrollHeight);
   },
 
   taskInProgress(task) {
@@ -106,9 +131,13 @@ var TaskDetails = React.createClass({
   },
 
   toggleLiveScroll() {
+    var liveScroll = !this.state.liveScroll;
     this.setState({
-      liveScroll: !this.state.liveScroll
+      liveScroll: liveScroll
     });
+    if (liveScroll) {
+      this.scrollLog();
+    }
   },
 
   getStatusLabel(task) {
@@ -163,7 +192,8 @@ var TaskDetails = React.createClass({
               <a className={liveScrollClassName}
                  onClick={this.toggleLiveScroll}>
                 <input type="checkbox"
-                       checked={this.state.liveScroll} /> <span>Follow Log</span>
+                       checked={this.state.liveScroll} />
+                <span>Follow</span>
               </a>
             </div>
           </div>
