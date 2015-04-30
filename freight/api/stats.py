@@ -26,7 +26,7 @@ class StatsApiView(ApiView):
         ))
 
         points = []
-        for day in range(30):
+        for day in range(31):
             point_date = end_date + timedelta(days=day)
             points.append((
                 int(point_date.strftime('%s')),
