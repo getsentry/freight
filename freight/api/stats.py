@@ -29,7 +29,7 @@ class StatsApiView(ApiView):
         for day in range(30):
             point_date = end_date + timedelta(days=day)
             points.append((
-                point_date.strftime('%s'),
+                int(point_date.strftime('%s')),
                 results.get(point_date, 0),
             ))
 
