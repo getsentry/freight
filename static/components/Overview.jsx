@@ -4,9 +4,9 @@ var React = require('react');
 
 var api = require('../api');
 
+var BarChart = require("./BarChart");
 var PollingMixin = require('../mixins/polling');
 var TaskSummary = require('./TaskSummary');
-
 
 var Overview = React.createClass({
   mixins: [PollingMixin],
@@ -14,7 +14,9 @@ var Overview = React.createClass({
   getInitialState() {
     return {
       loading: true,
-      tasks: []
+      tasks: [],
+      dailyStatsLoading: true,
+      dailyStats: []
     };
   },
 
@@ -24,6 +26,15 @@ var Overview = React.createClass({
         this.setState({
           loading: false,
           tasks: data
+        });
+      }
+    });
+
+    api.request('/stats/', {
+      success: (data) => {
+        this.setState({
+          dailyStats: data,
+          dailyStatsLoading: false
         });
       }
     });
@@ -64,6 +75,10 @@ var Overview = React.createClass({
       );
     });
 
+    points = this.state.dailyStats.map((point) => {
+      return {x: point[0], y: point[1]};
+    });
+
     return (
       <div>
         <div className="section">
@@ -83,6 +98,11 @@ var Overview = React.createClass({
           <div className="section-header">
             <h2>Deploy History</h2>
           </div>
+
+          <div className="section">
+            <BarChart points={points} label="deploys" />
+          </div>
+
           {previousTaskNodes.length ?
             <ul className="task-list">
               {previousTaskNodes}

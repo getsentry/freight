@@ -135,6 +135,7 @@ header {
     font-size: 18px;
     margin-bottom: 10px;
   }
+  margin-bottom: 20px;
 }
 
 .task-list {
@@ -241,6 +242,61 @@ header {
             line-height: 20px;
         }
     }
+}
+
+figure.barchart {
+  .clearfix();
+  position: relative;
+  background: @lessDark;
+  border-radius: 4px;
+  padding: 2px;
+
+  > .max-y,
+  > .min-y {
+    position: absolute;
+    width: 18px;
+    right: 4px;
+    text-align: right;
+    color: lighten(@lessDark, 20%);
+    font-size: 10px;
+  }
+
+  > .max-y {
+    top: 4px;
+  }
+  > .min-y {
+    bottom: 3px;
+  }
+
+  > a {
+    position: relative;
+    float: left;
+    height: 100px;
+    display: block;
+
+    &:hover {
+      > span {
+        background: #fff;
+        border-color: #fff;
+      }
+    }
+
+    > span {
+      display: block;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 1px;
+      background: lighten(@lessDark, 10%);
+      min-width: 10px;
+      height: 0;
+      overflow: hidden;
+      text-indent: -9999px;
+      text-align: left;
+      min-height: 3px;
+      border-radius: 2px 2px 0 0;
+    }
+  }
 }
 
 .loading-icon, .loading {

@@ -168,12 +168,14 @@ def configure_api(app):
     from freight.api.controller import ApiCatchall
     from freight.api.app_details import AppDetailsApiView
     from freight.api.app_index import AppIndexApiView
+    from freight.api.stats import StatsApiView
     from freight.api.task_details import TaskDetailsApiView
     from freight.api.task_index import TaskIndexApiView
     from freight.api.task_log import TaskLogApiView
 
     api.add_resource(AppIndexApiView, '/apps/')
     api.add_resource(AppDetailsApiView, '/apps/<app_id>/')
+    api.add_resource(StatsApiView, '/stats/')
     api.add_resource(TaskIndexApiView, '/tasks/')
     api.add_resource(TaskDetailsApiView, '/tasks/<task_id>/')
     api.add_resource(TaskLogApiView, '/tasks/<task_id>/log/')
