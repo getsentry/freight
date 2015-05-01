@@ -100,7 +100,7 @@ class TaskIndexApiView(ApiView):
         with lock(redis, 'repo:update:{}'.format(repo.id)):
             vcs_backend.clone_or_update()
 
-        ref = app.get_default_ref(args.env)
+        ref = args.ref or app.get_default_ref(args.env)
 
         try:
             sha = vcs_backend.describe(ref)
