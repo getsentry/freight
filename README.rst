@@ -55,6 +55,6 @@ Resources
 =========
 
 - `Documentation <http://freight.readthedocs.org>`_
-- `Bug Tracker <http://github.com/getsentry/freight/issues>`_
-- `Code <http://github.com/getsentry/freight>`_
+- `Bug Tracker <https://github.com/getsentry/freight/issues>`_
+- `Code <https://github.com/getsentry/freight>`_
 - `IRC <irc://irc.freenode.net/sentry>`_  (irc.freenode.net, #sentry)
