@@ -24,6 +24,7 @@ Current Features
 - API-accessible deploy logs
 - Hubot integration (starting deploys)
 - Slack integration (notifying when deploys start/finish/fail)
+- Sentry integration (release tracking, error reporting)
 - Integration with GitHub status checks (i.e. did Circle CI pass on sha XXX)
 - A GUI to get an overview of deploy status and history
 
