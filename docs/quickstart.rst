@@ -196,7 +196,7 @@ Once we've configured our application we can create a new deploy:
 .. code-block:: bash
 
   curlish http://localhost:5000/api/0/tasks/ \
-      -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70'
+      -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70' \
       -X POST \
       -J app=example \
       -J ref=master \
