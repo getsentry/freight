@@ -119,6 +119,10 @@ def main(task_id, log):
         task.date_finished = datetime.utcnow()
         db.session.add(task)
         db.session.commit()
+    except Exception:
+        import traceback
+        traceback.print_exc()
+        raise
     finally:
         workspace.remove()
 
