@@ -30,9 +30,9 @@ class CommandError(Exception):
 
     def __unicode__(self):
         if self.stdout is not None or self.stderr is not None:
-            return '%s had exit code %d:\nSTDOUT: %r\nSTDERR: %r' % (
+            return '%s failed with exit code %d:\nSTDOUT: %r\nSTDERR: %r' % (
                 self.cmd, self.retcode, self.stdout, self.stderr)
-        return '%s had exit code %d' % (self.cmd, self.retcode)
+        return '%s failed with exit code %d' % (self.cmd, self.retcode)
 
     def __str__(self):
         return self.__unicode__().encode('utf-8')
