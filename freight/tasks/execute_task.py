@@ -85,6 +85,7 @@ class LogReporter(Thread):
         # we also want to pipe this to stdout
         sys.stdout.write(text)
 
+        text = text.decode('utf-8', 'replace')
         text_len = len(text)
         db.session.add(LogChunk(
             task_id=self.task_id,
