@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import
 
 from .base import UnknownRevision  # NOQA
 from .manager import VcsManager

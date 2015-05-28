@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import
 
 from freight import vcs
 from freight.config import celery, db

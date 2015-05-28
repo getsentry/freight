@@ -8,7 +8,7 @@ A deploy service.
 :copyright: (c) 2015 GetSentry LLC
 :license: Apache 2.0, see LICENSE for more details.
 """
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import
 
 import os.path
 

@@ -1,4 +1,4 @@
-from __future__ import absolute_import, unicode_literals
+from __future__ import absolute_import
 
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.sql import func, select
