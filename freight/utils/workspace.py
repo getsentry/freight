@@ -51,6 +51,7 @@ class Workspace(object):
                 env[key] = value
 
         kwargs['env'] = env
+        kwargs['bufsize'] = 0
 
         self.log.info('Running {}'.format(command))
         try:
