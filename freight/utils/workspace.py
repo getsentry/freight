@@ -46,8 +46,9 @@ class Workspace(object):
 
         env = os.environ.copy()
         env['PYTHONUNBUFFERED'] = '1'
-        for key, value in kwargs.pop('env', {}).iteritems():
-            env[key] = value
+        if kwargs.get('env'):
+            for key, value in kwargs['env'].iteritems():
+                env[key] = value
 
         kwargs['env'] = env
 
