@@ -115,6 +115,8 @@ class LogReporter(Thread):
             if not (is_running or chunk):
                 break
 
+            chunk = chunk.decode('utf-8')
+
             last_write = time()
             flush_time = 3  # seconds
             while self.active and chunk:
