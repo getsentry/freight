@@ -9,6 +9,7 @@ class ShellProvider(Provider):
     def get_options(self):
         return {
             'command': {'required': True},
+            'env': {'required': False, 'type': dict},
         }
 
     def get_command(self, task, ssh_key):
@@ -28,4 +29,4 @@ class ShellProvider(Provider):
             task=task,
             ssh_key=ssh_key.name if ssh_key else '~/.ssh/id_rsa',
         )
-        return workspace.run(command)
+        return workspace.run(command, env=task.provider_config.get('env'))

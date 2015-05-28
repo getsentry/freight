@@ -1,6 +1,10 @@
 from __future__ import absolute_import, unicode_literals
 
+import pytest
+
 from freight import providers
+from freight.providers.utils import parse_provider_config
+from freight.exceptions import ApiError
 from freight.testutils import TestCase
 
 
@@ -24,3 +28,29 @@ class ShellProviderTest(ShellProviderBase):
         assert 'sha={}'.format(self.task.sha) in result
         assert 'task={}'.format(self.task.name) in result
         assert 'ssh_key=id_rsa' in result
+
+
+class ParseProviderConfigTest(ShellProviderBase):
+    def test_minimal(self):
+        result = parse_provider_config('shell', {
+            'command': '/usr/bin/true',
+        })
+        assert result['command'] == '/usr/bin/true'
+
+    def test_requires_command(self):
+        with pytest.raises(ApiError):
+            parse_provider_config('shell', {})
+
+    def test_valid_env(self):
+        result = parse_provider_config('shell', {
+            'command': '/usr/bin/true',
+            'env': {'FOO': 'BAR'},
+        })
+        assert result['env'] == {'FOO': 'BAR'}
+
+    def test_invalid_env(self):
+        with pytest.raises(ApiError):
+            parse_provider_config('shell', {
+                'command': '/usr/bin/true',
+                'env': 'FOO',
+            })
