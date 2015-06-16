@@ -60,7 +60,8 @@ def create_app(_read_config=True, **config):
 
     app.config['WORKSPACE_ROOT'] = os.environ.get('WORKSPACE_ROOT', '/tmp')
 
-    app.config['DEFAULT_TIMEOUT'] = int(os.environ.get('DEFAULT_TIMEOUT', 300))
+    app.config['DEFAULT_TIMEOUT'] = int(os.environ.get('DEFAULT_TIMEOUT', 3600))
+    app.config['DEFAULT_READ_TIMEOUT'] = int(os.environ.get('DEFAULT_READ_TIMEOUT', 600))
 
     app.config['LOG_LEVEL'] = os.environ.get('LOG_LEVEL', 'INFO' if config.get('DEBUG') else 'ERROR')
 

@@ -39,6 +39,7 @@ def execute_task(task_id):
     taskrunner = TaskRunner(
         task=task,
         timeout=provider_config.get('timeout', current_app.config['DEFAULT_TIMEOUT']),
+        read_timeout=provider_config.get('read_timeout', current_app.config['DEFAULT_READ_TIMEOUT']),
     )
     taskrunner.start()
     taskrunner.wait()
@@ -77,6 +78,7 @@ class LogReporter(Thread):
         self.process = process
         self.chunk_size = chunk_size
         self.cur_offset = 0
+        self.last_recv = None
         self.active = True
         Thread.__init__(self)
         self.daemon = True
@@ -106,6 +108,7 @@ class LogReporter(Thread):
             self._run()
 
     def _run(self):
+        self.last_recv = time()
         chunk_size = self.chunk_size
         proc = self.process
         result = ''
@@ -120,6 +123,7 @@ class LogReporter(Thread):
             flush_time = 3  # seconds
             while self.active and chunk:
                 result += chunk
+                self.last_recv = time()
                 while len(result) >= chunk_size or (time() - last_write) > flush_time:
                     newline_pos = result.rfind('\n', 0, chunk_size)
                     if newline_pos == -1:
@@ -137,9 +141,10 @@ class LogReporter(Thread):
 
 
 class TaskRunner(object):
-    def __init__(self, task, timeout=300):
+    def __init__(self, task, read_timeout=600, timeout=3600):
         self.task = task
         self.timeout = timeout
+        self.read_timeout = read_timeout
         self.active = False
         self._logthread = None
         self._process = None
@@ -183,6 +188,21 @@ class TaskRunner(object):
         db.session.add(self.task)
         db.session.commit()
 
+    def _read_timeout(self):
+        logging.error('Task(id=%s) did not receive any updates in %ds', self.task.id, self.read_timeout)
+
+        self._process.terminate()
+        self._logreporter.terminate()
+
+        self._logreporter.save_chunk('>> Process did not receive updates in %ds\n' % self.read_timeout)
+
+        # TODO(dcramer): ideally we could just send the signal to the subprocess
+        # so it can still manage the failure state
+        self.task.status = TaskStatus.failed
+        self.task.date_finished = datetime.utcnow()
+        db.session.add(self.task)
+        db.session.commit()
+
     def _cancel(self):
         logging.error('Task(id=%s) was cancelled', self.task.id)
 
@@ -210,6 +230,8 @@ class TaskRunner(object):
         while self.active and self._process.poll() is None:
             if self.timeout and time() > self._started + self.timeout:
                 self._timeout()
+            if self._logreporter.last_recv < time() - self.read_timeout:
+                self._read_timeout()
             if self._is_cancelled():
                 self._cancel()
             if self._process.poll() is None:
