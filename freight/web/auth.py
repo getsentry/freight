@@ -1,13 +1,13 @@
 from __future__ import absolute_import
 
 import freight
-import sys
 
 from flask import current_app, redirect, request, session, url_for
 from flask.views import MethodView
 from oauth2client.client import OAuth2WebServerFlow
 
 from freight.config import db
+from freight.constants import PYTHON_VERSION
 from freight.models import User
 
 GOOGLE_AUTH_URI = 'https://accounts.google.com/o/oauth2/auth'
@@ -30,7 +30,7 @@ def get_auth_flow(redirect_uri=None):
         redirect_uri=redirect_uri,
         user_agent='freight/{0} (python {1})'.format(
             freight.VERSION,
-            sys.version,
+            PYTHON_VERSION,
         ),
         auth_uri=auth_uri,
         token_uri=GOOGLE_TOKEN_URI,
