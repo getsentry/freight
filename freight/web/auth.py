@@ -28,7 +28,7 @@ def get_auth_flow(redirect_uri=None):
         client_secret=current_app.config['GOOGLE_CLIENT_SECRET'],
         scope='https://www.googleapis.com/auth/userinfo.email',
         redirect_uri=redirect_uri,
-        user_agent='ds/{0} (python {1})'.format(
+        user_agent='freight/{0} (python {1})'.format(
             freight.VERSION,
             sys.version,
         ),
