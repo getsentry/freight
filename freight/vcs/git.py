@@ -70,5 +70,6 @@ class GitVcs(Vcs):
                         capture=True)
 
     def get_sha(self, ref):
-        return self.run(['show-ref', '--hash=0', ref],
-                        capture=True)
+        shas = self.run(['show-ref', '--hash=0', ref],
+                        capture=True).split('\n')
+        return shas[0]
