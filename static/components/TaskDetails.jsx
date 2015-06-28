@@ -130,6 +130,25 @@ var TaskDetails = React.createClass({
     });
   },
 
+  cancelTask() {
+    var url = '/tasks/' + this.state.task.id + '/';
+
+    api.request(url, {
+      method: "PUT",
+      data: {
+        "status": "cancelled"
+      },
+      success: (data) => {
+        this.setState({
+          task: data,
+        });
+      },
+      error: () => {
+        alert("Unable to cancel task.");
+      }
+    });
+  },
+
   toggleLiveScroll() {
     var liveScroll = !this.state.liveScroll;
     this.setState({
@@ -161,6 +180,7 @@ var TaskDetails = React.createClass({
     }
 
     var task = this.state.task;
+    var inProgress = this.taskInProgress(task);
 
     var liveScrollClassName = "btn btn-default btn-sm";
     if (this.state.liveScroll) {
@@ -171,7 +191,7 @@ var TaskDetails = React.createClass({
       <div className="task-details">
         <div className="task-log">
           <div ref="log" />
-          {this.taskInProgress(task) &&
+          {inProgress &&
             <div className="loading-icon" />
           }
         </div>
@@ -189,6 +209,10 @@ var TaskDetails = React.createClass({
               <small> &mdash; by {task.user.name}</small>
             </span>
             <div className="pull-right">
+              {inProgress &&
+                <a className="btn btn-danger btn-sm"
+                   onClick={this.cancelTask}>Cancel</a>
+              }
               <a className={liveScrollClassName}
                  onClick={this.toggleLiveScroll}>
                 <input type="checkbox"
