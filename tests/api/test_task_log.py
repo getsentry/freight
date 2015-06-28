@@ -14,6 +14,11 @@ class TaskLogBase(TestCase):
         self.app = self.create_app(repository=self.repo)
         self.task = self.create_task(app=self.app, user=self.user)
         self.path = '/api/0/tasks/{}/log/'.format(self.task.id)
+        self.alt_path = '/api/0/tasks/{}/{}/{}/log/'.format(
+            self.app.name,
+            self.task.environment,
+            self.task.number,
+        )
 
         offset = 0
         for char in 'hello world':
@@ -32,6 +37,13 @@ class TaskLogBase(TestCase):
 class TaskLogTest(TaskLogBase):
     def test_simple(self):
         resp = self.client.get(self.path)
+        assert resp.status_code == 200
+        data = json.loads(resp.data)
+        assert data['nextOffset'] == 11
+        assert data['text'] == 'hello world'
+
+    def test_alt_path(self):
+        resp = self.client.get(self.alt_path)
         assert resp.status_code == 200
         data = json.loads(resp.data)
         assert data['nextOffset'] == 11
