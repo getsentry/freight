@@ -33,7 +33,7 @@ var TaskDetails = React.createClass({
   componentWillMount() {
     api.request(this.getPollingUrl(), {
       success: (data) => {
-        this.context.setHeading(this.getTaskLabel(data));
+        this.context.setHeading(data.name);
         this.setState({
           task: data,
         });
@@ -64,11 +64,8 @@ var TaskDetails = React.createClass({
   },
 
   getPollingUrl() {
-    return '/tasks/' + this.getParams().taskId + '/';
-  },
-
-  getTaskLabel(task) {
-    return task.app.name + '/' + task.environment + '#' + task.number;
+    var params = this.getParams();
+    return '/tasks/' + params.app + '/' + params.env + '/' + params.number + '/';
   },
 
   pollingReceiveData(data) {
@@ -104,7 +101,9 @@ var TaskDetails = React.createClass({
   },
 
   pollLog() {
-    var url = '/tasks/' + this.state.task.id + '/log/?offset=' + this.state.logNextOffset;
+    var task = this.state.task;
+
+    var url = '/tasks/' + task.app.name + '/' + task.environment + '/' + task.number + '/log/?offset=' + this.state.logNextOffset;
 
     api.request(url, {
       success: (data) => {
@@ -131,7 +130,9 @@ var TaskDetails = React.createClass({
   },
 
   cancelTask() {
-    var url = '/tasks/' + this.state.task.id + '/';
+    var task = this.state.task;
+
+    var url = '/tasks/' + task.app.name + '/' + task.environment + '/' + task.number + '/';
 
     api.request(url, {
       method: "PUT",

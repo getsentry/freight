@@ -33,7 +33,7 @@ class SentryNotifier(Notifier):
             'event': 'started' if event == NotifierEvent.TASK_STARTED else 'finished',
             'dateStarted': task.date_started.isoformat() + 'Z' if task.date_started else None,
             'dateFinished': task.date_finished.isoformat() + 'Z' if task.date_finished else None,
-            'link': http.absolute_uri('/tasks/{}/'.format(task.id)),
+            'link': http.absolute_uri('/tasks/{}/{}/{}/'.format(app.name, task.environment, task.number)),
         }
 
         http.post(webhook_url, json=payload)
