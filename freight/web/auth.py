@@ -60,8 +60,8 @@ class GitHubOAuth2WebServerFlow(OAuth2WebServerFlow):
                 team_ids.add(team['id'])
                 organization_ids.add(team['organization']['id'])
 
-            id_token_additions['team_ids'] = list(team_ids)
-            id_token_additions['organization_ids'] = list(organization_ids)
+            id_token_additions['team_ids'] = team_ids
+            id_token_additions['organization_ids'] = organization_ids
 
         if resp.id_token:
             resp.id_token.update(id_token_additions)
@@ -123,10 +123,9 @@ class LoginView(MethodView):
 
 
 class AuthorizedView(MethodView):
-    def __init__(self, complete_url, authorized_url, login_url):
+    def __init__(self, complete_url, authorized_url):
         self.complete_url = complete_url
         self.authorized_url = authorized_url
-        self.login_url = login_url
         super(AuthorizedView, self).__init__()
 
     def get(self):
@@ -136,7 +135,10 @@ class AuthorizedView(MethodView):
         try:
             resp = flow.step2_exchange(request.args['code'])
         except FlowExchangeError:
-            return redirect(url_for(self.login_url))
+            # If the flow breaks, one likely condition is that we've been given
+            # an expired code for the exchange. Redirect the user to the
+            # authentication provider again.
+            return redirect(flow.step1_get_authorize_url())
 
         if current_app.config['AUTH_BACKEND'] == 'google' and \
            current_app.config['GOOGLE_DOMAIN']:
