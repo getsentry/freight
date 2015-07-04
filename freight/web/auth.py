@@ -3,9 +3,9 @@ from __future__ import absolute_import
 import freight
 import requests
 
-from flask import current_app, redirect, request, session, url_for
+from flask import current_app, redirect, request, session, url_for, abort
 from flask.views import MethodView
-from oauth2client.client import OAuth2WebServerFlow
+from oauth2client.client import OAuth2WebServerFlow, FlowExchangeError
 
 from freight.config import db
 from freight.constants import PYTHON_VERSION
@@ -74,8 +74,7 @@ class GitHubOAuth2WebServerFlow(OAuth2WebServerFlow):
 def get_auth_flow(redirect_uri=None):
     # Determine the flow class and arguments to use with the authentication
     # backend.
-    if 'GITHUB_CLIENT_ID' in current_app.config and \
-       'GITHUB_CLIENT_SECRET' in current_app.config:
+    if current_app.config['AUTH_BACKEND'] == 'github':
         return GitHubOAuth2WebServerFlow(
             client_id=current_app.config['GITHUB_CLIENT_ID'],
             client_secret=current_app.config['GITHUB_CLIENT_SECRET'],
@@ -124,20 +123,35 @@ class LoginView(MethodView):
 
 
 class AuthorizedView(MethodView):
-    def __init__(self, complete_url, authorized_url):
+    def __init__(self, complete_url, authorized_url, login_url):
         self.complete_url = complete_url
         self.authorized_url = authorized_url
+        self.login_url = login_url
         super(AuthorizedView, self).__init__()
 
     def get(self):
         redirect_uri = url_for(self.authorized_url, _external=True)
         flow = get_auth_flow(redirect_uri=redirect_uri)
-        resp = flow.step2_exchange(request.args['code'])
 
-        if current_app.config['GOOGLE_DOMAIN']:
+        try:
+            resp = flow.step2_exchange(request.args['code'])
+        except FlowExchangeError:
+            return redirect(url_for(self.login_url))
+
+        if current_app.config['AUTH_BACKEND'] == 'google' and \
+           current_app.config['GOOGLE_DOMAIN']:
             if resp.id_token.get('hd') != current_app.config['GOOGLE_DOMAIN']:
                 # TODO(dcramer): this should show some kind of error
                 return redirect(url_for(self.complete_url))
+        elif current_app.config['AUTH_BACKEND'] == 'github':
+            if current_app.config['GITHUB_TEAM_ID']:
+                if current_app.config['GITHUB_TEAM_ID'] not in \
+                   resp.id_token['team_ids']:
+                    abort(403)
+            elif current_app.config['GITHUB_ORGANIZATION_ID']:
+                if current_app.config['GITHUB_ORGANIZATION_ID'] not in \
+                   resp.id_token['organization_ids']:
+                    abort(403)
 
         user = User.query.filter(
             User.name == resp.id_token['email'],

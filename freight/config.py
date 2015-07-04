@@ -64,10 +64,15 @@ def create_app(_read_config=True, **config):
 
     app.config['LOG_LEVEL'] = os.environ.get('LOG_LEVEL', 'INFO' if config.get('DEBUG') else 'ERROR')
 
-    # Currently authentication requires Google
+    # Currently authentication defaults to Google.
+    app.config['AUTH_BACKEND'] = os.environ.get('AUTH_BACKEND', 'google')
     app.config['GOOGLE_CLIENT_ID'] = os.environ.get('GOOGLE_CLIENT_ID')
     app.config['GOOGLE_CLIENT_SECRET'] = os.environ.get('GOOGLE_CLIENT_SECRET')
     app.config['GOOGLE_DOMAIN'] = os.environ.get('GOOGLE_DOMAIN')
+    app.config['GITHUB_CLIENT_ID'] = os.environ.get('GITHUB_CLIENT_ID')
+    app.config['GITHUB_CLIENT_SECRET'] = os.environ.get('GITHUB_CLIENT_SECRET')
+    app.config['GITHUB_TEAM_ID'] = os.environ.get('GITHUB_TEAM_ID')
+    app.config['GITHUB_ORGANIZATION_ID'] = os.environ.get('GITHUB_ORGANIZATION_ID')
 
     # Generate a GitHub token via Curl:
     # curlish https://api.github.com/authorizations \
@@ -160,6 +165,7 @@ def create_app(_read_config=True, **config):
     configure_redis(app)
     configure_sqlalchemy(app)
     configure_web_routes(app)
+    configure_auth(app)
 
     return app
 
@@ -193,6 +199,38 @@ def configure_api(app):
 
     # init must be called after routes are registered
     api.init_app(app)
+
+
+def configure_auth(app):
+    if not app.config['AUTH_BACKEND']:
+        app.config['AUTH_BACKEND'] = 'google'
+    elif app.config['AUTH_BACKEND'] not in {'google', 'github'}:
+        raise RuntimeError('invalid authentication backend: %s' %
+                           (app.config['AUTH_BACKEND']))
+
+    if app.config['AUTH_BACKEND'] == 'github':
+        if not app.config['GITHUB_CLIENT_ID'] or \
+           not app.config['GITHUB_CLIENT_SECRET']:
+            raise RuntimeError('GitHub authentication requires a client ID '
+                               'and secret to be provided')
+
+        if app.config['GITHUB_TEAM_ID']:
+            try:
+                app.config['GITHUB_TEAM_ID'] = \
+                    long(app.config['GITHUB_TEAM_ID'])
+            except ValueError:
+                raise RuntimeError('invalid team ID: %s' %
+                                   (app.config['GITHUB_TEAM_ID']))
+        elif app.config['GITHUB_ORGANIZATION_ID']:
+            try:
+                app.config['GITHUB_ORGANIZATION_ID'] = \
+                    long(app.config['GITHUB_ORGANIZATION_ID'])
+            except ValueError:
+                raise RuntimeError('invalid organization ID: %s' %
+                                   (app.config['GITHUB_ORGANIZATION_ID']))
+        else:
+            raise RuntimeError('either a team or an organization ID must be '
+                               'configured for GitHub authentication')
 
 
 def configure_celery(app):
@@ -244,7 +282,7 @@ def configure_web_routes(app):
         view_func=LogoutView.as_view(b'logout', complete_url='index'))
     app.add_url_rule(
         '/auth/complete/',
-        view_func=AuthorizedView.as_view(b'authorized', authorized_url='authorized', complete_url='index'))
+        view_func=AuthorizedView.as_view(b'authorized', authorized_url='authorized', complete_url='index', login_url='login'))
 
     index_view = IndexView.as_view(b'index', login_url='login')
     app.add_url_rule('/', view_func=index_view)
