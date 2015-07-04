@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 import freight
+import requests
 
 from flask import current_app, redirect, request, session, url_for
 from flask.views import MethodView
@@ -14,28 +15,100 @@ GOOGLE_AUTH_URI = 'https://accounts.google.com/o/oauth2/auth'
 GOOGLE_REVOKE_URI = 'https://accounts.google.com/o/oauth2/revoke'
 GOOGLE_TOKEN_URI = 'https://accounts.google.com/o/oauth2/token'
 
+GITHUB_AUTH_URI = 'https://github.com/login/oauth/authorize'
+GITHUB_TOKEN_URI = 'https://github.com/login/oauth/access_token'
+GITHUB_API_USER_URI = 'https://api.github.com/user'
+GITHUB_API_USER_TEAMS_URI = 'https://api.github.com/user/teams'
+
+
+class GitHubOAuth2WebServerFlow(OAuth2WebServerFlow):
+    """GitHub-specific OAuth 2.0 web server flow.
+    """
+
+    def step2_exchange(self, code, http=None):
+        # Perform the exchange.
+        resp = super(GitHubOAuth2WebServerFlow, self) \
+            .step2_exchange(code, http)
+
+        # Get the user's e-mail address, username, organization and team IDs
+        # if the scopes match.
+        scopes = frozenset(self.scope.split(','))
+        id_token_additions = {}
+
+        if 'user' in scopes:
+            # Fetch user information.
+            user_resp = requests.get(GITHUB_API_USER_URI,
+                                     params={'access_token':
+                                             resp.access_token})
+            user_resp.raise_for_status()
+            user_resp_json = user_resp.json()
+
+            id_token_additions['email'] = user_resp_json['email']
+            id_token_additions['login'] = user_resp_json['login']
+            id_token_additions['id'] = user_resp_json['id']
+
+            # Fetch teams.
+            teams_resp = requests.get(GITHUB_API_USER_TEAMS_URI,
+                                      params={'access_token':
+                                              resp.access_token})
+            teams_resp.raise_for_status()
+
+            team_ids = set()
+            organization_ids = set()
+
+            for team in teams_resp.json():
+                team_ids.add(team['id'])
+                organization_ids.add(team['organization']['id'])
+
+            id_token_additions['team_ids'] = list(team_ids)
+            id_token_additions['organization_ids'] = list(organization_ids)
+
+        if resp.id_token:
+            resp.id_token.update(id_token_additions)
+        else:
+            resp.id_token = id_token_additions
+
+        return resp
+
 
 def get_auth_flow(redirect_uri=None):
-    # XXX(dcramer): we have to generate this each request because oauth2client
-    # doesn't want you to set redirect_uri as part of the request, which causes
-    # a lot of runtime issues.
-    auth_uri = GOOGLE_AUTH_URI
-    if current_app.config['GOOGLE_DOMAIN']:
-        auth_uri = auth_uri + '?hd=' + current_app.config['GOOGLE_DOMAIN']
+    # Determine the flow class and arguments to use with the authentication
+    # backend.
+    if 'GITHUB_CLIENT_ID' in current_app.config and \
+       'GITHUB_CLIENT_SECRET' in current_app.config:
+        return GitHubOAuth2WebServerFlow(
+            client_id=current_app.config['GITHUB_CLIENT_ID'],
+            client_secret=current_app.config['GITHUB_CLIENT_SECRET'],
+            scope='user',
+            redirect_uri=redirect_uri,
+            user_agent='freight/{0} (python {1})'.format(
+                freight.VERSION,
+                PYTHON_VERSION,
+            ),
+            auth_uri=GITHUB_AUTH_URI,
+            token_uri=GITHUB_TOKEN_URI
+        )
+    else:
+        # XXX(dcramer): we have to generate this each request because
+        # oauth2client doesn't want you to set redirect_uri as part of the
+        # request, which causes a lot of runtime issues.
+        auth_uri = GOOGLE_AUTH_URI
+        if current_app.config['GOOGLE_DOMAIN']:
+            auth_uri = auth_uri + '?hd=' + current_app.config['GOOGLE_DOMAIN']
 
-    return OAuth2WebServerFlow(
-        client_id=current_app.config['GOOGLE_CLIENT_ID'],
-        client_secret=current_app.config['GOOGLE_CLIENT_SECRET'],
-        scope='https://www.googleapis.com/auth/userinfo.email',
-        redirect_uri=redirect_uri,
-        user_agent='freight/{0} (python {1})'.format(
-            freight.VERSION,
-            PYTHON_VERSION,
-        ),
-        auth_uri=auth_uri,
-        token_uri=GOOGLE_TOKEN_URI,
-        revoke_uri=GOOGLE_REVOKE_URI,
-    )
+        return OAuth2WebServerFlow(
+            client_id=current_app.config['GOOGLE_CLIENT_ID'],
+            client_secret=current_app.config['GOOGLE_CLIENT_SECRET'],
+            scope='https://www.googleapis.com/auth/userinfo.email',
+            redirect_uri=redirect_uri,
+            user_agent='freight/{0} (python {1})'.format(
+                freight.VERSION,
+                PYTHON_VERSION,
+            ),
+            auth_uri=auth_uri,
+            token_uri=GOOGLE_TOKEN_URI,
+            revoke_uri=GOOGLE_REVOKE_URI,
+        )
 
 
 class LoginView(MethodView):
