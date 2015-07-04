@@ -44,7 +44,11 @@ def reset_database(request, app):
         engine.dispose()
         subprocess.check_call('dropdb %s' % db_name, shell=True)
 
-    subprocess.check_call('createdb -E utf-8 %s' % db_name, shell=True)
+    subprocess.check_call('createdb -E utf-8 %s%s' %
+                          (' -T %s ' % (os.environ['POSTGRESQL_TEMPLATE'])
+                           if 'POSTGRESQL_TEMPLATE' in os.environ else '',
+                           db_name),
+                          shell=True)
 
     command.upgrade(ALEMBIC_CONFIG, 'head')
     return lambda: reset_database(request, app)
