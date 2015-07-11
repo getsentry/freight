@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+
+
 class AccessDeniedError(Exception):
     """Access denied.
 

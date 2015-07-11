@@ -1,3 +1,5 @@
+from __future__ import absolute_import
+
 from .exceptions import AccessDeniedError, ProviderConfigurationError  # noqa
 from .providers import GoogleOAuth2Provider, GitHubOAuth2Provider
 

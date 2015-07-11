@@ -1,10 +1,13 @@
-import freight
+from __future__ import absolute_import
+
 import logging
-import requests
 import warnings
 
-from freight.constants import PYTHON_VERSION
+import requests
 from oauth2client.client import OAuth2WebServerFlow, FlowExchangeError
+
+import freight
+from freight.constants import PYTHON_VERSION
 
 from .exceptions import AccessDeniedError, ProviderConfigurationError
 
