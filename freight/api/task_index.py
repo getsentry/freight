@@ -24,6 +24,41 @@ class TaskIndexApiView(ApiView):
             ).exists(),
         ).scalar()
 
+    def _get_current_sha(self, app, env):
+        return db.session.query(
+            Task.sha,
+        ).filter(
+            Task.app_id == app.id,
+            Task.environment == env,
+            Task.status == TaskStatus.finished,
+        ).order_by(
+            Task.number.desc(),
+        ).limit(1).scalar()
+
+    def _get_previous_sha(self, app, env, current_sha):
+        return db.session.query(
+            Task.sha,
+        ).filter(
+            Task.app_id == app.id,
+            Task.environment == env,
+            Task.status == TaskStatus.finished,
+            Task.sha != current_sha,
+        ).order_by(
+            Task.number.desc(),
+        ).limit(1).scalar()
+
+    def _get_internal_ref(self, app, env, ref):
+        # find the most recent green build for this app
+        if ref == ':current':
+            return self._get_current_sha(app, env)
+        # the previous stable ref (before current)
+        elif ref == ':previous':
+            current_sha = self._get_current_sha(app, env)
+            if not current_sha:
+                return
+            return self._get_previous_sha(app, env, current_sha)
+        raise ValueError('Unknown ref: {}'.format(ref))
+
     get_parser = reqparse.RequestParser()
     get_parser.add_argument('app', location='args')
     get_parser.add_argument('user', location='args')
@@ -102,10 +137,17 @@ class TaskIndexApiView(ApiView):
 
         ref = args.ref or app.get_default_ref(args.env)
 
-        try:
-            sha = vcs_backend.describe(ref)
-        except vcs.UnknownRevision:
-            return self.error('Invalid ref', name='invalid_ref', status_code=400)
+        # look for our special refs (prefixed via a colon)
+        # TODO(dcramer): this should be supported outside of just this endpoint
+        if ref.startswith(':'):
+            sha = self._get_internal_ref(app, args.env, ref)
+            if not sha:
+                return self.error('Invalid ref', name='invalid_ref', status_code=400)
+        else:
+            try:
+                sha = vcs_backend.describe(ref)
+            except vcs.UnknownRevision:
+                return self.error('Invalid ref', name='invalid_ref', status_code=400)
 
         if not args.force:
             for check_config in app.checks:
