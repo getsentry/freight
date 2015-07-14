@@ -2,6 +2,8 @@ from __future__ import absolute_import
 
 import json
 
+from uuid import uuid4
+
 from freight.models import Task, TaskStatus
 from freight.testutils import TestCase
 
@@ -164,3 +166,86 @@ class TaskCreateTest(TaskIndexBase):
         assert task.environment == 'staging'
         assert task.app_id == self.app.id
         assert task.ref == 'HEAD'
+
+    def test_current_ref_with_no_valids(self):
+        resp = self.client.post(self.path, data={
+            'env': 'staging',
+            'app': self.app.name,
+            'user': self.user.name,
+            'ref': ':current',
+        })
+        assert resp.status_code == 400
+        data = json.loads(resp.data)
+        assert data['error_name'] == 'invalid_ref'
+
+    def test_current_ref(self):
+        current = self.create_task(
+            app=self.app,
+            user=self.user,
+            environment='staging',
+            status=TaskStatus.finished,
+            sha=uuid4().hex,
+        )
+
+        resp = self.client.post(self.path, data={
+            'env': 'staging',
+            'app': self.app.name,
+            'user': self.user.name,
+            'ref': ':current',
+        })
+        assert resp.status_code == 201, resp.data
+        data = json.loads(resp.data)
+        assert data['id']
+
+        task = Task.query.get(data['id'])
+        assert task.ref == ':current'
+        assert task.sha == current.sha
+
+    def test_previous_ref_with_no_valids(self):
+        stable = self.create_task(
+            app=self.app,
+            user=self.user,
+            environment='staging',
+            status=TaskStatus.finished,
+            sha=uuid4().hex,
+        )
+
+        resp = self.client.post(self.path, data={
+            'env': 'staging',
+            'app': self.app.name,
+            'user': self.user.name,
+            'ref': ':previous',
+        })
+        assert resp.status_code == 400
+        data = json.loads(resp.data)
+        assert data['error_name'] == 'invalid_ref'
+
+    def test_previous_ref(self):
+        previous = self.create_task(
+            app=self.app,
+            user=self.user,
+            environment='staging',
+            status=TaskStatus.finished,
+            sha=uuid4().hex,
+        )
+        stable = self.create_task(
+            app=self.app,
+            user=self.user,
+            environment='staging',
+            status=TaskStatus.finished,
+            sha=uuid4().hex,
+        )
+
+        resp = self.client.post(self.path, data={
+            'env': 'staging',
+            'app': self.app.name,
+            'user': self.user.name,
+            'ref': ':previous',
+        })
+        assert resp.status_code == 201, resp.data
+        data = json.loads(resp.data)
+        assert data['id']
+
+        task = Task.query.get(data['id'])
+        assert task.ref == ':previous'
+        assert task.sha == previous.sha
