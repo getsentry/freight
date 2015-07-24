@@ -177,10 +177,20 @@ def configure_api(app):
     api.add_resource(AppDetailsApiView, '/apps/<app_id>/')
     api.add_resource(StatsApiView, '/stats/')
     api.add_resource(TaskIndexApiView, '/tasks/')
+
+    # old style
     api.add_resource(TaskDetailsApiView, '/tasks/<task_id>/')
     api.add_resource(TaskLogApiView, '/tasks/<task_id>/log/')
+
+    # new style
+    api.add_resource(TaskDetailsApiView, '/tasks/<app>/<env>/<number>/',
+                     endpoint='task-details')
+    api.add_resource(TaskLogApiView, '/tasks/<app>/<env>/<number>/log/',
+                     endpoint='task-log')
+
     # catchall should be the last resource
     api.add_resource(ApiCatchall, '/<path:path>')
+
     # init must be called after routes are registered
     api.init_app(app)
 

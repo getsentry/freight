@@ -30,7 +30,7 @@ class SlackNotifier(Notifier):
             'sha': task.sha[:7] if task.sha else task.ref,
             'status_label': task.status_label,
             'duration': task.duration,
-            'link': http.absolute_uri('/tasks/{}/'.format(task.id)),
+            'link': http.absolute_uri('/tasks/{}/{}/{}/'.format(app.name, task.environment, task.number)),
         }
 
         if event == NotifierEvent.TASK_STARTED:

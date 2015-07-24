@@ -55,6 +55,7 @@ class TaskSerializer(Serializer):
 
         return {
             'id': str(item.id),
+            'name': '{}/{}#{}'.format(app.name, item.environment, item.number),
             'app': {
                 'id': str(app.id),
                 'name': app.name,

@@ -4,19 +4,21 @@ from flask_restful import reqparse
 
 from freight.api.base import ApiView
 from freight.config import db
-from freight.models import LogChunk, Task
+from freight.models import LogChunk
+
+from .task_details import TaskMixin
 
 
-class TaskLogApiView(ApiView):
+class TaskLogApiView(ApiView, TaskMixin):
     get_parser = reqparse.RequestParser()
     get_parser.add_argument('offset', location='args', type=int, default=0)
     get_parser.add_argument('limit', location='args', type=int)
 
-    def get(self, task_id):
+    def get(self, **kwargs):
         """
         Retrieve task log.
         """
-        task = Task.query.get(task_id)
+        task = self._get_task(**kwargs)
         if task is None:
             return self.error('Invalid task', name='invalid_resource', status_code=404)
 

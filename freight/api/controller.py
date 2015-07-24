@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from flask.ext.restful import Api, Resource
+from flask_restful import Api, Resource
 
 
 class ApiController(Api):

@@ -14,7 +14,7 @@ Requirements
 
 If you're not using Heroku, you'll need to ensure a few server dependencies:
 
-- Redis (or any `Celery <http://http://www.celeryproject.org/>`_ compatible broker)
+- Redis (or any `Celery <http://www.celeryproject.org/>`_ compatible broker)
 - PostgreSQL
 - Python 2.7
 - Node.js
@@ -232,6 +232,22 @@ Additionally you can access the logs via the API:
 
     curlish http://localhost:5000/api/0/tasks/1/log/?offset=-1&limit=1000 \
       -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70'
+
+
+Rolling Back
+------------
+
+While Freight doesn't formally offer a first-class rollback control, you can tell it to deploy the previous stable:
+
+.. code-block:: bash
+
+  curlish http://localhost:5000/api/0/tasks/ \
+      -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70' \
+      -X POST \
+      -J app=example \
+      -J ref=:previous \
+      -J task=deploy \
+      -J user="user@example.com"
 
 
 Next Steps

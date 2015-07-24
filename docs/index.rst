@@ -16,6 +16,7 @@ Reference
 .. toctree::
    :maxdepth: 1
 
+   contributing/index
    changelog/index
    license/index
 

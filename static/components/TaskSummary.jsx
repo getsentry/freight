@@ -60,7 +60,11 @@ var TaskSummary = React.createClass({
       e.preventDefault();
     }
 
-    this.transitionTo('taskDetails', {taskId: this.props.task.id});
+    this.transitionTo('taskDetails', {
+      app: this.props.task.app.name,
+      env: this.props.task.environment,
+      number: this.props.task.number
+    });
   },
 
   render() {
@@ -82,7 +86,7 @@ var TaskSummary = React.createClass({
            onClick={this.gotoTask}>
         <Progress value={this.getEstimatedProgress(task)} />
         <h3>
-          {task.app.name}/{task.environment} #{task.number}
+          {task.name}
         </h3>
         <div className="ref">
           <div className="sha">{task.sha.substr(0, 7)}</div>

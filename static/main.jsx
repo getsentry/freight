@@ -11,7 +11,7 @@ var TaskDetails = require('./components/TaskDetails');
 var routes = (
   <Route path="/" name="app" handler={App}>
     <DefaultRoute name="overview" handler={Overview} />
-    <Route path="/tasks/:taskId/" name="taskDetails" handler={TaskDetails} />
+    <Route path="/tasks/:app/:env/:number/" name="taskDetails" handler={TaskDetails} />
   </Route>
 );
 

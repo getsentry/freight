@@ -33,7 +33,7 @@ var TaskDetails = React.createClass({
   componentWillMount() {
     api.request(this.getPollingUrl(), {
       success: (data) => {
-        this.context.setHeading(this.getTaskLabel(data));
+        this.context.setHeading(data.name);
         this.setState({
           task: data,
         });
@@ -64,11 +64,8 @@ var TaskDetails = React.createClass({
   },
 
   getPollingUrl() {
-    return '/tasks/' + this.getParams().taskId + '/';
-  },
-
-  getTaskLabel(task) {
-    return task.app.name + '/' + task.environment + '#' + task.number;
+    var params = this.getParams();
+    return '/tasks/' + params.app + '/' + params.env + '/' + params.number + '/';
   },
 
   pollingReceiveData(data) {
@@ -104,7 +101,9 @@ var TaskDetails = React.createClass({
   },
 
   pollLog() {
-    var url = '/tasks/' + this.state.task.id + '/log/?offset=' + this.state.logNextOffset;
+    var task = this.state.task;
+
+    var url = '/tasks/' + task.app.name + '/' + task.environment + '/' + task.number + '/log/?offset=' + this.state.logNextOffset;
 
     api.request(url, {
       success: (data) => {
@@ -126,6 +125,27 @@ var TaskDetails = React.createClass({
       },
       error: () => {
         window.setTimeout(this.pollLog, 10000);
+      }
+    });
+  },
+
+  cancelTask() {
+    var task = this.state.task;
+
+    var url = '/tasks/' + task.app.name + '/' + task.environment + '/' + task.number + '/';
+
+    api.request(url, {
+      method: "PUT",
+      data: {
+        "status": "cancelled"
+      },
+      success: (data) => {
+        this.setState({
+          task: data,
+        });
+      },
+      error: () => {
+        alert("Unable to cancel task.");
       }
     });
   },
@@ -161,6 +181,7 @@ var TaskDetails = React.createClass({
     }
 
     var task = this.state.task;
+    var inProgress = this.taskInProgress(task);
 
     var liveScrollClassName = "btn btn-default btn-sm";
     if (this.state.liveScroll) {
@@ -171,7 +192,7 @@ var TaskDetails = React.createClass({
       <div className="task-details">
         <div className="task-log">
           <div ref="log" />
-          {this.taskInProgress(task) &&
+          {inProgress &&
             <div className="loading-icon" />
           }
         </div>
@@ -189,6 +210,10 @@ var TaskDetails = React.createClass({
               <small> &mdash; by {task.user.name}</small>
             </span>
             <div className="pull-right">
+              {inProgress &&
+                <a className="btn btn-danger btn-sm"
+                   onClick={this.cancelTask}>Cancel</a>
+              }
               <a className={liveScrollClassName}
                  onClick={this.toggleLiveScroll}>
                 <input type="checkbox"
