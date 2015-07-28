@@ -135,22 +135,22 @@ class TaskCreateTest(TaskIndexBase):
         assert task.provider_config == self.app.provider_config
         assert task.notifiers == self.app.notifiers
 
-    def test_locked(self):
-        task = self.create_task(
-            app=self.app,
-            user=self.user,
-            status=TaskStatus.pending,
-        )
+    # def test_locked(self):
+    #     task = self.create_task(
+    #         app=self.app,
+    #         user=self.user,
+    #         status=TaskStatus.pending,
+    #     )
 
-        resp = self.client.post(self.path, data={
-            'env': task.environment,
-            'app': self.app.name,
-            'ref': 'master',
-            'user': self.user.name,
-        })
-        assert resp.status_code == 400
-        data = json.loads(resp.data)
-        assert data['error_name'] == 'locked'
+    #     resp = self.client.post(self.path, data={
+    #         'env': task.environment,
+    #         'app': self.app.name,
+    #         'ref': 'master',
+    #         'user': self.user.name,
+    #     })
+    #     assert resp.status_code == 400
+    #     data = json.loads(resp.data)
+    #     assert data['error_name'] == 'locked'
 
     def test_default_ref(self):
         resp = self.client.post(self.path, data={

@@ -5,7 +5,7 @@ from flask_restful import reqparse, inputs
 from freight import checks, vcs
 from freight.api.base import ApiView
 from freight.api.serializer import serialize
-from freight.config import celery, db, redis
+from freight.config import db, redis
 from freight.exceptions import CheckError, CheckPending
 from freight.models import (
     App, Repository, Task, TaskName, TaskSequence, TaskStatus, User
@@ -15,15 +15,6 @@ from freight.utils.workspace import Workspace
 
 
 class TaskIndexApiView(ApiView):
-    def _has_active_task(self, app, env):
-        return db.session.query(
-            Task.query.filter(
-                Task.status.in_([TaskStatus.pending, TaskStatus.in_progress]),
-                Task.app_id == app.id,
-                Task.environment == env,
-            ).exists(),
-        ).scalar()
-
     def _get_current_sha(self, app, env):
         return db.session.query(
             Task.sha,
@@ -171,12 +162,6 @@ class TaskIndexApiView(ApiView):
                 db.session.add(user)
                 db.session.flush()
 
-            if not args.force and self._has_active_task(app, args.env):
-                return self.error(
-                    message='Another task is already in progress for this app/environment',
-                    name='locked',
-                )
-
             task = Task(
                 app_id=app.id,
                 environment=args.env,
@@ -197,7 +182,5 @@ class TaskIndexApiView(ApiView):
             )
             db.session.add(task)
             db.session.commit()
-
-        celery.send_task("freight.execute_task", [task.id])
 
         return self.respond(serialize(task), status_code=201)

@@ -3,7 +3,9 @@ from __future__ import absolute_import
 import flask
 import os
 import logging
+import tempfile
 
+from datetime import timedelta
 from flask_heroku import Heroku
 from flask_redis import Redis
 from flask_sslify import SSLify
@@ -104,10 +106,22 @@ def create_app(_read_config=True, **config):
     app.config['CELERY_TIMEZONE'] = 'UTC'
     app.config['CELERYD_PREFETCH_MULTIPLIER'] = 1
     app.config['CELERYD_MAX_TASKS_PER_CHILD'] = 10000
+    app.config['CELERYBEAT_SCHEDULE_FILENAME'] = os.path.join(tempfile.gettempdir(), 'freight-celerybeat')
+    app.config['CELERYBEAT_SCHEDULE'] = {
+        'check-queue': {
+            'task': 'freight.check_queue',
+            'schedule': timedelta(seconds=5),
+            'options': {
+                'expires': 5,
+                'queue': 'freight.queue',
+            }
+        },
+    }
 
     app.config['CELERY_QUEUES'] = (
         Queue('default', routing_key='default'),
         Queue('freight.tasks', routing_key='freight.tasks'),
+        Queue('freight.queue', routing_key='freight.queue'),
     )
 
     app.config['CELERY_IMPORTS'] = (
@@ -118,6 +132,10 @@ def create_app(_read_config=True, **config):
         'freight.execute_task': {
             'queue': 'freight.tasks',
             'routing_key': 'freight.tasks',
+        },
+        'freight.check_queue': {
+            'queue': 'freight.queue',
+            'routing_key': 'freight.queue',
         },
     }
 
