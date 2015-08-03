@@ -35,7 +35,10 @@ class Vcs(object):
         if not self.exists(workspace=workspace):
             kwargs.setdefault('cwd', None)
 
-        env = kwargs.pop('env', {})
+        # We need to start out with the OS environ to not wipe out
+        # essential environment variables like HOME, LANG etc.
+        env = dict(os.environ)
+        env.update(kwargs.pop('env', {}))
         for key, value in self.get_default_env().iteritems():
             env.setdefault(key, value)
         env.setdefault('FREIGHT_SSH_REPO', self.url)
