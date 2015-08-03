@@ -33,11 +33,21 @@ if not repo_url:
 
 repo = get_repo(repo_url)
 
+SSH_LOG_LEVEL = {
+    'CRITICAL': 'ERROR',
+    'FATAL': 'ERROR',
+    'ERROR': 'ERROR',
+    'WARN': 'INFO',
+    'WARNING': 'INFO',
+    'INFO': 'INFO',
+    'DEBUG': 'DEBUG',
+}[app.config['LOG_LEVEL'].upper()]
+
 command = [
     'ssh',
     # Not supported in all ssh client versions
     # '-oUserAuthorizedKeysFile=/dev/null',
-    '-oLogLevel={}'.format(app.config['LOG_LEVEL']),
+    '-oLogLevel={}'.format(SSH_LOG_LEVEL),
     '-oStrictHostKeyChecking=no',
     '-oUserKnownHostsFile=/dev/null',
 ]
