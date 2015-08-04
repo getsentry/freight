@@ -59,6 +59,8 @@ def create_app(_read_config=True, **config):
 
     if 'REDISCLOUD_URL' in os.environ:
         app.config['REDIS_URL'] = os.environ['REDISCLOUD_URL']
+    elif 'REDIS_URL' in os.environ:
+        app.config['REDIS_URL'] = os.environ['REDIS_URL']
 
     app.config['WORKSPACE_ROOT'] = os.environ.get('WORKSPACE_ROOT', '/tmp')
 
@@ -116,12 +118,21 @@ def create_app(_read_config=True, **config):
                 'queue': 'freight.queue',
             }
         },
+        'send-pending-notifications': {
+            'task': 'freight.send_pending_notifications',
+            'schedule': timedelta(seconds=5),
+            'options': {
+                'expires': 5,
+                'queue': 'freight.notifications',
+            }
+        },
     }
 
     app.config['CELERY_QUEUES'] = (
         Queue('default', routing_key='default'),
         Queue('freight.tasks', routing_key='freight.tasks'),
         Queue('freight.queue', routing_key='freight.queue'),
+        Queue('freight.notifications', routing_key='freight.notifications'),
     )
 
     app.config['CELERY_IMPORTS'] = (
@@ -136,6 +147,10 @@ def create_app(_read_config=True, **config):
         'freight.check_queue': {
             'queue': 'freight.queue',
             'routing_key': 'freight.queue',
+        },
+        'freight.send_pending_notifications': {
+            'queue': 'freight.notifications',
+            'routing_key': 'freight.notifications',
         },
     }
 

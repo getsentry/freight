@@ -10,6 +10,8 @@ from freight.exceptions import CheckError, CheckPending
 from freight.models import (
     App, Repository, Task, TaskName, TaskSequence, TaskStatus, User
 )
+from freight.notifiers import NotifierEvent
+from freight.notifiers.utils import send_task_notifications
 from freight.utils.redis import lock
 from freight.utils.workspace import Workspace
 
@@ -182,5 +184,7 @@ class TaskIndexApiView(ApiView):
             )
             db.session.add(task)
             db.session.commit()
+
+            send_task_notifications(task, NotifierEvent.TASK_QUEUED)
 
         return self.respond(serialize(task), status_code=201)

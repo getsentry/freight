@@ -78,7 +78,7 @@ class AppCreateTest(AppIndexBase):
     def test_invalid_provider(self):
         resp = self.client.post(self.path, data={
             'name': 'foobar',
-            'provider': 'dummy',
+            'provider': 'invalid',
             'provider_config': '{"command": "/usr/bin/true"}',
             'repository': 'git@example.com:repo-name.git',
         })
@@ -102,7 +102,7 @@ class AppCreateTest(AppIndexBase):
             'name': 'foobar',
             'provider': 'shell',
             'provider_config': '{"command": "/usr/bin/true"}',
-            'notifiers': '[{"type": "dummy"}]',
+            'notifiers': '[{"type": "invalid"}]',
             'repository': 'git@example.com:repo-name.git',
         })
         assert resp.status_code == 400
@@ -127,7 +127,7 @@ class AppCreateTest(AppIndexBase):
             'provider': 'shell',
             'provider_config': '{"command": "/usr/bin/true"}',
             'repository': 'git@example.com:repo-name.git',
-            'checks': '[{"type": "dummy"}]',
+            'checks': '[{"type": "invalid"}]',
         })
         assert resp.status_code == 400
         data = json.loads(resp.data)

@@ -67,7 +67,7 @@ class AppUpdateTest(AppDetailsBase):
 
     def test_invalid_provider(self):
         resp = self.client.put(self.path, data={
-            'provider': 'dummy',
+            'provider': 'invalid',
         })
         assert resp.status_code == 400
         data = json.loads(resp.data)
@@ -84,7 +84,7 @@ class AppUpdateTest(AppDetailsBase):
 
     def test_invalid_notifier(self):
         resp = self.client.put(self.path, data={
-            'notifiers': '[{"type": "dummy"}]',
+            'notifiers': '[{"type": "invalid"}]',
         })
         assert resp.status_code == 400
         data = json.loads(resp.data)
@@ -100,7 +100,7 @@ class AppUpdateTest(AppDetailsBase):
 
     def test_invalid_check(self):
         resp = self.client.put(self.path, data={
-            'checks': '[{"type": "dummy"}]',
+            'checks': '[{"type": "invalid"}]',
         })
         assert resp.status_code == 400
         data = json.loads(resp.data)

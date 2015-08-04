@@ -16,10 +16,16 @@ os.environ['FREIGHT_CONF'] = os.path.join(PROJECT_ROOT, 'tests', 'config.py')
 
 @pytest.fixture(autouse=True, scope='session')
 def app(request):
-    app = create_app()
+    app = create_app(REDIS_URL='redis://localhost/9')
     app_context = app.test_request_context()
     app_context.push()
     return app
+
+
+def pytest_runtest_teardown(item):
+    from redis import StrictRedis
+    client = StrictRedis(db=9)
+    client.flushdb()
 
 
 @pytest.fixture(autouse=True)

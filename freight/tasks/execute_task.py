@@ -9,8 +9,8 @@ from subprocess import PIPE, Popen, STDOUT
 from threading import Thread
 from time import sleep, time
 
-from freight import notifiers
 from freight.notifiers import NotifierEvent
+from freight.notifiers.utils import send_task_notifications
 from freight.config import celery, db
 from freight.constants import PROJECT_ROOT
 from freight.models import LogChunk, Task, TaskStatus
@@ -55,19 +55,6 @@ def execute_task(task_id):
         db.session.commit()
 
     send_task_notifications(task, NotifierEvent.TASK_FINISHED)
-
-
-def send_task_notifications(task, event):
-    for data in task.notifiers:
-        notifier = notifiers.get(data['type'])
-        config = data.get('config', {})
-        if not notifier.should_send(task, config, event):
-            continue
-
-        try:
-            notifier.send(task, config, event)
-        except Exception as exc:
-            logging.exception('%s notifier failed to send Task(id=%s)', data['type'], task.id)
 
 
 class LogReporter(Thread):

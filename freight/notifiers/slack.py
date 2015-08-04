@@ -33,7 +33,10 @@ class SlackNotifier(Notifier):
             'link': http.absolute_uri('/tasks/{}/{}/{}/'.format(app.name, task.environment, task.number)),
         }
 
-        if event == NotifierEvent.TASK_STARTED:
+        # TODO(dcramer): show the ref when it differs from the sha
+        if event == NotifierEvent.TASK_QUEUED:
+            title = "[{app_name}/{env}] Queued deploy <{link}|#{number}> ({sha})".format(**params)
+        elif event == NotifierEvent.TASK_STARTED:
             title = "[{app_name}/{env}] Starting deploy <{link}|#{number}> ({sha})".format(**params)
         elif task.status == TaskStatus.failed:
             title = "[{app_name}/{env}] Failed to deploy <{link}|#{number}> ({sha}) after {duration}s".format(**params)

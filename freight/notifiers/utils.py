@@ -1,10 +1,12 @@
 from __future__ import absolute_import
 
+import logging
+
 from itertools import chain
 
 from freight.exceptions import ApiError
 
-from . import manager
+from . import manager, NotifierEvent, queue
 
 
 def parse_notifiers_config(value):
@@ -41,3 +43,22 @@ def parse_notifiers_config(value):
             'config': config,
         })
     return result
+
+
+def send_task_notifications(task, event):
+    for data in task.notifiers:
+        notifier = manager.get(data['type'])
+        config = data.get('config', {})
+        if not notifier.should_send(task, config, event):
+            continue
+
+        # We want to send task finished notifications immediately as we know
+        # there is no possible followup event
+        if event == NotifierEvent.TASK_FINISHED:
+            try:
+                notifier.send(task, config, event)
+            except Exception:
+                logging.exception('%s notifier failed to send Task(id=%s)',
+                                  data['type'], task.id)
+        else:
+            queue.put(task, data['type'], data['config'], event)

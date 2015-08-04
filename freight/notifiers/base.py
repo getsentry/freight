@@ -6,6 +6,7 @@ __all__ = ['Notifier', 'NotifierEvent']
 class NotifierEvent(object):
     TASK_STARTED = 0
     TASK_FINISHED = 1
+    TASK_QUEUED = 2
 
 
 class Notifier(object):
