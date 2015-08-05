@@ -21,6 +21,8 @@ def send_pending_notifications():
 
         task = Task.query.get(data['task'])
         if task is None:
+            logging.error('Task not found for notification (id=%s)',
+                          data['task'])
             continue
 
         notifier = notifiers.get(data['type'])
