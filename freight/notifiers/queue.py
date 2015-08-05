@@ -21,7 +21,7 @@ class NotificationQueue(object):
             self.delay = delay
 
     def put(self, task, type, config, event):
-        key = '{}:data:{}'.format(self.prefix, task.id)
+        key = '{}:data:{}:{}'.format(self.prefix, type, task.id)
         pipe = self.conn.pipeline()
         # the score represents the time enqueued, thus the debounce time
         # can be controlled after the fact
