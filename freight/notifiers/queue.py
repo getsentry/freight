@@ -42,15 +42,17 @@ class NotificationQueue(object):
         """
         queue_key = '{}:queue'.format(self.prefix)
         min_s = 0
-        max_s = time() - self.delay
+        max_s = time() - (self.delay / 1000)
 
         results = self.conn.zrangebyscore(queue_key, min_s, max_s, 0, 1)
         if not results:
             return None
+
         key = results[0]
         pipe = self.conn.pipeline()
         pipe.hgetall(key)
         pipe.delete(key)
+        pipe.zrem(queue_key, key)
         data = pipe.execute()[0]
         data['config'] = json.loads(data['config'])
         data['event'] = int(data['event'])

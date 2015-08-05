@@ -31,3 +31,6 @@ class NotificationQueueTest(TestCase):
             'config': {'foo': 'bar'},
             'event': NotifierEvent.TASK_STARTED,
         }
+
+        result = queue.get()
+        assert result is None
