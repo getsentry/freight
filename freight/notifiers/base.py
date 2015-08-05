@@ -10,7 +10,11 @@ class NotifierEvent(object):
 
 
 class Notifier(object):
-    DEFAULT_EVENTS = [NotifierEvent.TASK_STARTED, NotifierEvent.TASK_FINISHED]
+    DEFAULT_EVENTS = [
+        NotifierEvent.TASK_QUEUED,
+        NotifierEvent.TASK_STARTED,
+        NotifierEvent.TASK_FINISHED,
+    ]
 
     def get_default_options(self):
         return {
