@@ -16,6 +16,7 @@ def send_pending_notifications():
             data = queue.get()
 
         if data is None:
+            logging.info('No due notifications found')
             return
 
         task = Task.query.get(data['task'])
