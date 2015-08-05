@@ -61,4 +61,9 @@ def send_task_notifications(task, event):
                 logging.exception('%s notifier failed to send Task(id=%s)',
                                   data['type'], task.id)
         else:
-            queue.put(task, data['type'], data['config'], event)
+            queue.put(
+                task=task,
+                type=data['type'],
+                config=data['config'],
+                event=event,
+            )
