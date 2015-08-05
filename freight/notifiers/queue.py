@@ -7,8 +7,6 @@ from time import time
 from freight.config import redis
 
 
-# TODO(dcramer): there should be one item in queue per task + event
-# which should spawn all notifiers when it is finally fired
 class NotificationQueue(object):
     delay = 5000  # ms
     prefix = 'notif'
