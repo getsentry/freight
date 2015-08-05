@@ -14,10 +14,14 @@ class SentryNotifier(Notifier):
             'webhook_url': {'required': True},
         }
 
-    def send(self, task, config, event):
-        if task.status != TaskStatus.finished and event != NotifierEvent.TASK_STARTED:
-            return
+    def should_send(self, task, config, event):
+        if event == NotifierEvent.TASK_STARTED:
+            return True
+        elif event == NotifierEvent.TASK_FINISHED and task.status == TaskStatus.finished:
+            return True
+        return False
 
+    def send(self, task, config, event):
         webhook_url = config['webhook_url']
 
         app = App.query.get(task.app_id)
