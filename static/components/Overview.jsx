@@ -98,29 +98,20 @@ var Overview = React.createClass({
       return <div className="loading" />;
     }
 
-    var activeTaskNodes = this.state.tasks.filter((task) => {
-      return this.taskInProgress(task);
-    }).map((task) => {
-      return (
-        <TaskSummary key={task.id} task={task} />
-      );
-    }).reverse();
+    var activeTaskNodes = [];
+    var pendingTaskNodes = [];
+    var previousTaskNodes = [];
 
-    var pendingTaskNodes = this.state.tasks.filter((task) => {
-      return this.taskPending(task);
-    }).map((task) => {
-      return (
-        <TaskSummary key={task.id} task={task} />
-      );
-    }).reverse();
-
-    var previousTaskNodes = this.state.tasks.filter((task) => {
-      return !this.taskInProgress(task);
-    }).map((task) => {
-      return (
-        <TaskSummary key={task.id} task={task} />
-      );
-    });
+    this.state.tasks.forEach((task) => {
+      var node = <TaskSummary key={task.id} task={task} />;
+      if (this.taskInProgress(task)) {
+        activeTaskNodes.unshift(node);
+      } else if (this.taskPending(task)) {
+        pendingTaskNodes.unshift(node);
+      } else {
+        previousTaskNodes.push(node);
+      }
+    })
 
     return (
       <div>
