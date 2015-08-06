@@ -86,7 +86,11 @@ var Overview = React.createClass({
   },
 
   taskInProgress(task) {
-    return task.status == 'in_progress' || task.status == 'pending';
+    return task.status == 'in_progress';
+  },
+
+  taskPending(task) {
+    return task.status == 'pending';
   },
 
   render() {
@@ -96,6 +100,14 @@ var Overview = React.createClass({
 
     var activeTaskNodes = this.state.tasks.filter((task) => {
       return this.taskInProgress(task);
+    }).map((task) => {
+      return (
+        <TaskSummary key={task.id} task={task} />
+      );
+    });
+
+    var pendingTaskNodes = this.state.tasks.filter((task) => {
+      return this.taskPending(task);
     }).map((task) => {
       return (
         <TaskSummary key={task.id} task={task} />
@@ -119,6 +131,7 @@ var Overview = React.createClass({
           {activeTaskNodes.length ?
             <ul className="task-list">
               {activeTaskNodes}
+              {pendingTaskNodes}
             </ul>
           :
             <p>There are no active tasks.</p>
