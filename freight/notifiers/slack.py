@@ -10,6 +10,12 @@ from freight.models import App, TaskStatus
 from .base import Notifier, NotifierEvent
 
 
+STATUS_TO_COLOR = {
+    'finished': '#2ab27b',
+    'failed': '#f43f20',
+}
+
+
 class SlackNotifier(Notifier):
     def get_options(self):
         return {
@@ -49,7 +55,11 @@ class SlackNotifier(Notifier):
 
         payload = {
             'parse': 'none',
-            'text': title,
+            'attachments': [{
+                'fallback': title,
+                'title': title,
+                'color': STATUS_TO_COLOR.get(task.status),
+            }]
         }
 
         values = {'payload': json.dumps(payload)}
