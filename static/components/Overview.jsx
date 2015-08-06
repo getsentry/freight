@@ -104,7 +104,7 @@ var Overview = React.createClass({
       return (
         <TaskSummary key={task.id} task={task} />
       );
-    });
+    }).reverse();
 
     var pendingTaskNodes = this.state.tasks.filter((task) => {
       return this.taskPending(task);
@@ -112,7 +112,7 @@ var Overview = React.createClass({
       return (
         <TaskSummary key={task.id} task={task} />
       );
-    });
+    }).reverse();
 
     var previousTaskNodes = this.state.tasks.filter((task) => {
       return !this.taskInProgress(task);
