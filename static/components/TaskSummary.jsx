@@ -93,6 +93,9 @@ var TaskSummary = React.createClass({
           {task.ref}
         </div>
         <div className="meta">
+          {task.status == 'pending' &&
+            <small><strong>QUEUED</strong> &mdash; </small>
+          }
           {task.dateFinished ?
             <small>{this.getStatusLabel(task)} <TimeSince date={task.dateFinished} /> &mdash; <Duration seconds={task.duration} className="duration" /></small>
           : (task.dateStarted ?
