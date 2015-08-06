@@ -200,6 +200,9 @@ var TaskDetails = React.createClass({
         <div className="task-footer">
           <div className="container">
             <span className="task-status">
+              {task.status == 'pending' &&
+                <small><strong>QUEUED</strong> &mdash; </small>
+              }
               {task.dateFinished ?
                 <small>{this.getStatusLabel(task)} <TimeSince date={task.dateFinished} /> &mdash; <Duration seconds={task.duration} className="duration" /></small>
               : (task.dateStarted ?
