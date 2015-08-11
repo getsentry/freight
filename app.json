@@ -39,6 +39,9 @@
       "description": "A private key to use when cloning repositories"
     }
   },
+  "buildpacks": [
+    {"url": "https://github.com/heroku/heroku-buildpack-multi.git"}
+  ],
   "formation": [
     {
       "process": "web",
