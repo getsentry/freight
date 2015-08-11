@@ -14,12 +14,25 @@
       "description": "An API key used to communiate with the service.",
       "generator": "secret"
     },
-    "GOOGLE_CLIENT_ID": "",
-    "GOOGLE_CLIENT_SECRET": "",
+    "GOOGLE_CLIENT_ID": {
+      "description": "Go to https://console.developers.google.com/ to generate one"
+    },
+    "GOOGLE_CLIENT_SECRET": {},
     "GOOGLE_DOMAIN": {
       "description": "The Google Apps domain you wish to restrict login to"
     },
-    "SENTRY_DSN": "",
+    "GITHUB_TOKEN": {
+      "description": "The Google Apps domain you wish to restrict login to",
+      "required": false
+    },
+    "GITHUB_API_ROOT": {
+      "description": "The base URL for the API. Defaults to https://api.github.com",
+      "value": "https://api.github.com"
+    },
+    "SENTRY_DSN": {
+      "description": "A DSN value from Sentry",
+      "required": false
+    },
     "DEFAULT_TIMEOUT": "300",
     "LOG_LEVEL": "INFO",
     "SSH_PRIVATE_KEY": {
