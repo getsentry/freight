@@ -2,6 +2,7 @@
   "name": "Freight",
   "description": "A deploy service.",
   "repository": "https://github.com/getsentry/freight",
+  "logo": "https://raw.githubusercontent.com/getsentry/freight/master/static/img/freight-logo.png",
   "keywords": ["deploy"],
   "env": {
     "BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-multi.git",
