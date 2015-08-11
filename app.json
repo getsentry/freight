@@ -46,12 +46,12 @@
     {
       "process": "web",
       "quantity": 1,
-      "size": "1X"
+      "size": "free"
     },
     {
       "process": "worker",
       "quantity": 1,
-      "size": "1X"
+      "size": "free"
     }
   ],
   "addons": [
