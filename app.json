@@ -22,7 +22,7 @@
       "description": "The Google Apps domain you wish to restrict login to"
     },
     "GITHUB_TOKEN": {
-      "description": "The Google Apps domain you wish to restrict login to",
+      "description": "Github API token for a user that has access to the repository. https://github.com/settings/tokens",
       "required": false
     },
     "GITHUB_API_ROOT": {
@@ -30,7 +30,7 @@
       "value": "https://api.github.com"
     },
     "SENTRY_DSN": {
-      "description": "A DSN value from Sentry",
+      "description": "A DSN value from Sentry (Configuration/Client Keys for the project)",
       "required": false
     },
     "DEFAULT_TIMEOUT": "300",
