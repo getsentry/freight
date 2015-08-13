@@ -5,7 +5,7 @@ redis:
 db:
   image: postgres:latest
   environment:
-    POSTGRES_USER: freight
+    - POSTGRES_USER=freight
   env_file: .env
 
 web:
@@ -13,13 +13,11 @@ web:
   links:
     - redis:redis
     - db:db
-  environment:
-    PYTHONUNBUFFERED: 1
-  env_file: .env
   ports:
     - 5000:5000
-  volumes:
-    - /root/.docker:/root/.docker
+  environment:
+    - PYTHONUNBUFFERED=1
+  env_file: .env
   command: bin/web --addr 0.0.0.0:5000
 
 worker:
@@ -28,9 +26,7 @@ worker:
     - redis:redis
     - db:db
   environment:
-    PYTHONUNBUFFERED: 1
+    - PYTHONUNBUFFERED=1
   env_file: .env
-  volumes:
-    - /root/.docker:/root/.docker
   command: bin/worker
 
