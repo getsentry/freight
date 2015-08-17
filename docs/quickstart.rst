@@ -250,8 +250,33 @@ While Freight doesn't formally offer a first-class rollback control, you can tel
       -J user="user@example.com"
 
 
+Setting up Slack notifications
+------------------------------
+
+First of all, head to Slack and create a "webhook" integration.
+
+.. code-block:: bash
+
+    curlish https://scurri-freight-test.herokuapp.com/api/0/apps/1/ \
+        -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70' \
+        -X POST \
+        -J notifiers='[{"type":"slack", "config": {"webhook_url": "https://hooks.slack.com/services/XXX/YYY/ZZZ"}}]'
+
+
+Setting up Github checks
+------------------------
+
+In this case, only the CircleCI checks will be considered.
+
+.. code-block:: bash
+
+    curlish https://scurri-freight-test.herokuapp.com/api/0/apps/1/ \
+        -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70' \
+        -X POST \
+        -J checks='[{"type": "github", "config": {"contexts": ["ci/circleci"], "repo": "my-organization/example"}}]'
+
+
 Next Steps
 ----------
 
-We've gone through the basics of creating an application and firing off a deploy. Two important pieces that aren't yet covered in the quickstart include pre-deploy checks and notifications. To learn more about those, we recommend diving into the code.
-
+To learn more about other checks/notifiers, we recommend diving into the code.
