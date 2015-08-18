@@ -68,3 +68,8 @@ class GitVcs(Vcs):
     def describe(self, ref):
         return self.run(['describe', '--always', '--abbrev=0', ref],
                         capture=True)
+
+    def get_sha(self, ref):
+        shas = self.run(['show-ref', '--hash=0', ref],
+                        capture=True).split('\n')
+        return shas[0]
