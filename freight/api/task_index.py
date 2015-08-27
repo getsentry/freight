@@ -98,6 +98,8 @@ class TaskIndexApiView(ApiView):
     post_parser = reqparse.RequestParser()
     post_parser.add_argument('app', required=True)
     post_parser.add_argument('user', required=True)
+    post_parser.add_argument('name', default=TaskName.deploy)
+    post_parser.add_argument('sha')
     post_parser.add_argument('env', default='production')
     post_parser.add_argument('ref')
     post_parser.add_argument('force', default=False, type=inputs.boolean)
@@ -130,17 +132,23 @@ class TaskIndexApiView(ApiView):
 
         ref = args.ref or app.get_default_ref(args.env)
 
-        # look for our special refs (prefixed via a colon)
-        # TODO(dcramer): this should be supported outside of just this endpoint
-        if ref.startswith(':'):
-            sha = self._get_internal_ref(app, args.env, ref)
-            if not sha:
-                return self.error('Invalid ref', name='invalid_ref', status_code=400)
+        if args.sha is None:
+            # look for our special refs (prefixed via a colon)
+            # TODO(dcramer): this should be supported outside of just this endpoint
+            if ref.startswith(':'):
+                sha = self._get_internal_ref(app, args.env, ref)
+                if not sha:
+                    return self.error('Invalid ref', name='invalid_ref', status_code=400)
+            else:
+                try:
+                    sha = vcs_backend.get_sha(ref)
+                except vcs.UnknownRevision:
+                    return self.error('Invalid ref', name='invalid_ref', status_code=400)
         else:
-            try:
-                sha = vcs_backend.get_sha(ref)
-            except vcs.UnknownRevision:
-                return self.error('Invalid ref', name='invalid_ref', status_code=400)
+            sha = args.sha
+
+            if vcs_backend.is_sha_exists(sha) is False:
+                return self.error('Invalid sha', name='invalid_sha', status_code=400)
 
         if not args.force:
             for check_config in app.checks:
@@ -168,7 +176,7 @@ class TaskIndexApiView(ApiView):
                 app_id=app.id,
                 environment=args.env,
                 number=TaskSequence.get_clause(app.id, args.env),
-                name=TaskName.deploy,
+                name=args.name,
                 # TODO(dcramer): ref should default based on app config
                 ref=ref,
                 sha=sha,
