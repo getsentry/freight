@@ -76,7 +76,7 @@ class GitVcs(Vcs):
         if shas:
             return shas[0]
 
-        shas = self.run(['show-ref', '--hash=0', ref],
+        shas = self.run(['show-ref', '--hash=0'],
                         capture=True).split('\n')
 
         if ref in shas:
