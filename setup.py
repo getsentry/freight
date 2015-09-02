@@ -5,7 +5,7 @@ Freight
 
 A deploy service.
 
-:copyright: (c) 2015 GetSentry LLC
+:copyright: (c) 2015 Functional Software Inc.
 :license: Apache 2.0, see LICENSE for more details.
 """
 from __future__ import absolute_import
