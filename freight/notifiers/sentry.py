@@ -17,8 +17,10 @@ class SentryNotifier(Notifier):
     def should_send(self, task, config, event):
         if event == NotifierEvent.TASK_STARTED:
             return True
-        elif event == NotifierEvent.TASK_FINISHED and task.status == TaskStatus.finished:
+
+        if event == NotifierEvent.TASK_FINISHED and task.status == TaskStatus.finished:
             return True
+
         return False
 
     def send(self, task, config, event):
@@ -29,7 +31,7 @@ class SentryNotifier(Notifier):
         payload = {
             'number': task.number,
             'app_name': app.name,
-            'task_name': task.name,
+            'params': dict(task.params or {}),
             'env': task.environment,
             'ref': task.ref,
             'sha': task.sha,

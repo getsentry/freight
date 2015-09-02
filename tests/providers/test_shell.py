@@ -26,7 +26,7 @@ class ShellProviderTest(ShellProviderBase):
         assert 'env={}'.format(self.task.environment) in result
         assert 'ref={}'.format(self.task.ref) in result
         assert 'sha={}'.format(self.task.sha) in result
-        assert 'task={}'.format(self.task.name) in result
+        assert 'task={}'.format(self.task.params['task']) in result
         assert 'ssh_key=id_rsa' in result
 
 

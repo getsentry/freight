@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+import json
+
 from flask_restful import reqparse, inputs
 
 from freight import checks, vcs
@@ -8,7 +10,7 @@ from freight.api.serializer import serialize
 from freight.config import db, redis
 from freight.exceptions import CheckError, CheckPending
 from freight.models import (
-    App, Repository, Task, TaskName, TaskSequence, TaskStatus, User
+    App, Repository, Task, TaskSequence, TaskStatus, User
 )
 from freight.notifiers import NotifierEvent
 from freight.notifiers.utils import send_task_notifications
@@ -77,6 +79,7 @@ class TaskIndexApiView(ApiView):
 
     post_parser = reqparse.RequestParser()
     post_parser.add_argument('app', required=True)
+    post_parser.add_argument('params', type=json.loads)
     post_parser.add_argument('user', required=True)
     post_parser.add_argument('env', default='production')
     post_parser.add_argument('ref')
@@ -92,6 +95,8 @@ class TaskIndexApiView(ApiView):
         app = App.query.filter(App.name == args.app).first()
         if not app:
             return self.error('Invalid app', name='invalid_resource', status_code=404)
+
+        params = None
 
         repo = Repository.query.get(app.repository_id)
 
@@ -122,6 +127,9 @@ class TaskIndexApiView(ApiView):
             except vcs.UnknownRevision:
                 return self.error('Invalid ref', name='invalid_ref', status_code=400)
 
+        if args.params is not None:
+            params = args.params
+
         if not args.force:
             for check_config in app.checks:
                 check = checks.get(check_config['type'])
@@ -148,10 +156,10 @@ class TaskIndexApiView(ApiView):
                 app_id=app.id,
                 environment=args.env,
                 number=TaskSequence.get_clause(app.id, args.env),
-                name=TaskName.deploy,
                 # TODO(dcramer): ref should default based on app config
                 ref=ref,
                 sha=sha,
+                params=params,
                 status=TaskStatus.pending,
                 user_id=user.id,
                 provider=app.provider,

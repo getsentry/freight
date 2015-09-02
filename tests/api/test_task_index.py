@@ -202,7 +202,7 @@ class TaskCreateTest(TaskIndexBase):
         assert task.sha == current.sha
 
     def test_previous_ref_with_no_valids(self):
-        stable = self.create_task(
+        self.create_task(
             app=self.app,
             user=self.user,
             environment='staging',
@@ -228,7 +228,7 @@ class TaskCreateTest(TaskIndexBase):
             status=TaskStatus.finished,
             sha=uuid4().hex,
         )
-        stable = self.create_task(
+        self.create_task(
             app=self.app,
             user=self.user,
             environment='staging',

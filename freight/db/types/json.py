@@ -41,8 +41,8 @@ class MutableDict(Mutable, MutableMapping):
 
             # this call will raise ValueError
             return Mutable.coerce(key, value)
-        else:
-            return value
+
+        return value
 
 
 class JSONEncodedDict(TypeDecorator):

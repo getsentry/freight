@@ -43,12 +43,12 @@ class Fixtures(object):
 
     def create_task(self, app, user, **kwargs):
         kwargs.setdefault('provider', 'shell')
-        kwargs.setdefault('name', 'deploy')
         kwargs.setdefault('ref', 'master')
         kwargs.setdefault('environment', 'production')
         kwargs.setdefault('sha', 'HEAD')
         kwargs.setdefault('status', TaskStatus.in_progress)
         kwargs.setdefault('data', {'provider_config': app.provider_config})
+        kwargs.setdefault('params', {'task': 'deploy'})
 
         task = Task(
             app_id=app.id,
