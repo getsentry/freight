@@ -1,13 +1,21 @@
 Freight
 -------
 
-**This project is a work in progress and is not yet intended to be production ready.**
+**This project is a work in progress and is not yet intended to be
+production ready.**
 
-This service is intended to augment your existing deployment processes. It should improve on what you may already have, or help you fill in what you're missing.
+This service is intended to augment your existing deployment processes. It
+should improve on what you may already have, or help you fill in what
+you're missing.
 
-The overarching goal of the system is to provide easy manual and automated deploys, with a consistent central view of the world. It's heavily inspired by GitHub's processes (and its Heaven project) as well as personal experiences of internal tools from members of the Sentry team.
+The overarching goal of the system is to provide easy manual and automated
+deploys, with a consistent central view of the world. It's heavily
+inspired by GitHub's processes (and its Heaven project) as well as
+personal experiences of internal tools from members of the Sentry team.
 
-It's not designed to replace something like Heroku, or other PaaS services, but rather to work *with* your existing processes, no matter what they are.
+It's not designed to replace something like Heroku, or other PaaS
+services, but rather to work *with* your existing processes, no matter
+what they are.
 
 .. image:: https://www.herokucdn.com/deploy/button.png
   :alt: Deploy
