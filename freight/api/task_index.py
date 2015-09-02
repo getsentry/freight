@@ -138,7 +138,7 @@ class TaskIndexApiView(ApiView):
                 return self.error('Invalid ref', name='invalid_ref', status_code=400)
         else:
             try:
-                sha = vcs_backend.get_sha(ref)
+                sha = vcs_backend.describe(ref)
             except vcs.UnknownRevision:
                 return self.error('Invalid ref', name='invalid_ref', status_code=400)
 
