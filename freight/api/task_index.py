@@ -17,39 +17,19 @@ from freight.utils.workspace import Workspace
 
 
 class TaskIndexApiView(ApiView):
-    def _get_current_sha(self, app, env):
-        return db.session.query(
-            Task.sha,
-        ).filter(
-            Task.app_id == app.id,
-            Task.environment == env,
-            Task.status == TaskStatus.finished,
-        ).order_by(
-            Task.number.desc(),
-        ).limit(1).scalar()
-
-    def _get_previous_sha(self, app, env, current_sha):
-        return db.session.query(
-            Task.sha,
-        ).filter(
-            Task.app_id == app.id,
-            Task.environment == env,
-            Task.status == TaskStatus.finished,
-            Task.sha != current_sha,
-        ).order_by(
-            Task.number.desc(),
-        ).limit(1).scalar()
-
     def _get_internal_ref(self, app, env, ref):
         # find the most recent green build for this app
         if ref == ':current':
-            return self._get_current_sha(app, env)
+            return app.get_current_sha(env)
+
         # the previous stable ref (before current)
-        elif ref == ':previous':
-            current_sha = self._get_current_sha(app, env)
+        if ref == ':previous':
+            current_sha = app.get_current_sha(env)
+
             if not current_sha:
                 return
-            return self._get_previous_sha(app, env, current_sha)
+
+            return app.get_previous_sha(env, current_sha=current_sha)
         raise ValueError('Unknown ref: {}'.format(ref))
 
     get_parser = reqparse.RequestParser()
@@ -98,6 +78,7 @@ class TaskIndexApiView(ApiView):
     post_parser = reqparse.RequestParser()
     post_parser.add_argument('app', required=True)
     post_parser.add_argument('user', required=True)
+    post_parser.add_argument('name', default=TaskName.deploy)
     post_parser.add_argument('env', default='production')
     post_parser.add_argument('ref')
     post_parser.add_argument('force', default=False, type=inputs.boolean)
@@ -137,10 +118,10 @@ class TaskIndexApiView(ApiView):
             if not sha:
                 return self.error('Invalid ref', name='invalid_ref', status_code=400)
         else:
-            try:
-                sha = vcs_backend.get_sha(ref)
-            except vcs.UnknownRevision:
-                return self.error('Invalid ref', name='invalid_ref', status_code=400)
+            sha = vcs_backend.get_sha(ref)
+
+            if sha is None:
+                return self.error('Invalid ref {}'.format(ref), name='invalid_ref', status_code=400)
 
         if not args.force:
             for check_config in app.checks:
@@ -168,7 +149,7 @@ class TaskIndexApiView(ApiView):
                 app_id=app.id,
                 environment=args.env,
                 number=TaskSequence.get_clause(app.id, args.env),
-                name=TaskName.deploy,
+                name=args.name,
                 # TODO(dcramer): ref should default based on app config
                 ref=ref,
                 sha=sha,

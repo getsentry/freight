@@ -2,11 +2,8 @@ from __future__ import absolute_import
 
 from subprocess import check_call
 
-import pytest
-
 from freight.testutils import TestCase
 from freight.utils.workspace import Workspace
-from freight.vcs.base import CommandError
 from freight.vcs.git import GitVcs
 
 
@@ -66,11 +63,23 @@ class GitVcsTest(TestCase):
         vcs.clone()
         vcs.update()
         sha = vcs.get_sha('master')
+
+        assert len(sha) == 40
+
+    def test_get_sha_with_specific_sha(self):
+        vcs = self.get_vcs()
+        vcs.clone()
+        vcs.update()
+
+        shas = vcs.run(['show-ref', '--hash=0'],
+                       capture=True).split('\n')
+
+        sha = vcs.get_sha(shas[0])
+
         assert len(sha) == 40
 
     def test_invalid_ref(self):
         vcs = self.get_vcs()
         vcs.clone()
         vcs.update()
-        with pytest.raises(CommandError):
-            vcs.get_sha('foo')
+        assert vcs.get_sha('foo') is None

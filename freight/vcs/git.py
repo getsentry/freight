@@ -70,6 +70,17 @@ class GitVcs(Vcs):
                         capture=True)
 
     def get_sha(self, ref):
-        shas = self.run(['show-ref', '--hash=0', ref],
-                        capture=True).split('\n')
-        return shas[0]
+        try:
+            shas = self.run(['show-ref', '--hash=0', ref],
+                            capture=True).split('\n')
+
+            if shas:
+                return shas[0]
+        except CommandError:
+            shas = self.run(['show-ref', '--hash=0'],
+                            capture=True).split('\n')
+
+            if ref in shas:
+                return ref
+
+        return None

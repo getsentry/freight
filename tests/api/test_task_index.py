@@ -4,8 +4,10 @@ import json
 
 from uuid import uuid4
 
-from freight.models import Task, TaskStatus
+from freight.models import Task, TaskStatus, TaskName
 from freight.testutils import TestCase
+from freight import vcs
+from freight.utils.workspace import Workspace
 
 
 class TaskIndexBase(TestCase):
@@ -166,6 +168,56 @@ class TaskCreateTest(TaskIndexBase):
         assert task.environment == 'staging'
         assert task.app_id == self.app.id
         assert task.ref == 'HEAD'
+        assert task.name == TaskName.deploy
+
+    def test_task_target_specific_sha(self):
+        vcs_backend = vcs.get(
+            self.repo.vcs,
+            url=self.repo.url,
+            workspace=Workspace(
+                path=self.repo.get_path(),
+            ),
+        )
+
+        shas = vcs_backend.run(['show-ref', '--hash=0'],
+                               capture=True).split('\n')
+
+        current_sha = shas[0]
+
+        resp = self.client.post(self.path, data={
+            'env': 'staging',
+            'app': self.app.name,
+            'user': self.user.name,
+            'ref': current_sha
+        })
+
+        assert resp.status_code == 201
+        data = json.loads(resp.data)
+        assert data['id']
+
+        task = Task.query.get(data['id'])
+
+        assert task.environment == 'staging'
+        assert task.app_id == self.app.id
+        assert task.ref == current_sha
+        assert task.name == TaskName.deploy
+
+    def test_task_name(self):
+        resp = self.client.post(self.path, data={
+            'name': 'collectstatic',
+            'env': 'staging',
+            'app': self.app.name,
+            'user': self.user.name,
+        })
+        assert resp.status_code == 201
+        data = json.loads(resp.data)
+        assert data['id']
+
+        task = Task.query.get(data['id'])
+        assert task.environment == 'staging'
+        assert task.app_id == self.app.id
+        assert task.ref == 'HEAD'
+        assert task.name == 'collectstatic'
 
     def test_current_ref_with_no_valids(self):
         resp = self.client.post(self.path, data={
@@ -202,7 +254,7 @@ class TaskCreateTest(TaskIndexBase):
         assert task.sha == current.sha
 
     def test_previous_ref_with_no_valids(self):
-        stable = self.create_task(
+        self.create_task(
             app=self.app,
             user=self.user,
             environment='staging',
@@ -228,7 +280,7 @@ class TaskCreateTest(TaskIndexBase):
             status=TaskStatus.finished,
             sha=uuid4().hex,
         )
-        stable = self.create_task(
+        self.create_task(
             app=self.app,
             user=self.user,
             environment='staging',
