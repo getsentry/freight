@@ -10,4 +10,4 @@ class CatchallTest(TestCase):
         for method in ('get', 'post', 'put', 'delete', 'patch'):
             resp = getattr(self.client, method)(path)
             assert resp.status_code == 404
-            assert resp.data == '{"error": "Not Found"}'
+            assert resp.data == '{"error": "Not Found"}\n'
