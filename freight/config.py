@@ -207,7 +207,7 @@ def configure_api(app):
     from freight.api.task_log import TaskLogApiView
 
     api.add_resource(AppIndexApiView, '/apps/')
-    api.add_resource(AppDetailsApiView, '/apps/<app_id>/')
+    api.add_resource(AppDetailsApiView, '/apps/<app>/')
     api.add_resource(StatsApiView, '/stats/')
     api.add_resource(TaskIndexApiView, '/tasks/')
 

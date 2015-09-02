@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 var api = require('../api');
 
 var PollingMixin = {
@@ -38,4 +36,4 @@ var PollingMixin = {
   },
 };
 
-module.exports = PollingMixin;
+export default PollingMixin;

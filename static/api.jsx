@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 var jQuery = require("jquery");
 
 class Client {
@@ -44,4 +42,4 @@ class Client {
   }
 }
 
-module.exports = new Client();
+export default new Client();

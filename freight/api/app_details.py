@@ -15,8 +15,8 @@ from freight.providers.utils import parse_provider_config
 
 
 class AppDetailsApiView(ApiView):
-    def get(self, app_id):
-        app = App.query.get(app_id)
+    def get(self, app):
+        app = App.query.filter(App.name == app).first()
         if app is None:
             return self.error('Invalid app', name='invalid_resource', status_code=404)
 
@@ -40,13 +40,13 @@ class AppDetailsApiView(ApiView):
     put_parser.add_argument('checks', type=json.loads)
     put_parser.add_argument('environments', type=json.loads)
 
-    def put(self, app_id):
+    def put(self, app):
         """
         Update an app.
         """
         args = self.put_parser.parse_args()
 
-        app = App.query.get(app_id)
+        app = App.query.filter(App.name == app).first()
         if app is None:
             return self.error('Invalid app', name='invalid_resource', status_code=404)
 
@@ -102,11 +102,11 @@ class AppDetailsApiView(ApiView):
 
         return self.respond(context)
 
-    def delete(self, app_id):
+    def delete(self, app):
         """
         Delete an app.
         """
-        app = App.query.get(app_id)
+        app = App.query.filter(App.name == app).first()
         if app is None:
             return self.error('Invalid app', name='invalid_resource', status_code=404)
 

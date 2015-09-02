@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 var ansi_up = require('ansi_up');
 var React = require('react');
 var Router = require('react-router');
@@ -232,4 +230,4 @@ var TaskDetails = React.createClass({
   }
 });
 
-module.exports = TaskDetails;
+export default TaskDetails;

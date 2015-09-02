@@ -1,9 +1,7 @@
-/** @jsx React.DOM */
-
 var React = require('react');
 var {Link, RouteHandler} = require('react-router');
 
-var App = React.createClass({
+var Layout = React.createClass({
   childContextTypes: {
     setHeading: React.PropTypes.func
   },
@@ -45,4 +43,4 @@ var App = React.createClass({
   }
 });
 
-module.exports = App;
+export default Layout;

@@ -45,4 +45,4 @@ var TooltipTrigger = React.createClass({
   }
 });
 
-module.exports = TooltipTrigger;
+export default TooltipTrigger;

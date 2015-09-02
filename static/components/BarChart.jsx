@@ -134,4 +134,4 @@ var BarChart = React.createClass({
   }
 });
 
-module.exports = BarChart;
+export default BarChart;

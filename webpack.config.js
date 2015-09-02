@@ -1,10 +1,7 @@
-// var watchLess = function(compiler) {
-//   compiler.plugin("after-compiler", function() {
-//     this.contextDependencies.push("./app/less/");
-//   }
-// };
+/*eslint-env node*/
 
-var webpack = require("webpack");
+var path = require("path"),
+    webpack = require("webpack");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 module.exports = {
@@ -14,6 +11,7 @@ module.exports = {
     "app": "./main",
     "vendor": [
       "ansi_up",
+      "babel-core/polyfill",
       "jquery",
       "moment",
       "react/addons",
@@ -23,8 +21,12 @@ module.exports = {
   module: {
     loaders: [
       {
-        test: /\.jsx$/,
-        loader: "jsx-loader?insertPragma=React.DOM&harmony"
+        test: /\.jsx?$/,
+        loader: "babel-loader"
+      },
+      {
+        test: /\.json$/,
+        loader: "json-loader"
       },
       {
         test: /\.less$/,
@@ -60,5 +62,6 @@ module.exports = {
     publicPath: "/dist/",
     path: __dirname + "/dist",
     filename: "[name].js",
-  }
+  },
+  devtool: 'source-map'
 };

@@ -38,4 +38,4 @@ var TimeSince = React.createClass({
   }
 });
 
-module.exports = TimeSince;
+export default TimeSince;

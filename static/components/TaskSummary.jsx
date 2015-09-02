@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 var React = require('react');
 var Router = require('react-router');
 var Link = Router.Link;
@@ -21,10 +19,7 @@ var Progress = React.createClass({
 });
 
 var TaskSummary = React.createClass({
-  mixins: [
-    Router.Navigation,
-    Router.State
-  ],
+  mixins: [Router.Navigation],
 
   taskInProgress(task) {
     return task.status == 'in_progress' || task.status == 'pending';
@@ -110,4 +105,4 @@ var TaskSummary = React.createClass({
   }
 });
 
-module.exports = TaskSummary;
+export default TaskSummary;

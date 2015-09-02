@@ -1,5 +1,3 @@
-/** @jsx React.DOM */
-
 var React = require("react");
 var Router = require("react-router");
 
@@ -7,6 +5,10 @@ var classSet = require('react/lib/cx');
 
 var ListLink = React.createClass({
   displayName: 'ListLink',
+
+  contextTypes: {
+    router: React.PropTypes.func
+  },
 
   propTypes: {
     activeClassName: React.PropTypes.string.isRequired,
@@ -24,7 +26,6 @@ var ListLink = React.createClass({
 
   mixins: [
     Router.Navigation,
-    Router.State
   ],
 
   getClassName() {
@@ -50,4 +51,4 @@ var ListLink = React.createClass({
   }
 });
 
-module.exports = ListLink;
+export default ListLink;

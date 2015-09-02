@@ -1,25 +1,35 @@
 var React = require('react');
+var Router = require('react-router');
 
 var api = require('../api');
 
-var DeployChart = require("./DeployChart");
 var PollingMixin = require('../mixins/polling');
 var TaskSummary = require('./TaskSummary');
 
-var Overview = React.createClass({
-  mixins: [PollingMixin],
+var AppDetails = React.createClass({
+  mixins: [PollingMixin, Router.State],
 
   contextTypes: {
-    router: React.PropTypes.func
+    setHeading: React.PropTypes.func,
   },
 
   getInitialState() {
     return {
+      appId: this.getParams().app,
+      app: null,
       tasks: null,
     };
   },
 
   componentWillMount() {
+    api.request(this.getAppUrl(), {
+      success: (data) => {
+        this.setState({
+          app: data
+        });
+        this.context.setHeading(data.name);
+      }
+    });
     api.request(this.getPollingUrl(), {
       success: (data) => {
         this.setState({
@@ -29,8 +39,16 @@ var Overview = React.createClass({
     });
   },
 
+  componentWillUnmount() {
+    this.context.setHeading(null);
+  },
+
+  getAppUrl() {
+    return '/apps/' + this.state.appId + '/';
+  },
+
   getPollingUrl() {
-    return '/tasks/';
+    return '/tasks/?app=' + this.state.appId;
   },
 
   pollingReceiveData(data) {
@@ -48,15 +66,16 @@ var Overview = React.createClass({
   },
 
   render() {
-    if (this.state.tasks === null) {
+    if (this.state.tasks === null || this.state.app === null) {
       return <div className="loading" />;
     }
 
+    var {app, tasks} = this.state;
     var activeTaskNodes = [];
     var pendingTaskNodes = [];
     var previousTaskNodes = [];
 
-    this.state.tasks.forEach((task) => {
+    tasks.forEach((task) => {
       var node = <TaskSummary key={task.id} task={task} />;
       if (this.taskInProgress(task)) {
         activeTaskNodes.unshift(node);
@@ -71,31 +90,16 @@ var Overview = React.createClass({
       <div>
         <div className="section">
           <div className="section-header">
-            <h2>Active Deploys</h2>
+            <h2>{app.name} Deploys</h2>
           </div>
-          {activeTaskNodes.length ?
+          {tasks.length ?
             <ul className="task-list">
               {activeTaskNodes}
               {pendingTaskNodes}
-            </ul>
-          :
-            <p>There are no active tasks.</p>
-          }
-        </div>
-
-        <div className="section">
-          <div className="section-header">
-            <h2>Deploy History</h2>
-          </div>
-
-          <DeployChart />
-
-          {previousTaskNodes.length ?
-            <ul className="task-list">
               {previousTaskNodes}
             </ul>
           :
-            <p>There are no historical tasks.</p>
+            <p>There have been no deploys for this app.</p>
           }
         </div>
       </div>
@@ -103,4 +107,4 @@ var Overview = React.createClass({
   }
 });
 
-export default Overview;
+export default AppDetails;

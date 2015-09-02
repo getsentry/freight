@@ -41,4 +41,4 @@ var Duration = React.createClass({
   }
 });
 
-module.exports = Duration;
+export default Duration;
