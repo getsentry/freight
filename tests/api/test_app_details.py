@@ -12,7 +12,7 @@ class AppDetailsBase(TestCase):
         self.user = self.create_user()
         self.repo = self.create_repo()
         self.app = self.create_app(repository=self.repo)
-        self.path = '/api/0/apps/{}/'.format(self.app.id)
+        self.path = '/api/0/apps/{}/'.format(self.app.name)
         super(AppDetailsBase, self).setUp()
 
 
