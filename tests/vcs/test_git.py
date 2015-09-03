@@ -2,8 +2,11 @@ from __future__ import absolute_import
 
 from subprocess import check_call
 
+import pytest
+
 from freight.testutils import TestCase
 from freight.utils.workspace import Workspace
+from freight.vcs.base import CommandError
 from freight.vcs.git import GitVcs
 
 
@@ -55,5 +58,43 @@ class GitVcsTest(TestCase):
         vcs = self.get_vcs()
         vcs.clone()
         vcs.update()
-        sha = vcs.describe('master')
+        sha = vcs.get_sha('master')
         assert len(sha) == 40
+
+    def test_get_sha_with_sha(self):
+        vcs = self.get_vcs()
+        vcs.clone()
+        vcs.update()
+        sha = vcs.get_sha('master')
+
+        assert vcs.get_sha(sha) == sha
+
+    def test_get_sha_with_annotated_tag(self):
+        vcs = self.get_vcs()
+        vcs.clone()
+        vcs.update()
+
+        # create annotated tag
+        check_call('cd %s && git tag -a v1 -m "v1"' % (
+            self.remote_path,
+        ), shell=True)
+
+        vcs.update()
+        master_sha = vcs.get_sha('master')
+        assert len(master_sha) == 40
+
+        check_call('cd %s && touch BAZ && git add BAZ && git commit -m "test\nbaz\n"' % (
+            self.remote_path,
+        ), shell=True)
+
+        vcs.update()
+        new_master_sha = vcs.get_sha('master')
+        assert len(new_master_sha) == 40
+        assert new_master_sha != master_sha
+
+    def test_invalid_ref(self):
+        vcs = self.get_vcs()
+        vcs.clone()
+        vcs.update()
+        with pytest.raises(CommandError):
+            vcs.get_sha('foo')

@@ -71,7 +71,7 @@ class Vcs(object):
     def checkout(self, ref):
         raise NotImplementedError
 
-    def describe(self, ref):
+    def get_sha(self, ref):
         """
         Given a `ref` return the fully qualified version.
         """
