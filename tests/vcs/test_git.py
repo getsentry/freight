@@ -57,3 +57,29 @@ class GitVcsTest(TestCase):
         vcs.update()
         sha = vcs.describe('master')
         assert len(sha) == 40
+
+    def test_describe_branch(self):
+        vcs = self.get_vcs()
+        vcs.clone()
+        vcs.update()
+
+        # create annotated tag
+        check_call('cd %s && git tag -a v1 -m "v1"' % (
+            self.remote_path,
+        ), shell=True)
+        check_call('cd %s && touch BAZ && git add BAZ && git commit -m "test\nbaz\n"' % (
+            self.remote_path,
+        ), shell=True)
+
+        check_call('cd %s && git checkout -b foo' % (
+            self.remote_path,
+        ), shell=True)
+        check_call('cd %s && touch BUZZ && git add BUZZ && git commit -m "test\nbuzz\n"' % (
+            self.remote_path,
+        ), shell=True)
+
+        vcs.update()
+        master_sha = vcs.describe('master')
+        branch_sha = vcs.describe('foo')
+
+        assert branch_sha != master_sha
