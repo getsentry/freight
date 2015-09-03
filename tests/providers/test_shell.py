@@ -20,13 +20,13 @@ class ShellProviderBase(TestCase):
 class ShellProviderTest(ShellProviderBase):
     def test_get_command(self):
         self.task.data['provider_config'] = {
-            'command': 'env={environment} task={task} ref={ref} sha={sha} ssh_key={ssh_key}'
+            'command': 'env={environment} task={params[task]} ref={ref} sha={sha} ssh_key={ssh_key}'
         }
         result = self.provider.get_command(self.task, 'id_rsa').split(' ')
         assert 'env={}'.format(self.task.environment) in result
         assert 'ref={}'.format(self.task.ref) in result
         assert 'sha={}'.format(self.task.sha) in result
-        assert 'task={}'.format(self.task.name) in result
+        assert 'task={}'.format(self.task.params['task']) in result
         assert 'ssh_key=id_rsa' in result
 
 

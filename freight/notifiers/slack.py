@@ -24,7 +24,7 @@ class SlackNotifier(Notifier):
         params = {
             'number': task.number,
             'app_name': app.name,
-            'task_name': task.name,
+            'params': dict(task.params or {}),
             'env': task.environment,
             'ref': task.ref,
             'sha': task.sha[:7] if task.sha else task.ref,

@@ -64,12 +64,12 @@ class Task(db.Model):
     number = Column(Integer, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id', ondelete="CASCADE"),
                      nullable=False)
-    name = Column(String(128), nullable=False, default=TaskName.deploy)
     ref = Column(String(128), nullable=False)
     sha = Column(String(40))
     environment = Column(String(64), nullable=False, default='production')
     provider = Column(String(64), nullable=False)
     status = Column(Integer, nullable=False)
+    params = Column(JSONEncodedDict, nullable=True)
     data = Column(JSONEncodedDict)
     date_created = Column(DateTime, default=datetime.utcnow, nullable=False)
     # represents the start of the task (or the last time it was attempted)

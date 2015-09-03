@@ -13,12 +13,14 @@ class ShellProvider(Provider):
         }
 
     def get_command(self, task, ssh_key):
+        params = task.params or {}
+
         return task.provider_config['command'].format(
             environment=task.environment,
             sha=task.sha,
             ref=task.ref,
-            task=task.name,
             ssh_key=ssh_key,
+            params=params,
         )
 
     def execute(self, workspace, task):

@@ -200,8 +200,8 @@ Once we've configured our application we can create a new deploy:
       -X POST \
       -J app=example \
       -J ref=master \
-      -J task=deploy \
-      -J user="user@example.com"
+      -J user="user@example.com" \
+      -J params='{"task": "deploy"}'
 
 In our response we'll get back the task summary which simply notes its pending and gives you it's ID:
 
@@ -246,8 +246,8 @@ While Freight doesn't formally offer a first-class rollback control, you can tel
       -X POST \
       -J app=example \
       -J ref=:previous \
-      -J task=deploy \
-      -J user="user@example.com"
+      -J user="user@example.com" \
+      -J params='{"task": "deploy"}'
 
 
 Setting up Slack notifications

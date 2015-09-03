@@ -135,6 +135,30 @@ class TaskCreateTest(TaskIndexBase):
         assert task.provider_config == self.app.provider_config
         assert task.notifiers == self.app.notifiers
 
+    def test_custom_params(self):
+        resp = self.client.post(self.path, data={
+            'env': 'production',
+            'app': self.app.name,
+            'ref': 'master',
+            'user': self.user.name,
+            'params': '{"task": "collectstatic"}'
+        })
+
+        assert resp.status_code == 201
+        data = json.loads(resp.data)
+        assert data['id']
+
+        task = Task.query.get(data['id'])
+
+        assert task.environment == 'production'
+        assert task.app_id == self.app.id
+        assert task.ref == 'master'
+        assert task.user_id == self.user.id
+        assert task.provider_config == self.app.provider_config
+        assert task.notifiers == self.app.notifiers
+
+        assert task.params == {'task': 'collectstatic'}
+
     # def test_locked(self):
     #     task = self.create_task(
     #         app=self.app,
@@ -202,7 +226,7 @@ class TaskCreateTest(TaskIndexBase):
         assert task.sha == current.sha
 
     def test_previous_ref_with_no_valids(self):
-        stable = self.create_task(
+        self.create_task(
             app=self.app,
             user=self.user,
             environment='staging',
@@ -228,7 +252,7 @@ class TaskCreateTest(TaskIndexBase):
             status=TaskStatus.finished,
             sha=uuid4().hex,
         )
-        stable = self.create_task(
+        self.create_task(
             app=self.app,
             user=self.user,
             environment='staging',
