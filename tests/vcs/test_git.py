@@ -67,19 +67,15 @@ class GitVcsTest(TestCase):
         check_call('cd %s && git tag -a v1 -m "v1"' % (
             self.remote_path,
         ), shell=True)
-        check_call('cd %s && touch BAZ && git add BAZ && git commit -m "test\nbaz\n"' % (
-            self.remote_path,
-        ), shell=True)
 
-        check_call('cd %s && git checkout -b foo' % (
-            self.remote_path,
-        ), shell=True)
-        check_call('cd %s && touch BUZZ && git add BUZZ && git commit -m "test\nbuzz\n"' % (
+        vcs.update()
+        master_sha = vcs.describe('master')
+        assert master_sha == 'v1'
+
+        check_call('cd %s && touch BAZ && git add BAZ && git commit -m "test\nbaz\n"' % (
             self.remote_path,
         ), shell=True)
 
         vcs.update()
         master_sha = vcs.describe('master')
-        branch_sha = vcs.describe('foo')
-
-        assert branch_sha != master_sha
+        assert master_sha != 'v1'
