@@ -21,8 +21,3 @@ before_script:
 script:
   - bin/lint
   - bin/test
-notifications:
-  irc:
-    channels: "irc.freenode.org#sentry"
-    on_success: change
-    on_failure: change
