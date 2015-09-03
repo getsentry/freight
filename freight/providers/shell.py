@@ -20,7 +20,7 @@ class ShellProvider(Provider):
             sha=task.sha,
             ref=task.ref,
             ssh_key=ssh_key,
-            **params
+            params=params,
         )
 
     def execute(self, workspace, task):
