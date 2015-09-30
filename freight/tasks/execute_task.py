@@ -61,6 +61,23 @@ def execute_task(task_id):
     send_task_notifications(task, NotifierEvent.TASK_FINISHED)
 
 
+def kill_subprocess(process):
+    logging.debug('Sending kill() to process %s', process.pid)
+    process.kill()
+
+
+def forcefully_stop_process(process, timeout=10):
+    timer = threading.Timer(timeout, kill_subprocess, args=[process])
+    timer.start()
+    try:
+        logging.debug('Sending terminate() to process %s (%ds timeout)',
+                      process.pid, timeout)
+        process.terminate()
+        process.wait()
+    finally:
+        timer.cancel()
+
+
 class LogReporter(threading.Thread):
     def __init__(self, app_context, task_id, process, chunk_size=4096):
         self.app_context = app_context
@@ -166,8 +183,7 @@ class TaskRunner(object):
     def _timeout(self):
         logging.error('Task(id=%s) exceeded time limit of %ds', self.task.id, self.timeout)
 
-        logging.debug('Sending terminate() to process')
-        self._process.terminate()
+        forcefully_stop_process(self._process)
         logging.debug('Sending terminate() to LogReporter')
         self._logreporter.terminate()
 
@@ -183,8 +199,7 @@ class TaskRunner(object):
     def _read_timeout(self):
         logging.error('Task(id=%s) did not receive any updates in %ds', self.task.id, self.read_timeout)
 
-        logging.debug('Sending terminate() to process')
-        self._process.terminate()
+        forcefully_stop_process(self._process)
         logging.debug('Sending terminate() to LogReporter')
         self._logreporter.terminate()
 
@@ -200,8 +215,7 @@ class TaskRunner(object):
     def _cancel(self):
         logging.error('Task(id=%s) was cancelled', self.task.id)
 
-        logging.debug('Sending terminate() to process')
-        self._process.terminate()
+        forcefully_stop_process(self._process)
         logging.debug('Sending terminate() to LogReporter')
         self._logreporter.terminate()
 
