@@ -12,6 +12,7 @@ class Provider(object):
     def get_default_options(self):
         return {
             'timeout': {},
+            'read_timeout': {},
         }
 
     def get_options(self):
