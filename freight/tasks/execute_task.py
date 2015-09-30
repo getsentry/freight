@@ -220,7 +220,7 @@ class TaskRunner(object):
         while self.active and self._process.poll() is None:
             if self.timeout and time() > self._started + self.timeout:
                 self._timeout()
-            if self._logreporter.last_recv < time() - self.read_timeout:
+            if self._logreporter.last_recv and self._logreporter.last_recv < time() - self.read_timeout:
                 self._read_timeout()
             if self._is_cancelled():
                 self._cancel()
