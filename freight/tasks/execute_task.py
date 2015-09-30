@@ -166,7 +166,9 @@ class TaskRunner(object):
     def _timeout(self):
         logging.error('Task(id=%s) exceeded time limit of %ds', self.task.id, self.timeout)
 
+        logging.debug('Sending terminate() to process')
         self._process.terminate()
+        logging.debug('Sending terminate() to LogReporter')
         self._logreporter.terminate()
 
         self._logreporter.save_chunk('>> Process exceeded time limit of %ds\n' % self.timeout)
@@ -181,7 +183,9 @@ class TaskRunner(object):
     def _read_timeout(self):
         logging.error('Task(id=%s) did not receive any updates in %ds', self.task.id, self.read_timeout)
 
+        logging.debug('Sending terminate() to process')
         self._process.terminate()
+        logging.debug('Sending terminate() to LogReporter')
         self._logreporter.terminate()
 
         self._logreporter.save_chunk('>> Process did not receive updates in %ds\n' % self.read_timeout)
@@ -196,7 +200,9 @@ class TaskRunner(object):
     def _cancel(self):
         logging.error('Task(id=%s) was cancelled', self.task.id)
 
+        logging.debug('Sending terminate() to process')
         self._process.terminate()
+        logging.debug('Sending terminate() to LogReporter')
         self._logreporter.terminate()
 
         self._logreporter.save_chunk('>> Task was cancelled\n')
@@ -227,5 +233,6 @@ class TaskRunner(object):
             if self._process.poll() is None:
                 sleep(0.1)
         self.active = False
+        logging.debug('Waiting for LogReporter to finish')
         self._logreporter.join()
         return self._process.returncode
