@@ -2,11 +2,11 @@ from __future__ import absolute_import
 
 import logging
 import sys
+import threading
 
 from datetime import datetime
 from flask import current_app
 from subprocess import PIPE, Popen, STDOUT
-from threading import Thread
 from time import sleep, time
 
 from freight.notifiers import NotifierEvent
@@ -18,6 +18,9 @@ from freight.models import LogChunk, Task, TaskStatus
 
 @celery.task(name='freight.execute_task', max_retries=None)
 def execute_task(task_id):
+    logging.debug('ExecuteTask fired with %d active thread(s)',
+                  threading.active_count())
+
     task = Task.query.get(task_id)
     if not task:
         logging.warning('ExecuteTask fired with missing Task(id=%s)', task_id)
@@ -58,7 +61,7 @@ def execute_task(task_id):
     send_task_notifications(task, NotifierEvent.TASK_FINISHED)
 
 
-class LogReporter(Thread):
+class LogReporter(threading.Thread):
     def __init__(self, app_context, task_id, process, chunk_size=4096):
         self.app_context = app_context
         self.task_id = task_id
@@ -67,7 +70,7 @@ class LogReporter(Thread):
         self.cur_offset = 0
         self.last_recv = None
         self.active = True
-        Thread.__init__(self)
+        threading.Thread.__init__(self)
         self.daemon = True
 
     def save_chunk(self, text):
