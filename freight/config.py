@@ -155,7 +155,7 @@ def create_app(_read_config=True, **config):
     }
 
     app.config['SENTRY_INCLUDE_PATHS'] = [
-        'ds',
+        'freight',
     ]
 
     # We don't support non-proxied installs
