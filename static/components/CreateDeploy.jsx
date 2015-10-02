@@ -27,8 +27,12 @@ var CreateDeploy = React.createClass({
   },
 
   onChangeApplication(e) {
+    let val = jQuery(e.target).val();
     this.setState({
-      app: jQuery(e.target).val()
+      app: val,
+      envList: val ? this.props.appList.filter((app) => {
+        return app.name === val;
+      })[0].environments || [] : []
     });
   },
 
