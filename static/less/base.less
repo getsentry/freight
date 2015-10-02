@@ -58,11 +58,14 @@ header {
     top: 0;
     left: 0;
     right: 0;
-    padding: 10px 0;
-    height: 49px;
+    z-index: 1000;
     background: @light;
     border-bottom: 1px solid @lessDark;
-    z-index: 1000;
+
+    .container {
+      padding: 10px 0;
+      height: 49px;
+    }
 
     h1 {
         display: inline-block;
@@ -95,6 +98,10 @@ header {
 
 .container {
     max-width: 960px;
+}
+
+.body > .container {
+  padding: 10px 0;
 }
 
 .nav-pills > li.active > a,
@@ -142,71 +149,71 @@ header {
     padding-left: 0;
     list-style: none;
 
-    > li {
-        .clearfix();
-        margin-bottom: 3px;
+    > .task {
+      margin-bottom: 3px;
+    }
+}
+
+.task {
+    .clearfix();
+    padding: 15px;
+    background: @lessDark;
+    border-radius: 4px;
+
+    &:hover {
+        cursor: pointer;
+        background: #585262;
     }
 
-    .task {
-        padding: 15px;
-        background: @lessDark;
-        border-radius: 4px;
+    h3 {
+        font-size: 12pt;
+        margin: 0;
+        display: inline-block;
+    }
 
-        &:hover {
-            cursor: pointer;
-            background: #585262;
-        }
+    .ref {
+        float: right;
+        text-align: right;
 
-        h3 {
+        .sha {
             font-size: 12pt;
-            margin: 0;
-            display: inline-block;
+            margin-bottom: 5px;
         }
+    }
 
-        .ref {
-            float: right;
-            text-align: right;
+    .meta {
+        margin-top: 5px;
+    }
 
-            .sha {
-                font-size: 12pt;
-                margin-bottom: 5px;
-            }
-        }
+    &.finished {
+      border-left: 8px solid #3ED33E;
+      &.cancelled {
+        border-left-color: #7B7B7B;
+      }
+      &.failed {
+        border-left-color: #D33E3E;
+      }
+    }
 
-        .meta {
-            margin-top: 5px;
-        }
+    &.active {
+        z-index: 2;
+        position: relative;
 
-        &.finished {
-          border-left: 8px solid #3ED33E;
-          &.cancelled {
-            border-left-color: #7B7B7B;
-          }
-          &.failed {
-            border-left-color: #D33E3E;
-          }
-        }
+        .progress {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: -1;
+            border-radius: 4px;
 
-        &.active {
-            z-index: 2;
-            position: relative;
+            background-size: 30px 30px;
+            background-image: linear-gradient(135deg, rgba(63, 56, 74, .7) 25%, transparent 25%,
+                                transparent 50%, rgba(63, 56, 74, .7) 50%, rgba(63, 56, 74, .7) 75%,
+                                transparent 75%, transparent);
 
-            .progress {
-                display: block;
-                position: absolute;
-                top: 0;
-                left: 0;
-                bottom: 0;
-                z-index: -1;
-                border-radius: 4px;
-
-                background-size: 30px 30px;
-                background-image: linear-gradient(135deg, rgba(63, 56, 74, .7) 25%, transparent 25%,
-                                    transparent 50%, rgba(63, 56, 74, .7) 50%, rgba(63, 56, 74, .7) 75%,
-                                    transparent 75%, transparent);
-
-                -webkit-animation: animate-stripes 2s linear infinite;
-            }
+            -webkit-animation: animate-stripes 2s linear infinite;
         }
     }
 }
@@ -217,35 +224,137 @@ header {
 
 
 .task-details {
-    padding-bottom: 70px;
+  padding-bottom: 70px;
+
+  .task-header {
+    z-index: 1000;
+    background: @light;
+    color: @dark;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 48px;
+    border-bottom: 1px solid @lessDark;
+
+    > .container {
+      height: 53px;
+      position: relative;
+    }
+
+    h3 {
+      font-size: 12pt;
+      margin: 0;
+      display: inline-block;
+    }
+
+    .ref {
+      float: right;
+      text-align: right;
+
+      .sha {
+        font-size: 12pt;
+        margin-bottom: 5px;
+      }
+    }
+
+    .meta {
+      display: block;
+      margin-top: 5px;
+    }
+  }
+
+  &.finished .task-header .container {
+    padding-left: 18px;
+  }
+
+  &.finished .task-header .container h3:before {
+    content: "";
+    width: 8px;
+    border-radius: 4px;
+    position: absolute;
+    top: 0;
+    bottom: 5px;
+    left: 0;
+    height: 43px;
+    background: #3ED33E;
+  }
+  &.cancelled .task-header .container h3:before {
+    background-color: #7B7B7B;
+  }
+  &.failed .task-header .container h3:before {
+    background-color: #D33E3E;
+  }
+
+  .task-footer {
+    z-index: 1000;
+    background: @dark;
+    color: @light;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    line-height: 45px;
+    height: 50px;
+
+    .btn {
+      margin-left: 5px;
+    }
+  }
+
+  .task-actions {
+    float: right;
+  }
+
+  .task-progress {
+    border: 1px solid @lessDark;
+    border-radius: 4px;
+    position: relative;
+    height: 28px;
+    margin-top: 10px;
+    margin-right: 150px;
+
+    .progress {
+      display: block;
+      position: absolute;
+      border-radius: 4px;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      background: lighten(@dark, 20%);
+    }
+  }
+
+  &.finished {
+    padding-bottom: 0;
 
     .task-footer {
-        background: @dark;
-        color: @light;
-        position: fixed;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        padding: 0 20px;
-        line-height: 45px;
-        height: 50px;
-        border-top: 1px solid @lessDark;
-
-        .btn {
-          margin-left: 5px;
-        }
+      display: none;
     }
+  }
 
-    .task-log {
-        padding: 5px;
+  &.active {
+    position: relative;
 
-        .line {
-            font-family: monospace, serif;
-            font-size: 0.9em;
-            white-space: pre-wrap;
-            line-height: 20px;
-        }
+    .progress {
+      background-size: 30px 30px;
+      background-image: linear-gradient(135deg, rgba(63, 56, 74, .7) 25%, transparent 25%,
+                          transparent 50%, rgba(63, 56, 74, .7) 50%, rgba(63, 56, 74, .7) 75%,
+                          transparent 75%, transparent);
+
+      -webkit-animation: animate-stripes 2s linear infinite;
     }
+  }
+
+  .task-log {
+    padding: 5px;
+
+    .line {
+      font-family: monospace, serif;
+      font-size: 0.9em;
+      white-space: pre-wrap;
+      line-height: 20px;
+    }
+  }
 }
 
 figure.barchart {

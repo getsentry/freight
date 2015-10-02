@@ -26,6 +26,10 @@ var TaskSummary = React.createClass({
   },
 
   getEstimatedProgress(task) {
+    if (task.dateFinished) {
+      return 100;
+    }
+
     var started = new Date(task.dateStarted).getTime();
     if (!started) {
       return 0;
@@ -77,7 +81,7 @@ var TaskSummary = React.createClass({
     }
 
     return (
-      <li className={joinClasses(this.props.className, className)}
+      <div className={joinClasses(this.props.className, className)}
            onClick={this.gotoTask}>
         <Progress value={this.getEstimatedProgress(task)} />
         <h3>
@@ -100,7 +104,7 @@ var TaskSummary = React.createClass({
           )}
           <small> &mdash; by {task.user.name}</small>
         </div>
-      </li>
+      </div>
     );
   }
 });

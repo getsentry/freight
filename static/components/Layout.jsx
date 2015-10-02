@@ -35,8 +35,10 @@ var Layout = React.createClass({
             }
           </div>
         </header>
-        <div className="container">
-          <RouteHandler />
+        <div className="body">
+          <div className="container">
+            <RouteHandler />
+          </div>
         </div>
       </div>
     );

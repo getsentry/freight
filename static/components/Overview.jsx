@@ -74,10 +74,10 @@ var Overview = React.createClass({
             <h2>Active Deploys</h2>
           </div>
           {activeTaskNodes.length ?
-            <ul className="task-list">
+            <div className="task-list">
               {activeTaskNodes}
               {pendingTaskNodes}
-            </ul>
+            </div>
           :
             <p>There are no active tasks.</p>
           }
@@ -91,9 +91,9 @@ var Overview = React.createClass({
           <DeployChart />
 
           {previousTaskNodes.length ?
-            <ul className="task-list">
+            <div className="task-list">
               {previousTaskNodes}
-            </ul>
+            </div>
           :
             <p>There are no historical tasks.</p>
           }
