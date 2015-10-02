@@ -241,12 +241,12 @@ class TaskRunner(object):
     def wait(self):
         assert self._process is not None, 'TaskRunner not started'
         while self.active and self._process.poll() is None:
-            if self.timeout and time() > self._started + self.timeout:
-                self._timeout()
-            if self._logreporter.last_recv and self._logreporter.last_recv < time() - self.read_timeout:
-                self._read_timeout()
             if self._is_cancelled():
                 self._cancel()
+            elif self.timeout and time() > self._started + self.timeout:
+                self._timeout()
+            elif self._logreporter.last_recv and self._logreporter.last_recv < time() - self.read_timeout:
+                self._read_timeout()
             if self._process.poll() is None:
                 sleep(0.1)
         self.active = False
