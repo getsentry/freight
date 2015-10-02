@@ -131,7 +131,7 @@ class LogReporter(threading.Thread):
             while self.active and chunk:
                 result += chunk
                 self.last_recv = time()
-                while len(result) >= chunk_size or (self.last_recv - last_write) > flush_time:
+                while len(result) >= chunk_size or (time() - last_write) > flush_time:
                     newline_pos = result.rfind('\n', 0, chunk_size)
                     if newline_pos == -1:
                         newline_pos = chunk_size
