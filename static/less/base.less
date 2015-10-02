@@ -67,6 +67,24 @@ header {
       height: 49px;
     }
 
+    .btn-default {
+      color: @light;
+
+      &:focus, &:hover {
+        color: #fff;
+      }
+      &.active {
+        color: @dark;
+        background-color: @light;
+        border-color: @lessDark;
+        &:focus, &:hover {
+          background-color: @light;
+          color: @dark;
+          border-color: @lessDark;
+        }
+      }
+    }
+
     h1 {
         display: inline-block;
         margin: 0;
@@ -102,6 +120,37 @@ header {
 
 .body {
   padding: 10px 0;
+}
+
+.create-deploy {
+  .clearfix;
+  background: @light;
+  color: @dark;
+  padding: 20px 20px 0;
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto;
+  border-radius: 4px;
+
+  .submit-group {
+    margin: 20px -20px -10px;
+    border-top: 1px solid lighten(@dark, 40%);
+    padding: 10px 20px 0;
+    text-align: right;
+  }
+
+  .btn-primary {
+    font-weight: bold;
+    background: #fff;
+    color: @dark;
+    text-transform: uppercase;
+    font-size: 13px;
+    border-color: lighten(@dark, 40%);
+
+    &:hover, &:focus {
+      border-color: @lessDark;
+    }
+  }
 }
 
 .nav-pills > li.active > a,

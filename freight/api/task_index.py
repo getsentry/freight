@@ -14,6 +14,7 @@ from freight.models import (
 )
 from freight.notifiers import NotifierEvent
 from freight.notifiers.utils import send_task_notifications
+from freight.utils.auth import get_current_user
 from freight.utils.redis import lock
 from freight.utils.workspace import Workspace
 
@@ -80,7 +81,7 @@ class TaskIndexApiView(ApiView):
     post_parser = reqparse.RequestParser()
     post_parser.add_argument('app', required=True)
     post_parser.add_argument('params', type=json.loads)
-    post_parser.add_argument('user', required=True)
+    post_parser.add_argument('user')
     post_parser.add_argument('env', default='production')
     post_parser.add_argument('ref')
     post_parser.add_argument('force', default=False, type=inputs.boolean)
@@ -91,6 +92,23 @@ class TaskIndexApiView(ApiView):
         a new task and enqueue it.
         """
         args = self.post_parser.parse_args()
+
+        user = get_current_user()
+        if not user:
+            username = args.user
+            if not username:
+                return self.error('Missing required argument "user"', status_code=400)
+
+            with lock(redis, 'user:create:{}'.format(username), timeout=5):
+                # TODO(dcramer): this needs to be a get_or_create pattern and
+                # ideally moved outside of the lock
+                user = User.query.filter(User.name == username).first()
+                if not user:
+                    user = User(name=username)
+                    db.session.add(user)
+                    db.session.flush()
+        elif args.user:
+            return self.error('Cannot specify user when using session authentication.', status_code=400)
 
         app = App.query.filter(App.name == args.app).first()
         if not app:
@@ -144,14 +162,6 @@ class TaskIndexApiView(ApiView):
                     )
 
         with lock(redis, 'task:create:{}'.format(app.id), timeout=5):
-            # TODO(dcramer): this needs to be a get_or_create pattern and
-            # ideally moved outside of the lock
-            user = User.query.filter(User.name == args.user).first()
-            if not user:
-                user = User(name=args.user)
-                db.session.add(user)
-                db.session.flush()
-
             task = Task(
                 app_id=app.id,
                 environment=args.env,
