@@ -27,6 +27,7 @@ var TaskDetails = React.createClass({
   getInitialState() {
     return {
       loading: true,
+      logLoading: true,
       task: null,
       logNextOffset: 0,
       liveScroll: true
@@ -42,6 +43,7 @@ var TaskDetails = React.createClass({
       success: (data) => {
         this.setState({
           task: data,
+          loading: false
         });
         this.pollLog();
       }
@@ -129,14 +131,14 @@ var TaskDetails = React.createClass({
       success: (data) => {
         if (data.text !== "") {
           this.setState({
-            loading: false,
+            logLoading: false,
             logNextOffset: data.nextOffset
           });
           this.updateBuildLog(data);
         }
-        if (this.state.loading) {
+        if (this.state.logLoading) {
           this.setState({
-            loading: false
+            logLoading: false
           });
         }
         if (this.taskInProgress(this.state.task)) {
@@ -197,7 +199,12 @@ var TaskDetails = React.createClass({
 
   render() {
     if (this.state.loading) {
-      return <div className="loading" />;
+      return (
+        <div style={{textAlign: "center"}}>
+          <div className="loading" style={{marginBottom: 20}} />
+          <p>Loading task details.</p>
+        </div>
+      );
     }
 
     let task = this.state.task;
@@ -223,8 +230,15 @@ var TaskDetails = React.createClass({
     return (
       <div className={className}>
         <div className="task-log">
-          <div ref="log" />
-          {inProgress &&
+          {this.state.logLoading ?
+            <div style={{textAlign: "center"}}>
+              <div className="loading" style={{marginBottom: 20}} />
+              <p>Loading log history.</p>
+            </div>
+          :
+            <div ref="log" />
+          }
+          {!this.state.logLoading && inProgress &&
             <div className="loading-icon" />
           }
         </div>
