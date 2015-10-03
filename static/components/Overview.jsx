@@ -49,7 +49,12 @@ var Overview = React.createClass({
 
   render() {
     if (this.state.tasks === null) {
-      return <div className="loading" />;
+      return (
+        <div className="container" style={{textAlign: "center"}}>
+          <div className="loading" />
+          <p>Loading list of tasks.</p>
+        </div>
+      );
     }
 
     var activeTaskNodes = [];

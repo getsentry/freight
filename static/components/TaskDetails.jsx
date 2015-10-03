@@ -232,7 +232,7 @@ var TaskDetails = React.createClass({
         <div className="task-log">
           {this.state.logLoading ?
             <div style={{textAlign: "center"}}>
-              <div className="loading" style={{marginBottom: 20}} />
+              <div className="loading" />
               <p>Loading log history.</p>
             </div>
           :

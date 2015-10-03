@@ -55,7 +55,7 @@ var Layout = React.createClass({
       return (
         <div>
           <div className="container" style={{textAlign: "center"}}>
-            <div className="loading" style={{marginBottom: 20}} />
+            <div className="loading" />
             <p>Loading application data. Hold on to your pants!</p>
           </div>
         </div>
