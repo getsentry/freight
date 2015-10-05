@@ -22,7 +22,7 @@ var Progress = React.createClass({
 });
 
 var TaskDetails = React.createClass({
-  mixins: [PollingMixin, Router.State],
+  mixins: [PollingMixin, Router.Navigation, Router.State],
 
   getInitialState() {
     return {
@@ -182,6 +182,35 @@ var TaskDetails = React.createClass({
     }
   },
 
+  reDeploy() {
+    if (this.state.submitInProgress) {
+      return false;
+    }
+
+    this.setState({
+      submitInProgress: true,
+    }, () => {
+      let task = this.state.task;
+
+      api.request('/tasks/', {
+        method: 'POST',
+        data: {
+          app: task.app.name,
+          env: task.environment,
+          ref: task.ref,
+          sha: task.sha,
+        },
+        success: (data) => {
+          this.transitionTo('taskDetails', {
+            app: data.app.name,
+            env: data.environment,
+            number: data.number
+          });
+        }
+      });
+    });
+  },
+
   getStatusLabel(task) {
     switch (task.status) {
       case 'cancelled':
@@ -269,16 +298,22 @@ var TaskDetails = React.createClass({
         <div className="task-footer">
           <div className="container">
             <div className="task-actions">
-              {inProgress &&
-                <a className="btn btn-danger btn-sm"
-                   onClick={this.cancelTask}>Cancel</a>
+              {inProgress ?
+                <span>
+                  <a className="btn btn-danger btn-sm"
+                     onClick={this.cancelTask}>Cancel</a>
+                  <a className={liveScrollClassName}
+                     onClick={this.toggleLiveScroll}>
+                    <input type="checkbox"
+                           checked={this.state.liveScroll} />
+                    <span>Follow</span>
+                  </a>
+                </span>
+              :
+                <a className="btn btn-default btn-sm"
+                   disabled={this.state.submitInProgress}
+                   onClick={this.reDeploy}>Re-deploy</a>
               }
-              <a className={liveScrollClassName}
-                 onClick={this.toggleLiveScroll}>
-                <input type="checkbox"
-                       checked={this.state.liveScroll} />
-                <span>Follow</span>
-              </a>
             </div>
             <div className="task-progress">
               <Progress value={this.getEstimatedProgress(task)} />
