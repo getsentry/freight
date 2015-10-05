@@ -61,21 +61,20 @@ var CreateDeploy = React.createClass({
 
     this.setState({
       submitInProgress: true,
-    });
-
-    api.request('/tasks/', {
-      method: 'POST',
-      data: {
-        app: this.state.app,
-        env: this.state.env,
-        ref: this.state.ref
-      },
-      success: (data) => {
-        this.gotoTask(data);
-      }
+    }, () => {
+      api.request('/tasks/', {
+        method: 'POST',
+        data: {
+          app: this.state.app,
+          env: this.state.env,
+          ref: this.state.ref
+        },
+        success: (data) => {
+          this.gotoTask(data);
+        }
+      });
     });
   },
-
 
   gotoTask(task) {
     this.transitionTo('taskDetails', {
