@@ -45,11 +45,11 @@ var TaskDetails = React.createClass({
   componentWillMount() {
     this.lastScrollPos = 0;
     this.logTimer = null;
-    this.fetchData();
   },
 
   componentDidMount() {
     window.addEventListener('scroll', this.onScroll, false);
+    this.fetchData();
   },
 
   componentDidUpdate() {
@@ -75,7 +75,9 @@ var TaskDetails = React.createClass({
       window.clearTimeout(this.logTimer);
     }
 
-    this.refs.log.getDOMNode().innerHTML = '';
+    if (this.refs.log) {
+      this.refs.log.getDOMNode().innerHTML = '';
+    }
 
     api.request(this.getPollingUrl(), {
       success: (data) => {
