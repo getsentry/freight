@@ -36,19 +36,16 @@ var TaskDetails = React.createClass({
 
   componentWillUnmount() {
     window.removeEventListener('scroll', this.onScroll, false);
+
+    if (this.logTimer) {
+      window.clearTimeout(this.logTimer);
+    }
   },
 
   componentWillMount() {
-    api.request(this.getPollingUrl(), {
-      success: (data) => {
-        this.setState({
-          task: data,
-          loading: false
-        });
-        this.pollLog();
-      }
-    });
     this.lastScrollPos = 0;
+    this.logTimer = null;
+    this.fetchData();
   },
 
   componentDidMount() {
@@ -59,6 +56,37 @@ var TaskDetails = React.createClass({
     if (this.state.liveScroll) {
       this.scrollLog();
     }
+  },
+
+  componentWillReceiveProps(nextProps) {
+    var params = this.getParams();
+    var task = this.state.task;
+    if (params.app !== task.app.name || params.env !== task.environment || params.number !== task.number) {
+      this.setState({
+        loading: true,
+        error: false,
+        task: null
+      }, this.fetchData());
+    }
+  },
+
+  fetchData() {
+    if (this.logTimer) {
+      window.clearTimeout(this.logTimer);
+    }
+
+    this.refs.log.getDOMNode().innerHTML = '';
+
+    api.request(this.getPollingUrl(), {
+      success: (data) => {
+        this.setState({
+          task: data,
+          loading: false
+        });
+
+        this.pollLog();
+      }
+    });
   },
 
   onScroll(event) {
@@ -142,11 +170,11 @@ var TaskDetails = React.createClass({
           });
         }
         if (this.taskInProgress(this.state.task)) {
-          window.setTimeout(this.pollLog, 1000);
+          this.logTimer = window.setTimeout(this.pollLog, 1000);
         }
       },
       error: () => {
-        window.setTimeout(this.pollLog, 10000);
+        this.logTimer = window.setTimeout(this.pollLog, 10000);
       }
     });
   },
