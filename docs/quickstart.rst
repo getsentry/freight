@@ -257,9 +257,9 @@ First of all, head to Slack and create a "webhook" integration.
 
 .. code-block:: bash
 
-    curlish https://scurri-freight-test.herokuapp.com/api/0/apps/1/ \
+    curlish https://scurri-freight-test.herokuapp.com/api/0/apps/example/ \
         -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70' \
-        -X POST \
+        -X PUT \
         -J notifiers='[{"type":"slack", "config": {"webhook_url": "https://hooks.slack.com/services/XXX/YYY/ZZZ"}}]'
 
 
@@ -270,9 +270,9 @@ In this case, only the CircleCI checks will be considered.
 
 .. code-block:: bash
 
-    curlish https://scurri-freight-test.herokuapp.com/api/0/apps/1/ \
+    curlish https://scurri-freight-test.herokuapp.com/api/0/apps/example/ \
         -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70' \
-        -X POST \
+        -X PUT \
         -J checks='[{"type": "github", "config": {"contexts": ["ci/circleci"], "repo": "my-organization/example"}}]'
 
 
