@@ -40,6 +40,6 @@ def put(*args, **kwargs):
 
 def absolute_uri(path):
     base = current_app.config['FREIGHT_URL']
-    if path.startswith(('http:', 'http:')):
+    if path.startswith(('https:', 'http:')):
         return path
     return '{}{}'.format(base, path)
