@@ -89,6 +89,7 @@ class LogReporter(threading.Thread):
         self.active = True
         threading.Thread.__init__(self)
         self.daemon = True
+        self.write_lock = threading.Lock()
 
     def save_chunk(self, text):
         # we also want to pipe this to stdout
@@ -96,16 +97,18 @@ class LogReporter(threading.Thread):
 
         text = text.decode('utf-8', 'replace')
         text_len = len(text)
-        db.session.add(LogChunk(
-            task_id=self.task_id,
-            text=text,
-            offset=self.cur_offset,
-            size=text_len,
-        ))
 
-        # we commit immediately to ensure the API can stream logs
-        db.session.commit()
-        self.cur_offset += text_len
+        with self.write_lock:
+            db.session.add(LogChunk(
+                task_id=self.task_id,
+                text=text,
+                offset=self.cur_offset,
+                size=text_len,
+            ))
+
+            # we commit immediately to ensure the API can stream logs
+            db.session.commit()
+            self.cur_offset += text_len
 
     def terminate(self):
         self.active = False
