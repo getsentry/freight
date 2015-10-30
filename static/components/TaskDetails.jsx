@@ -227,8 +227,7 @@ var TaskDetails = React.createClass({
         data: {
           app: task.app.name,
           env: task.environment,
-          ref: task.ref,
-          sha: task.sha,
+          ref: task.sha,
         },
         success: (data) => {
           this.transitionTo('taskDetails', {
