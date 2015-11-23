@@ -53,8 +53,13 @@ class GitHubContextCheckTest(GitHubCheckBase):
             self.check.check(self.app, 'abcdefg', config)
 
     @responses.activate
-    def test_missing_context(self):
-        body = json.dumps([])
+    def test_missing_required_context(self):
+        body = json.dumps([
+            {
+                "state": "success",
+                "context": "other",
+            }
+        ])
 
         responses.add(responses.GET, 'https://api.github.com/repos/getsentry/freight/commits/abcdefg/statuses',
                       body=body)
@@ -79,3 +84,32 @@ class GitHubContextCheckTest(GitHubCheckBase):
         config = {'contexts': ['travisci'], 'repo': 'getsentry/freight'}
 
         self.check.check(self.app, 'abcdefg', config)
+
+    @responses.activate
+    def test_no_contexts_with_none_defined(self):
+        body = json.dumps([])
+
+        responses.add(responses.GET, 'https://api.github.com/repos/getsentry/freight/commits/abcdefg/statuses',
+                      body=body)
+
+        config = {'repo': 'getsentry/freight'}
+
+        with pytest.raises(CheckFailed):
+            self.check.check(self.app, 'abcdefg', config)
+
+    @responses.activate
+    def test_any_failing_context_with_none_define(self):
+        body = json.dumps([
+            {
+                "state": "failing",
+                "context": "travisci",
+            }
+        ])
+
+        responses.add(responses.GET, 'https://api.github.com/repos/getsentry/freight/commits/abcdefg/statuses',
+                      body=body)
+
+        config = {'repo': 'getsentry/freight'}
+
+        with pytest.raises(CheckFailed):
+            self.check.check(self.app, 'abcdefg', config)
