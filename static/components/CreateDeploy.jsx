@@ -22,7 +22,8 @@ var CreateDeploy = React.createClass({
       env: defaultEnv ? defaultEnv.name : null,
       envList: defaultApp ? defaultApp.environments : [],
       ref: defaultRef,
-      submitInProgress: false
+      submitInProgress: false,
+      submitError: null,
     };
   },
 
@@ -71,7 +72,13 @@ var CreateDeploy = React.createClass({
         },
         success: (data) => {
           this.gotoTask(data);
-        }
+        },
+        error: (response) => {
+          this.setState({
+            submitError: response.responseJSON['error'],
+            submitInProgress: false,
+          });
+        },
       });
     });
   },
@@ -91,6 +98,9 @@ var CreateDeploy = React.createClass({
           <div className="section-header">
             <h2>Create Deploy</h2>
           </div>
+          {this.state.submitError &&
+            <div className="alert alert-block alert-error">{this.state.submitError}</div>
+          }
           <form onSubmit={this.onSubmit}>
             <div className="form-group">
               <label>Application</label>
