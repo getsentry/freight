@@ -18,7 +18,8 @@ class GitHubContextCheck(Check):
     def get_options(self):
         return {
             'api_root': {'required': False},
-            'contexts': {'required': True},
+            # if contexts is not set it will require all of them be valid
+            'contexts': {'required': False},
             'repo': {'required': True},
         }
 
@@ -31,7 +32,7 @@ class GitHubContextCheck(Check):
             config.get('api_root') or current_app.config['GITHUB_API_ROOT']
         ).rstrip('/')
 
-        contexts = set(config['contexts'])
+        contexts = set(config.get('contexts') or [])
         repo = config['repo']
 
         url = '{api_root}/repos/{repo}/commits/{ref}/statuses'.format(
@@ -47,8 +48,21 @@ class GitHubContextCheck(Check):
 
         resp = http.get(url, headers=headers)
 
-        for data in resp.json():
-            if data['context'] not in contexts:
+        context_list = resp.json()
+        if not context_list:
+            raise CheckFailed('No contexts were present in GitHub')
+
+        valid_contexts = set()
+        for data in context_list:
+            if data['state'] == 'success':
+                valid_contexts.add(data['context'])
+                try:
+                    contexts.remove(data['context'])
+                except KeyError:
+                    pass
+            if data['context'] in valid_contexts:
+                continue
+            if contexts and data['context'] not in contexts:
                 continue
             if data['state'] == 'pending':
                 raise CheckPending(ERR_CHECK.format(data['context'], data['state']))
