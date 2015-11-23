@@ -99,7 +99,10 @@ var CreateDeploy = React.createClass({
             <h2>Create Deploy</h2>
           </div>
           {this.state.submitError &&
-            <div className="alert alert-block alert-error">{this.state.submitError}</div>
+            <div className="alert alert-block alert-danger">
+              <strong>Unable to create deploy:</strong>
+              <span>{this.state.submitError}</span>
+            </div>
           }
           <form onSubmit={this.onSubmit}>
             <div className="form-group">
