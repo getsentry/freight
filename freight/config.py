@@ -84,8 +84,8 @@ def create_app(_read_config=True, **config):
     app.config['GITHUB_API_ROOT'] = 'https://api.github.com'
 
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
-    app.config['SQLALCHEMY_POOL_SIZE'] = 60
-    app.config['SQLALCHEMY_MAX_OVERFLOW'] = 20
+    app.config['SQLALCHEMY_POOL_SIZE'] = 5
+    app.config['SQLALCHEMY_MAX_OVERFLOW'] = 5
     if 'SQLALCHEMY_DATABASE_URI' in os.environ:
         app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
 
