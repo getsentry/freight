@@ -85,7 +85,7 @@ def create_app(_read_config=True, **config):
 
     app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
     app.config['SQLALCHEMY_POOL_SIZE'] = 5
-    app.config['SQLALCHEMY_MAX_OVERFLOW'] = 5
+    app.config['SQLALCHEMY_MAX_OVERFLOW'] = 0
     if 'SQLALCHEMY_DATABASE_URI' in os.environ:
         app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
 
