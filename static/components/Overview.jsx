@@ -78,7 +78,7 @@ var Overview = React.createClass({
           <div className="section-header">
             <h2>Active Deploys</h2>
           </div>
-          {activeTaskNodes.length ?
+          {(activeTaskNodes.length || pendingTaskNodes.length) ?
             <div className="task-list">
               {activeTaskNodes}
               {pendingTaskNodes}
