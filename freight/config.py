@@ -16,6 +16,7 @@ from werkzeug.contrib.fixers import ProxyFix
 from freight.api.controller import ApiController
 from freight.constants import PROJECT_ROOT
 from freight.utils.celery import ContextualCelery
+from freight.auth import Auth
 
 
 api = ApiController(prefix='/api/0')
@@ -24,6 +25,7 @@ celery = ContextualCelery()
 heroku = Heroku()
 redis = Redis()
 sentry = Sentry(logging=True, level=logging.WARN)
+auth = Auth()
 
 
 def configure_logging(app):
@@ -69,10 +71,8 @@ def create_app(_read_config=True, **config):
 
     app.config['LOG_LEVEL'] = os.environ.get('LOG_LEVEL', 'INFO' if config.get('DEBUG') else 'ERROR')
 
-    # Currently authentication requires Google
-    app.config['GOOGLE_CLIENT_ID'] = os.environ.get('GOOGLE_CLIENT_ID')
-    app.config['GOOGLE_CLIENT_SECRET'] = os.environ.get('GOOGLE_CLIENT_SECRET')
-    app.config['GOOGLE_DOMAIN'] = os.environ.get('GOOGLE_DOMAIN')
+    # Currently authentication defaults to Google.
+    app.config['AUTH_BACKEND'] = os.environ.get('AUTH_BACKEND', 'google')
 
     # Generate a GitHub token via Curl:
     # curlish https://api.github.com/authorizations \
@@ -194,6 +194,7 @@ def create_app(_read_config=True, **config):
     configure_redis(app)
     configure_sqlalchemy(app)
     configure_web_routes(app)
+    configure_auth(app)
 
     return app
 
@@ -227,6 +228,10 @@ def configure_api(app):
 
     # init must be called after routes are registered
     api.init_app(app)
+
+
+def configure_auth(app):
+    auth.init_app(app)
 
 
 def configure_celery(app):
