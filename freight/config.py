@@ -3,9 +3,7 @@ from __future__ import absolute_import
 import flask
 import os
 import logging
-import tempfile
 
-from datetime import timedelta
 from flask_heroku import Heroku
 from flask_redis import Redis
 from flask_sslify import SSLify
@@ -13,17 +11,17 @@ from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
 from werkzeug.contrib.fixers import ProxyFix
 
+from freight.queue import Queue
 from freight.api.controller import ApiController
 from freight.constants import PROJECT_ROOT
-from freight.utils.celery import ContextualCelery
 
 
 api = ApiController(prefix='/api/0')
 db = SQLAlchemy(session_options={})
-celery = ContextualCelery()
 heroku = Heroku()
 redis = Redis()
 sentry = Sentry(logging=True, level=logging.WARN)
+queue = Queue()
 
 
 def configure_logging(app):
@@ -31,8 +29,6 @@ def configure_logging(app):
 
 
 def create_app(_read_config=True, **config):
-    from kombu import Queue
-
     app = flask.Flask(
         __name__,
         static_folder=None,
@@ -89,69 +85,24 @@ def create_app(_read_config=True, **config):
     if 'SQLALCHEMY_DATABASE_URI' in os.environ:
         app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['SQLALCHEMY_DATABASE_URI']
 
-    app.config['BROKER_TRANSPORT'] = None
-    if 'BROKER_URL' in os.environ:
-        app.config['BROKER_URL'] = os.environ['BROKER_URL']
-
-    app.config['CELERY_ACCEPT_CONTENT'] = ['json']
-    app.config['CELERY_ACKS_LATE'] = True
-    app.config['CELERY_DEFAULT_QUEUE'] = "default"
-    app.config['CELERY_DEFAULT_EXCHANGE'] = "default"
-    app.config['CELERY_DEFAULT_EXCHANGE_TYPE'] = "direct"
-    app.config['CELERY_DEFAULT_ROUTING_KEY'] = "default"
-    app.config['CELERY_DISABLE_RATE_LIMITS'] = True
-    app.config['CELERY_IGNORE_RESULT'] = True
-    app.config['CELERY_RESULT_BACKEND'] = None
-    app.config['CELERY_RESULT_SERIALIZER'] = 'json'
-    app.config['CELERY_SEND_EVENTS'] = False
-    app.config['CELERY_TASK_RESULT_EXPIRES'] = 1
-    app.config['CELERY_TASK_SERIALIZER'] = 'json'
-    app.config['CELERY_TIMEZONE'] = 'UTC'
-    app.config['CELERYD_PREFETCH_MULTIPLIER'] = 1
-    app.config['CELERYD_MAX_TASKS_PER_CHILD'] = 10000
-    app.config['CELERYBEAT_SCHEDULE_FILENAME'] = os.path.join(tempfile.gettempdir(), 'freight-celerybeat')
-    app.config['CELERYBEAT_SCHEDULE'] = {
-        'check-queue': {
-            'task': 'freight.check_queue',
-            'schedule': timedelta(seconds=5),
-            'options': {
-                'expires': 5,
-                'queue': 'freight.queue',
-            }
-        },
-        'send-pending-notifications': {
-            'task': 'freight.send_pending_notifications',
-            'schedule': timedelta(seconds=5),
-            'options': {
-                'expires': 5,
-                'queue': 'freight.notifications',
-            }
-        },
-    }
-
-    app.config['CELERY_QUEUES'] = (
-        Queue('default', routing_key='default'),
-        Queue('freight.tasks', routing_key='freight.tasks'),
-        Queue('freight.queue', routing_key='freight.queue'),
-        Queue('freight.notifications', routing_key='freight.notifications'),
-    )
-
-    app.config['CELERY_IMPORTS'] = (
+    app.config['QUEUES'] = [
+        'freight.default',
         'freight.tasks',
-    )
-
-    app.config['CELERY_ROUTES'] = {
-        'freight.execute_task': {
-            'queue': 'freight.tasks',
-            'routing_key': 'freight.tasks',
+        'freight.queue',
+        'freight.notifications',
+    ]
+    app.config['QUEUE_DEFAULT'] = 'freight.default'
+    app.config['QUEUE_ROUTES'] = {
+        'freight.jobs.execute_task': 'freight.tasks',
+        'freight.jobs.check_queue': 'freight.queue',
+        'freight.jobs.send_pending_notifications': 'freight.notifications',
+    }
+    app.config['QUEUE_SCHEDULE'] = {
+        'freight.jobs.check_queue': {
+            'seconds': 1,
         },
-        'freight.check_queue': {
-            'queue': 'freight.queue',
-            'routing_key': 'freight.queue',
-        },
-        'freight.send_pending_notifications': {
-            'queue': 'freight.notifications',
-            'routing_key': 'freight.notifications',
+        'freight.jobs.send_pending_notifications': {
+            'seconds': 1,
         },
     }
 
@@ -173,8 +124,8 @@ def create_app(_read_config=True, **config):
     if not app.config.get('SQLALCHEMY_DATABASE_URI'):
         app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///freight'
 
-    if not app.config.get('BROKER_URL'):
-        app.config['BROKER_URL'] = 'redis://localhost/0'
+    app.config.setdefault('REDIS_URL', 'redis://localhost:6379')
+    app.config.setdefault('REDIS_DB', 0)
 
     app.config.update(config)
 
@@ -190,8 +141,8 @@ def create_app(_read_config=True, **config):
     configure_logging(app)
     configure_sentry(app)
     configure_api(app)
-    configure_celery(app)
     configure_redis(app)
+    configure_queue(app)
     configure_sqlalchemy(app)
     configure_web_routes(app)
 
@@ -229,17 +180,16 @@ def configure_api(app):
     api.init_app(app)
 
 
-def configure_celery(app):
-    celery.init_app(app)
-
-
 def configure_redis(app):
     redis.init_app(app)
 
 
+def configure_queue(app):
+    queue.init_app(app, db)
+
+
 def configure_sentry(app):
     from flask import session
-    from raven.contrib.celery import register_signal, register_logger_signal
 
     sentry.init_app(app)
 
@@ -250,9 +200,6 @@ def configure_sentry(app):
                 'id': session['uid'],
                 'email': session['email'],
             })
-
-    register_signal(sentry.client)
-    register_logger_signal(sentry.client)
 
 
 def configure_sqlalchemy(app):

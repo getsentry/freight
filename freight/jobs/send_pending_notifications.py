@@ -3,17 +3,16 @@ from __future__ import absolute_import
 import logging
 
 from freight import notifiers
-from freight.config import celery, redis
+from freight.config import redis, queue
 from freight.models import Task
-from freight.notifiers import queue
 from freight.utils.redis import lock
 
 
-@celery.task(name='freight.send_pending_notifications', max_retries=None)
+@queue.job()
 def send_pending_notifications():
     while True:
         with lock(redis, 'notificationcheck', timeout=5):
-            data = queue.get()
+            data = notifiers.queue.get()
 
         if data is None:
             logging.info('No due notifications found')

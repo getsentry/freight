@@ -7,7 +7,7 @@ from flask_restful import reqparse
 from freight.api.base import ApiView
 from freight.api.serializer import serialize
 from freight.checks.utils import parse_checks_config
-from freight.config import celery, db
+from freight.config import db, queue
 from freight.environments.utils import parse_environments_config
 from freight.models import App, Repository
 from freight.notifiers.utils import parse_notifiers_config
@@ -110,6 +110,6 @@ class AppDetailsApiView(ApiView):
         if app is None:
             return self.error('Invalid app', name='invalid_resource', status_code=404)
 
-        celery.send_task("freight.delete_object", kwargs={'model': 'App', 'app_id': app.id})
+        queue.push('freight.delete_object', kwargs={'model': 'App', 'app_id': app.id})
 
         return self.respond({"id": str(app.id)})
