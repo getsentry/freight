@@ -1,2 +1,2 @@
-web: bin/upgrade && bin/web --no-debug --addr=:${PORT}
-worker: bin/upgrade && bin/worker -l ${LOG_LEVEL} -O fair
+web: bin/upgrade && PYTHONUNBUFFERED=1 bin/web --no-debug --addr=:${PORT}
+worker: bin/upgrade && PYTHONUNBUFFERED=1 bin/worker -n 4 --no-debug

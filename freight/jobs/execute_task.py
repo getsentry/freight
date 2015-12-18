@@ -11,12 +11,12 @@ from time import sleep, time
 
 from freight.notifiers import NotifierEvent
 from freight.notifiers.utils import send_task_notifications
-from freight.config import celery, db
+from freight.config import db, queue
 from freight.constants import PROJECT_ROOT
 from freight.models import LogChunk, Task, TaskStatus
 
 
-@celery.task(name='freight.execute_task', max_retries=None)
+@queue.job()
 def execute_task(task_id):
     logging.debug('ExecuteTask fired with %d active thread(s)',
                   threading.active_count())

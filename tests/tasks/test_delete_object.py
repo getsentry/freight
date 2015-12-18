@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from freight.config import celery, db
+from freight.config import db, queue
 from freight.models import App, Task
 from freight.testutils import TestCase
 
@@ -12,7 +12,10 @@ class DeleteObjectTest(TestCase):
         app = self.create_app(repository=repo)
         task = self.create_task(app=app, user=user)
 
-        celery.apply("freight.delete_object", model='App', object_id=app.id)
+        queue.apply('freight.jobs.delete_object', kwargs={
+            'model': 'App',
+            'object_id': app.id,
+        })
 
         db.session.expire_all()
 

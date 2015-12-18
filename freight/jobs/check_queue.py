@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 import logging
 
-from freight.config import celery, db, redis
+from freight.config import db, redis, queue
 from freight.models import App, Task, TaskStatus
 from freight.utils.redis import lock
 
@@ -29,7 +29,7 @@ def get_pending_task_id(app_id, env):
     ).limit(1).scalar()
 
 
-@celery.task(name='freight.check_queue', max_retries=None)
+@queue.job()
 def check_queue():
     """
     Checks the pending task queue and, given there's not an in-progress task
@@ -63,4 +63,4 @@ def check_queue():
                 'status': TaskStatus.in_progress,
             }, synchronize_session=False)
 
-            celery.send_task("freight.execute_task", [task_id])
+            queue.push("freight.jobs.execute_task", [task_id])

@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 import logging
 
-from freight.config import celery, db
+from freight.config import db, queue
 from freight.models import App
 
 
@@ -11,7 +11,7 @@ models = {
 }
 
 
-@celery.task(name='freight.delete_object', max_retries=None)
+@queue.job()
 def delete_object(model, object_id):
     try:
         Model = models[model]

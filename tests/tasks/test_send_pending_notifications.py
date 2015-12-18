@@ -2,9 +2,10 @@ from __future__ import absolute_import
 
 from mock import call, patch
 
-from freight.config import celery, db
+from freight.config import db, queue
 from freight.models import TaskStatus
-from freight.notifiers import NotifierEvent, queue
+from freight import notifiers
+from freight.notifiers import NotifierEvent
 from freight.notifiers.dummy import DummyNotifier
 from freight.testutils import TransactionTestCase
 
@@ -17,7 +18,7 @@ def maybe_pop(collection):
 
 
 class SendPendingNotificationsTestCase(TransactionTestCase):
-    @patch.object(queue, 'get')
+    @patch.object(notifiers.queue, 'get')
     @patch.object(DummyNotifier, 'send')
     def test_with_pending_task(self, mock_send, mock_queue_get):
         user = self.create_user()
@@ -37,7 +38,7 @@ class SendPendingNotificationsTestCase(TransactionTestCase):
 
         mock_queue_get.side_effect = lambda: maybe_pop(pending)
 
-        celery.apply("freight.send_pending_notifications")
+        queue.apply('freight.jobs.send_pending_notifications')
 
         mock_send.assert_called_once_with(
             task=task,

@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from freight import vcs
-from freight.config import celery, db
+from freight.config import db, queue
 from freight.models import LogChunk, TaskStatus
 from freight.testutils import TransactionTestCase
 from freight.utils.workspace import Workspace
@@ -31,7 +31,7 @@ class ExecuteTaskTestCase(TransactionTestCase):
         else:
             vcs_backend.clone()
 
-        celery.apply("freight.execute_task", task_id=task.id)
+        queue.apply('freight.jobs.execute_task', kwargs={'task_id': task.id})
 
         db.session.expire_all()
 

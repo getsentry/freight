@@ -131,10 +131,10 @@ class AppUpdateTest(AppDetailsBase):
 
 
 class AppDeleteTest(AppDetailsBase):
-    @mock.patch('freight.config.celery.send_task')
-    def test_simple(self, mock_send_task):
+    @mock.patch('freight.config.queue.push')
+    def test_simple(self, mock_push):
         self.create_task(app=self.app, user=self.user)
         resp = self.client.delete(self.path)
         assert resp.status_code == 200
 
-        mock_send_task.assert_called_once_with('freight.delete_object', kwargs={'model': 'App', 'app_id': self.app.id})
+        mock_push.assert_called_once_with('freight.delete_object', kwargs={'model': 'App', 'app_id': self.app.id})
