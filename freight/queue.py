@@ -6,6 +6,8 @@ from redis import StrictRedis
 from rq import Worker, Queue as QueueType
 from time import sleep
 
+DEFAULT_JOB_TIMEOUT = 60 * 60 * 24  # one day
+
 
 def to_unix(datetime):
     return float(datetime.strftime('%s.%f'))
@@ -35,7 +37,7 @@ class Queue(object):
         queue = QueueType(self.get_queue_name(job_name), connection=self.connection)
         return queue.enqueue_call(
             job_name, args=args, kwargs=kwargs,
-            result_ttl=0, **opts
+            result_ttl=0, timeout=DEFAULT_JOB_TIMEOUT, **opts
         )
 
     def apply(self, job_name, args=(), kwargs={}, **opts):
@@ -45,7 +47,7 @@ class Queue(object):
         queue = QueueType(self.get_queue_name(job_name), connection=self.connection, async=False)
         return queue.enqueue_call(
             job_name, args=args, kwargs=kwargs,
-            result_ttl=0, **opts
+            result_ttl=0, timeout=DEFAULT_JOB_TIMEOUT, **opts
         )
 
     def job(self, *args, **kwargs):
