@@ -29,11 +29,15 @@ var CreateDeploy = React.createClass({
 
   onChangeApplication(e) {
     let val = jQuery(e.target).val();
+    let envList = val ? this.props.appList.filter((app) => {
+      return app.name === val;
+    })[0].environments || [] : [];
+    let env = envList.length ? envList[0] : null;
     this.setState({
       app: val,
-      envList: val ? this.props.appList.filter((app) => {
-        return app.name === val;
-      })[0].environments || [] : []
+      envList: envList,
+      env: env,
+      ref: env ? env.defaultRef : 'master',
     });
   },
 
