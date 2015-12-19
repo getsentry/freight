@@ -74,10 +74,15 @@ class Queue(object):
         if not listen:
             listen = self.config['queues']
 
-        return Worker([
-            QueueType(k, connection=self.connection)
-            for k in listen
-        ], default_worker_ttl=ONE_DAY, connection=self.connection)
+        return Worker(
+            [
+                QueueType(k, connection=self.connection)
+                for k in listen
+            ],
+            default_worker_ttl=ONE_DAY,
+            exception_handlers=(),
+            connection=self.connection,
+        )
 
 
 class Scheduler(object):
