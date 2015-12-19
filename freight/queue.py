@@ -6,6 +6,8 @@ from redis import StrictRedis
 from rq import Worker, Queue as QueueType
 from time import sleep
 
+ONE_DAY = 24 * 60 * 60
+
 
 def to_unix(datetime):
     return float(datetime.strftime('%s.%f'))
@@ -75,7 +77,7 @@ class Queue(object):
         return Worker([
             QueueType(k, connection=self.connection)
             for k in listen
-        ], connection=self.connection)
+        ], default_worker_ttl=ONE_DAY, connection=self.connection)
 
 
 class Scheduler(object):
