@@ -185,7 +185,7 @@ def configure_redis(app):
 
 
 def configure_queue(app):
-    queue.init_app(app, db)
+    queue.init_app(app, db, sentry)
 
 
 def configure_sentry(app):

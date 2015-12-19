@@ -14,7 +14,7 @@ def to_unix(datetime):
 
 
 class Queue(object):
-    def init_app(self, app, db):
+    def init_app(self, app, db, sentry):
         self.config = {
             'queues': app.config['QUEUES'],
             'routes': app.config['QUEUE_ROUTES'],
@@ -23,6 +23,7 @@ class Queue(object):
         }
         self.app = app
         self.db = db
+        self.sentry = sentry
 
         self.connection = StrictRedis.from_url(
             app.config['REDIS_URL'],
@@ -74,13 +75,26 @@ class Queue(object):
         if not listen:
             listen = self.config['queues']
 
+        def send_to_sentry(job, *exc_info):
+            self.sentry.captureException(
+                exc_info=exc_info,
+                extra={
+                    'job_id': job.id,
+                    'func': job.func_name,
+                    'args': job.args,
+                    'kwargs': job.kwargs,
+                    'description': job.description,
+                })
+
+        exception_handlers = [send_to_sentry]
+
         return Worker(
             [
                 QueueType(k, connection=self.connection)
                 for k in listen
             ],
             default_worker_ttl=ONE_DAY,
-            exception_handlers=(),
+            exception_handlers=exception_handlers,
             connection=self.connection,
         )
 
