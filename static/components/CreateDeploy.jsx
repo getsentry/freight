@@ -14,13 +14,14 @@ var CreateDeploy = React.createClass({
   getInitialState() {
     let appList = this.props.appList;
     let defaultApp = appList.length !== 0 ? appList[0] : null;
-    let defaultEnv = defaultApp ? defaultApp.environments[0] : null;
-    let defaultRef = defaultEnv ? defaultEnv.defaultRef : 'master';
+    let defaultEnv = defaultApp ? Object.keys(defaultApp.environments)[0] : null;
+    let envMap = defaultApp ? defaultApp.environments : {};
+    let defaultRef = defaultEnv ? envMap[defaultEnv].defaultRef : 'master';
 
     return {
       app: defaultApp ? defaultApp.name : null,
       env: defaultEnv ? defaultEnv.name : null,
-      envList: defaultApp ? defaultApp.environments : [],
+      envMap: envMap,
       ref: defaultRef,
       submitInProgress: false,
       submitError: null,
@@ -29,13 +30,14 @@ var CreateDeploy = React.createClass({
 
   onChangeApplication(e) {
     let val = jQuery(e.target).val();
-    let envList = val ? this.props.appList.filter((app) => {
+    let envMap = val ? this.props.appList.filter((app) => {
       return app.name === val;
-    })[0].environments || [] : [];
+    })[0].environments || {} : {};
+    let envList = Object.keys(envMap);
     let env = envList.length ? envList[0] : null;
     this.setState({
       app: val,
-      envList: envList,
+      envMap: envMap,
       env: env,
       ref: env ? env.defaultRef : 'master',
     });
@@ -43,17 +45,16 @@ var CreateDeploy = React.createClass({
 
   onChangeEnvironment(e) {
     let val = jQuery(e.target).val();
+    let config = val ? this.state.envMap[val] || {} : {};
     this.setState({
       env: val,
-      ref: val ? this.state.envList.filter((env) => {
-        return env.name === val;
-      })[0].defaultRef || 'master' : 'master'
+      ref: config.defaultRef || 'master',
     });
   },
 
   onChangeRef(e) {
     this.setState({
-      ref: jQuery(e.target).val()
+      ref: e.target.value,
     });
   },
 
@@ -124,8 +125,8 @@ var CreateDeploy = React.createClass({
               <select className="form-control"
                       value={this.state.env}
                       onChange={this.onChangeEnvironment}>
-                {this.state.envList.map((env) => {
-                  return <option key={env.name}>{env.name}</option>
+                {Object.keys(this.state.envMap).map((env) => {
+                  return <option key={env}>{env}</option>
                 })}
               </select>
             </div>

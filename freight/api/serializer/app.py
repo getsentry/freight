@@ -9,21 +9,19 @@ from .manager import add
 @add(App)
 class AppSerializer(Serializer):
     def serialize(self, item, attrs):
-        env_list = []
+        env_map = {}
         for env, env_data in item.environments.iteritems():
-            env_list.append({
-                'name': env,
-                'defaultRef': env_data.get('default_ref', 'master')
-            })
+            env_map[env] = {
+                'defaultRef': env_data.get('default_ref', 'master'),
+            }
 
-        if not env_list:
-            env_list.append({
-                'name': 'production',
+        if not env_map:
+            env_map['production'] = {
                 'defaultRef': 'master',
-            })
+            }
 
         return {
             'id': str(item.id),
             'name': item.name,
-            'environments': env_list,
+            'environments': env_map,
         }
