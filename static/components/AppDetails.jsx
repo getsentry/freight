@@ -3,6 +3,7 @@ var Router = require('react-router');
 
 var api = require('../api');
 
+import LoadingIndicator from './LoadingIndicator';
 var PollingMixin = require('../mixins/polling');
 var TaskSummary = require('./TaskSummary');
 
@@ -67,7 +68,7 @@ var AppDetails = React.createClass({
 
   render() {
     if (this.state.tasks === null || this.state.app === null) {
-      return <div className="loading" />;
+      return <LoadingIndicator />;
     }
 
     var {app, tasks} = this.state;

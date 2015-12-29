@@ -19,6 +19,8 @@ def parse_environments_config(value):
             )
 
         result[env_name] = {
-            'default_ref': data.get('default_ref', 'master'),
+            # TODO(dcramer): this is a mess, we should unify the API to just look
+            # like JSON
+            'default_ref': data.get('defaultRef', data.get('default_ref', 'master')),
         }
     return result

@@ -4,6 +4,7 @@ import Router from "react-router";
 
 import api from "../api";
 import Duration from "./Duration";
+import LoadingIndicator from './LoadingIndicator';
 import PollingMixin from "../mixins/polling";
 import TaskSummary from "./TaskSummary";
 import TimeSince from "./TimeSince";
@@ -259,8 +260,7 @@ var TaskDetails = React.createClass({
     if (this.state.loading) {
       return (
         <div style={{textAlign: "center"}}>
-          <div className="loading" style={{marginBottom: 20}} />
-          <p>Loading task details.</p>
+          <LoadingIndicator style={{marginBottom: 20}}>Loading task details.</LoadingIndicator>
         </div>
       );
     }

@@ -3,6 +3,7 @@ var React = require('react');
 var api = require('../api');
 
 var DeployChart = require("./DeployChart");
+import LoadingIndicator from './LoadingIndicator';
 var PollingMixin = require('../mixins/polling');
 var TaskSummary = require('./TaskSummary');
 
@@ -51,8 +52,9 @@ var Overview = React.createClass({
     if (this.state.tasks === null) {
       return (
         <div className="container" style={{textAlign: "center"}}>
-          <div className="loading" />
-          <p>Loading list of tasks.</p>
+          <LoadingIndicator>
+            <p>Loading list of tasks.</p>
+          </LoadingIndicator>
         </div>
       );
     }
