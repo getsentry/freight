@@ -16,14 +16,14 @@ RUN curl -sSL https://deb.nodesource.com/setup_0.12 -o setup_0.12 \
     && npm set progress=false
 
 COPY package.json /usr/src/app/
-RUN npm install \
-    && npm run postinstall
+RUN npm install
 
 COPY requirements.txt /usr/src/app/
 RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /usr/src/app
-RUN pip install --no-cache-dir -e .
+RUN node_modules/.bin/webpack -p \
+    && pip install --no-cache-dir -e .
 
 EXPOSE 5000
 
