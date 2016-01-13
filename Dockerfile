@@ -16,7 +16,8 @@ RUN curl -sSL https://deb.nodesource.com/setup_0.12 -o setup_0.12 \
     && npm set progress=false
 
 COPY package.json /usr/src/app/
-RUN npm install
+RUN npm install \
+    && npm run postinstall
 
 COPY requirements.txt /usr/src/app/
 RUN pip install --no-cache-dir -r requirements.txt
