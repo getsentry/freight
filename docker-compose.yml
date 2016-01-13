@@ -1,32 +1,24 @@
 redis:
-  image: redis:latest
+  image: redis
   command: redis-server --appendonly yes
 
-db:
-  image: postgres:latest
-  environment:
-    - POSTGRES_USER=freight
-  env_file: .env
+postgres:
+  image: postgres
 
 web:
   build: .
   links:
     - redis:redis
-    - db:db
+    - postgres:postgres
   ports:
     - 5000:5000
-  environment:
-    - PYTHONUNBUFFERED=1
   env_file: .env
-  command: bin/web --addr 0.0.0.0:5000
 
 worker:
   build: .
   links:
     - redis:redis
-    - db:db
-  environment:
-    - PYTHONUNBUFFERED=1
+    - postgres:postgres
   env_file: .env
-  command: bin/worker
+  command: bin/worker --no-debug
 
