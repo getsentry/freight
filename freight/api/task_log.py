@@ -60,7 +60,7 @@ class TaskLogApiView(ApiView, TaskMixin):
         else:
             next_offset = args.offset
 
-        links = self.build_cursor_link('next', next_offset)
+        links = [self.build_cursor_link('next', next_offset)]
 
         context = {
             'text': ''.join(l.text for l in logchunks),
