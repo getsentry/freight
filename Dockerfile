@@ -9,7 +9,6 @@ RUN curl -sSL https://deb.nodesource.com/setup_0.12 -o setup_0.12 \
     && bash setup_0.12 \
     && rm setup_0.12 \
     && apt-get install -y --no-install-recommends \
-        ca-certificates \
         nodejs \
         redis-server \
     && rm -rf /var/lib/apt/lists/* \
