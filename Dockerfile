@@ -11,6 +11,7 @@ RUN curl -sSL https://deb.nodesource.com/setup_0.12 -o setup_0.12 \
     && apt-get install -y --no-install-recommends \
         ca-certificates \
         nodejs \
+        redis-server \
     && rm -rf /var/lib/apt/lists/* \
     && npm install -g npm@2.14.15 \
     && npm set progress=false
