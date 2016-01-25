@@ -5,6 +5,11 @@ ENV PYTHONUNBUFFERED 1
 RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        unzip \
+        zip \
+    && rm -rf /var/lib/apt/lists/*
+
 # gpg keys listed at https://github.com/nodejs/node
 RUN set -ex \
   && for key in \
