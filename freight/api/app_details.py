@@ -109,6 +109,6 @@ class AppDetailsApiView(ApiView):
         if app is None:
             return self.error('Invalid app', name='invalid_resource', status_code=404)
 
-        queue.push('freight.delete_object', kwargs={'model': 'App', 'app_id': app.id})
+        queue.push('freight.jobs.delete_object', kwargs={'model': 'App', 'app_id': app.id})
 
         return self.respond({"id": str(app.id)})
