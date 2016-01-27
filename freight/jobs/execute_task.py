@@ -241,6 +241,13 @@ class TaskRunner(object):
         ).scalar()
         return cur_status == TaskStatus.cancelled
 
+    def _should_read_timeout(self):
+        if not self._logreporter.last_recv:
+            return False
+        if not self.read_timeout:
+            return False
+        return self._logreporter.last_recv < time() - self.read_timeout
+
     def wait(self):
         assert self._process is not None, 'TaskRunner not started'
         while self.active and self._process.poll() is None:
@@ -248,7 +255,7 @@ class TaskRunner(object):
                 self._cancel()
             elif self.timeout and time() > self._started + self.timeout:
                 self._timeout()
-            elif self._logreporter.last_recv and self._logreporter.last_recv < time() - self.read_timeout:
+            elif self._should_read_timeout():
                 self._read_timeout()
             if self._process.poll() is None:
                 sleep(0.1)
