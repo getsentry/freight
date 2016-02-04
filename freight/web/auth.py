@@ -61,6 +61,11 @@ class AuthorizedView(MethodView):
         flow = get_auth_flow(redirect_uri=redirect_uri)
         resp = flow.step2_exchange(request.args['code'])
 
+        if current_app.config['ALLOWED_USERS']:
+            if resp.id_token['email'] not in current_app.config['ALLOWED_USERS']:
+                return "Forbidden", 403
+
+
         if current_app.config['GOOGLE_DOMAIN']:
             if resp.id_token.get('hd') != current_app.config['GOOGLE_DOMAIN']:
                 # TODO(dcramer): this should show some kind of error
@@ -76,11 +81,6 @@ class AuthorizedView(MethodView):
 
         session['uid'] = user.id
         session['access_token'] = resp.access_token
-
-        if current_app.config['ALLOWED_USERS']:
-            if resp.id_token['email'] not in current_app.config['ALLOWED_USERS']:
-                return "Forbidden", 403
-
         session['email'] = resp.id_token['email']
 
         return redirect(url_for(self.complete_url))
