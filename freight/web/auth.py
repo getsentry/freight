@@ -76,6 +76,11 @@ class AuthorizedView(MethodView):
 
         session['uid'] = user.id
         session['access_token'] = resp.access_token
+
+        if current_app.config['ALLOWED_USERS']:
+            if resp.id_token['email'] not in current_app.config['ALLOWED_USERS']:
+                return "Forbidden", 403
+
         session['email'] = resp.id_token['email']
 
         return redirect(url_for(self.complete_url))
