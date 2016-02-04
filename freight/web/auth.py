@@ -63,6 +63,7 @@ class AuthorizedView(MethodView):
 
         if current_app.config['ALLOWED_USERS']:
             if resp.id_token['email'] not in current_app.config['ALLOWED_USERS']:
+                session.clear()
                 return "Forbidden", 403
 
 
