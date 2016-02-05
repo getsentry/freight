@@ -64,7 +64,7 @@ class AuthorizedView(MethodView):
         if current_app.config.get('WHITELISTED_USERS'):
             if resp.id_token['email'] not in current_app.config['WHITELISTED_USERS']:
                 session.clear()
-                return "Forbidden", 403
+                return redirect(url_for(self.complete_url))
 
 
         if current_app.config['GOOGLE_DOMAIN']:
