@@ -61,8 +61,8 @@ class AuthorizedView(MethodView):
         flow = get_auth_flow(redirect_uri=redirect_uri)
         resp = flow.step2_exchange(request.args['code'])
 
-        if current_app.config['ALLOWED_USERS']:
-            if resp.id_token['email'] not in current_app.config['ALLOWED_USERS']:
+        if current_app.config['WHITELISTED_USERS']:
+            if resp.id_token['email'] not in current_app.config['WHITELISTED_USERS']:
                 session.clear()
                 return "Forbidden", 403
 
