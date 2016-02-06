@@ -4,8 +4,11 @@ from flask_restful import reqparse
 
 from freight.api.base import ApiView
 from freight.api.serializer import serialize
-from freight.config import db
+from freight.config import db, redis
 from freight.models import App, Task, TaskStatus
+from freight.notifiers import NotifierEvent
+from freight.notifiers.utils import send_task_notifications
+from freight.utils.redis import lock
 
 
 class TaskMixin(object):
@@ -45,12 +48,20 @@ class TaskDetailsApiView(ApiView, TaskMixin):
         if task is None:
             return self.error('Invalid task', name='invalid_resource', status_code=404)
 
-        args = self.put_parser.parse_args()
-        if args.status:
-            assert task.status in (TaskStatus.pending, TaskStatus.in_progress)
-            assert args.status == 'cancelled'
-            task.status = TaskStatus.cancelled
-        db.session.add(task)
-        db.session.commit()
+        with lock(redis, 'task:{}'.format(task.id), timeout=5):
+            # we have to refetch in order to ensure lock state changes
+            task = Task.query.get(task.id)
+            args = self.put_parser.parse_args()
+            if args.status:
+                assert task.status in (TaskStatus.pending, TaskStatus.in_progress)
+                assert args.status == 'cancelled'
+                did_cancel = task.status == TaskStatus.pending
+                task.status = TaskStatus.cancelled
+
+            db.session.add(task)
+            db.session.commit()
+
+        if args.status and did_cancel:
+            send_task_notifications(task, NotifierEvent.TASK_FINISHED)
 
         return self.respond(serialize(task))

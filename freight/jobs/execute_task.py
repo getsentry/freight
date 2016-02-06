@@ -11,9 +11,10 @@ from time import sleep, time
 
 from freight.notifiers import NotifierEvent
 from freight.notifiers.utils import send_task_notifications
-from freight.config import db, queue
+from freight.config import db, queue, redis
 from freight.constants import PROJECT_ROOT
 from freight.models import LogChunk, Task, TaskStatus
+from freight.utils.redis import lock
 
 
 @queue.job()
@@ -21,14 +22,20 @@ def execute_task(task_id):
     logging.debug('ExecuteTask fired with %d active thread(s)',
                   threading.active_count())
 
-    task = Task.query.get(task_id)
-    if not task:
-        logging.warning('ExecuteTask fired with missing Task(id=%s)', task_id)
-        return
+    with lock(redis, 'task:{}'.format(task_id), timeout=5):
+        task = Task.query.get(task_id)
+        if not task:
+            logging.warning('ExecuteTask fired with missing Task(id=%s)', task_id)
+            return
 
-    if task.status not in (TaskStatus.pending, TaskStatus.in_progress):
-        logging.warning('ExecuteTask fired with finished Task(id=%s)', task_id)
-        return
+        if task.status not in (TaskStatus.pending, TaskStatus.in_progress):
+            logging.warning('ExecuteTask fired with finished Task(id=%s)', task_id)
+            return
+
+        task.date_started = datetime.utcnow()
+        task.status = TaskStatus.in_progress
+        db.session.add(task)
+        db.session.commit()
 
     send_task_notifications(task, NotifierEvent.TASK_STARTED)
 
@@ -193,12 +200,13 @@ class TaskRunner(object):
 
         self._logreporter.save_chunk('>> Process exceeded time limit of %ds\n' % self.timeout)
 
-        # TODO(dcramer): ideally we could just send the signal to the subprocess
-        # so it can still manage the failure state
-        self.task.status = TaskStatus.failed
-        self.task.date_finished = datetime.utcnow()
-        db.session.add(self.task)
-        db.session.commit()
+        with lock(redis, 'task:{}'.format(self.task.id), timeout=5):
+            # TODO(dcramer): ideally we could just send the signal to the subprocess
+            # so it can still manage the failure state
+            self.task.status = TaskStatus.failed
+            self.task.date_finished = datetime.utcnow()
+            db.session.add(self.task)
+            db.session.commit()
 
     def _read_timeout(self):
         logging.error('Task(id=%s) did not receive any updates in %ds', self.task.id, self.read_timeout)
@@ -210,12 +218,13 @@ class TaskRunner(object):
 
         self._logreporter.save_chunk('>> Process did not receive updates in %ds\n' % self.read_timeout)
 
-        # TODO(dcramer): ideally we could just send the signal to the subprocess
-        # so it can still manage the failure state
-        self.task.status = TaskStatus.failed
-        self.task.date_finished = datetime.utcnow()
-        db.session.add(self.task)
-        db.session.commit()
+        with lock(redis, 'task:{}'.format(self.task.id), timeout=5):
+            # TODO(dcramer): ideally we could just send the signal to the subprocess
+            # so it can still manage the failure state
+            self.task.status = TaskStatus.failed
+            self.task.date_finished = datetime.utcnow()
+            db.session.add(self.task)
+            db.session.commit()
 
     def _cancel(self):
         logging.error('Task(id=%s) was cancelled', self.task.id)
@@ -227,11 +236,12 @@ class TaskRunner(object):
 
         self._logreporter.save_chunk('>> Task was cancelled\n')
 
-        # TODO(dcramer): ideally we could just send the signal to the subprocess
-        # so it can still manage the failure state
-        self.task.date_finished = datetime.utcnow()
-        db.session.add(self.task)
-        db.session.commit()
+        with lock(redis, 'task:{}'.format(self.task.id), timeout=5):
+            # TODO(dcramer): ideally we could just send the signal to the subprocess
+            # so it can still manage the failure state
+            self.task.date_finished = datetime.utcnow()
+            db.session.add(self.task)
+            db.session.commit()
 
     def _is_cancelled(self):
         cur_status = db.session.query(
