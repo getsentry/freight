@@ -67,3 +67,11 @@ def send_task_notifications(task, event):
                 config=data['config'],
                 event=event,
             )
+
+
+def clear_task_notifications(task):
+    for data in task.notifiers:
+        queue.remove(
+            task=task,
+            type=data['type'],
+        )

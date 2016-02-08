@@ -34,6 +34,15 @@ class NotificationQueue(object):
         })
         pipe.execute()
 
+    def remove(self, task, type):
+        key = '{}:data:{}:{}'.format(self.prefix, type, task.id)
+        pipe = self.conn.pipeline()
+        # the score represents the time enqueued, thus the debounce time
+        # can be controlled after the fact
+        pipe.zrem('{}:queue'.format(self.prefix), key)
+        pipe.rem(key)
+        pipe.execute()
+
     def get(self):
         """
         Fetches and removes a due item from the queue.
