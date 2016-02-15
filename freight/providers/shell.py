@@ -31,4 +31,4 @@ class ShellProvider(Provider):
             task=task,
             ssh_key=ssh_key.name if ssh_key else '~/.ssh/id_rsa',
         )
-        return workspace.run(command, env=task.provider_config.get('env'))
+        return workspace.run(['bash', '-c', command], env=task.provider_config.get('env'))
