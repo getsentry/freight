@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from freight.models import App
+from freight.models import App, Repository
 
 from .base import Serializer
 from .manager import add
@@ -20,8 +20,14 @@ class AppSerializer(Serializer):
                 'defaultRef': 'master',
             }
 
+        if item.repository_id:
+            repo = Repository.query.filter(Repository.id == item.repository_id).first().url
+        else:
+            repo = None
+
         return {
             'id': str(item.id),
             'name': item.name,
             'environments': env_map,
+            'repository': repo,
         }
