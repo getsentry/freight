@@ -2,22 +2,10 @@ from __future__ import absolute_import
 
 from datetime import datetime
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
-from sqlalchemy.schema import Index, UniqueConstraint
+from sqlalchemy.schema import Index
 
 from freight.config import db
 from freight.db.types.json import JSONEncodedDict
-
-
-class TaskName(object):
-    deploy = 'deploy'
-
-    @classmethod
-    def get_label(cls, status):
-        return status
-
-    @classmethod
-    def label_to_id(cls, label):
-        return getattr(cls, label)
 
 
 class TaskStatus(object):
@@ -55,18 +43,15 @@ class Task(db.Model):
     __table_args__ = (
         Index('idx_task_app_id', 'app_id'),
         Index('idx_task_user_id', 'user_id'),
-        UniqueConstraint('app_id', 'environment', 'number', name='unq_task_number'),
     )
 
     id = Column(Integer, primary_key=True)
     app_id = Column(Integer, ForeignKey('app.id', ondelete="CASCADE"),
                     nullable=False)
-    number = Column(Integer, nullable=False)
     user_id = Column(Integer, ForeignKey('user.id', ondelete="CASCADE"),
                      nullable=False)
     ref = Column(String(128), nullable=False)
     sha = Column(String(40))
-    environment = Column(String(64), nullable=False, default='production')
     provider = Column(String(64), nullable=False)
     status = Column(Integer, nullable=False)
     params = Column(JSONEncodedDict, nullable=True)

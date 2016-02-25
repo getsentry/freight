@@ -17,7 +17,8 @@ var routes = (
     <Route path="/deploy" name="createDeploy" handler={CreateDeploy} />
     <Route path="/tasks/:app/:env/:number" name="taskDetailsLegacy" handler={TaskDetails} />
     <Route path="/:app/settings" name="appSettings" handler={AppSettings} />
-    <Route path="/:app/:env/:number" name="taskDetails" handler={TaskDetails} />
+    <Route path="/:app/:env/:number" name="deployDetailsLegancy" handler={TaskDetails} />
+    <Route path="/deploys/:app/:env/:number" name="deployDetails" handler={TaskDetails} />
     <Route path="/:app" name="appDetails" handler={AppDetails} />
     <Router.NotFoundRoute handler={RouteNotFound} />
   </Route>

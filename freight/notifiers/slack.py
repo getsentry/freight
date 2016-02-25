@@ -16,21 +16,21 @@ class SlackNotifier(Notifier):
             'webhook_url': {'required': True},
         }
 
-    def send(self, task, config, event):
+    def send_deploy(self, deploy, task, config, event):
         webhook_url = config['webhook_url']
 
-        app = App.query.get(task.app_id)
+        app = App.query.get(deploy.app_id)
 
         params = {
-            'number': task.number,
+            'number': deploy.number,
             'app_name': app.name,
             'params': dict(task.params or {}),
-            'env': task.environment,
+            'env': deploy.environment,
             'ref': task.ref,
             'sha': task.sha[:7] if task.sha else task.ref,
             'status_label': task.status_label,
             'duration': task.duration,
-            'link': http.absolute_uri('/{}/{}/{}'.format(app.name, task.environment, task.number)),
+            'link': http.absolute_uri('/deploys/{}/{}/{}'.format(app.name, deploy.environment, deploy.number)),
         }
 
         # TODO(dcramer): show the ref when it differs from the sha

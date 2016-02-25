@@ -15,6 +15,7 @@ class ShellProviderBase(TestCase):
         self.repo = self.create_repo()
         self.app = self.create_app(repository=self.repo)
         self.task = self.create_task(app=self.app, user=self.user)
+        self.deploy = self.create_deploy(app=self.app, task=self.task)
 
 
 class ShellProviderTest(ShellProviderBase):
@@ -22,8 +23,8 @@ class ShellProviderTest(ShellProviderBase):
         self.task.data['provider_config'] = {
             'command': 'env={environment} task={params[task]} ref={ref} sha={sha} ssh_key={ssh_key}'
         }
-        result = self.provider.get_command(self.task, 'id_rsa').split(' ')
-        assert 'env={}'.format(self.task.environment) in result
+        result = self.provider.get_command(self.deploy, self.task, 'id_rsa').split(' ')
+        assert 'env={}'.format(self.deploy.environment) in result
         assert 'ref={}'.format(self.task.ref) in result
         assert 'sha={}'.format(self.task.sha) in result
         assert 'task={}'.format(self.task.params['task']) in result

@@ -6,7 +6,7 @@ from uuid import uuid4
 
 from freight.config import db
 from freight.constants import PROJECT_ROOT
-from freight.models import App, Repository, Task, TaskSequence, TaskStatus, User
+from freight.models import App, Repository, Task, DeploySequence, Deploy, TaskStatus, User
 
 
 class Fixtures(object):
@@ -44,7 +44,6 @@ class Fixtures(object):
     def create_task(self, app, user, **kwargs):
         kwargs.setdefault('provider', 'shell')
         kwargs.setdefault('ref', 'master')
-        kwargs.setdefault('environment', 'production')
         kwargs.setdefault('sha', 'HEAD')
         kwargs.setdefault('status', TaskStatus.in_progress)
         kwargs.setdefault('data', {'provider_config': app.provider_config})
@@ -53,13 +52,26 @@ class Fixtures(object):
         task = Task(
             app_id=app.id,
             user_id=user.id,
-            number=TaskSequence.get_clause(app.id, kwargs['environment']),
             **kwargs
         )
         db.session.add(task)
         db.session.commit()
 
         return task
+
+    def create_deploy(self, task, app, **kwargs):
+        kwargs.setdefault('environment', 'production')
+
+        deploy = Deploy(
+            task_id=task.id,
+            app_id=app.id,
+            number=DeploySequence.get_clause(app.id, kwargs['environment']),
+            **kwargs
+        )
+        db.session.add(deploy)
+        db.session.commit()
+
+        return deploy
 
     def create_repo(self, **kwargs):
         kwargs.setdefault('url', PROJECT_ROOT)

@@ -14,7 +14,7 @@ class SentryNotifier(Notifier):
             'webhook_url': {'required': True},
         }
 
-    def should_send(self, task, config, event):
+    def should_send_deploy(self, deploy, task, config, event):
         if event == NotifierEvent.TASK_STARTED:
             return True
 
@@ -23,23 +23,23 @@ class SentryNotifier(Notifier):
 
         return False
 
-    def send(self, task, config, event):
+    def send_deploy(self, deploy, task, config, event):
         webhook_url = config['webhook_url']
 
-        app = App.query.get(task.app_id)
+        app = App.query.get(deploy.app_id)
 
         payload = {
-            'number': task.number,
+            'number': deploy.number,
             'app_name': app.name,
             'params': dict(task.params or {}),
-            'env': task.environment,
+            'env': deploy.environment,
             'ref': task.ref,
             'sha': task.sha,
             'duration': task.duration,
             'event': 'started' if event == NotifierEvent.TASK_STARTED else 'finished',
             'dateStarted': task.date_started.isoformat() + 'Z' if task.date_started else None,
             'dateFinished': task.date_finished.isoformat() + 'Z' if task.date_finished else None,
-            'link': http.absolute_uri('/tasks/{}/{}/{}/'.format(app.name, task.environment, task.number)),
+            'link': http.absolute_uri('/deploys/{}/{}/{}/'.format(app.name, deploy.environment, deploy.number)),
         }
 
         http.post(webhook_url, json=payload)

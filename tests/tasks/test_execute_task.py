@@ -14,6 +14,7 @@ class ExecuteTaskTestCase(TransactionTestCase):
         repo = self.create_repo()
         app = self.create_app(repository=repo)
         task = self.create_task(app=app, user=user)
+        deploy = self.create_deploy(app=app, task=task)
         db.session.commit()
 
         workspace = Workspace(
@@ -31,7 +32,7 @@ class ExecuteTaskTestCase(TransactionTestCase):
         else:
             vcs_backend.clone()
 
-        queue.apply('freight.jobs.execute_task', kwargs={'task_id': task.id})
+        queue.apply('freight.jobs.execute_deploy', kwargs={'deploy_id': deploy.id})
 
         db.session.expire_all()
 

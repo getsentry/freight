@@ -68,7 +68,7 @@ var CreateDeploy = React.createClass({
     this.setState({
       submitInProgress: true,
     }, () => {
-      api.request('/tasks/', {
+      api.request('/deploys/', {
         method: 'POST',
         data: {
           app: this.state.app,
@@ -76,7 +76,7 @@ var CreateDeploy = React.createClass({
           ref: this.state.ref
         },
         success: (data) => {
-          this.gotoTask(data);
+          this.gotoDeploy(data);
         },
         error: (response) => {
           this.setState({
@@ -88,11 +88,11 @@ var CreateDeploy = React.createClass({
     });
   },
 
-  gotoTask(task) {
-    this.transitionTo('taskDetails', {
-      app: task.app.name,
-      env: task.environment,
-      number: task.number
+  gotoDeploy(deploy) {
+    this.transitionTo('deployDetails', {
+      app: deploy.app.name,
+      env: deploy.environment,
+      number: deploy.number
     });
   },
 

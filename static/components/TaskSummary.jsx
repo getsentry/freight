@@ -59,7 +59,7 @@ var TaskSummary = React.createClass({
       e.preventDefault();
     }
 
-    this.transitionTo('taskDetails', {
+    this.transitionTo('deployDetails', {
       app: this.props.task.app.name,
       env: this.props.task.environment,
       number: this.props.task.number
@@ -68,7 +68,7 @@ var TaskSummary = React.createClass({
 
   render() {
     var task = this.props.task;
-    var className = 'task';
+    var className = 'deploy';
     if (this.taskInProgress(task)) {
       className += ' active';
     } else {

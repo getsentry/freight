@@ -104,7 +104,7 @@ var TaskDetails = React.createClass({
 
   getPollingUrl() {
     var params = this.getParams();
-    return '/tasks/' + params.app + '/' + params.env + '/' + params.number + '/';
+    return '/deploys/' + params.app + '/' + params.env + '/' + params.number + '/';
   },
 
   pollingReceiveData(data) {
@@ -156,7 +156,7 @@ var TaskDetails = React.createClass({
   pollLog() {
     var task = this.state.task;
 
-    var url = '/tasks/' + task.app.name + '/' + task.environment + '/' + task.number + '/log/?offset=' + this.state.logNextOffset;
+    var url = '/deploys/' + task.app.name + '/' + task.environment + '/' + task.number + '/log/?offset=' + this.state.logNextOffset;
 
     api.request(url, {
       success: (data) => {
@@ -185,7 +185,7 @@ var TaskDetails = React.createClass({
   cancelTask() {
     var task = this.state.task;
 
-    var url = '/tasks/' + task.app.name + '/' + task.environment + '/' + task.number + '/';
+    var url = '/deploys/' + task.app.name + '/' + task.environment + '/' + task.number + '/';
 
     api.request(url, {
       method: "PUT",
@@ -198,7 +198,7 @@ var TaskDetails = React.createClass({
         });
       },
       error: () => {
-        alert("Unable to cancel task.");
+        alert("Unable to cancel deploy.");
       }
     });
   },
@@ -223,7 +223,7 @@ var TaskDetails = React.createClass({
     }, () => {
       let task = this.state.task;
 
-      api.request('/tasks/', {
+      api.request('/deploys/', {
         method: 'POST',
         data: {
           app: task.app.name,
@@ -231,7 +231,7 @@ var TaskDetails = React.createClass({
           ref: task.sha,
         },
         success: (data) => {
-          this.transitionTo('taskDetails', {
+          this.transitionTo('deployDetails', {
             app: data.app.name,
             env: data.environment,
             number: data.number
@@ -273,7 +273,7 @@ var TaskDetails = React.createClass({
       liveScrollClassName += " btn-active";
     }
 
-    let className = 'task-details';
+    let className = 'deploy-details';
     if (inProgress) {
       className += ' active';
     } else {
@@ -287,7 +287,7 @@ var TaskDetails = React.createClass({
 
     return (
       <div className={className}>
-        <div className="task-log">
+        <div className="deploy-log">
           {this.state.logLoading ?
             <div style={{textAlign: "center"}}>
               <div className="loading" />
@@ -301,7 +301,7 @@ var TaskDetails = React.createClass({
           }
         </div>
 
-        <div className="task-header">
+        <div className="deploy-header">
           <div className="container">
             <h3>{task.name}</h3>
             <div className="ref">
@@ -324,9 +324,9 @@ var TaskDetails = React.createClass({
           </div>
         </div>
 
-        <div className="task-footer">
+        <div className="deploy-footer">
           <div className="container">
-            <div className="task-actions">
+            <div className="deploy-actions">
               {inProgress ?
                 <span>
                   <a className="btn btn-danger btn-sm"
@@ -344,7 +344,7 @@ var TaskDetails = React.createClass({
                    onClick={this.reDeploy}>Re-deploy</a>
               }
             </div>
-            <div className="task-progress">
+            <div className="deploy-progress">
               <Progress value={this.getEstimatedProgress(task)} />
             </div>
           </div>

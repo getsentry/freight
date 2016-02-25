@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from freight.models import Deploy
+
 __all__ = ['Notifier', 'NotifierEvent']
 
 
@@ -27,7 +29,18 @@ class Notifier(object):
         return {}
 
     def send(self, task, config, event):
+        # TODO(mattrobenolt): Split this out into send_deploy, send_x
+        # since we want different notifications for different tasks,
+        # and remove this shim. For now, we there are only deploys
+        deploy = Deploy.query.filter(Deploy.task_id == task.id).first()
+        return self.send_deploy(deploy, task, config, event)
+
+    def send_deploy(self, deploy, task, config, event):
         raise NotImplementedError
 
     def should_send(self, task, config, event):
+        deploy = Deploy.query.filter(Deploy.task_id == task.id).first()
+        return self.should_send_deploy(deploy, task, config, event)
+
+    def should_send_deploy(self, deploy, task, config, event):
         return event in config.get('events', self.DEFAULT_EVENTS)
