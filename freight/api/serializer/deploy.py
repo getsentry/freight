@@ -52,6 +52,7 @@ class DeploySerializer(Serializer):
 
             attrs[item] = {
                 'app': apps[item.app_id],
+                'task': tasks[item.task_id],
                 'user': user_map.get(tasks[item.task_id].user_id),
                 'estimatedDuration': estimatedDuration,
             }
@@ -59,8 +60,7 @@ class DeploySerializer(Serializer):
 
     def serialize(self, item, attrs):
         app = attrs['app']
-
-        task = Task.query.filter(Task.id == item.task_id).first()
+        task = attrs['task']
 
         return {
             'id': str(item.id),
