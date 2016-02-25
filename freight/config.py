@@ -165,6 +165,8 @@ def configure_api(app):
     api.add_resource(AppIndexApiView, '/apps/')
     api.add_resource(AppDetailsApiView, '/apps/<app>/')
     api.add_resource(StatsApiView, '/stats/')
+    api.add_resource(DeployIndexApiView, '/tasks/',
+                     endpoint='deploy-index-deprecated')
     api.add_resource(DeployIndexApiView, '/deploys/')
 
     # old style
@@ -172,6 +174,10 @@ def configure_api(app):
     api.add_resource(DeployLogApiView, '/deploys/<deploy_id>/log/')
 
     # new style
+    api.add_resource(DeployDetailsApiView, '/tasks/<app>/<env>/<number>/',
+                     endpoint='deploy-details-deprecated')
+    api.add_resource(DeployLogApiView, '/tasks/<app>/<env>/<number>/log/',
+                     endpoint='deploy-log-deprecated')
     api.add_resource(DeployDetailsApiView, '/deploys/<app>/<env>/<number>/',
                      endpoint='deploy-details')
     api.add_resource(DeployLogApiView, '/deploys/<app>/<env>/<number>/log/',
