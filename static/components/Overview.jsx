@@ -16,7 +16,7 @@ var Overview = React.createClass({
 
   getInitialState() {
     return {
-      tasks: null,
+      deploys: null,
     };
   },
 
@@ -24,53 +24,53 @@ var Overview = React.createClass({
     api.request(this.getPollingUrl(), {
       success: (data) => {
         this.setState({
-          tasks: data
+          deploys: data
         });
       }
     });
   },
 
   getPollingUrl() {
-    return '/tasks/';
+    return '/deploys/';
   },
 
   pollingReceiveData(data) {
     this.setState({
-      tasks: data
+      deploys: data
     });
   },
 
-  taskInProgress(task) {
-    return task.status == 'in_progress';
+  deployInProgress(deploy) {
+    return deploy.status == 'in_progress';
   },
 
-  taskPending(task) {
-    return task.status == 'pending';
+  deployPending(deploy) {
+    return deploy.status == 'pending';
   },
 
   render() {
-    if (this.state.tasks === null) {
+    if (this.state.deploys === null) {
       return (
         <div className="container" style={{textAlign: "center"}}>
           <LoadingIndicator>
-            <p>Loading list of tasks.</p>
+            <p>Loading list of deploys.</p>
           </LoadingIndicator>
         </div>
       );
     }
 
-    var activeTaskNodes = [];
-    var pendingTaskNodes = [];
-    var previousTaskNodes = [];
+    var activedeployNodes = [];
+    var pendingdeployNodes = [];
+    var previousdeployNodes = [];
 
-    this.state.tasks.forEach((task) => {
-      var node = <TaskSummary key={task.id} task={task} />;
-      if (this.taskInProgress(task)) {
-        activeTaskNodes.unshift(node);
-      } else if (this.taskPending(task)) {
-        pendingTaskNodes.unshift(node);
+    this.state.deploys.forEach((deploy) => {
+      var node = <TaskSummary key={deploy.id} task={deploy} />;
+      if (this.deployInProgress(deploy)) {
+        activedeployNodes.unshift(node);
+      } else if (this.deployPending(deploy)) {
+        pendingdeployNodes.unshift(node);
       } else {
-        previousTaskNodes.push(node);
+        previousdeployNodes.push(node);
       }
     });
 
@@ -80,13 +80,13 @@ var Overview = React.createClass({
           <div className="section-header">
             <h2>Active Deploys</h2>
           </div>
-          {(activeTaskNodes.length || pendingTaskNodes.length) ?
-            <div className="task-list">
-              {activeTaskNodes}
-              {pendingTaskNodes}
+          {(activedeployNodes.length || pendingdeployNodes.length) ?
+            <div className="deploy-list">
+              {activedeployNodes}
+              {pendingdeployNodes}
             </div>
           :
-            <p>There are no active tasks.</p>
+            <p>There are no active deploys.</p>
           }
         </div>
 
@@ -97,12 +97,12 @@ var Overview = React.createClass({
 
           <DeployChart />
 
-          {previousTaskNodes.length ?
-            <div className="task-list">
-              {previousTaskNodes}
+          {previousdeployNodes.length ?
+            <div className="deploy-list">
+              {previousdeployNodes}
             </div>
           :
-            <p>There are no historical tasks.</p>
+            <p>There are no historical deploys.</p>
           }
         </div>
       </div>

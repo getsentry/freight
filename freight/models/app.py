@@ -84,20 +84,20 @@ class App(db.Model):
         return data.get('default_ref', DEFAULT_REF)
 
     def get_current_sha(self, env):
-        from freight.models import Task, TaskStatus
+        from freight.models import Task, Deploy, TaskStatus
 
         return db.session.query(
             Task.sha,
         ).filter(
             Task.app_id == self.id,
-            Task.environment == env,
+            Deploy.environment == env,
             Task.status == TaskStatus.finished,
         ).order_by(
-            Task.number.desc(),
+            Deploy.number.desc(),
         ).limit(1).scalar()
 
     def get_previous_sha(self, env, current_sha=None):
-        from freight.models import Task, TaskStatus
+        from freight.models import Task, Deploy, TaskStatus
 
         if current_sha is None:
             current_sha = self.get_current_sha(env)
@@ -109,9 +109,9 @@ class App(db.Model):
             Task.sha,
         ).filter(
             Task.app_id == self.id,
-            Task.environment == env,
+            Deploy.environment == env,
             Task.status == TaskStatus.finished,
             Task.sha != current_sha,
         ).order_by(
-            Task.number.desc(),
+            Deploy.number.desc(),
         ).limit(1).scalar()

@@ -13,23 +13,24 @@ from freight.notifiers import NotifierEvent
 from freight.notifiers.utils import send_task_notifications
 from freight.config import db, queue, redis
 from freight.constants import PROJECT_ROOT
-from freight.models import LogChunk, Task, TaskStatus
+from freight.models import LogChunk, Task, Deploy, TaskStatus
 from freight.utils.redis import lock
 
 
 @queue.job()
-def execute_task(task_id):
-    logging.debug('ExecuteTask fired with %d active thread(s)',
+def execute_deploy(deploy_id):
+    logging.debug('ExecuteDeploy fired with %d active thread(s)',
                   threading.active_count())
 
-    with lock(redis, 'task:{}'.format(task_id), timeout=5):
-        task = Task.query.get(task_id)
+    with lock(redis, 'deploy:{}'.format(deploy_id), timeout=5):
+        deploy = Deploy.query.get(deploy_id)
+        task = Task.query.get(deploy.task_id)
         if not task:
-            logging.warning('ExecuteTask fired with missing Task(id=%s)', task_id)
+            logging.warning('ExecuteDeploy fired with missing Deploy(id=%s)', deploy_id)
             return
 
         if task.status not in (TaskStatus.pending, TaskStatus.in_progress):
-            logging.warning('ExecuteTask fired with finished Task(id=%s)', task_id)
+            logging.warning('ExecuteDeploy fired with finished Deploy(id=%s)', deploy_id)
             return
 
         task.date_started = datetime.utcnow()

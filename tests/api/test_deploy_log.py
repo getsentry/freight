@@ -7,17 +7,18 @@ from freight.models import LogChunk
 from freight.testutils import TestCase
 
 
-class TaskLogBase(TestCase):
+class DeployLogBase(TestCase):
     def setUp(self):
         self.user = self.create_user()
         self.repo = self.create_repo()
         self.app = self.create_app(repository=self.repo)
         self.task = self.create_task(app=self.app, user=self.user)
-        self.path = '/api/0/tasks/{}/log/'.format(self.task.id)
-        self.alt_path = '/api/0/tasks/{}/{}/{}/log/'.format(
+        self.deploy = self.create_deploy(app=self.app, task=self.task)
+        self.path = '/api/0/deploys/{}/log/'.format(self.deploy.id)
+        self.alt_path = '/api/0/deploys/{}/{}/{}/log/'.format(
             self.app.name,
-            self.task.environment,
-            self.task.number,
+            self.deploy.environment,
+            self.deploy.number,
         )
 
         offset = 0
@@ -31,10 +32,10 @@ class TaskLogBase(TestCase):
             offset += len(char)
         db.session.commit()
 
-        super(TaskLogBase, self).setUp()
+        super(DeployLogBase, self).setUp()
 
 
-class TaskLogTest(TaskLogBase):
+class DeployLogTest(DeployLogBase):
     def test_simple(self):
         resp = self.client.get(self.path)
         assert resp.status_code == 200

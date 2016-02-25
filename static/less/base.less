@@ -194,16 +194,16 @@ header {
   margin-bottom: 20px;
 }
 
-.task-list {
+.deploy-list {
     padding-left: 0;
     list-style: none;
 
-    > .task {
+    > .deploy {
       margin-bottom: 3px;
     }
 }
 
-.task {
+.deploy {
     .clearfix();
     padding: 15px;
     background: @lessDark;
@@ -272,11 +272,11 @@ header {
 }
 
 
-.task-details {
+.deploy-details {
   padding-top: 40px;
   padding-bottom: 30px;
 
-  .task-header {
+  .deploy-header {
     z-index: 1000;
     background: @lessDark;
     color: @light;
@@ -314,11 +314,11 @@ header {
     }
   }
 
-  &.finished .task-header .container {
+  &.finished .deploy-header .container {
     padding-left: 32px;
   }
 
-  &.finished .task-header .container h3:before {
+  &.finished .deploy-header .container h3:before {
     content: "";
     width: 8px;
     border-radius: 4px;
@@ -328,14 +328,14 @@ header {
     left: 15px;
     background: #3ED33E;
   }
-  &.cancelled .task-header .container h3:before {
+  &.cancelled .deploy-header .container h3:before {
     background-color: #7B7B7B;
   }
-  &.failed .task-header .container h3:before {
+  &.failed .deploy-header .container h3:before {
     background-color: #D33E3E;
   }
 
-  .task-footer {
+  .deploy-footer {
     z-index: 1000;
     background: @dark;
     color: @light;
@@ -351,11 +351,11 @@ header {
     }
   }
 
-  .task-actions {
+  .deploy-actions {
     float: right;
   }
 
-  .task-progress {
+  .deploy-progress {
     border: 1px solid @lessDark;
     border-radius: 4px;
     position: relative;
@@ -375,7 +375,7 @@ header {
   }
 
   &.finished {
-    .task-progress {
+    .deploy-progress {
       display: none;
     }
   }
@@ -393,7 +393,7 @@ header {
     }
   }
 
-  .task-log {
+  .deploy-log {
     padding: 5px;
 
     .line {

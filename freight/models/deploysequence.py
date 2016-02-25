@@ -6,8 +6,8 @@ from sqlalchemy.sql import func, select
 from freight.config import db
 
 
-class TaskSequence(db.Model):
-    __tablename__ = 'tasksequence'
+class DeploySequence(db.Model):
+    __tablename__ = 'deploysequence'
 
     app_id = Column(Integer, nullable=False, primary_key=True)
     environment = Column(String(64), nullable=False, primary_key=True)
@@ -16,4 +16,4 @@ class TaskSequence(db.Model):
 
     @classmethod
     def get_clause(self, app_id, environment):
-        return select([func.next_task_number(app_id, environment)])
+        return select([func.next_deploy_number(app_id, environment)])

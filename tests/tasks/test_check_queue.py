@@ -16,11 +16,14 @@ class CheckQueueTestCase(TransactionTestCase):
         task = self.create_task(
             app=app, user=user, status=TaskStatus.pending,
         )
+        deploy = self.create_deploy(
+            app=app, task=task,
+        )
         db.session.commit()
 
         queue.apply('freight.jobs.check_queue')
 
-        mock_push.assert_called_once_with('freight.jobs.execute_task', [task.id])
+        mock_push.assert_called_once_with('freight.jobs.execute_deploy', [deploy.id])
 
     @patch.object(queue, 'push')
     def test_without_pending_task(self, mock_push):
@@ -29,6 +32,9 @@ class CheckQueueTestCase(TransactionTestCase):
         app = self.create_app(repository=repo)
         task = self.create_task(
             app=app, user=user, status=TaskStatus.in_progress,
+        )
+        deploy = self.create_deploy(
+            app=app, task=task,
         )
         db.session.commit()
 

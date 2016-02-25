@@ -158,24 +158,30 @@ def configure_api(app):
     from freight.api.app_details import AppDetailsApiView
     from freight.api.app_index import AppIndexApiView
     from freight.api.stats import StatsApiView
-    from freight.api.task_details import TaskDetailsApiView
-    from freight.api.task_index import TaskIndexApiView
-    from freight.api.task_log import TaskLogApiView
+    from freight.api.deploy_details import DeployDetailsApiView
+    from freight.api.deploy_index import DeployIndexApiView
+    from freight.api.deploy_log import DeployLogApiView
 
     api.add_resource(AppIndexApiView, '/apps/')
     api.add_resource(AppDetailsApiView, '/apps/<app>/')
     api.add_resource(StatsApiView, '/stats/')
-    api.add_resource(TaskIndexApiView, '/tasks/')
+    api.add_resource(DeployIndexApiView, '/tasks/',
+                     endpoint='deploy-index-deprecated')
+    api.add_resource(DeployIndexApiView, '/deploys/')
 
     # old style
-    api.add_resource(TaskDetailsApiView, '/tasks/<task_id>/')
-    api.add_resource(TaskLogApiView, '/tasks/<task_id>/log/')
+    api.add_resource(DeployDetailsApiView, '/deploys/<deploy_id>/')
+    api.add_resource(DeployLogApiView, '/deploys/<deploy_id>/log/')
 
     # new style
-    api.add_resource(TaskDetailsApiView, '/tasks/<app>/<env>/<number>/',
-                     endpoint='task-details')
-    api.add_resource(TaskLogApiView, '/tasks/<app>/<env>/<number>/log/',
-                     endpoint='task-log')
+    api.add_resource(DeployDetailsApiView, '/tasks/<app>/<env>/<number>/',
+                     endpoint='deploy-details-deprecated')
+    api.add_resource(DeployLogApiView, '/tasks/<app>/<env>/<number>/log/',
+                     endpoint='deploy-log-deprecated')
+    api.add_resource(DeployDetailsApiView, '/deploys/<app>/<env>/<number>/',
+                     endpoint='deploy-details')
+    api.add_resource(DeployLogApiView, '/deploys/<app>/<env>/<number>/log/',
+                     endpoint='deploy-log')
 
     # catchall should be the last resource
     api.add_resource(ApiCatchall, '/<path:path>')

@@ -3,27 +3,27 @@ from __future__ import absolute_import
 import logging
 
 from freight.config import db, redis, queue
-from freight.models import App, Task, TaskStatus
+from freight.models import App, Task, Deploy, TaskStatus
 from freight.utils.redis import lock
 
 
-def has_active_task(app_id, env):
+def has_active_deploy(app_id, env):
     return db.session.query(
-        Task.query.filter(
+        Deploy.query.filter(
             Task.status == TaskStatus.in_progress,
-            Task.app_id == app_id,
-            Task.environment == env,
+            Deploy.app_id == app_id,
+            Deploy.environment == env,
         ).exists(),
     ).scalar()
 
 
 def get_pending_task_id(app_id, env):
     return db.session.query(
-        Task.id,
+        Task.id
     ).filter(
         Task.status == TaskStatus.pending,
-        Task.app_id == app_id,
-        Task.environment == env,
+        Deploy.app_id == app_id,
+        Deploy.environment == env,
     ).order_by(
         Task.date_created.asc(),
     ).limit(1).scalar()
@@ -36,25 +36,44 @@ def check_queue():
     for the given APP + ENV, marks the latest as in progress and fires the
     execute_task job.
     """
-    pending_queues = list(db.session.query(
-        Task.app_id, Task.environment
+    tasks = list(db.session.query(
+        Task.id, Task.app_id
     ).filter(
         Task.status == TaskStatus.pending
     ).group_by(
-        Task.app_id, Task.environment
+        Task.id, Task.app_id
     ))
-    logging.info('Found pending tasks for %d queues', len(pending_queues))
 
-    for app_id, environment in pending_queues:
-        app = App.query.get(app_id)
-        with lock(redis, 'taskcheck:{}-{}'.format(app.id, environment), timeout=5):
-            if has_active_task(app.id, environment):
-                logging.info('Task already in progress for %s/%s', app.name, environment)
+    if not tasks:
+        return
+
+    logging.info('Found pending tasks for %d queues', len(tasks))
+
+    deploys = list(db.session.query(
+        Deploy.id, Deploy.app_id, Deploy.environment
+    ).filter(
+        Deploy.task_id.in_(set(t.id for t in tasks))
+    ).group_by(
+        Deploy.id, Deploy.app_id, Deploy.environment
+    ))
+
+    apps = {
+        a.id: a
+        for a in App.query.filter(
+            App.id.in_(set(t.app_id for t in tasks)),
+        )
+    }
+
+    for deploy_id, app_id, environment in deploys:
+        app = apps[app_id]
+        with lock(redis, 'deploycheck:{}-{}'.format(app.id, environment), timeout=5):
+            if has_active_deploy(app.id, environment):
+                logging.info('Deploy already in progress for %s/%s', app.name, environment)
                 continue
 
             task_id = get_pending_task_id(app.id, environment)
             if not task_id:
-                logging.info('Unable to find a pending task for %s/%s', app.name, environment)
+                logging.info('Unable to find a pending deploy for %s/%s', app.name, environment)
                 continue
 
             Task.query.filter(
@@ -63,4 +82,4 @@ def check_queue():
                 'status': TaskStatus.in_progress,
             }, synchronize_session=False)
 
-            queue.push("freight.jobs.execute_task", [task_id])
+            queue.push("freight.jobs.execute_deploy", [deploy_id])
