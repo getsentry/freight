@@ -89,6 +89,7 @@ class App(db.Model):
         return db.session.query(
             Task.sha,
         ).filter(
+            Deploy.task_id == Task.id,
             Task.app_id == self.id,
             Deploy.environment == env,
             Task.status == TaskStatus.finished,
@@ -108,6 +109,7 @@ class App(db.Model):
         return db.session.query(
             Task.sha,
         ).filter(
+            Deploy.task_id == Task.id,
             Task.app_id == self.id,
             Deploy.environment == env,
             Task.status == TaskStatus.finished,
