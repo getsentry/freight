@@ -6,14 +6,15 @@ from uuid import uuid4
 
 from freight.config import db
 from freight.constants import PROJECT_ROOT
-from freight.models import App, Repository, Task, DeploySequence, Deploy, TaskStatus, User
+from freight.models import (
+    App, Repository, Task, DeploySequence, Deploy, TaskStatus, User,
+    TaskConfig, TaskConfigType,
+)
 
 
 class Fixtures(object):
-    def create_app(self, repository, **kwargs):
-        if not kwargs.get('name'):
-            kwargs['name'] = uuid4().hex
-
+    def create_taskconfig(self, app, **kwargs):
+        kwargs.setdefault('type', TaskConfigType.deploy)
         kwargs.setdefault('provider', 'shell')
         kwargs.setdefault('data', {
             'provider_config': {
@@ -25,6 +26,19 @@ class Fixtures(object):
                     'config': {'webhook_url': 'https://example.com'},
                 },
             ],
+        })
+
+        task_config = TaskConfig(app_id=app.id, **kwargs)
+        db.session.add(task_config)
+        db.session.commit()
+
+        return task_config
+
+    def create_app(self, repository, **kwargs):
+        if not kwargs.get('name'):
+            kwargs['name'] = uuid4().hex
+
+        kwargs.setdefault('data', {
             'environments': {
                 'production': {
                     'default_ref': 'master',
@@ -46,7 +60,7 @@ class Fixtures(object):
         kwargs.setdefault('ref', 'master')
         kwargs.setdefault('sha', 'HEAD')
         kwargs.setdefault('status', TaskStatus.in_progress)
-        kwargs.setdefault('data', {'provider_config': app.provider_config})
+        kwargs.setdefault('data', {'provider_config': app.deploy_config.provider_config})
         kwargs.setdefault('params', {'task': 'deploy'})
 
         task = Task(

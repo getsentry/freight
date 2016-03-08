@@ -15,6 +15,7 @@ class SendTaskNotificationsTest(TestCase):
         self.user = self.create_user()
         self.repo = self.create_repo()
         self.app = self.create_app(repository=self.repo)
+        self.deploy_config = self.create_taskconfig(app=self.app)
         self.task = self.create_task(
             app=self.app,
             user=self.user,
@@ -48,6 +49,7 @@ class ClearTaskNotificationsTest(TestCase):
         self.user = self.create_user()
         self.repo = self.create_repo()
         self.app = self.create_app(repository=self.repo)
+        self.deploy_config = self.create_taskconfig(app=self.app)
         self.task = self.create_task(
             app=self.app,
             user=self.user,

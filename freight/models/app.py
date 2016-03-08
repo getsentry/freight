@@ -62,20 +62,16 @@ class App(db.Model):
     date_created = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     @property
-    def checks(self):
-        return self.data.get('checks', [])
-
-    @property
-    def notifiers(self):
-        return self.data.get('notifiers', [])
-
-    @property
-    def provider_config(self):
-        return self.data.get('provider_config', {})
-
-    @property
     def environments(self):
         return self.data.get('environments', {})
+
+    @property
+    def deploy_config(self):
+        from freight.models import TaskConfig, TaskConfigType
+        return TaskConfig.query.filter(
+            TaskConfig.app_id == self.id,
+            TaskConfig.type == TaskConfigType.deploy,
+        ).first()
 
     def get_default_ref(self, env):
         data = self.environments.get(env)

@@ -12,6 +12,7 @@ class AppDetailsBase(TestCase):
         self.user = self.create_user()
         self.repo = self.create_repo()
         self.app = self.create_app(repository=self.repo)
+        self.deploy_config = self.create_taskconfig(app=self.app)
         self.path = '/api/0/apps/{}/'.format(self.app.name)
         super(AppDetailsBase, self).setUp()
 
@@ -40,17 +41,18 @@ class AppUpdateTest(AppDetailsBase):
         assert data['id'] == str(self.app.id)
 
         app = App.query.get(self.app.id)
+        deploy_config = app.deploy_config
         assert app.name == 'foobar'
-        assert app.provider == 'shell'
-        assert app.provider_config['command'] == '/usr/bin/true'
-        assert app.provider_config['timeout'] == 50
-        assert app.notifiers == [
+        assert deploy_config.provider == 'shell'
+        assert deploy_config.provider_config['command'] == '/usr/bin/true'
+        assert deploy_config.provider_config['timeout'] == 50
+        assert deploy_config.notifiers == [
             {'type': 'slack', 'config': {'webhook_url': 'https://example.com'}},
         ]
 
-        assert len(app.checks) == 1
-        assert app.checks[0]['type'] == 'github'
-        assert app.checks[0]['config'] == {'contexts': ['travisci'], 'repo': 'getsentry/freight'}
+        assert len(deploy_config.checks) == 1
+        assert deploy_config.checks[0]['type'] == 'github'
+        assert deploy_config.checks[0]['config'] == {'contexts': ['travisci'], 'repo': 'getsentry/freight'}
         assert len(app.environments) == 1
         assert app.environments['staging'] == {'default_ref': 'develop'}
 
@@ -61,9 +63,10 @@ class AppUpdateTest(AppDetailsBase):
         assert data['id'] == str(self.app.id)
 
         app = App.query.get(self.app.id)
+        deploy_config = app.deploy_config
         assert app.name == self.app.name
-        assert app.provider == self.app.provider
-        assert app.provider_config == self.app.provider_config
+        assert deploy_config.provider == self.deploy_config.provider
+        assert deploy_config.provider_config == self.deploy_config.provider_config
 
     def test_invalid_provider(self):
         resp = self.client.put(self.path, data={

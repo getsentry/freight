@@ -10,7 +10,8 @@ from freight.api.serializer import serialize
 from freight.config import db, redis
 from freight.exceptions import CheckError, CheckPending
 from freight.models import (
-    App, Repository, Task, Deploy, DeploySequence, TaskStatus, User
+    App, Repository, Task, Deploy, DeploySequence, TaskStatus, User,
+    TaskConfig, TaskConfigType,
 )
 from freight.notifiers import NotifierEvent
 from freight.notifiers.utils import send_task_notifications
@@ -114,6 +115,13 @@ class DeployIndexApiView(ApiView):
         if not app:
             return self.error('Invalid app', name='invalid_resource', status_code=404)
 
+        deploy_config = TaskConfig.query.filter(
+            TaskConfig.app_id == app.id,
+            TaskConfig.type == TaskConfigType.deploy,
+        ).first()
+        if not deploy_config:
+            return self.error('Missing deploy config', name='missing_conf', status_code=404)
+
         params = None
 
         repo = Repository.query.get(app.repository_id)
@@ -149,7 +157,7 @@ class DeployIndexApiView(ApiView):
             params = args.params
 
         if not args.force:
-            for check_config in app.checks:
+            for check_config in deploy_config.checks:
                 check = checks.get(check_config['type'])
                 try:
                     check.check(app, sha, check_config['config'])
@@ -170,12 +178,12 @@ class DeployIndexApiView(ApiView):
                 params=params,
                 status=TaskStatus.pending,
                 user_id=user.id,
-                provider=app.provider,
+                provider=deploy_config.provider,
                 data={
                     'force': args.force,
-                    'provider_config': app.provider_config,
-                    'notifiers': app.notifiers,
-                    'checks': app.checks,
+                    'provider_config': deploy_config.provider_config,
+                    'notifiers': deploy_config.notifiers,
+                    'checks': deploy_config.checks,
                 },
             )
             db.session.add(task)

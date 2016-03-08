@@ -13,6 +13,7 @@ class ExecuteTaskTestCase(TransactionTestCase):
         user = self.create_user()
         repo = self.create_repo()
         app = self.create_app(repository=repo)
+        self.create_taskconfig(app=app)
         task = self.create_task(app=app, user=user)
         deploy = self.create_deploy(app=app, task=task)
         db.session.commit()
