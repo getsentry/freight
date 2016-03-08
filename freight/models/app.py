@@ -15,35 +15,11 @@ class App(db.Model):
     Example App configuration:
 
     {
-        "provider_config": {
-            "timeout": 1200,
-            "command": "bin/fab --colorize-errors -a -i {ssh_key} -R {environment} deploy:branch_name={sha}"
-        },
-        "provider": "shell",
         "environments": {
             "production": {
                 "default_ref": "master"
             }
-        },
-        "checks": [
-            {
-                "type": "github",
-                "config": {
-                    "contexts": [
-                        "ci/circleci"
-                    ],
-                    "repo": "getsentry/getsentry"
-                }
-            }
-        ],
-        "notifiers": [
-            {
-                "type": "slack",
-                "config": {
-                    "webhook_url": "..."
-                }
-            }
-        ]
+        }
     }
     """
 

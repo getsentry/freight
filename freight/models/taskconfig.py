@@ -28,6 +28,37 @@ TYPE_LABELS_REV = {
 
 
 class TaskConfig(db.Model):
+    """
+    Example TaskConfig:
+
+    {
+        "provider_config": {
+            "timeout": 1200,
+            "command": "bin/fab --colorize-errors -a -i {ssh_key} -R {environment} deploy:branch_name={sha}"
+        },
+        "provider": "shell",
+        "checks": [
+            {
+                "type": "github",
+                "config": {
+                    "contexts": [
+                        "ci/circleci"
+                    ],
+                    "repo": "getsentry/getsentry"
+                }
+            }
+        ],
+        "notifiers": [
+            {
+                "type": "slack",
+                "config": {
+                    "webhook_url": "..."
+                }
+            }
+        ]
+    }
+    """
+
     __tablename__ = 'taskconfig'
     __table_args__ = (
         Index('idx_taskconfig_app_id', 'app_id'),
