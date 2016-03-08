@@ -3,6 +3,7 @@
 var path = require("path"),
     webpack = require("webpack");
 var ExtractTextPlugin = require("extract-text-webpack-plugin");
+var CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
   context: __dirname + "/static",
@@ -52,7 +53,10 @@ module.exports = {
     new webpack.ProvidePlugin({
         $: 'jquery',
         jQuery: 'jquery',
-    })
+    }),
+    new CopyWebpackPlugin([
+        {from: 'favicon.png'},
+    ])
   ],
   resolve: {
     modulesDirectories: ["node_modules"],
