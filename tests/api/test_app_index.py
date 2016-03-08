@@ -23,6 +23,7 @@ class AppListTest(AppIndexBase):
         app = self.create_app(
             repository=self.repo,
         )
+        self.create_taskconfig(app=app)
         resp = self.client.get(self.path)
         assert resp.status_code == 200
         data = json.loads(resp.data)
@@ -34,6 +35,7 @@ class AppListTest(AppIndexBase):
             repository=self.repo,
             name='foobar',
         )
+        self.create_taskconfig(app=app)
         resp = self.client.get(self.path + '?name=' + app.name)
         assert resp.status_code == 200
         data = json.loads(resp.data)
@@ -62,16 +64,17 @@ class AppCreateTest(AppIndexBase):
         assert data['id']
 
         app = App.query.get(data['id'])
+        deploy_config = app.deploy_config
         assert app.name == 'foobar'
-        assert app.provider == 'shell'
-        assert app.provider_config['command'] == '/usr/bin/true'
-        assert app.provider_config['timeout'] == 50
-        assert app.notifiers == [
+        assert deploy_config.provider == 'shell'
+        assert deploy_config.provider_config['command'] == '/usr/bin/true'
+        assert deploy_config.provider_config['timeout'] == 50
+        assert deploy_config.notifiers == [
             {'type': 'slack', 'config': {'webhook_url': 'https://example.com'}},
         ]
-        assert len(app.checks) == 1
-        assert app.checks[0]['type'] == 'github'
-        assert app.checks[0]['config'] == {'contexts': ['travisci'], 'repo': 'getsentry/freight'}
+        assert len(deploy_config.checks) == 1
+        assert deploy_config.checks[0]['type'] == 'github'
+        assert deploy_config.checks[0]['config'] == {'contexts': ['travisci'], 'repo': 'getsentry/freight'}
         assert len(app.environments) == 1
         assert app.environments['staging'] == {'default_ref': 'develop'}
 

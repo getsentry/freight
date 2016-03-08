@@ -24,6 +24,7 @@ class SendPendingNotificationsTestCase(TransactionTestCase):
         user = self.create_user()
         repo = self.create_repo()
         app = self.create_app(repository=repo)
+        self.create_taskconfig(app=app)
         task = self.create_task(
             app=app, user=user, status=TaskStatus.pending,
         )

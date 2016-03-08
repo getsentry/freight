@@ -13,6 +13,7 @@ class CheckQueueTestCase(TransactionTestCase):
         user = self.create_user()
         repo = self.create_repo()
         app = self.create_app(repository=repo)
+        deploy_config = self.create_taskconfig(app=app)
         task = self.create_task(
             app=app, user=user, status=TaskStatus.pending,
         )
@@ -30,6 +31,7 @@ class CheckQueueTestCase(TransactionTestCase):
         user = self.create_user()
         repo = self.create_repo()
         app = self.create_app(repository=repo)
+        deploy_config = self.create_taskconfig(app=app)
         task = self.create_task(
             app=app, user=user, status=TaskStatus.in_progress,
         )

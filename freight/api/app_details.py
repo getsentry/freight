@@ -9,7 +9,7 @@ from freight.api.serializer import serialize
 from freight.checks.utils import parse_checks_config
 from freight.config import db, queue
 from freight.environments.utils import parse_environments_config
-from freight.models import App, Repository
+from freight.models import App, Repository, TaskConfig, TaskConfigType
 from freight.notifiers.utils import parse_notifiers_config
 from freight.providers.utils import parse_provider_config
 
@@ -20,12 +20,19 @@ class AppDetailsApiView(ApiView):
         if app is None:
             return self.error('Invalid app', name='invalid_resource', status_code=404)
 
+        deploy_config = TaskConfig.query.filter(
+            TaskConfig.app_id == app.id,
+            TaskConfig.type == TaskConfigType.deploy,
+        ).first()
+        if deploy_config is None:
+            return self.error('Missing deploy config', name='missing_conf', status_code=404)
+
         context = serialize(app)
         context.update({
-            'provider': app.provider,
-            'provider_config': app.provider_config,
-            'notifiers': app.notifiers,
-            'checks': app.checks,
+            'provider': deploy_config.provider,
+            'provider_config': deploy_config.provider_config,
+            'notifiers': deploy_config.notifiers,
+            'checks': deploy_config.checks,
         })
 
         return self.respond(context)
@@ -49,27 +56,38 @@ class AppDetailsApiView(ApiView):
         if app is None:
             return self.error('Invalid app', name='invalid_resource', status_code=404)
 
+        # For backwards compatibility, we assume that we need a deploy TaskConfig
+        # on the app at all times.
+        deploy_config = TaskConfig.query.filter(
+            TaskConfig.app_id == app.id,
+            TaskConfig.type == TaskConfigType.deploy,
+        ).first()
+        if deploy_config is None:
+            deploy_config = TaskConfig(app_id=app.id, type=TaskConfigType.deploy)
+            db.session.add(deploy_config)
+            db.session.flush()
+
         if args.provider or args.provider_config:
             if args.provider is not None:
                 provider = args.provider
             else:
-                provider = app.provider
+                provider = deploy_config.provider
 
             if args.provider_config is not None:
                 provider_config = args.provider_config
             else:
-                provider_config = app.provider_config
+                provider_config = deploy_config.provider_config
 
-            app.provider = provider
-            app.data['provider_config'] = parse_provider_config(
+            deploy_config.provider = provider
+            deploy_config.data['provider_config'] = parse_provider_config(
                 provider, provider_config
             )
 
         if args.notifiers is not None:
-            app.data['notifiers'] = parse_notifiers_config(args.notifiers)
+            deploy_config.data['notifiers'] = parse_notifiers_config(args.notifiers)
 
         if args.checks is not None:
-            app.data['checks'] = parse_checks_config(args.checks)
+            deploy_config.data['checks'] = parse_checks_config(args.checks)
 
         if args.environments is not None:
             app.data['environments'] = parse_environments_config(args.environments)
@@ -89,14 +107,15 @@ class AppDetailsApiView(ApiView):
             app.repository_id = repo.id
 
         db.session.add(app)
+        db.session.add(deploy_config)
         db.session.commit()
 
         context = serialize(app)
         context.update({
-            'provider': app.provider,
-            'provider_config': app.provider_config,
-            'notifiers': app.notifiers,
-            'checks': app.checks,
+            'provider': deploy_config.provider,
+            'provider_config': deploy_config.provider_config,
+            'notifiers': deploy_config.notifiers,
+            'checks': deploy_config.checks,
         })
 
         return self.respond(context)

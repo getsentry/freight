@@ -15,6 +15,7 @@ class DeployIndexBase(TestCase):
         self.user = self.create_user()
         self.repo = self.create_repo()
         self.app = self.create_app(repository=self.repo)
+        self.deploy_config = self.create_taskconfig(app=self.app)
         super(DeployIndexBase, self).setUp()
 
 
@@ -158,8 +159,8 @@ class DeployCreateTest(DeployIndexBase):
         assert task.app_id == self.app.id
         assert task.ref == 'master'
         assert task.user_id == self.user.id
-        assert task.provider_config == self.app.provider_config
-        assert task.notifiers == self.app.notifiers
+        assert task.provider_config == self.deploy_config.provider_config
+        assert task.notifiers == self.deploy_config.notifiers
 
     def test_custom_params(self):
         resp = self.client.post(self.path, data={
@@ -182,8 +183,8 @@ class DeployCreateTest(DeployIndexBase):
         assert task.app_id == self.app.id
         assert task.ref == 'master'
         assert task.user_id == self.user.id
-        assert task.provider_config == self.app.provider_config
-        assert task.notifiers == self.app.notifiers
+        assert task.provider_config == self.deploy_config.provider_config
+        assert task.notifiers == self.deploy_config.notifiers
 
         assert task.params == {'task': 'collectstatic'}
 

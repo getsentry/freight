@@ -9,7 +9,7 @@ from freight.api.serializer import serialize
 from freight.checks.utils import parse_checks_config
 from freight.config import db
 from freight.environments.utils import parse_environments_config
-from freight.models import App, Repository
+from freight.models import App, Repository, TaskConfig, TaskConfigType
 from freight.notifiers.utils import parse_notifiers_config
 from freight.providers.utils import parse_provider_config
 
@@ -68,15 +68,26 @@ class AppIndexApiView(ApiView):
         app = App(
             name=args.name,
             repository_id=repo.id,
+            data={
+                'environments': environments_config,
+            },
+        )
+        db.session.add(app)
+        db.session.flush()
+
+        # For backwards compatibility, we assume that we need a deploy TaskConfig
+        # on the app at all times.
+        deploy_config = TaskConfig(
+            app_id=app.id,
+            type=TaskConfigType.deploy,
             provider=args.provider,
             data={
                 'provider_config': provider_config,
                 'notifiers': notifiers_config,
                 'checks': checks_config,
-                'environments': environments_config,
             },
         )
-        db.session.add(app)
+        db.session.add(deploy_config)
         db.session.commit()
 
         return self.respond(serialize(app), status_code=201)
