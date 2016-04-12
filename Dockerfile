@@ -51,8 +51,8 @@ RUN set -x \
     && make -C /usr/src/redis install \
     && rm -r /usr/src/redis
 
-ENV DOCKER_VERSION 1.10.2
-ENV DOCKER_SHA256 3fcac4f30e1c1a346c52ba33104175ae4ccbd9b9dbb947f56a0a32c9e401b768
+ENV DOCKER_VERSION 1.10.3
+ENV DOCKER_SHA256 d0df512afa109006a450f41873634951e19ddabf8c7bd419caeb5a526032d86d
 
 RUN curl -fSL "https://get.docker.com/builds/Linux/x86_64/docker-$DOCKER_VERSION" -o /usr/local/bin/docker \
     && echo "${DOCKER_SHA256}  /usr/local/bin/docker" | sha256sum -c - \
