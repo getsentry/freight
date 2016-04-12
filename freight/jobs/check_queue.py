@@ -11,6 +11,7 @@ def has_active_deploy(app_id, env):
     return db.session.query(
         Deploy.query.filter(
             Task.status == TaskStatus.in_progress,
+            Deploy.task_id == Task.id,
             Deploy.app_id == app_id,
             Deploy.environment == env,
         ).exists(),

@@ -43,3 +43,36 @@ class CheckQueueTestCase(TransactionTestCase):
         queue.apply('freight.jobs.check_queue')
 
         assert not mock_push.called
+
+    @patch.object(queue, 'push')
+    def test_inprogress_pending_task(self, mock_push):
+        user = self.create_user()
+        repo = self.create_repo()
+
+        app_1 = self.create_app(repository=repo)
+        deploy_config_1 = self.create_taskconfig(app=app_1)
+        task_1 = self.create_task(
+            app=app_1, user=user, status=TaskStatus.in_progress,
+        )
+        deploy_1 = self.create_deploy(
+            app=app_1, task=task_1,
+        )
+        db.session.commit()
+
+        queue.apply('freight.jobs.check_queue')
+
+        assert not mock_push.called
+
+        app_2 = self.create_app(repository=repo)
+        deploy_config_2 = self.create_taskconfig(app=app_2)
+        task_2 = self.create_task(
+            app=app_2, user=user, status=TaskStatus.pending,
+        )
+        deploy_2 = self.create_deploy(
+            app=app_2, task=task_2,
+        )
+        db.session.commit()
+
+        queue.apply('freight.jobs.check_queue')
+
+        mock_push.assert_called_once_with('freight.jobs.execute_deploy', [deploy_2.id])
