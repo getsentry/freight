@@ -2,14 +2,13 @@
 
 from __future__ import absolute_import
 
-import logging
 import os
 import subprocess
 import sys
 
 from tempfile import NamedTemporaryFile
 
-from freight.config import create_app, db
+from freight.config import create_app
 from freight.models import Repository
 
 app = create_app()
