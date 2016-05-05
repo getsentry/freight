@@ -66,6 +66,8 @@ def create_app(_read_config=True, **config):
 
     app.config['LOG_LEVEL'] = os.environ.get('LOG_LEVEL', 'INFO' if config.get('DEBUG') else 'ERROR')
 
+    app.config['DEV'] = config.get('DEV', False)
+
     # Currently authentication requires Google
     app.config['GOOGLE_CLIENT_ID'] = os.environ.get('GOOGLE_CLIENT_ID')
     app.config['GOOGLE_CLIENT_SECRET'] = os.environ.get('GOOGLE_CLIENT_SECRET')
