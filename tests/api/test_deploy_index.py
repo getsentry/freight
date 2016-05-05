@@ -145,7 +145,7 @@ class DeployCreateTest(DeployIndexBase):
         resp = self.client.post(self.path, data={
             'env': 'production',
             'app': self.app.name,
-            'ref': 'master',
+            'ref': 'HEAD',
             'user': self.user.name,
         })
         assert resp.status_code == 201
@@ -157,7 +157,7 @@ class DeployCreateTest(DeployIndexBase):
         assert deploy.environment == 'production'
         assert deploy.app_id == self.app.id
         assert task.app_id == self.app.id
-        assert task.ref == 'master'
+        assert task.ref == 'HEAD'
         assert task.user_id == self.user.id
         assert task.provider_config == self.deploy_config.provider_config
         assert task.notifiers == self.deploy_config.notifiers
@@ -166,7 +166,7 @@ class DeployCreateTest(DeployIndexBase):
         resp = self.client.post(self.path, data={
             'env': 'production',
             'app': self.app.name,
-            'ref': 'master',
+            'ref': 'HEAD',
             'user': self.user.name,
             'params': '{"task": "collectstatic"}'
         })
@@ -181,7 +181,7 @@ class DeployCreateTest(DeployIndexBase):
         assert deploy.environment == 'production'
         assert deploy.app_id == self.app.id
         assert task.app_id == self.app.id
-        assert task.ref == 'master'
+        assert task.ref == 'HEAD'
         assert task.user_id == self.user.id
         assert task.provider_config == self.deploy_config.provider_config
         assert task.notifiers == self.deploy_config.notifiers
@@ -198,7 +198,7 @@ class DeployCreateTest(DeployIndexBase):
     #     resp = self.client.post(self.path, data={
     #         'env': task.environment,
     #         'app': self.app.name,
-    #         'ref': 'master',
+    #         'ref': 'HEAD',
     #         'user': self.user.name,
     #     })
     #     assert resp.status_code == 400
