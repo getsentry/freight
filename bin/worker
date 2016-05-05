@@ -15,6 +15,7 @@ from multiprocessing import Process
 def main(argv=sys.argv[1:]):
     parser = argparse.ArgumentParser()
 
+    parser.add_argument('--dev', dest='dev', action='store_true', default=False)
     parser.add_argument('--debug', dest='debug', action='store_true',
                         default=False)
     parser.add_argument('--no-debug', dest='debug', action='store_false',
@@ -36,6 +37,7 @@ def main(argv=sys.argv[1:]):
         children.append(Process(target=worker, kwargs={
             'debug': args.debug,
             'log_level': log_level,
+            'dev': args.dev,
         }))
 
     if args.scheduler:
@@ -43,6 +45,7 @@ def main(argv=sys.argv[1:]):
             Process(target=scheduler, kwargs={
                 'debug': args.debug,
                 'log_level': log_level,
+                'dev': args.dev,
             })
         )
 
@@ -53,24 +56,24 @@ def main(argv=sys.argv[1:]):
         process.join()
 
 
-def scheduler(debug=False, interval=None, log_level='INFO'):
+def scheduler(debug=False, interval=None, log_level='INFO', dev=False):
     from freight.config import create_app, queue
 
     setup_loghandlers(log_level)
 
-    app = create_app(DEBUG=debug)
+    app = create_app(DEBUG=debug, DEV=dev)
     logger.info("RQ scheduler started")
     with app.app_context():
         scheduler = queue.get_scheduler(interval=interval)
         scheduler.run()
 
 
-def worker(listen=(), debug=True, log_level='INFO'):
+def worker(listen=(), debug=True, log_level='INFO', dev=False):
     from freight.config import create_app, queue
 
     setup_loghandlers(log_level)
 
-    app = create_app(DEBUG=debug)
+    app = create_app(DEBUG=debug, DEV=dev)
     with app.app_context():
         worker = queue.get_worker(listen=listen)
         worker.work()
