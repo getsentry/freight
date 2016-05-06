@@ -93,11 +93,14 @@ def main():
         user=user,
         sha=uuid4().hex,
         ref='master',
-        environment='production',
         status=TaskStatus.in_progress,
         date_started=datetime.utcnow(),
     )
 
+    lock = fixtures.create_lock(
+        app_id=app.id,
+        user_id=user.id,
+    )
 
 
 if __name__ == '__main__':
