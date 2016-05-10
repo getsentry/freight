@@ -4,8 +4,6 @@ from flask import current_app, request, session
 
 from freight.models import User
 
-from freight.testutils.fixtures import Fixtures
-
 NOT_SET = object()
 
 
@@ -16,6 +14,8 @@ def get_current_user():
     """
     if getattr(request, 'current_user', NOT_SET) is NOT_SET:
         if current_app.config.get('DEV'):
+            from freight.testutils.fixtures import Fixtures
+
             request.current_user = User.query.filter(
                 User.name == 'Freight',
             ).first()
