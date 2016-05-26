@@ -5,7 +5,7 @@ __all__ = ['SlackNotifier']
 import json
 
 from freight import http
-from freight.models import App, TaskStatus
+from freight.models import App, Task, TaskStatus, User
 
 from .base import Notifier, NotifierEvent
 
@@ -20,6 +20,8 @@ class SlackNotifier(Notifier):
         webhook_url = config['webhook_url']
 
         app = App.query.get(deploy.app_id)
+        task = Task.query.get(deploy.task_id)
+        user = User.query.get(task.user_id)
 
         params = {
             'number': deploy.number,
@@ -30,14 +32,15 @@ class SlackNotifier(Notifier):
             'sha': task.sha[:7] if task.sha else task.ref,
             'status_label': task.status_label,
             'duration': task.duration,
+            'user': user.name,
             'link': http.absolute_uri('/deploys/{}/{}/{}'.format(app.name, deploy.environment, deploy.number)),
         }
 
         # TODO(dcramer): show the ref when it differs from the sha
         if event == NotifierEvent.TASK_QUEUED:
-            title = "[{app_name}/{env}] Queued deploy <{link}|#{number}> ({sha})".format(**params)
+            title = "[{app_name}/{env}] {user} queued deploy <{link}|#{number}> ({sha})".format(**params)
         elif event == NotifierEvent.TASK_STARTED:
-            title = "[{app_name}/{env}] Starting deploy <{link}|#{number}> ({sha})".format(**params)
+            title = "[{app_name}/{env}] {user} started deploy <{link}|#{number}> ({sha})".format(**params)
         elif task.status == TaskStatus.failed:
             title = "[{app_name}/{env}] Failed to deploy <{link}|#{number}> ({sha}) after {duration}s".format(**params)
         elif task.status == TaskStatus.cancelled:
