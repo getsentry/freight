@@ -32,7 +32,7 @@ class SlackNotifier(Notifier):
             'sha': task.sha[:7] if task.sha else task.ref,
             'status_label': task.status_label,
             'duration': task.duration,
-            'user': user.name.split('@')[0],  # Usernames can either be 'user' or 'user@example.com'
+            'user': user.name.split('@', 1)[0],  # Usernames can either be 'user' or 'user@example.com'
             'link': http.absolute_uri('/deploys/{}/{}/{}'.format(app.name, deploy.environment, deploy.number)),
         }
 
