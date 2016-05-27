@@ -42,11 +42,11 @@ class SlackNotifier(Notifier):
         elif event == NotifierEvent.TASK_STARTED:
             title = "[{app_name}/{env}] {user} started deploy <{link}|#{number}> ({sha})".format(**params)
         elif task.status == TaskStatus.failed:
-            title = "[{app_name}/{env}] Failed to deploy <{link}|#{number}> ({sha}) after {duration}s".format(**params)
+            title = "[{app_name}/{env}] Failed to finish {user}'s deploy <{link}|#{number}> ({sha}) after {duration}s".format(**params)
         elif task.status == TaskStatus.cancelled:
-            title = "[{app_name}/{env}] Deploy <{link}|#{number}> ({sha}) was cancelled after {duration}s".format(**params)
+            title = "[{app_name}/{env}] {user}'s deploy <{link}|#{number}> ({sha}) was cancelled after {duration}s".format(**params)
         elif task.status == TaskStatus.finished:
-            title = "[{app_name}/{env}] Successfully deployed <{link}|#{number}> ({sha}) after {duration}s".format(**params)
+            title = "[{app_name}/{env}] Successfully finished {user}'s deploy <{link}|#{number}> ({sha}) after {duration}s".format(**params)
         else:
             raise NotImplementedError(task.status)
 
