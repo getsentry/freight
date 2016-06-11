@@ -69,7 +69,7 @@ deploy a version" which could assist in pull-based deploys.
 Resources
 =========
 
-- `Documentation <http://freight.readthedocs.org>`_
+- `Documentation <https://freight.readthedocs.io>`_
 - `Bug Tracker <https://github.com/getsentry/freight/issues>`_
 - `Code <https://github.com/getsentry/freight>`_
 - `IRC <irc://irc.freenode.net/sentry>`_  (irc.freenode.net, #sentry)
