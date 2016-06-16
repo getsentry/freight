@@ -102,10 +102,13 @@ COPY . /usr/src/app
 RUN node_modules/.bin/webpack -p \
     && pip install --no-cache-dir -e .
 
-ENV WORKSPACE_ROOT /tmp
+ENV WORKSPACE_ROOT /workspace
+RUN mkdir -p $WORKSPACE_ROOT
+
 ENV PATH /usr/src/app/bin:$PATH
 
 EXPOSE 5000
+VOLUME /workspace
 
 ENTRYPOINT ["/usr/src/app/docker-entrypoint.sh"]
 CMD ["web", "--no-debug", "--addr", "0.0.0.0:5000"]
