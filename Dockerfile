@@ -65,8 +65,9 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
     && grep " node-v$NODE_VERSION-linux-x64.tar.gz\$" SHASUMS256.txt.asc | sha256sum -c - \
     && tar -xzf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local --strip-components=1 \
     && rm "node-v$NODE_VERSION-linux-x64.tar.gz" SHASUMS256.txt.asc \
+    && npm set progress=false \
     && npm install -g "npm@${NPM_VERSION}" \
-    && npm set progress=false
+    && npm cache clear
 
 ENV REDIS_VERSION 3.0.7
 ENV REDIS_DOWNLOAD_URL http://download.redis.io/releases/redis-3.0.7.tar.gz
@@ -92,7 +93,7 @@ RUN curl -fSL "https://get.docker.com/builds/Linux/x86_64/docker-$DOCKER_VERSION
 ENV DOCKER_HOST tcp://docker:2375
 
 COPY package.json /usr/src/app/
-RUN npm install
+RUN npm install && npm cache clear
 
 COPY requirements.txt /usr/src/app/
 RUN pip install --no-cache-dir -r requirements.txt
