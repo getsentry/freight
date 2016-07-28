@@ -1,4 +1,4 @@
-FROM python:2.7.11
+FROM python:2.7.12
 
 # add our user and group first to make sure their IDs get assigned consistently
 RUN groupadd -r freight && useradd -r -m -g freight freight
@@ -56,8 +56,8 @@ RUN set -ex \
     gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
   done
 
-ENV NODE_VERSION 0.12.14
-ENV NPM_VERSION 2.15.6
+ENV NODE_VERSION 0.12.15
+ENV NPM_VERSION 2.15.9
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
     && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
@@ -69,9 +69,9 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
     && npm install -g "npm@${NPM_VERSION}" \
     && npm cache clear
 
-ENV REDIS_VERSION 3.0.7
-ENV REDIS_DOWNLOAD_URL http://download.redis.io/releases/redis-3.0.7.tar.gz
-ENV REDIS_DOWNLOAD_SHA1 e56b4b7e033ae8dbf311f9191cf6fdf3ae974d1c
+ENV REDIS_VERSION 3.2.2
+ENV REDIS_DOWNLOAD_URL http://download.redis.io/releases/redis-3.2.2.tar.gz
+ENV REDIS_DOWNLOAD_SHA1 3141be9757532139f445bd5f6f4fae293bc33d27
 
 RUN set -x \
     && mkdir -p /usr/src/redis \
@@ -83,12 +83,18 @@ RUN set -x \
     && make -C /usr/src/redis install \
     && rm -r /usr/src/redis
 
-ENV DOCKER_VERSION 1.10.3
-ENV DOCKER_SHA256 d0df512afa109006a450f41873634951e19ddabf8c7bd419caeb5a526032d86d
+ENV DOCKER_BUCKET get.docker.com
+ENV DOCKER_VERSION 1.11.2
+ENV DOCKER_SHA256 8c2e0c35e3cda11706f54b2d46c2521a6e9026a7b13c7d4b8ae1f3a706fc55e1
 
-RUN curl -fSL "https://get.docker.com/builds/Linux/x86_64/docker-$DOCKER_VERSION" -o /usr/local/bin/docker \
-    && echo "${DOCKER_SHA256}  /usr/local/bin/docker" | sha256sum -c - \
-    && chmod +x /usr/local/bin/docker
+RUN set -x \
+        && curl -fSL "https://${DOCKER_BUCKET}/builds/Linux/x86_64/docker-$DOCKER_VERSION.tgz" -o docker.tgz \
+        && echo "${DOCKER_SHA256} *docker.tgz" | sha256sum -c - \
+        && tar -zxvf docker.tgz \
+        && mv docker/* /usr/local/bin/ \
+        && rmdir docker \
+        && rm docker.tgz \
+        && docker -v
 
 ENV DOCKER_HOST tcp://docker:2375
 
