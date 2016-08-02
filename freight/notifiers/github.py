@@ -47,26 +47,26 @@ class GithubNotifier(Notifier):
 
         if event == NotifierEvent.TASK_QUEUED:
             state = 'pending'
-            description = 'The freight deploy is current queued.'
+            description = 'Freight deploy #{number} is currently queued.'
         elif event == NotifierEvent.TASK_STARTED:
             state = 'pending'
-            description = 'The freight deploy has started.'
+            description = 'Freight deploy #{number} has started.'
         elif task.status == TaskStatus.failed:
             state = 'failure'
-            description = 'The freight deploy has failed.'
+            description = 'Freight deploy #{number} has failed.'
         elif task.status == TaskStatus.cancelled:
             state = 'error'
-            description = 'The freight deploy has been cancelled.'
+            description = 'Freight deploy #{number} has been cancelled.'
         elif task.status == TaskStatus.finished:
             state = 'success'
-            description = 'The freight deploy has finished successfully.'
+            description = 'Freight deploy #{number} has finished successfully.'
         else:
             raise NotImplementedError(task.status)
 
         payload = {
             'state': state,
             'target_url': target_url,
-            'description': description,
+            'description': description.format(number=deploy.number),
             'context': 'continuous-integration/freight/deploy',
         }
 
