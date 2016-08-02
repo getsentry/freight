@@ -22,7 +22,7 @@ class GithubNotifier(Notifier):
         if not token:
             raise ValueError('GITHUB_TOKEN is not set')
         headers = {
-            'Accepts': 'application/json',
+            'Accept': 'application/vnd.github.v3+json',
             'Authorization': 'token {}'.format(token),
         }
 
