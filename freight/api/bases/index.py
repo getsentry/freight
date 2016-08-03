@@ -199,13 +199,18 @@ class BaseIndexApiView(ApiView):
             db.session.add(task)
             db.session.flush()
             db.session.refresh(task)
+            kwargs = {
+                'task_id': task.id,
+                'app_id': app.id,
+            }
 
-            obj = self.obj_model(
-                task_id=task.id,
-                app_id=app.id,
-                environment=args.env,
-                number=self.sequence_model.get_clause(app.id, args.env),
-            )
+            if hasattr(self.obj_model, 'environment'):
+                kwargs['number'] = self.sequence_model.get_clause(app.id, args.env)
+                kwargs['environment'] = args.env
+            else:
+                kwargs['number'] = self.sequence_model.get_clause(app.id)
+
+            obj = self.obj_model(**kwargs)
             db.session.add(obj)
             db.session.commit()
 
