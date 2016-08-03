@@ -21,11 +21,18 @@ class BaseMixin(object):
         except IndexError:
             return None
         try:
-            return obj_model.query.filter(
-                obj_model.app_id == app.id,
-                obj_model.environment == env,
-                obj_model.number == number,
-            )[0]
+            # HACK(jtcunning): Only difference in build and deploy.
+            try:
+                return obj_model.query.filter(
+                    obj_model.app_id == app.id,
+                    obj_model.environment == env,
+                    obj_model.number == number,
+                )[0]
+            except AttributeError:
+                return obj_model.query.filter(
+                    obj_model.app_id == app.id,
+                    obj_model.number == number,
+                )[0]
         except IndexError:
             return None
 
