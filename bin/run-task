@@ -22,7 +22,7 @@ from freight.utils.workspace import TemporaryWorkspace, Workspace
 INFO_CHECK_FINISHED = 'Check has passed: {check}'
 
 INFO_CHECK_PENDING = 'Waiting on check {check}:\n  {message}'
-
+INFO_CHECK_STALE = 'Check {check} has spent {timer}s in it\'s current state.'
 ERR_CHECK_FAILED = 'Task cancelled due to failing check {check}:\n  {message}'
 
 
@@ -34,6 +34,8 @@ def checks_are_passing(app, task, log):
 
     announced_checks = set()
     pending_checks = set(checks_with_ids.keys())
+    timer = 0
+    interval = 5
     while pending_checks:
         for check_id in set(pending_checks):
             check_config = checks_with_ids[check_id]
@@ -64,7 +66,15 @@ def checks_are_passing(app, task, log):
                 ))
 
         if pending_checks:
-            sleep(5)
+            sleep(interval)
+            timer += interval
+            # Report that we're still waiting after ten intervals.
+            if not timer % (interval * 10):
+                log.info(INFO_CHECK_STALE.format(
+                    check=check_config['type'],
+                    timer=timer,
+                ))
+
     return True
 
 
