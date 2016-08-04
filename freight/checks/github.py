@@ -10,7 +10,7 @@ from freight.exceptions import CheckFailed, CheckPending
 
 from .base import Check
 
-ERR_CHECK = '{} context is {}'
+ERR_CHECK = '[{state}] {context}: {description} ({target_url})'
 ERR_MISSING_CONTEXT = '{} context was not found'
 
 
@@ -65,9 +65,9 @@ class GitHubContextCheck(Check):
             if contexts and data['context'] not in contexts:
                 continue
             if data['state'] == 'pending':
-                raise CheckPending(ERR_CHECK.format(data['context'], data['state']))
+                raise CheckPending(ERR_CHECK.format(**data))
             elif data['state'] != 'success':
-                raise CheckFailed(ERR_CHECK.format(data['context'], data['state']))
+                raise CheckFailed(ERR_CHECK.format(**data))
             contexts.remove(data['context'])
 
         if contexts:
