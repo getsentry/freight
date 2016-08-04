@@ -24,6 +24,8 @@ class GitHubContextCheckTest(GitHubCheckBase):
             {
                 "state": "failed",
                 "context": "travisci",
+                "description": "we didn't it",
+                "target_url": "example.com/build",
             }
         ])
 
@@ -41,6 +43,8 @@ class GitHubContextCheckTest(GitHubCheckBase):
             {
                 "state": "pending",
                 "context": "travisci",
+                "description": "we're doing it",
+                "target_url": "example.com/build",
             }
         ])
 
@@ -58,6 +62,8 @@ class GitHubContextCheckTest(GitHubCheckBase):
             {
                 "state": "success",
                 "context": "other",
+                "description": "we did it",
+                "target_url": "example.com/build",
             }
         ])
 
@@ -75,6 +81,8 @@ class GitHubContextCheckTest(GitHubCheckBase):
             {
                 "state": "success",
                 "context": "travisci",
+                "description": "we did it",
+                "target_url": "example.com/build",
             }
         ])
 
@@ -103,6 +111,8 @@ class GitHubContextCheckTest(GitHubCheckBase):
             {
                 "state": "failing",
                 "context": "travisci",
+                "description": "we didn't do it",
+                "target_url": "example.com/build",
             }
         ])
 
