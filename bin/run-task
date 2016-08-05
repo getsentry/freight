@@ -22,7 +22,7 @@ from freight.utils.workspace import TemporaryWorkspace, Workspace
 INFO_CHECK_FINISHED = 'Check has passed: {check}'
 
 INFO_CHECK_PENDING = 'Waiting on check {check}:\n  {message}'
-INFO_CHECK_STALE = 'Check {check} has spent {timer}s in it\'s current state.'
+INFO_CHECK_STALE = 'Check {check} has spent {timer}s in its current state.'
 ERR_CHECK_FAILED = 'Task cancelled due to failing check {check}:\n  {message}'
 
 
