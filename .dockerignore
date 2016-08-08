@@ -1,2 +1,11 @@
 .git
+Dockerfile
 Procfile
+docker-compose.yml
+.dockerignore
+CHANGES
+LICENSE
+*.egg-info
+.env
+.travis.yml
+.gitignore
