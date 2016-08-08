@@ -9,6 +9,14 @@ case "$1" in
     ;;
 esac
 
+if [ "$DOCKER_CONFIG" ]; then
+    gosu freight bash -c 'mkdir -p ~/.docker'
+    gosu freight bash -c 'echo $DOCKER_CONFIG > ~/.docker/config.json'
+    gosu freight bash -c 'chmod 400 ~/.docker/config.json'
+    # Make sure we don't pass this along since it contains sensitive info
+    unset DOCKER_CONFIG
+fi
+
 # Check if we're trying to execute a freight bin
 if [ -f "/usr/src/app/bin/$1" ]; then
     set -- tini -- "$@"
