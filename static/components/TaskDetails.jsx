@@ -31,7 +31,8 @@ var TaskDetails = React.createClass({
       logLoading: true,
       task: null,
       logNextOffset: 0,
-      liveScroll: true
+      liveScroll: true,
+      notifyOnCompletion: false,
     };
   },
 
@@ -82,9 +83,15 @@ var TaskDetails = React.createClass({
 
     api.request(this.getPollingUrl(), {
       success: (data) => {
+        var notify = this.state.notifyOnCompletion;
+        if (data.status == "finished" && this.state.notifyOnCompletion && Notification.permission === "granted") {
+          new Notification("Finished deploying " + data.name);
+          notify = false;
+        }
         this.setState({
           task: data,
-          loading: false
+          loading: false,
+          notifyOnCompletion: notify
         });
 
         this.pollLog();
@@ -213,6 +220,27 @@ var TaskDetails = React.createClass({
     }
   },
 
+  toggleNotifyOnCompletion() {
+    if (!this.state.notifyOnCompletion && Notification.permission != "granted") {
+      Notification.requestPermission(function(permission) {
+        if (permission == 'granted') {
+          new Notification('Notification will appear here when build is deployed.')
+          this.setState({
+            notifyOnCompletion: true
+          });
+        } else {
+          this.setState({
+            notifyOnCompletion: false
+          })
+        }
+      })
+    } else {
+      this.setState({
+        notifyOnCompletion: !this.state.notifyOnCompletion
+      })
+    }
+  },
+
   reDeploy() {
     if (this.state.submitInProgress) {
       return false;
@@ -271,6 +299,11 @@ var TaskDetails = React.createClass({
     let liveScrollClassName = "btn btn-default btn-sm";
     if (this.state.liveScroll) {
       liveScrollClassName += " btn-active";
+    }
+
+    let notifyClassName = "btn btn-default btn-sm";
+    if (this.state.notifyOnCompletion) {
+      notifyClassName += " btn-active";
     }
 
     let className = 'deploy-details';
@@ -336,6 +369,12 @@ var TaskDetails = React.createClass({
                     <input type="checkbox"
                            checked={this.state.liveScroll} />
                     <span>Follow</span>
+                  </a>
+                  <a className={notifyClassName}
+                     onClick={this.toggleNotifyOnCompletion}>
+                    <input type="checkbox"
+                           checked={this.state.notifyOnCompletion} />
+                    <span>Notify me</span>
                   </a>
                 </span>
               :
