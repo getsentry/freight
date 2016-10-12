@@ -3,7 +3,7 @@ from __future__ import absolute_import
 __all__ = ['ShellProvider']
 
 from .base import Provider
-from freight.models import Deploy
+from freight.models import App, Deploy
 
 
 class ShellProvider(Provider):
@@ -16,9 +16,14 @@ class ShellProvider(Provider):
     def get_command(self, deploy, task, ssh_key):
         params = task.params or {}
 
+        app = App.query.get(task.app_id)
+        prev_sha = app.get_previous_sha(
+            deploy.environment, current_sha=task.sha)
+
         return task.provider_config['command'].format(
             environment=deploy.environment,
             sha=task.sha,
+            prev_sha=prev_sha or '',
             ref=task.ref,
             ssh_key=ssh_key,
             params=params,
