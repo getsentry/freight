@@ -38,7 +38,7 @@ class SentryNotifier(Notifier):
             'duration': task.duration,
             'event': 'started' if event == NotifierEvent.TASK_STARTED else 'finished',
             'dateStarted': task.date_started.isoformat() + 'Z' if task.date_started else None,
-            'dateFinished': task.date_finished.isoformat() + 'Z' if task.date_finished else None,
+            'dateReleased': task.date_finished.isoformat() + 'Z' if task.date_finished else None,
             'link': http.absolute_uri('/deploys/{}/{}/{}/'.format(app.name, deploy.environment, deploy.number)),
         }
 
