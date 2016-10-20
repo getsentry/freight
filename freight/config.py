@@ -34,6 +34,7 @@ def create_app(_read_config=True, **config):
         __name__,
         static_folder=None,
         template_folder=os.path.join(PROJECT_ROOT, 'templates'))
+    app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 300
 
     # Utilized for sessions and other secrets
     # NOTE: This key is insecure and you should override it on the server
