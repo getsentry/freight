@@ -8,7 +8,7 @@ from flask.views import MethodView
 class StaticView(MethodView):
     def __init__(self, root, cache_timeout=0):
         self.root = root
-        self.cache_timeout = 30
+        self.cache_timeout = app.config['SEND_FILE_MAX_AGE_DEFAULT']
 
     def get(self, filename):
         return send_from_directory(
