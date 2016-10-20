@@ -8,7 +8,7 @@ module.exports = {
   context: __dirname + "/static",
   entry: {
     "styles": "./less/base.less",
-    "app": "./main",
+    "app2": "./main",
     "vendor": [
       "ansi_up",
       "babel-core/polyfill",
