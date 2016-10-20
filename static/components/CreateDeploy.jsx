@@ -44,10 +44,9 @@ var CreateDeploy = React.createClass({
   },
 
   onChangeEnvironment(e) {
-    let val = jQuery(e.target).val();
     let config = val ? this.state.envMap[val] || {} : {};
     this.setState({
-      env: val,
+      env: e.target.value,
       ref: config.defaultRef || 'master',
     });
   },
@@ -129,6 +128,11 @@ var CreateDeploy = React.createClass({
                   return <option key={env}>{env}</option>
                 })}
               </select>
+              <input type="text" className="form-control"
+                     onChange={this.onChangeEnvironment}
+                     placeholder="e.g. staging, full-stack" value={this.state.env} />
+
+
             </div>
             <div className="form-group">
               <label>Ref</label>
