@@ -84,8 +84,8 @@ RUN set -x \
     && rm -r /usr/src/redis
 
 ENV DOCKER_BUCKET get.docker.com
-ENV DOCKER_VERSION 1.11.2
-ENV DOCKER_SHA256 8c2e0c35e3cda11706f54b2d46c2521a6e9026a7b13c7d4b8ae1f3a706fc55e1
+ENV DOCKER_VERSION 1.12.3
+ENV DOCKER_SHA256 626601deb41d9706ac98da23f673af6c0d4631c4d194a677a9a1a07d7219fa0f
 
 RUN set -x \
         && curl -fSL "https://${DOCKER_BUCKET}/builds/Linux/x86_64/docker-$DOCKER_VERSION.tgz" -o docker.tgz \
