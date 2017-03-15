@@ -140,4 +140,4 @@ class AppDeleteTest(AppDetailsBase):
         resp = self.client.delete(self.path)
         assert resp.status_code == 200
 
-        mock_push.assert_called_once_with('freight.jobs.delete_object', kwargs={'model': 'App', 'app_id': self.app.id})
+        mock_push.assert_called_once_with('freight.jobs.delete_object', kwargs={'model': 'App', 'object_id': self.app.id})
