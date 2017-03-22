@@ -2,10 +2,9 @@ from __future__ import absolute_import
 
 __all__ = ['GitHubHooks']
 
-from flask import current_app, request, Response
+from flask import request, Response
 
 from .base import Hook
-from freight.testutils.client import AuthenticatedTestClient
 
 
 class GitHubHooks(Hook):
@@ -27,13 +26,13 @@ class GitHubHooks(Hook):
             return self.ok()
 
         head_commit = payload['head_commit']
+        if not head_commit:
+            # Deleting a branch is one case, not sure of others
+            return self.ok()
+
         committer = head_commit['committer']
 
-        client = AuthenticatedTestClient(
-            current_app, current_app.response_class
-        )
-
-        return client.post('/api/0/deploys/', data={
+        return self.client().post('/api/0/deploys/', data={
             'env': env,
             'app': app.name,
             'ref': head_commit['id'],
