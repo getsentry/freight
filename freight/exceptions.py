@@ -48,3 +48,7 @@ class InvalidNotifier(KeyError):
 
 class InvalidCheck(KeyError):
     pass
+
+
+class InvalidHook(KeyError):
+    pass

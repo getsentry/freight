@@ -5,6 +5,7 @@ import json
 from flask import current_app, request, Response
 from flask_restful import Resource
 from urllib import quote
+from hmac import compare_digest
 
 from freight.config import db
 from freight.exceptions import ApiError
@@ -32,7 +33,7 @@ class ApiView(Resource):
         if method != 'Key':
             return False
 
-        if payload != current_app.config['API_KEY']:
+        if not compare_digest(payload.decode('utf8'), current_app.config['API_KEY'].decode('utf8')):
             return False
 
         return True
