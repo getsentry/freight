@@ -222,13 +222,16 @@ def configure_web_routes(app):
     from freight.web.auth import AuthorizedView, LoginView, LogoutView
     from freight.web.index import IndexView
     from freight.web.static import StaticView
+    from freight.web.webhooks import WebhooksView
 
     static_root = os.path.join(PROJECT_ROOT, 'dist')
 
     app.add_url_rule(
         '/static/<path:filename>',
         view_func=StaticView.as_view(b'static', root=static_root))
-
+    app.add_url_rule(
+        '/webhooks/<hook>/<action>/<app>/<env>/<digest>/',
+        view_func=WebhooksView.as_view(b'webhooks'))
     app.add_url_rule(
         '/auth/login/',
         view_func=LoginView.as_view(b'login', authorized_url='authorized'))
