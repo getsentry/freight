@@ -32,6 +32,11 @@ class GitHubHooks(Hook):
 
         committer = head_commit['committer']
 
+        # If the committer is GitHub and the action was triggered from
+        # the web UI, ignore it and use the author instead
+        if committer['email'] == 'noreply@github.com' and committer['username'] == 'web-flow':
+            committer = head_commit['author']
+
         return self.client().post('/api/0/deploys/', data={
             'env': env,
             'app': app.name,
