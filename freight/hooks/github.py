@@ -41,5 +41,5 @@ class GitHubHooks(Hook):
             'env': env,
             'app': app.name,
             'ref': head_commit['id'],
-            'user': head_commit['committer']['email'],
+            'user': committer['email'],
         })
