@@ -2,17 +2,24 @@
 # sets up a linux system (e.g. a virtualbox VM managed by Vagrant) to be a dev environment
 
 ag () {
-    sudo DEBIAN_FRONTEND=noninteractive apt-get ${@} -yq --no-install-recommends
+    sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq --no-install-recommends ${@}
 }
 
 sql () {
     sudo -u postgres psql -d postgres -c "${@}"
 }
 
+# add node repo
+curl --silent https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo apt-key add -
+echo "deb https://deb.nodesource.com/node_7.x xenial main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+
+# update system
 ag update
 ag dist-upgrade
 ag autoremove
-ag install python-dev libffi-dev libssl-dev redis-server postgresql python-pip virtualenvwrapper libpq-dev git libkrb5-dev
+
+# install packages
+ag install python-dev libffi-dev libssl-dev redis-server postgresql python-pip virtualenvwrapper libpq-dev git libkrb5-dev nodejs
 
 
 # setup db
@@ -34,24 +41,21 @@ sudo service postgresql restart
 
 
 # set up node
-curl --silent https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo apt-key add -
-echo "deb https://deb.nodesource.com/node_7.x xenial main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-ag update
-ag install nodejs
-
 pushd /vagrant
 npm install
 popd
 
 
 # set up python
-sudo -H pip install --upgrade pip setuptools urllib3[secure] virtualenvwrapper
+sudo -H pip install -qq --upgrade pip setuptools urllib3[secure] virtualenvwrapper
 
 . /etc/bash_completion.d/virtualenvwrapper
 
 mkvirtualenv --system-site-packages freight
-pip install -r /vagrant/requirements.txt
-pip install -r /vagrant/requirements-test.txt
+pip install -qqr /vagrant/requirements.txt
+pip install -qqr /vagrant/requirements-test.txt
 add2virtualenv /vagrant
+pushd /vagrant
 alembic upgrade head
+popd
 deactivate
