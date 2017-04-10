@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # sets up a linux system (e.g. a virtualbox VM managed by Vagrant) to be a dev environment
 
-ag () {
+aptgetquiet () {
     sudo DEBIAN_FRONTEND=noninteractive apt-get -yqq --no-install-recommends ${@}
 }
 
@@ -11,15 +11,15 @@ sql () {
 
 # add node repo
 curl --silent https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo apt-key add -
-echo "deb https://deb.nodesource.com/node_7.x xenial main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+echo "deb https://deb.nodesource.com/node_4.x xenial main" | sudo tee /etc/apt/sources.list.d/nodesource.list
 
 # update system
-ag update
-ag dist-upgrade
-ag autoremove
+aptgetquiet update
+aptgetquiet dist-upgrade
+aptgetquiet autoremove
 
 # install packages
-ag install python-dev libffi-dev libssl-dev redis-server postgresql python-pip virtualenvwrapper libpq-dev git libkrb5-dev nodejs g++ build-essential
+aptgetquiet install python-dev libffi-dev libssl-dev redis-server postgresql python-pip virtualenvwrapper libpq-dev git libkrb5-dev nodejs g++ build-essential
 
 
 # setup db
