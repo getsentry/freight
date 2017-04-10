@@ -29,7 +29,7 @@ RUN set -x \
 
 # grab tini for signal processing and zombie killing
 RUN set -x \
-    && export TINI_VERSION=0.13.1 \
+    && export TINI_VERSION=0.14.0 \
     && apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
     && wget -O /usr/local/bin/tini "https://github.com/krallin/tini/releases/download/v$TINI_VERSION/tini" \
     && wget -O /usr/local/bin/tini.asc "https://github.com/krallin/tini/releases/download/v$TINI_VERSION/tini.asc" \
