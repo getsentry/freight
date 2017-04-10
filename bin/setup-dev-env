@@ -19,7 +19,7 @@ ag dist-upgrade
 ag autoremove
 
 # install packages
-ag install python-dev libffi-dev libssl-dev redis-server postgresql python-pip virtualenvwrapper libpq-dev git libkrb5-dev nodejs
+ag install python-dev libffi-dev libssl-dev redis-server postgresql python-pip virtualenvwrapper libpq-dev git libkrb5-dev nodejs g++ build-essential
 
 
 # setup db
