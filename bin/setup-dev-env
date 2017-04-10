@@ -42,7 +42,7 @@ sudo service postgresql restart
 
 # set up node
 pushd /vagrant
-npm install
+npm install --silent
 popd
 
 
