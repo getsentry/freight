@@ -24,6 +24,7 @@ deactivate
 # set up node
 curl --silent https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo apt-key add -
 echo "deb https://deb.nodesource.com/node_7.x xenial main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+ag update
 ag install nodejs
 
 pushd /vagrant
