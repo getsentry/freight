@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+# sets up a linux system (e.g. a virtualbox VM managed by Vagrant) to be a dev environment
+
+ag () {
+    sudo DEBIAN_FRONTEND=noninteractive apt-get ${@} -yq --no-install-recommends
+}
+
+ag update
+ag dist-upgrade
+ag autoremove
+ag install python-dev libffi-dev libssl-dev redis-server postgresql python-pip virtualenvwrapper libpq-dev git libkrb5-dev
+
+# set up python
+sudo -H pip install --upgrade pip setuptools urllib3[secure] virtualenvwrapper
+
+. /etc/bash_completion.d/virtualenvwrapper
+
+mkvirtualenv --system-site-packages freight
+pip install -r /vagrant/requirements.txt
+pip install -r /vagrant/requirements-test.txt
+add2virtualenv /vagrant
+deactivate
+
+# set up node
+curl --silent https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo apt-key add -
+echo "deb https://deb.nodesource.com/node_7.x xenial main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+sudo DEBIAN_FRONTEND=noninteractive apt-get install -yq nodejs
+
+pushd /vagrant
+npm install
+popd
+
+# setup db
