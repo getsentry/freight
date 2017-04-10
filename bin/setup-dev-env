@@ -5,21 +5,33 @@ ag () {
     sudo DEBIAN_FRONTEND=noninteractive apt-get ${@} -yq --no-install-recommends
 }
 
+sql () {
+    sudo -u postgres psql -d postgres -c "${@}"
+}
+
 ag update
 ag dist-upgrade
 ag autoremove
 ag install python-dev libffi-dev libssl-dev redis-server postgresql python-pip virtualenvwrapper libpq-dev git libkrb5-dev
 
-# set up python
-sudo -H pip install --upgrade pip setuptools urllib3[secure] virtualenvwrapper
 
-. /etc/bash_completion.d/virtualenvwrapper
+# setup db
+sql 'alter role postgres with inherit;'
+sql 'create role vagrant with login createdb;'
+sql 'grant postgres to vagrant;'
+sql 'create database freight;'
+sql 'create database test_freight;'
 
-mkvirtualenv --system-site-packages freight
-pip install -r /vagrant/requirements.txt
-pip install -r /vagrant/requirements-test.txt
-add2virtualenv /vagrant
-deactivate
+# remove all restrictions on db access
+cat <<EOF | sudo tee /etc/postgresql/9.5/main/pg_hba.conf
+local   all             all                                     trust
+local   all             all                                     trust
+host    all             all             127.0.0.1/32            trust
+host    all             all             ::1/128                 trust
+EOF
+
+sudo service postgresql restart
+
 
 # set up node
 curl --silent https://deb.nodesource.com/gpgkey/nodesource.gpg.key | sudo apt-key add -
@@ -31,4 +43,15 @@ pushd /vagrant
 npm install
 popd
 
-# setup db
+
+# set up python
+sudo -H pip install --upgrade pip setuptools urllib3[secure] virtualenvwrapper
+
+. /etc/bash_completion.d/virtualenvwrapper
+
+mkvirtualenv --system-site-packages freight
+pip install -r /vagrant/requirements.txt
+pip install -r /vagrant/requirements-test.txt
+add2virtualenv /vagrant
+alembic upgrade head
+deactivate
