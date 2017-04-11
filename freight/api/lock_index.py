@@ -6,7 +6,7 @@ from freight.api.base import ApiView
 from freight.api.serializer import serialize
 from freight.config import db
 from freight.models import App, User, Lock
-from freight.util.auth import get_current_user
+from freight.utils.auth import get_current_user
 
 
 class LockIndexApiView(ApiView):
@@ -76,4 +76,4 @@ class LockIndexApiView(ApiView):
         db.session.add(lock)
         db.session.commit()
 
-        return self.response(serialize(lock), status_code=201)
+        return self.respond(serialize(lock), status_code=201)
