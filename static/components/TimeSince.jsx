@@ -1,7 +1,7 @@
-var React = require("react");
-var moment = require("moment");
+const React = require("react");
+const moment = require("moment");
 
-var TimeSince = React.createClass({
+const TimeSince = React.createClass({
   propTypes: {
     date: React.PropTypes.any.isRequired
   },

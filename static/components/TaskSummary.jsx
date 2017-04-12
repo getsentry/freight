@@ -1,12 +1,11 @@
-var React = require('react');
-var Router = require('react-router');
-var Link = Router.Link;
-var joinClasses = require("react/lib/joinClasses");
+const React = require('react');
+const Router = require('react-router');
+const classNames = require('classnames');
 
-var Duration = require('./Duration');
-var TimeSince = require('./TimeSince');
+const Duration = require('./Duration');
+const TimeSince = require('./TimeSince');
 
-var Progress = React.createClass({
+const Progress = React.createClass({
   propTypes: {
     value: React.PropTypes.number.isRequired,
   },
@@ -18,7 +17,7 @@ var Progress = React.createClass({
   }
 });
 
-var TaskSummary = React.createClass({
+const TaskSummary = React.createClass({
   mixins: [Router.Navigation],
 
   taskInProgress(task) {
@@ -81,7 +80,7 @@ var TaskSummary = React.createClass({
     }
 
     return (
-      <div className={joinClasses(this.props.className, className)}
+      <div className={classNames(this.props.className, className)}
            onClick={this.gotoTask}>
         <Progress value={this.getEstimatedProgress(task)} />
         <h3>

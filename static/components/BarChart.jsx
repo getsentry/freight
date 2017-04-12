@@ -1,9 +1,9 @@
-var moment = require("moment");
-var React = require("react");
+const moment = require("moment");
+const React = require("react");
 
-var TooltipTrigger = require("./TooltipTrigger");
+const TooltipTrigger = require("./TooltipTrigger");
 
-var BarChart = React.createClass({
+const BarChart = React.createClass({
   propTypes: {
     points: React.PropTypes.arrayOf(React.PropTypes.shape({
       x: React.PropTypes.number.isRequired,

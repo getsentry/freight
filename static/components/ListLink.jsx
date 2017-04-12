@@ -1,9 +1,9 @@
-var React = require("react");
-var Router = require("react-router");
+const React = require("react");
+const Router = require("react-router");
 
-var classSet = require('react/lib/cx');
+const classSet = require('react/lib/cx');
 
-var ListLink = React.createClass({
+const ListLink = React.createClass({
   displayName: 'ListLink',
 
   contextTypes: {

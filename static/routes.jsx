@@ -12,15 +12,15 @@ import TaskDetails from "./components/TaskDetails";
 const {DefaultRoute, Route} = Router;
 
 var routes = (
-  <Route path="/" name="main" handler={Layout}>
-    <DefaultRoute name="overview" handler={Overview} />
-    <Route path="/deploy" name="createDeploy" handler={CreateDeploy} />
-    <Route path="/tasks/:app/:env/:number" name="taskDetailsLegacy" handler={TaskDetails} />
-    <Route path="/deploys/:app/:env/:number" name="deployDetails" handler={TaskDetails} />
-    <Route path="/:app/settings" name="appSettings" handler={AppSettings} />
-    <Route path="/:app/:env/:number" name="deployDetailsLegancy" handler={TaskDetails} />
-    <Route path="/:app" name="appDetails" handler={AppDetails} />
-    <Router.NotFoundRoute handler={RouteNotFound} />
+  <Route path="/" name="main" component={Layout}>
+    <IndexRoute name="overview" component={Overview} />
+    <Route path="/deploy" name="createDeploy" component={CreateDeploy} />
+    <Route path="/tasks/:app/:env/:number" name="taskDetailsLegacy" component={TaskDetails} />
+    <Route path="/deploys/:app/:env/:number" name="deployDetails" component={TaskDetails} />
+    <Route path="/:app/settings" name="appSettings" component={AppSettings} />
+    <Route path="/:app/:env/:number" name="deployDetailsLegancy" component={TaskDetails} />
+    <Route path="/:app" name="appDetails" component={AppDetails} />
+    <Route path="*" component={RouteNotFound} />
   </Route>
 );
 

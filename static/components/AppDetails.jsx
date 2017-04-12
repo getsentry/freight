@@ -1,13 +1,13 @@
-var React = require('react');
-var Router = require('react-router');
+const React = require('react');
+const Router = require('react-router');
 
-var api = require('../api');
+const api = require('../api');
 
 import LoadingIndicator from './LoadingIndicator';
-var PollingMixin = require('../mixins/polling');
-var TaskSummary = require('./TaskSummary');
+const PollingMixin = require('../mixins/polling');
+const TaskSummary = require('./TaskSummary');
 
-var AppDetails = React.createClass({
+const AppDetails = React.createClass({
   mixins: [PollingMixin, Router.State],
 
   contextTypes: {

@@ -1,6 +1,6 @@
-var React = require("react");
+const React = require("react");
 
-var Duration = React.createClass({
+const Duration = React.createClass({
   propTypes: {
     seconds: React.PropTypes.number.isRequired
   },

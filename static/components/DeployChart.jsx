@@ -1,12 +1,12 @@
-var React = require('react');
+const React = require('react');
 
-var api = require('../api');
+const api = require('../api');
 
-var BarChart = require("./BarChart");
-var PollingMixin = require('../mixins/polling');
-var TaskSummary = require('./TaskSummary');
+const BarChart = require("./BarChart");
+const PollingMixin = require('../mixins/polling');
+const TaskSummary = require('./TaskSummary');
 
-var DeployChart = React.createClass({
+const DeployChart = React.createClass({
   mixins: [PollingMixin],
 
   getInitialState() {

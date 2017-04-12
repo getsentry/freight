@@ -1,6 +1,6 @@
 import React from "react";
 
-var RouteNotFound = React.createClass({
+const RouteNotFound = React.createClass({
   render() {
     return (
       <div>
