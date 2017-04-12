@@ -41,6 +41,7 @@ sudo service postgresql restart
 
 
 # set up node
+sudo -H npm install -g webpack
 pushd /vagrant
 npm install --silent
 popd
