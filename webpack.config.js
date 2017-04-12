@@ -1,71 +1,76 @@
 /*eslint-env node*/
 
-var path = require("path"),
-    webpack = require("webpack");
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
-var CopyWebpackPlugin = require('copy-webpack-plugin');
+const path = require("path");
+const webpack = require("webpack");
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
-  context: __dirname + "/static",
+  context: path.resolve(__dirname, "static"),
   entry: {
-    "styles": "./less/base.less",
-    "app": "./main",
-    "vendor": [
-      "ansi_up",
-      "babel-core/polyfill",
-      "jquery",
-      "moment",
-      "react/addons",
-      "react-router"
-    ]
+    styles: "./less/base.less",
+    app: "./main.jsx",
+    vendor: "./vendor.js",
   },
   module: {
     loaders: [
       {
         test: /\.jsx?$/,
-        loader: "babel-loader"
-      },
-      {
-        test: /\.json$/,
-        loader: "json-loader"
+        loader: "babel-loader",
+        query: {
+          presets: ["es2015", "react"]
+        }
       },
       {
         test: /\.less$/,
-        loader: ExtractTextPlugin.extract("style-loader", "css-loader!less-loader")
+        loader: ExtractTextPlugin.extract({
+          fallback: "style-loader",
+          use: "css-loader!less-loader"
+        })
       },
       {
         test: /\.css$/,
-        loader: ExtractTextPlugin.extract("style-loader", "css-loader")
+        loader: ExtractTextPlugin.extract({
+          fallback: "style-loader",
+          use: "css-loader!less-loader"
+        })
       },
       // inline base64 URLs for <=8k images, direct URLs for the rest
       {
         test: /\.(png|jpg)$/,
-        loader: "url-loader?limit=8192"
+        loader: "url-loader",
+        query: {
+          limit: 8192
+        }
       }
     ]
   },
   plugins: [
-    new ExtractTextPlugin("styles.css", {
-      allChunks: true
+    new ExtractTextPlugin("styles.css"),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: "vendor",
+      filename: "vendor.js",
+      minChunks: function (module) {
+        return module.context && module.context.indexOf("node_modules") !== -1;
+      }
     }),
-    new webpack.optimize.CommonsChunkPlugin("vendor", "vendor.js"),
-    new webpack.optimize.DedupePlugin(),
     new webpack.ProvidePlugin({
-        $: 'jquery',
-        jQuery: 'jquery',
+      $: "jquery",
+      jQuery: "jquery",
     }),
     new CopyWebpackPlugin([
-        {from: 'favicon.png'},
+      {
+        from: "favicon.png"
+      },
     ])
   ],
   resolve: {
-    modulesDirectories: ["node_modules"],
-    extensions: ["", ".jsx", ".js", ".json"]
+    extensions: [".jsx", ".js", ".json"]
   },
   output: {
     publicPath: "/dist/",
-    path: __dirname + "/dist",
+    path: path.join(__dirname, "/dist"),
     filename: "[name].js",
   },
-  devtool: 'source-map'
+  devtool: "source-map"
 };
