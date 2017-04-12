@@ -1,4 +1,3 @@
-/*** @jsx React.DOM */
 var moment = require("moment");
 var React = require("react");
 
