@@ -29,7 +29,7 @@ const ListLink = React.createClass({
   ],
 
   getClassName() {
-    var classNames = {};
+    const classNames = {};
 
     if (this.props.className)
       classNames[this.props.className] = true;

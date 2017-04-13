@@ -1,5 +1,5 @@
 import React from "react";
-import {Link, RouteHandler} from "react-router";
+import { Link } from "react-router-dom";
 
 import api from "../api";
 import Indicators from './Indicators';
@@ -82,7 +82,8 @@ const Layout = React.createClass({
         </header>
         <div className="body">
           <div className="container">
-            <RouteHandler appList={this.state.appList} />
+            {this.props.children}
+            {React.cloneElement(this.props.children, {appList: this.state.appList})}
           </div>
         </div>
       </div>

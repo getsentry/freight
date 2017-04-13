@@ -1,6 +1,7 @@
-import React from "react";
-import Router from "react-router";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { BrowserRouter } from 'react-router-dom';
 
 import routes from "./routes";
 
-React.render(<Router routes={routes}/>, document.body);
+ReactDOM.render(<BrowserRouter routes={routes}/>, document.body);

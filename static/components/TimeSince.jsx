@@ -7,7 +7,7 @@ const TimeSince = React.createClass({
   },
 
   componentDidMount: function() {
-    var delay = 2600;
+    const delay = 2600;
 
     this.ticker = setInterval(this.ensureValidity, delay);
   },
@@ -25,7 +25,7 @@ const TimeSince = React.createClass({
   },
 
   render: function() {
-    var date = this.props.date;
+    let date = this.props.date;
 
     if (typeof date === "string" || typeof date === "number") {
       date = new Date(date);

@@ -6,10 +6,10 @@ const Duration = React.createClass({
   },
 
   getDuration() {
-    var result, neg;
-    var value = this.props.seconds * 1000;
+    let result, neg;
+    let value = this.props.seconds * 1000;
 
-    neg = value < 0 ? true : false;
+    neg = (value < 0);
     if (neg) {
       value = -value;
     }

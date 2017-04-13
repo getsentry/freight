@@ -4,7 +4,6 @@ const api = require('../api');
 
 const BarChart = require("./BarChart");
 const PollingMixin = require('../mixins/polling');
-const TaskSummary = require('./TaskSummary');
 
 const DeployChart = React.createClass({
   mixins: [PollingMixin],

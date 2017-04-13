@@ -59,11 +59,11 @@ const AppDetails = React.createClass({
   },
 
   taskInProgress(task) {
-    return task.status == 'in_progress';
+    return task.status === 'in_progress';
   },
 
   taskPending(task) {
-    return task.status == 'pending';
+    return task.status === 'pending';
   },
 
   render() {
@@ -71,13 +71,13 @@ const AppDetails = React.createClass({
       return <LoadingIndicator />;
     }
 
-    var {app, tasks} = this.state;
-    var activeTaskNodes = [];
-    var pendingTaskNodes = [];
-    var previousTaskNodes = [];
+    const {app, tasks} = this.state;
+    const activeTaskNodes = [];
+    const pendingTaskNodes = [];
+    const previousTaskNodes = [];
 
     tasks.forEach((task) => {
-      var node = <TaskSummary key={task.id} task={task} />;
+      const node = <TaskSummary key={task.id} task={task} />;
       if (this.taskInProgress(task)) {
         activeTaskNodes.unshift(node);
       } else if (this.taskPending(task)) {

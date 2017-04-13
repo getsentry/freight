@@ -20,8 +20,8 @@ const LoadingIndicator = React.createClass({
 
     return (
       <div className={classNames(this.props.className, className)}>
-        <div className="loading-mask"></div>
-        <div className="loading-indicator"></div>
+        <div className="loading-mask" />
+        <div className="loading-indicator" />
         <div className="loading-message">{this.props.children}</div>
       </div>
     );
