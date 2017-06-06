@@ -14,7 +14,7 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 
 from freight.config import db
-from freight.models import App, LogChunk, Task, TaskStatus, Repository, User
+from freight.models import App, LogChunk, Task, TaskConfig, TaskStatus, Repository, User
 from freight.testutils.fixtures import Fixtures
 
 fixtures = Fixtures()
@@ -54,12 +54,17 @@ def main():
         'date_finished': datetime.utcnow(),
     }, synchronize_session=False)
 
+    task_config = TaskConfig.query.filter(
+        TaskConfig.app_id == app.id
+    ).first()
+    if not task_config:
+        task_config = fixtures.create_taskconfig(app)
+
     task = fixtures.create_task(
         app=app,
         user=user,
         sha=uuid4().hex,
         ref='master',
-        environment='production',
         status=TaskStatus.finished,
         date_started=datetime.utcnow() - timedelta(minutes=3),
         date_finished=datetime.utcnow(),
@@ -93,7 +98,6 @@ def main():
         user=user,
         sha=uuid4().hex,
         ref='master',
-        environment='production',
         status=TaskStatus.in_progress,
         date_started=datetime.utcnow(),
     )
