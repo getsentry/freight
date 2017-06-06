@@ -49,6 +49,14 @@ class App(db.Model):
             TaskConfig.type == TaskConfigType.deploy,
         ).first()
 
+    @property
+    def build_config(self):
+        from freight.models import TaskConfig, TaskConfigType
+        return TaskConfig.query.filter(
+            TaskConfig.app_id == self.id,
+            TaskConfig.type == TaskConfigType.build,
+        ).first()
+
     def get_default_ref(self, env):
         data = self.environments.get(env)
         if not data:

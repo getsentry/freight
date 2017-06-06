@@ -7,7 +7,7 @@ from uuid import uuid4
 from freight.config import db
 from freight.constants import PROJECT_ROOT
 from freight.models import (
-    App, Repository, Task, DeploySequence, Deploy, TaskStatus, User,
+    App, Build, BuildSequence, Repository, Task, DeploySequence, Deploy, TaskStatus, User,
     TaskConfig, TaskConfigType,
 )
 
@@ -55,13 +55,18 @@ class Fixtures(object):
 
         return app
 
-    def create_task(self, app, user, **kwargs):
+    def create_task(self, app, user, task_type='deploy', **kwargs):
+        if task_type == 'deploy':
+            kwargs.setdefault('data', {'provider_config': app.deploy_config.provider_config})
+            kwargs.setdefault('params', {'task': 'deploy'})
+        elif task_type == 'build':
+            kwargs.setdefault('data', {'provider_config': app.build_config.provider_config})
+            kwargs.setdefault('params', {'task': 'build'})
+
         kwargs.setdefault('provider', 'shell')
         kwargs.setdefault('ref', 'master')
         kwargs.setdefault('sha', 'HEAD')
         kwargs.setdefault('status', TaskStatus.in_progress)
-        kwargs.setdefault('data', {'provider_config': app.deploy_config.provider_config})
-        kwargs.setdefault('params', {'task': 'deploy'})
 
         task = Task(
             app_id=app.id,
@@ -86,6 +91,18 @@ class Fixtures(object):
         db.session.commit()
 
         return deploy
+
+    def create_build(self, task, app, **kwargs):
+        build = Build(
+            task_id=task.id,
+            app_id=app.id,
+            number=BuildSequence.get_clause(app.id),
+            **kwargs
+        )
+        db.session.add(build)
+        db.session.commit()
+
+        return build
 
     def create_repo(self, **kwargs):
         kwargs.setdefault('url', PROJECT_ROOT)

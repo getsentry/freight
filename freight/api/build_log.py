@@ -1,9 +1,9 @@
 from __future__ import absolute_import
 
 from freight.api.bases.log import BaseLogApiView
-from freight.models import Deploy
+from freight.models import Build
 
 
-class DeployLogApiView(BaseLogApiView):
+class BuildLogApiView(BaseLogApiView):
     def __init__(self):
-        self.obj_model = Deploy
+        self.obj_model = Build

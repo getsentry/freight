@@ -14,7 +14,8 @@ from datetime import datetime, timedelta
 from uuid import uuid4
 
 from freight.config import db
-from freight.models import App, LogChunk, Task, TaskStatus, Repository, User
+from freight.models import (App, LogChunk, Task, TaskConfig, TaskConfigType, TaskStatus,
+    Repository, User)
 from freight.testutils.fixtures import Fixtures
 
 fixtures = Fixtures()
@@ -47,6 +48,20 @@ def main():
             name='Freight',
         )
 
+    deploy_config = TaskConfig.query.filter(
+        TaskConfig.app_id == app.id,
+        TaskConfig.type == TaskConfigType.deploy,
+    ).first()
+    if not deploy_config:
+        deploy_config = fixtures.create_taskconfig(app, type=TaskConfigType.deploy)
+
+    build_config = TaskConfig.query.filter(
+        TaskConfig.app_id == app.id,
+        TaskConfig.type == TaskConfigType.build,
+    ).first()
+    if not build_config:
+        build_config = fixtures.create_taskconfig(app, type=TaskConfigType.build)
+
     Task.query.filter(
         Task.status.in_([TaskStatus.in_progress, TaskStatus.pending]),
     ).update({
@@ -59,7 +74,6 @@ def main():
         user=user,
         sha=uuid4().hex,
         ref='master',
-        environment='production',
         status=TaskStatus.finished,
         date_started=datetime.utcnow() - timedelta(minutes=3),
         date_finished=datetime.utcnow(),
@@ -88,16 +102,28 @@ def main():
 
     db.session.commit()
 
-    task = fixtures.create_task(
+    sha = uuid4().hex
+    task1 = fixtures.create_task(
         app=app,
         user=user,
-        sha=uuid4().hex,
+        sha=sha,
         ref='master',
-        environment='production',
         status=TaskStatus.in_progress,
         date_started=datetime.utcnow(),
     )
 
+    task2 = fixtures.create_task(
+        task_type='build',
+        app=app,
+        user=user,
+        sha=sha,
+        ref='master',
+        status=TaskStatus.in_progress,
+        date_started=datetime.utcnow(),
+    )
+
+    deploy = fixtures.create_deploy(task1, app)
+    build = fixtures.create_build(task2, app)
 
 
 if __name__ == '__main__':

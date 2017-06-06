@@ -163,6 +163,9 @@ def configure_api(app):
     from freight.api.deploy_details import DeployDetailsApiView
     from freight.api.deploy_index import DeployIndexApiView
     from freight.api.deploy_log import DeployLogApiView
+    from freight.api.build_details import BuildDetailsApiView
+    from freight.api.build_index import BuildIndexApiView
+    from freight.api.build_log import BuildLogApiView
 
     api.add_resource(AppIndexApiView, '/apps/')
     api.add_resource(AppDetailsApiView, '/apps/<app>/')
@@ -170,6 +173,7 @@ def configure_api(app):
     api.add_resource(DeployIndexApiView, '/tasks/',
                      endpoint='deploy-index-deprecated')
     api.add_resource(DeployIndexApiView, '/deploys/')
+    api.add_resource(BuildIndexApiView, '/builds/')
 
     # old style
     api.add_resource(DeployDetailsApiView, '/deploys/<deploy_id>/')
@@ -184,6 +188,10 @@ def configure_api(app):
                      endpoint='deploy-details')
     api.add_resource(DeployLogApiView, '/deploys/<app>/<env>/<number>/log/',
                      endpoint='deploy-log')
+
+    # builds
+    api.add_resource(BuildDetailsApiView, '/builds/<app>/<number>/')
+    api.add_resource(BuildLogApiView, '/builds/<app>/<number>/log/')
 
     # catchall should be the last resource
     api.add_resource(ApiCatchall, '/<path:path>')

@@ -9,6 +9,7 @@ from freight.db.types.json import JSONEncodedDict
 
 class TaskConfigType(object):
     deploy = 0
+    build = 1
 
     @classmethod
     def get_label(cls, status):
@@ -21,6 +22,7 @@ class TaskConfigType(object):
 
 TYPE_LABELS = {
     TaskConfigType.deploy: 'deploy',
+    TaskConfigType.build: 'build',
 }
 TYPE_LABELS_REV = {
     v: k for k, v in TYPE_LABELS.items()
