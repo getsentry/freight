@@ -9,7 +9,8 @@
     "prevalidate-app.json": "npm install",
     "prestart": "npm install",
     "postinstall": "webpack -p",
-    "start": "webpack-dev-server --content-base freight-frontend/"
+    "start": "webpack-dev-server --content-base freight-frontend/",
+    "validate-app.json": "app.json validate"
   },
   "repository": {
     "type": "git",

@@ -33,3 +33,7 @@ lint-python:
 	@echo "--> Linting Python files"
 	bin/lint
 	@echo ""
+
+validate-heroku:
+	@echo "--> Validating app.json"
+	npm run validate-app.json
