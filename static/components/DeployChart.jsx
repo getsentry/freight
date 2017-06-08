@@ -2,9 +2,9 @@ var React = require('react');
 
 var api = require('../api');
 
-var BarChart = require("./BarChart");
+var BarChart     = require("./BarChart");
 var PollingMixin = require('../mixins/polling');
-var TaskSummary = require('./TaskSummary');
+var TaskSummary  = require('./TaskSummary');
 
 var DeployChart = React.createClass({
   mixins: [PollingMixin],

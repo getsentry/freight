@@ -6,9 +6,9 @@ import argparse
 import os
 import sys
 
-from datetime import datetime
-from rq.worker import logger
-from rq.logutils import setup_loghandlers
+from datetime        import datetime
+from rq.worker       import logger
+from rq.logutils     import setup_loghandlers
 from multiprocessing import Process
 
 

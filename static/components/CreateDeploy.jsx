@@ -12,10 +12,10 @@ var CreateDeploy = React.createClass({
   },
 
   getInitialState() {
-    let appList = this.props.appList;
+    let appList    = this.props.appList;
     let defaultApp = appList.length !== 0 ? appList[0] : null;
     let defaultEnv = defaultApp ? Object.keys(defaultApp.environments)[0] : null;
-    let envMap = defaultApp ? defaultApp.environments : {};
+    let envMap     = defaultApp ? defaultApp.environments : {};
     let defaultRef = defaultEnv ? envMap[defaultEnv].defaultRef : 'master';
 
     return {
@@ -29,12 +29,12 @@ var CreateDeploy = React.createClass({
   },
 
   onChangeApplication(e) {
-    let val = jQuery(e.target).val();
+    let val    = jQuery(e.target).val();
     let envMap = val ? this.props.appList.filter((app) => {
       return app.name === val;
     })[0].environments || {} : {};
     let envList = Object.keys(envMap);
-    let env = envList.length ? envList[0] : null;
+    let env     = envList.length ? envList[0] : null;
     this.setState({
       app: val,
       envMap: envMap,

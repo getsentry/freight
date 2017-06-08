@@ -286,6 +286,7 @@ var TaskDetails = React.createClass({
     }
 
     return (
+
       <div className={className}>
         <div className="deploy-log">
           {this.state.logLoading ?
