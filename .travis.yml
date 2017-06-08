@@ -13,8 +13,13 @@ cache:
 env:
   global:
     - PIP_DOWNLOAD_CACHE=".pip_download_cache"
+    - TRAVIS_NODE_VERSION="4.7.0"
+
 install:
+  - rm -rf ~/.nvm && git clone https://github.com/creationix/nvm.git ~/.nvm && (cd ~/.nvm && git checkout `git describe --abbrev=0 --tags`) && source ~/.nvm/nvm.sh && nvm install $TRAVIS_NODE_VERSION
+  - npm install
   - time make develop
+
 before_script:
   - psql -c 'create database test_freight;' -U postgres
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
