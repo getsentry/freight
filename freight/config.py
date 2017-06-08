@@ -25,6 +25,12 @@ sentry = Sentry(logging=True, level=logging.WARN)
 queue = Queue()
 
 
+@app.after_request
+def add_header(response):
+    response.cache_control.max_age = 300
+    return response
+
+
 def configure_logging(app):
     logging.getLogger().setLevel(getattr(logging, app.config['LOG_LEVEL']))
 

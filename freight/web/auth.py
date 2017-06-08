@@ -61,6 +61,12 @@ class AuthorizedView(MethodView):
         flow = get_auth_flow(redirect_uri=redirect_uri)
         resp = flow.step2_exchange(request.args['code'])
 
+        if current_app.config.get('WHITELISTED_USERS'):
+            if resp.id_token['email'] not in current_app.config['WHITELISTED_USERS']:
+                session.clear()
+                return redirect(url_for(self.complete_url))
+
+
         if current_app.config['GOOGLE_DOMAIN']:
             if resp.id_token.get('hd') != current_app.config['GOOGLE_DOMAIN']:
                 # TODO(dcramer): this should show some kind of error
