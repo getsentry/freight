@@ -1,10 +1,9 @@
-/*** @jsx React.DOM */
-var React = require("react");
+const React = require("react");
 
-var $ = require("jquery");
+const $ = require("jquery");
 require("bootstrap/js/tooltip");
 
-var TooltipTrigger = React.createClass({
+const TooltipTrigger = React.createClass({
   propTypes: {
     title: React.PropTypes.node.isRequired,
     placement: React.PropTypes.string,

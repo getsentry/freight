@@ -1,8 +1,7 @@
-import React from "react";
-import Router from "react-router";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { BrowserRouter } from 'react-router-dom';
 
 import routes from "./routes";
 
-Router.run(routes, Router.HistoryLocation, (Handler) => {
-  React.render(<Handler/>, document.body);
-});
+ReactDOM.render(<BrowserRouter routes={routes}/>, document.body);

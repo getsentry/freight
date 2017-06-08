@@ -6,11 +6,10 @@ import api from "../api";
 import Duration from "./Duration";
 import LoadingIndicator from './LoadingIndicator';
 import PollingMixin from "../mixins/polling";
-import TaskSummary from "./TaskSummary";
 import TimeSince from "./TimeSince";
 
 
-var Progress = React.createClass({
+const Progress = React.createClass({
   propTypes: {
     value: React.PropTypes.number.isRequired,
   },
@@ -22,7 +21,7 @@ var Progress = React.createClass({
   }
 });
 
-var TaskDetails = React.createClass({
+const TaskDetails = React.createClass({
   mixins: [PollingMixin, Router.Navigation, Router.State],
 
   getInitialState() {

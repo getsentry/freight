@@ -4,7 +4,7 @@ import Router from "react-router";
 
 import api from "../api";
 
-var CreateDeploy = React.createClass({
+const CreateDeploy = React.createClass({
   mixins: [Router.Navigation],
 
   contextTypes: {

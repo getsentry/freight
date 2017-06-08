@@ -1,9 +1,9 @@
-var React = require("react");
-var Router = require("react-router");
+const React = require("react");
+const Router = require("react-router");
 
-var classSet = require('react/lib/cx');
+const classSet = require('react/lib/cx');
 
-var ListLink = React.createClass({
+const ListLink = React.createClass({
   displayName: 'ListLink',
 
   contextTypes: {
@@ -29,7 +29,7 @@ var ListLink = React.createClass({
   ],
 
   getClassName() {
-    var classNames = {};
+    const classNames = {};
 
     if (this.props.className)
       classNames[this.props.className] = true;

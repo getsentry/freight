@@ -1,16 +1,15 @@
-/*** @jsx React.DOM */
-var React = require("react");
+const React = require("react");
 
-var Duration = React.createClass({
+const Duration = React.createClass({
   propTypes: {
     seconds: React.PropTypes.number.isRequired
   },
 
   getDuration() {
-    var result, neg;
-    var value = this.props.seconds * 1000;
+    let result, neg;
+    let value = this.props.seconds * 1000;
 
-    neg = value < 0 ? true : false;
+    neg = (value < 0);
     if (neg) {
       value = -value;
     }

@@ -1,13 +1,13 @@
-var React = require('react');
-var Router = require('react-router');
+const React = require('react');
+const Router = require('react-router');
 
-var api = require('../api');
+const api = require('../api');
 
 import LoadingIndicator from './LoadingIndicator';
-var PollingMixin = require('../mixins/polling');
-var TaskSummary = require('./TaskSummary');
+const PollingMixin = require('../mixins/polling');
+const TaskSummary = require('./TaskSummary');
 
-var AppDetails = React.createClass({
+const AppDetails = React.createClass({
   mixins: [PollingMixin, Router.State],
 
   contextTypes: {
@@ -59,11 +59,11 @@ var AppDetails = React.createClass({
   },
 
   taskInProgress(task) {
-    return task.status == 'in_progress';
+    return task.status === 'in_progress';
   },
 
   taskPending(task) {
-    return task.status == 'pending';
+    return task.status === 'pending';
   },
 
   render() {
@@ -71,13 +71,13 @@ var AppDetails = React.createClass({
       return <LoadingIndicator />;
     }
 
-    var {app, tasks} = this.state;
-    var activeTaskNodes = [];
-    var pendingTaskNodes = [];
-    var previousTaskNodes = [];
+    const {app, tasks} = this.state;
+    const activeTaskNodes = [];
+    const pendingTaskNodes = [];
+    const previousTaskNodes = [];
 
     tasks.forEach((task) => {
-      var node = <TaskSummary key={task.id} task={task} />;
+      const node = <TaskSummary key={task.id} task={task} />;
       if (this.taskInProgress(task)) {
         activeTaskNodes.unshift(node);
       } else if (this.taskPending(task)) {

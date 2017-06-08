@@ -1,10 +1,9 @@
-/*** @jsx React.DOM */
-var moment = require("moment");
-var React = require("react");
+const moment = require("moment");
+const React = require("react");
 
-var TooltipTrigger = require("./TooltipTrigger");
+const TooltipTrigger = require("./TooltipTrigger");
 
-var BarChart = React.createClass({
+const BarChart = React.createClass({
   propTypes: {
     points: React.PropTypes.arrayOf(React.PropTypes.shape({
       x: React.PropTypes.number.isRequired,
@@ -25,13 +24,13 @@ var BarChart = React.createClass({
   },
 
   floatFormat(number, places) {
-      var multi = Math.pow(10, places);
+      const multi = Math.pow(10, places);
       return parseInt(number * multi, 10) / multi;
   },
 
   timeLabelAsHour(point) {
-    var timeMoment = moment(point.x * 1000);
-    var nextMoment = timeMoment.clone().add(59, "minute");
+    const timeMoment = moment(point.x * 1000);
+    const nextMoment = timeMoment.clone().add(59, "minute");
 
     return (
       <span>
@@ -42,8 +41,7 @@ var BarChart = React.createClass({
   },
 
   timeLabelAsDay(point) {
-    var timeMoment = moment(point.x * 1000);
-    var nextMoment = timeMoment.clone().add(59, "minute");
+    const timeMoment = moment(point.x * 1000);
 
     return (
       <span>
@@ -53,8 +51,8 @@ var BarChart = React.createClass({
   },
 
   timeLabelAsRange(interval, point) {
-    var timeMoment = moment(point.x * 1000);
-    var nextMoment = timeMoment.clone().add(interval - 1, "second");
+    const timeMoment = moment(point.x * 1000);
+    const nextMoment = timeMoment.clone().add(interval - 1, "second");
 
     return (
       <span>
@@ -65,23 +63,23 @@ var BarChart = React.createClass({
   },
 
   timeLabelAsFull(point) {
-    var timeMoment = moment(point.x * 1000);
+    const timeMoment = moment(point.x * 1000);
     return timeMoment.format("lll");
   },
 
   render(){
-    var points = this.props.points;
-    var maxval = 10;
+    const points = this.props.points;
+    let maxval = 10;
     points.forEach(function(point){
       if (point.y > maxval) {
         maxval = point.y;
       }
     });
 
-    var pointWidth = this.floatFormat(100.0 / points.length, 2) + "%";
+    const pointWidth = this.floatFormat(100.0 / points.length, 2) + "%";
 
-    var interval = (points.length > 1 ? points[1].x - points[0].x : null);
-    var timeLabelFunc;
+    const interval = (points.length > 1 ? points[1].x - points[0].x : null);
+    let timeLabelFunc;
     switch (interval) {
       case 3600:
         timeLabelFunc = this.timeLabelAsHour;
@@ -96,11 +94,11 @@ var BarChart = React.createClass({
         timeLabelFunc = this.timeLabelAsRange.bind(this, interval);
     }
 
-    var children = points.map((point, pointIdx) => {
-      var pct = this.floatFormat(point.y / maxval * 99, 2) + "%";
-      var timeLabel = timeLabelFunc(point);
+    const children = points.map((point, pointIdx) => {
+      const pct = this.floatFormat(point.y / maxval * 99, 2) + "%";
+      const timeLabel = timeLabelFunc(point);
 
-      var title = (
+      let title = (
         <div style={{minWidth: 100}}>
           {point.y} {this.props.label}<br/>
           {timeLabel}

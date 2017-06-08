@@ -1,14 +1,13 @@
-/*** @jsx React.DOM */
-var React = require("react");
-var moment = require("moment");
+const React = require("react");
+const moment = require("moment");
 
-var TimeSince = React.createClass({
+const TimeSince = React.createClass({
   propTypes: {
     date: React.PropTypes.any.isRequired
   },
 
   componentDidMount: function() {
-    var delay = 2600;
+    const delay = 2600;
 
     this.ticker = setInterval(this.ensureValidity, delay);
   },
@@ -26,7 +25,7 @@ var TimeSince = React.createClass({
   },
 
   render: function() {
-    var date = this.props.date;
+    let date = this.props.date;
 
     if (typeof date === "string" || typeof date === "number") {
       date = new Date(date);

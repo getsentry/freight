@@ -1,4 +1,4 @@
-var jQuery = require("jquery");
+const jQuery = require("jquery");
 
 class Client {
   constructor(options) {
@@ -9,10 +9,10 @@ class Client {
   }
 
   request(path, options) {
-    var query = jQuery.param(options.query || "", true);
-    var method = options.method || (options.data ? "POST" : "GET");
-    var data = options.data;
-    var contentType;
+    const query = jQuery.param(options.query || "", true);
+    const method = options.method || (options.data ? "POST" : "GET");
+    let data = options.data;
+    let contentType;
 
     if (typeof data !== "undefined") {
       data = JSON.stringify(data);
@@ -21,7 +21,7 @@ class Client {
       contentType = undefined;
     }
 
-    var fullUrl = this.baseUrl + path;
+    let fullUrl = this.baseUrl + path;
     if (query) {
       if (fullUrl.indexOf('?') !== -1) {
         fullUrl += '&' + query;

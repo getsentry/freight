@@ -1,13 +1,13 @@
-var React = require('react');
+const React = require('react');
 
-var api = require('../api');
+const api = require('../api');
 
-var DeployChart = require("./DeployChart");
+const DeployChart = require("./DeployChart");
 import LoadingIndicator from './LoadingIndicator';
-var PollingMixin = require('../mixins/polling');
-var TaskSummary = require('./TaskSummary');
+const PollingMixin = require('../mixins/polling');
+const TaskSummary = require('./TaskSummary');
 
-var Overview = React.createClass({
+const Overview = React.createClass({
   mixins: [PollingMixin],
 
   contextTypes: {
