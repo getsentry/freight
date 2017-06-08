@@ -102,6 +102,10 @@ def main():
         date_started=datetime.utcnow(),
     )
 
+    lock = fixtures.create_lock(
+        app_id=app.id,
+        user_id=user.id,
+    )
 
 
 if __name__ == '__main__':

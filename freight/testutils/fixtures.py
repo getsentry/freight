@@ -3,12 +3,13 @@ from __future__ import absolute_import
 __all__ = ['Fixtures']
 
 from uuid import uuid4
+from datetime import datetime, timedelta
 
 from freight.config import db
 from freight.constants import PROJECT_ROOT
 from freight.models import (
     App, Repository, Task, DeploySequence, Deploy, TaskStatus, User,
-    TaskConfig, TaskConfigType,
+    TaskConfig, TaskConfigType, Lock,
 )
 
 
@@ -106,3 +107,19 @@ class Fixtures(object):
         db.session.commit()
 
         return user
+
+    def create_lock(self, **kwargs):
+        if not kwargs.get('message'):
+            kwargs['message'] = 'The roof is on fire.'
+
+        if not kwargs.get('date_locked'):
+            kwargs['date_locked'] = datetime.utcnow() - timedelta(hours=1)
+
+        if not kwargs.get('date_unlocked'):
+            kwargs['date_unlocked'] = datetime.utcnow()
+
+        newlock = Lock(**kwargs)
+        db.session.add(newlock)
+        db.session.commit()
+
+        return newlock
