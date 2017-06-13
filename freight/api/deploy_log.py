@@ -8,6 +8,9 @@ from freight.models import LogChunk
 
 from .deploy_details import DeployMixin
 
+# Edit this file so that I can actually seperate the chunks of data instead of
+# appending them to one big ass text chunk.
+
 
 class DeployLogApiView(ApiView, DeployMixin):
     get_parser = reqparse.RequestParser()
@@ -25,7 +28,7 @@ class DeployLogApiView(ApiView, DeployMixin):
         args = self.get_parser.parse_args()
 
         queryset = db.session.query(
-            LogChunk.text, LogChunk.offset, LogChunk.size
+            LogChunk.text, LogChunk.offset, LogChunk.size, LogChunk.date_created,
         ).filter(
             LogChunk.task_id == deploy.task_id,
         ).order_by(LogChunk.offset.asc())
@@ -63,8 +66,11 @@ class DeployLogApiView(ApiView, DeployMixin):
         links = [self.build_cursor_link('next', next_offset)]
 
         context = {
-            'text': ''.join(l.text for l in logchunks),
             'nextOffset': next_offset,
+            'chunks': [{
+                'text': c.text,
+                'date': c.date_created.isoformat(),
+            } for c in logchunks]
         }
 
         return self.respond(context, links=links)
