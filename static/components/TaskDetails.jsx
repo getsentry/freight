@@ -9,6 +9,7 @@ import PollingMixin from "../mixins/polling";
 import TaskSummary from "./TaskSummary";
 import TimeSince from "./TimeSince";
 
+var moment = require('moment');
 
 var Progress = React.createClass({
   propTypes: {
@@ -31,7 +32,7 @@ var TaskDetails = React.createClass({
       logLoading: true,
       task: null,
       logNextOffset: 0,
-      liveScroll: true
+      liveScroll: true,
     };
   },
 
@@ -114,15 +115,34 @@ var TaskDetails = React.createClass({
   },
 
   updateBuildLog(data) {
-    var frag = document.createDocumentFragment();
-
     // add each additional new line
-    data.text.split('\n').forEach((line) => {
-      var div = document.createElement('div');
-      div.className = 'line';
-      div.innerHTML = ansi_up.ansi_to_html(line);
+    var frag       = document.getElementsByClassName('frag')[0] || document.createDocumentFragment();
+    frag.className = 'frag';
+
+    var text       = data.chunks
+    var objLength  = data.chunks.length
+
+    for(var i = 0; i < objLength; i++){
+      var timer    = new Date(data.chunks[i].date)
+      var timeMil  = timer.getTime()
+      var offset   = timer.getTimezoneOffset() * 60000
+      var timezone = timeMil - offset
+      var newDate  = new Date(timezone)
+
+      var div  = document.createElement('div');
+      var time = document.createElement('div');
+
+      div.className  = 'line';
+      time.className = 'time';
+
+      var words = data.chunks[i].text.split('>>' || '--->' ||'>')
+
+      div.innerHTML  = data.chunks[i].text
+      console.log(words)
+      time.innerHTML = "This part finished on " + moment(newDate).parseZone().format("dddd, MMMM Do YYYY, h:mm:ss a")
       frag.appendChild(div);
-    });
+      frag.appendChild(time);
+    }
 
     this.refs.log.getDOMNode().appendChild(frag);
 
@@ -155,12 +175,13 @@ var TaskDetails = React.createClass({
 
   pollLog() {
     var task = this.state.task;
+    var currentTime = new Date().getMilliseconds();
 
     var url = '/deploys/' + task.app.name + '/' + task.environment + '/' + task.number + '/log/?offset=' + this.state.logNextOffset;
 
     api.request(url, {
       success: (data) => {
-        if (data.text !== "") {
+        if (data.chunks.length > 0) {
           this.setState({
             logLoading: false,
             logNextOffset: data.nextOffset
@@ -335,7 +356,7 @@ var TaskDetails = React.createClass({
                   <a className={liveScrollClassName}
                      onClick={this.toggleLiveScroll}>
                     <input type="checkbox"
-                           checked={this.state.liveScroll} />
+                           defaultChecked={this.state.liveScroll} />
                     <span>Follow</span>
                   </a>
                 </span>
