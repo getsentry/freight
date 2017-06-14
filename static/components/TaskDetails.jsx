@@ -122,7 +122,9 @@ var TaskDetails = React.createClass({
     var text       = data.chunks
     var objLength  = data.chunks.length
 
+
     for(var i = 0; i < objLength; i++){
+      console.log(data.chunks[i].text)
       var timer    = new Date(data.chunks[i].date)
       var timeMil  = timer.getTime()
       var offset   = timer.getTimezoneOffset() * 60000
@@ -135,11 +137,9 @@ var TaskDetails = React.createClass({
       div.className  = 'line';
       time.className = 'time';
 
-      var words = data.chunks[i].text.split('>>' || '--->' ||'>')
 
-      div.innerHTML  = data.chunks[i].text
-      console.log(words)
-      time.innerHTML = "This part finished on " + moment(newDate).parseZone().format("dddd, MMMM Do YYYY, h:mm:ss a")
+      div.innerHTML  = ansi_up.ansi_to_html(data.chunks[i].text)
+      time.innerHTML = "Chunk finished at " + moment(newDate).parseZone().format("h:mm:ss a")
       frag.appendChild(div);
       frag.appendChild(time);
     }
