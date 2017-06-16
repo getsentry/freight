@@ -175,8 +175,6 @@ var TaskDetails = React.createClass({
 
   pollLog() {
     var task = this.state.task;
-    var currentTime = new Date().getMilliseconds();
-
     var url = '/deploys/' + task.app.name + '/' + task.environment + '/' + task.number + '/log/?offset=' + this.state.logNextOffset;
 
     api.request(url, {
