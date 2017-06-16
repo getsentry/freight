@@ -124,9 +124,9 @@ var TaskDetails = React.createClass({
 
 
     for(var i = 0; i < objLength; i++){
-      console.log(data.chunks[i].text)
       var timer    = new Date(data.chunks[i].date)
       var timeMil  = timer.getTime()
+      //Multiple by 60000 to convert offset to milliseconds
       var offset   = timer.getTimezoneOffset() * 60000
       var timezone = timeMil - offset
       var newDate  = new Date(timezone)
