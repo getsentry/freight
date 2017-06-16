@@ -8,9 +8,6 @@ from freight.models import LogChunk
 
 from .deploy_details import DeployMixin
 
-# Edit this file so that I can actually seperate the chunks of data instead of
-# appending them to one big ass text chunk.
-
 
 class DeployLogApiView(ApiView, DeployMixin):
     get_parser = reqparse.RequestParser()
