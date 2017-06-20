@@ -137,11 +137,11 @@ var TaskDetails = React.createClass({
       div.className  = 'line';
       time.className = 'time';
 
-
       div.innerHTML  = ansi_up.ansi_to_html(data.chunks[i].text)
-      time.innerHTML = "Chunk finished at " + moment(newDate).parseZone().format("h:mm:ss a")
-      frag.appendChild(div);
-      frag.appendChild(time);
+      time.innerHTML = moment(newDate).parseZone().format("h:mm a")
+
+      frag.appendChild(time)
+      frag.appendChild(div)
     }
 
     this.refs.log.getDOMNode().appendChild(frag);
