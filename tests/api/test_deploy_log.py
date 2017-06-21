@@ -42,37 +42,37 @@ class DeployLogTest(DeployLogBase):
         assert resp.status_code == 200
         data = json.loads(resp.data)
         assert data['nextOffset'] == 11
-        assert data['text'] == 'hello world'
+        assert ''.join(chunk['text'] for chunk in data['chunks']) == 'hello world'
 
     def test_alt_path(self):
         resp = self.client.get(self.alt_path)
         assert resp.status_code == 200
         data = json.loads(resp.data)
         assert data['nextOffset'] == 11
-        assert data['text'] == 'hello world'
+        assert ''.join(chunk['text'] for chunk in data['chunks']) == 'hello world'
 
     def test_limit_and_offset(self):
         resp = self.client.get(self.path + '?limit=1')
         assert resp.status_code == 200
         data = json.loads(resp.data)
-        assert data['text'] == 'h'
+        assert data['chunks'][0]['text'] == 'h'
         assert data['nextOffset'] == 1
 
         resp = self.client.get(self.path + '?limit=1&offset=1')
         assert resp.status_code == 200
         data = json.loads(resp.data)
-        assert data['text'] == 'e'
+        assert data['chunks'][0]['text'] == 'e'
         assert data['nextOffset'] == 2
 
     def test_tail(self):
         resp = self.client.get(self.path + '?offset=-1&limit=1')
         assert resp.status_code == 200
         data = json.loads(resp.data)
-        assert data['text'] == 'd'
+        assert data['chunks'][0]['text'] == 'd'
         assert data['nextOffset'] == 11
 
         resp = self.client.get(self.path + '?offset=-1&limit=11')
         assert resp.status_code == 200
         data = json.loads(resp.data)
-        assert data['text'] == 'hello world'
+        assert ''.join(chunk['text'] for chunk in data['chunks']) == 'hello world'
         assert data['nextOffset'] == 11

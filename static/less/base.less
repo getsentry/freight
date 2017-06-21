@@ -395,12 +395,36 @@ header {
 
   .deploy-log {
     padding: 5px;
+    position: relative;
+    width: 100%;
 
     .line {
       font-family: monospace, serif;
       font-size: 0.9em;
       white-space: pre-wrap;
       line-height: 20px;
+      margin-right: 70px;
+    }
+    .time{
+      width: 57px;
+      height: 21px;
+      display: inline-block;
+      right: 11px;
+      left: auto;
+      position: absolute;
+      background: @lessDark;
+      border-radius: 15px;
+      font-family: Helvetica Neue, serif;
+      font-style: normal;
+      font-size: 9px;
+      text-align: center;
+      vertical-align: middle;
+      line-height: 21px;
+      color: #FFFFFF;
+    }
+    .time:hover{
+      color: #FFFFFF;
+      background: lighten(@dark, 20%);
     }
   }
 }
