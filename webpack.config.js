@@ -64,7 +64,7 @@ module.exports = {
   output: {
     publicPath: "/dist/",
     path: __dirname + "/dist",
-    filename: "[name].js",
+    filename: "[name].[chunkhash].js",
   },
   devtool: 'source-map'
 };
