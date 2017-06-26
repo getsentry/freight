@@ -9,7 +9,7 @@ import TaskSummary from "./TaskSummary";
 import TimeSince from "./TimeSince";
 import { browserHistory } from 'react-router';
 
-var moment = require("moment");
+var moment = require('moment');
 
 var Progress = React.createClass({
   propTypes: {
