@@ -136,6 +136,7 @@ var TaskDetails = React.createClass({
 
       div.className  = 'line';
       time.className = 'time';
+
       div.innerHTML  = ansi_up.ansi_to_html(data.chunks[i].text)
       time.innerHTML = moment(newDate).parseZone().format("h:mm a")
 
