@@ -1,8 +1,12 @@
 import React from "react";
-import Router from "react-router";
+import ReactDOM from "react-dom";
+
+import {Router, browserHistory} from "react-router";
 
 import routes from "./routes";
 
-Router.run(routes, Router.HistoryLocation, (Handler) => {
-  React.render(<Handler/>, document.body);
-});
+
+ReactDOM.render(
+      React.createElement(Router, {history: browserHistory}, routes()),
+      document.getElementById("app")
+    );
