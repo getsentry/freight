@@ -13,7 +13,9 @@ cache:
 env:
   global:
     - PIP_DOWNLOAD_CACHE=".pip_download_cache"
+    - TRAVIS_NODE_VERSION=4
 install:
+  - nvm install $TRAVIS_NODE_VERSION
   - time make develop
 before_script:
   - psql -c 'create database test_freight;' -U postgres
