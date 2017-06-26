@@ -23,11 +23,9 @@ var routes = () => {
       <Route path="/:app" component={AppDetails} />
       <Route
        path="*"
-       component={RouteNotFound}
-     />
+       component={RouteNotFound} />
     </Route>
   );
 };
-
 
 export default routes;
