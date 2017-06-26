@@ -4,8 +4,9 @@ import Router from "react-router";
 
 import api from "../api";
 
+import { browserHistory } from 'react-router';
+
 var CreateDeploy = React.createClass({
-  mixins: [Router.Navigation],
 
   contextTypes: {
     router: React.PropTypes.func
@@ -89,11 +90,8 @@ var CreateDeploy = React.createClass({
   },
 
   gotoDeploy(deploy) {
-    this.transitionTo('deployDetails', {
-      app: deploy.app.name,
-      env: deploy.environment,
-      number: deploy.number
-    });
+    let {app, environment, number} = deploy;
+    browserHistory.push(`/deploys/${app.name}/${environment}/${number}`);
   },
 
   render() {
