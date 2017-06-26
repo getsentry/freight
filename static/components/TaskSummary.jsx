@@ -77,7 +77,7 @@ var TaskSummary = React.createClass({
     if (task.status === 'failed') {
       className += ' failed';
     } else if (task.status === 'cancelled') {
-      className += 'cancelled';
+      className += ' cancelled';
     }
 
     return (
