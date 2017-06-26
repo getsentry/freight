@@ -1,10 +1,11 @@
 var React = require('react');
 var Router = require('react-router');
 var Link = Router.Link;
-var joinClasses = require("react/lib/joinClasses");
-
+var classnames = require('classnames');
 var Duration = require('./Duration');
 var TimeSince = require('./TimeSince');
+
+import { browserHistory } from 'react-router';
 
 var Progress = React.createClass({
   propTypes: {
@@ -19,7 +20,9 @@ var Progress = React.createClass({
 });
 
 var TaskSummary = React.createClass({
-  mixins: [Router.Navigation],
+   contextTypes: {
+    router: React.PropTypes.object.isRequired
+  },
 
   taskInProgress(task) {
     return task.status == 'in_progress' || task.status == 'pending';
@@ -53,17 +56,14 @@ var TaskSummary = React.createClass({
         return 'In progress';
     }
   },
-
   gotoTask(e) {
     if (e) {
       e.preventDefault();
     }
 
-    this.transitionTo('deployDetails', {
-      app: this.props.task.app.name,
-      env: this.props.task.environment,
-      number: this.props.task.number
-    });
+    let {app, environment, number} = this.props.task;
+
+    browserHistory.push(`/deploys/${app.name}/${environment}/${number}`);
   },
 
   render() {
@@ -77,11 +77,11 @@ var TaskSummary = React.createClass({
     if (task.status === 'failed') {
       className += ' failed';
     } else if (task.status === 'cancelled') {
-      className += ' cancelled';
+      className += 'cancelled';
     }
 
     return (
-      <div className={joinClasses(this.props.className, className)}
+      <div className={classnames(this.props.className, className)}
            onClick={this.gotoTask}>
         <Progress value={this.getEstimatedProgress(task)} />
         <h3>
