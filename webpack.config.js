@@ -15,7 +15,6 @@ module.exports = {
       "babel-core/polyfill",
       "jquery",
       "moment",
-      "react/addons",
       "react-router"
     ]
   },
