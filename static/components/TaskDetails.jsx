@@ -1,15 +1,15 @@
 import ansi_up from "ansi_up";
 import React from "react";
-import Router from "react-router";
 
 import api from "../api";
 import Duration from "./Duration";
-import LoadingIndicator from './LoadingIndicator';
+import LoadingIndicator from "./LoadingIndicator";
 import PollingMixin from "../mixins/polling";
 import TaskSummary from "./TaskSummary";
 import TimeSince from "./TimeSince";
+import { browserHistory } from 'react-router';
 
-var moment = require('moment');
+var moment = require("moment");
 
 var Progress = React.createClass({
   propTypes: {
@@ -24,7 +24,7 @@ var Progress = React.createClass({
 });
 
 var TaskDetails = React.createClass({
-  mixins: [PollingMixin, Router.Navigation, Router.State],
+  mixins: [PollingMixin],
 
   getInitialState() {
     return {
@@ -61,7 +61,7 @@ var TaskDetails = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    var params = this.getParams();
+    var params = this.props.params;
     var task = this.state.task;
     if (params.app !== task.app.name || params.env !== task.environment || params.number !== task.number) {
       this.setState({
@@ -78,7 +78,7 @@ var TaskDetails = React.createClass({
     }
 
     if (this.refs.log) {
-      this.refs.log.getDOMNode().innerHTML = '';
+      this.refs.log.innerHTML = '';
     }
 
     api.request(this.getPollingUrl(), {
@@ -104,8 +104,8 @@ var TaskDetails = React.createClass({
   },
 
   getPollingUrl() {
-    var params = this.getParams();
-    return '/deploys/' + params.app + '/' + params.env + '/' + params.number + '/';
+    var {app, env, number} = this.props.params;
+    return '/deploys/' + app + '/' + env + '/' + number + '/';
   },
 
   pollingReceiveData(data) {
@@ -144,7 +144,7 @@ var TaskDetails = React.createClass({
       frag.appendChild(div)
     }
 
-    this.refs.log.getDOMNode().appendChild(frag);
+    this.refs.log.appendChild(frag);
 
     if (this.state.liveScroll) {
       this.scrollLog();
@@ -250,11 +250,8 @@ var TaskDetails = React.createClass({
           ref: task.sha,
         },
         success: (data) => {
-          this.transitionTo('deployDetails', {
-            app: data.app.name,
-            env: data.environment,
-            number: data.number
-          });
+          let {app, environment, number} = this.props.task;
+          browserHistory.push(`/deploys/${app.name}/${environment}/${number}`);
         }
       });
     });
