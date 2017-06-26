@@ -9,8 +9,6 @@ import Overview from "./components/Overview";
 import RouteNotFound from "./components/RouteNotFound";
 import TaskDetails from "./components/TaskDetails";
 
-
-
 var routes = () => {
   return (
     <Route exact path="/" component={Layout}>
