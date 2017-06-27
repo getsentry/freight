@@ -9,7 +9,7 @@ import { browserHistory } from 'react-router';
 var CreateDeploy = React.createClass({
 
   contextTypes: {
-    router: React.PropTypes.object.isRequred,
+    router: React.PropTypes.func
   },
 
   getInitialState() {
