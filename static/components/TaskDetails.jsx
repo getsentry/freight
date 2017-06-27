@@ -105,7 +105,7 @@ var TaskDetails = React.createClass({
 
   getPollingUrl() {
     var {app, env, number} = this.props.params;
-    return '/deploys/' + app + '/' + env + '/' + number + '/';
+    return `/deploys/${app}/${env}/${number}/`;
   },
 
   pollingReceiveData(data) {
