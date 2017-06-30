@@ -44,10 +44,22 @@ module.exports = {
     ]
   },
   plugins: [
+    function() {
+      this.plugin("done", function(stats) {
+        console.log(JSON.stringify(stats.toJson({
+          assetsSort: true
+        }).publicPath))
+        require("fs").writeFileSync(
+          path.join(__dirname, "/", "stats.json"),
+          JSON.stringify(stats.toJson({
+            assetsSort: true
+          }).assetsByChunkName));
+      });
+    },
     new ExtractTextPlugin("styles.css", {
       allChunks: true
     }),
-    new webpack.optimize.CommonsChunkPlugin("vendor", "vendor.js"),
+    //new webpack.optimize.CommonsChunkPlugin("vendor", "vendor.js"),
     new webpack.optimize.DedupePlugin(),
     new webpack.ProvidePlugin({
         $: 'jquery',
