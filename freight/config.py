@@ -11,6 +11,7 @@ from flask_sslify import SSLify
 from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
 from werkzeug.contrib.fixers import ProxyFix
+from flask_webpack import Webpack
 
 from freight.queue import Queue
 from freight.api.controller import ApiController
@@ -23,6 +24,7 @@ heroku = Heroku()
 redis = Redis()
 sentry = Sentry(logging=True, level=logging.WARN)
 queue = Queue()
+webpack = Webpack()
 
 
 def configure_logging(app):
@@ -151,6 +153,7 @@ def create_app(_read_config=True, **config):
     configure_queue(app)
     configure_sqlalchemy(app)
     configure_web_routes(app)
+    configure_webpack(app)
 
     return app
 
@@ -216,6 +219,11 @@ def configure_sentry(app):
 
 def configure_sqlalchemy(app):
     db.init_app(app)
+
+
+def configure_webpack(app):
+    app.config['WEBPACK_MANIFEST_PATH'] = '../stats.json'
+    webpack.init_app(app)
 
 
 def configure_web_routes(app):
