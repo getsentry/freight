@@ -46,20 +46,35 @@ module.exports = {
   plugins: [
     function() {
       this.plugin("done", function(stats) {
-        console.log(JSON.stringify(stats.toJson({
+        var app = stats.toJson({
           assetsSort: true
-        }).publicPath))
+        }).assetsByChunkName.app[0]
+
+        var vendor = stats.toJson({
+          assetsSort: true
+        }).assetsByChunkName.vendor[0]
+
+        var styles = stats.toJson({
+          assetsSort: true
+        }).assetsByChunkName.styles[0]
+
+        var newObj = {
+          "assets": {
+            "vendor.js": vendor,
+            "app.js": app,
+            "styles.css": styles
+          },
+          "publicPath": "/static/"
+        };
+        console.log(newObj)
         require("fs").writeFileSync(
           path.join(__dirname, "/", "stats.json"),
-          JSON.stringify(stats.toJson({
-            assetsSort: true
-          }).assetsByChunkName));
+          JSON.stringify(newObj));
       });
     },
     new ExtractTextPlugin("styles.css", {
       allChunks: true
     }),
-    //new webpack.optimize.CommonsChunkPlugin("vendor", "vendor.js"),
     new webpack.optimize.DedupePlugin(),
     new webpack.ProvidePlugin({
         $: 'jquery',
