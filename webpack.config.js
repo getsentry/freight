@@ -66,7 +66,6 @@ module.exports = {
           },
           "publicPath": "/static/"
         };
-        console.log(newObj)
         require("fs").writeFileSync(
           path.join(__dirname, "/", "stats.json"),
           JSON.stringify(newObj));
