@@ -15,7 +15,6 @@ module.exports = {
       "babel-core/polyfill",
       "jquery",
       "moment",
-      "react/addons",
       "react-router"
     ]
   },
@@ -45,10 +44,36 @@ module.exports = {
     ]
   },
   plugins: [
+    function() {
+      this.plugin("done", function(stats) {
+        var app = stats.toJson({
+          assetsSort: true
+        }).assetsByChunkName.app[0]
+
+        var vendor = stats.toJson({
+          assetsSort: true
+        }).assetsByChunkName.vendor[0]
+
+        var styles = stats.toJson({
+          assetsSort: true
+        }).assetsByChunkName.styles[0]
+
+        var newObj = {
+          "assets": {
+            "vendor.js": vendor,
+            "app.js": app,
+            "styles.css": styles
+          },
+          "publicPath": "/static/"
+        };
+        require("fs").writeFileSync(
+          path.join(__dirname, "/", "stats.json"),
+          JSON.stringify(newObj));
+      });
+    },
     new ExtractTextPlugin("styles.css", {
       allChunks: true
     }),
-    new webpack.optimize.CommonsChunkPlugin("vendor", "vendor.js"),
     new webpack.optimize.DedupePlugin(),
     new webpack.ProvidePlugin({
         $: 'jquery',
@@ -65,7 +90,7 @@ module.exports = {
   output: {
     publicPath: "/dist/",
     path: __dirname + "/dist",
-    filename: "[name].js",
+    filename: "[name].[chunkhash].js",
   },
   devtool: 'source-map'
 };

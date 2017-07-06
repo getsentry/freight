@@ -1,5 +1,8 @@
 /*** @jsx React.DOM */
 var React = require("react");
+import ReactDOM from "react-dom";
+import {findDOMNode} from 'react';
+import ReactDOMServer from 'react-dom/server';
 
 var $ = require("jquery");
 require("bootstrap/js/tooltip");
@@ -26,16 +29,16 @@ var TooltipTrigger = React.createClass({
 
   componentDidMount() {
     // These can be configured via options; this is just a demo
-    $(this.getDOMNode()).tooltip({
+  $(ReactDOM.findDOMNode(this)).tooltip({
       html: true,
       placement: this.props.placement,
-      title: React.renderToString(this.props.title),
+      title: ReactDOMServer.renderToString(this.props.title),
       viewport: this.props.viewport
     });
   },
 
   componentWillUnmount() {
-    var node = $(this.getDOMNode());
+    var node = $(ReactDOM.findDOMNode(this));
     node.tooltip("destroy");
     node.unbind("show.bs.tooltip", "shown.bs.tooltip", "hide.bs.tooltip", "hidden.bs.tooltip");
   },

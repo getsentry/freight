@@ -12,4 +12,3 @@ var RouteNotFound = React.createClass({
 });
 
 export default RouteNotFound;
-

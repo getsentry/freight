@@ -19,7 +19,8 @@
     </script>
   </head>
   <body>
+    <div id="app"></div>
   </body>
-  <script src="{{ url_for('static', filename='vendor.js') }}"></script>
-  <script src="{{ url_for('static', filename='app.js') }}"></script>
+  <script src="{{ asset_url_for('vendor.js') }}"></script>
+  <script src="{{ asset_url_for('app.js') }}"></script>
 </html>

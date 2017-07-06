@@ -1,5 +1,5 @@
 import React from "react";
-import {Link, RouteHandler} from "react-router";
+import {Link} from "react-router";
 
 import api from "../api";
 import Indicators from './Indicators';
@@ -72,9 +72,9 @@ const Layout = React.createClass({
         <header>
           <div className="container">
             <div className="pull-right">
-              <Link to="createDeploy" className="btn btn-sm btn-default">Deploy</Link>
+              <Link to="/deploy" className="btn btn-sm btn-default">Deploy</Link>
             </div>
-            <h1><Link to="overview">Freight</Link></h1>
+            <h1><Link to="/">Freight</Link></h1>
             {this.state.heading &&
               <h2>{this.state.heading}</h2>
             }
@@ -82,7 +82,9 @@ const Layout = React.createClass({
         </header>
         <div className="body">
           <div className="container">
-            <RouteHandler appList={this.state.appList} />
+            {React.cloneElement(this.props.children, {
+              appList: this.state.appList
+            })}
           </div>
         </div>
       </div>

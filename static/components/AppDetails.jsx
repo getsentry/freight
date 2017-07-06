@@ -7,8 +7,9 @@ import LoadingIndicator from './LoadingIndicator';
 var PollingMixin = require('../mixins/polling');
 var TaskSummary = require('./TaskSummary');
 
+
 var AppDetails = React.createClass({
-  mixins: [PollingMixin, Router.State],
+  mixins: [PollingMixin],
 
   contextTypes: {
     setHeading: React.PropTypes.func,
@@ -16,7 +17,7 @@ var AppDetails = React.createClass({
 
   getInitialState() {
     return {
-      appId: this.getParams().app,
+      appId: this.props.params.app,
       app: null,
       tasks: null,
     };

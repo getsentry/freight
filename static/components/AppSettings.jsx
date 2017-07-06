@@ -6,15 +6,15 @@ import IndicatorStore from '../stores/indicatorStore';
 import LoadingIndicator from './LoadingIndicator';
 
 const AppSettings = React.createClass({
-  mixins: [Router.State],
 
   contextTypes: {
     setHeading: React.PropTypes.func,
+    router: React.PropTypes.func.isRequired
   },
 
   getInitialState() {
     return {
-      appId: this.getParams().app,
+      appId: this.props.params.app,
       app: null,
       formData: null,
       submitInProgress: false,

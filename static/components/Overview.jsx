@@ -8,7 +8,6 @@ var PollingMixin = require('../mixins/polling');
 var TaskSummary = require('./TaskSummary');
 
 var Overview = React.createClass({
-  mixins: [PollingMixin],
 
   contextTypes: {
     router: React.PropTypes.func
