@@ -138,7 +138,7 @@ var TaskDetails = React.createClass({
       time.className = 'time';
 
       div.innerHTML  = ansi_up.ansi_to_html(data.chunks[i].text)
-      time.innerHTML = moment(newDate).parseZone().format("h:mm a")
+      time.innerHTML = moment(newDate).parseZone().format("h:mm:ss a")
 
       frag.appendChild(time)
       frag.appendChild(div)
