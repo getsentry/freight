@@ -250,8 +250,10 @@ var TaskDetails = React.createClass({
           ref: task.sha,
         },
         success: (data) => {
-          let {app, environment, number} = this.props.task;
-          browserHistory.push(`/deploys/${app.name}/${environment}/${number}`);
+         browserHistory.push(`/deploys/${data.app.name}/${data.environment}/${data.number}`);
+         //full window reload.
+         // TODO: rerender page with existing functions.
+         window.location.reload()
         }
       });
     });
