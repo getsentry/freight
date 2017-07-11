@@ -241,7 +241,6 @@ var TaskDetails = React.createClass({
       submitInProgress: true,
     }, () => {
       let task = this.state.task;
-
       api.request('/deploys/', {
         method: 'POST',
         data: {
@@ -250,12 +249,10 @@ var TaskDetails = React.createClass({
           ref: task.sha,
         },
         success: (data) => {
-         browserHistory.push(`/deploys/${data.app.name}/${data.environment}/${data.number}`);
-         //full window reload.
-         // TODO: rerender page with existing functions.
-         window.location.reload()
-        }
-      });
+          browserHistory.push('/');
+          browserHistory.push(`/deploys/${data.app.name}/${data.environment}/${data.number}`);
+       },
+     });
     });
   },
 
