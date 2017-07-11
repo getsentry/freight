@@ -113,19 +113,16 @@ var TaskDetails = React.createClass({
       task: data
     });
   },
-
   updateBuildLog(data) {
     // add each additional new line
-    var frag       = document.getElementsByClassName('frag')[0] || document.createDocumentFragment();
-    frag.className = 'frag';
-
+    var frag       = document.createDocumentFragment();
     var text       = data.chunks
     var objLength  = data.chunks.length
-
 
     for(var i = 0; i < objLength; i++){
       var timer    = new Date(data.chunks[i].date)
       var timeMil  = timer.getTime()
+
       //Multiple by 60000 to convert offset to milliseconds
       var offset   = timer.getTimezoneOffset() * 60000
       var timezone = timeMil - offset
