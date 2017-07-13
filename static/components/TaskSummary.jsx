@@ -1,9 +1,8 @@
-var React = require('react');
-var Router = require('react-router');
-var Link = Router.Link;
-var classnames = require('classnames');
-var Duration = require('./Duration');
-var TimeSince = require('./TimeSince');
+import React from 'react';
+import {Link} from 'react-router';
+import classnames from 'classnames';
+import Duration from './Duration';
+import TimeSince from './TimeSince';
 
 import { browserHistory } from 'react-router';
 

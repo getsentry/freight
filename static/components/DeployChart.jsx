@@ -1,10 +1,10 @@
-var React = require('react');
+import React from 'react';
 
-var api = require('../api');
+import api from '../api';
 
-var BarChart     = require("./BarChart");
-var PollingMixin = require('../mixins/polling');
-var TaskSummary  = require('./TaskSummary');
+import BarChart     from "./BarChart";
+import PollingMixin from '../mixins/polling';
+import TaskSummary  from './TaskSummary';
 
 var DeployChart = React.createClass({
   mixins: [PollingMixin],

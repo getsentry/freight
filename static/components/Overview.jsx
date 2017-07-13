@@ -1,11 +1,11 @@
 var React = require('react');
 
-var api = require('../api');
+import api from '../api';
 
-var DeployChart = require("./DeployChart");
+import DeployChart from "./DeployChart";
 import LoadingIndicator from './LoadingIndicator';
-var PollingMixin = require('../mixins/polling');
-var TaskSummary = require('./TaskSummary');
+import PollingMixin from '../mixins/polling';
+import TaskSummary from './TaskSummary';
 
 var Overview = React.createClass({
 

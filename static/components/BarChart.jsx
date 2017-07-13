@@ -1,8 +1,7 @@
-/*** @jsx React.DOM */
-var moment = require("moment");
-var React = require("react");
+import moment from "moment";
+import React from "react";
 
-var TooltipTrigger = require("./TooltipTrigger");
+import TooltipTrigger from "./TooltipTrigger";
 
 var BarChart = React.createClass({
   propTypes: {
