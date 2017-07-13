@@ -246,6 +246,7 @@ var TaskDetails = React.createClass({
           ref: task.sha,
         },
         success: (data) => {
+          //workaround is referenced from here: https://github.com/ReactTraining/react-router/issues/1982
           browserHistory.push('/');
           browserHistory.push(`/deploys/${data.app.name}/${data.environment}/${data.number}`);
        },

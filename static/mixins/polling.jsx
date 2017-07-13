@@ -1,4 +1,4 @@
-var api = require('../api');
+import api from '../api';
 
 var PollingMixin = {
   getInitialState() {

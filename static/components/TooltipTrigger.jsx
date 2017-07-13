@@ -1,4 +1,3 @@
-/*** @jsx React.DOM */
 var React = require("react");
 import ReactDOM from "react-dom";
 import {findDOMNode} from 'react';
