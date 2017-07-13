@@ -12,7 +12,7 @@ module.exports = {
     "app": "./main",
     "vendor": [
       "ansi_up",
-      "babel-core/polyfill",
+      "babel-polyfill",
       "jquery",
       "moment",
       "react-router"
@@ -25,16 +25,18 @@ module.exports = {
         loader: "babel-loader"
       },
       {
-        test: /\.json$/,
-        loader: "json-loader"
-      },
-      {
         test: /\.less$/,
-        loader: ExtractTextPlugin.extract("style-loader", "css-loader!less-loader")
+        loader: ExtractTextPlugin.extract({
+          fallback: "style-loader",
+          use: "css-loader!less-loader"
+        })
       },
       {
         test: /\.css$/,
-        loader: ExtractTextPlugin.extract("style-loader", "css-loader")
+        loader: ExtractTextPlugin.extract({
+          fallback: "style-loader",
+          use: "css-loader"
+        })
       },
       // inline base64 URLs for <=8k images, direct URLs for the rest
       {
@@ -48,15 +50,15 @@ module.exports = {
       this.plugin("done", function(stats) {
         var app = stats.toJson({
           assetsSort: true
-        }).assetsByChunkName.app[0]
+        }).assets[1].name
 
         var vendor = stats.toJson({
           assetsSort: true
-        }).assetsByChunkName.vendor[0]
+        }).assets[0].name
 
         var styles = stats.toJson({
           assetsSort: true
-        }).assetsByChunkName.styles[0]
+        }).assets[2].name
 
         var newObj = {
           "assets": {
@@ -71,10 +73,7 @@ module.exports = {
           JSON.stringify(newObj));
       });
     },
-    new ExtractTextPlugin("styles.css", {
-      allChunks: true
-    }),
-    new webpack.optimize.DedupePlugin(),
+    new ExtractTextPlugin('style.css'),
     new webpack.ProvidePlugin({
         $: 'jquery',
         jQuery: 'jquery',
@@ -84,8 +83,8 @@ module.exports = {
     ])
   ],
   resolve: {
-    modulesDirectories: ["node_modules"],
-    extensions: ["", ".jsx", ".js", ".json"]
+    modules: ["node_modules"],
+    extensions: [".jsx", ".js", ".json"]
   },
   output: {
     publicPath: "/dist/",
