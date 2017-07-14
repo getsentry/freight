@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BarChart Snapshot 1`] = `
+<figure
+  className=" barchart"
+  height={undefined}
+  width={undefined}
+>
+  <span
+    className="max-y"
+  >
+    10
+  </span>
+  <span
+    className="min-y"
+  >
+    0
+  </span>
+</figure>
+`;
