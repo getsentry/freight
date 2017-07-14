@@ -46,14 +46,25 @@
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-router": "2.8.1",
+    "react-test-renderer": "^15.6.1",
     "reflux": "^6.4.1",
     "style-loader": "^0.8.3",
     "url-loader": "^0.5.5",
     "webpack": "2.2.0",
     "webpack-dev-server": "^2.0.0"
   },
+  "jest":{
+    "setupFiles": [
+      "<rootDir>/static/tests/setup.js"
+    ],
+    "modulePaths": [
+      "<rootDir>/static/tests"
+    ]
+  },
   "devDependencies": {
     "app.json": "^1.2.1",
-    "babel-polyfill": "^6.23.0"
+    "babel-jest": "^20.0.3",
+    "babel-polyfill": "^6.23.0",
+    "jest": "^20.0.4"
   }
 }
