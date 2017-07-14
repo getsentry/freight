@@ -6,6 +6,7 @@
     "test": "tests"
   },
   "scripts": {
+    "test": "jest",
     "prevalidate-app.json": "npm install",
     "prestart": "npm install",
     "postinstall": "webpack -p",
