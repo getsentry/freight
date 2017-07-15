@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TaskSummary Snapshot 1`] = `
+<div
+  className="deploy finished"
+  onClick={[Function]}
+>
+  <span
+    className="progress"
+    style={
+      Object {
+        "width": "100%",
+      }
+    }
+  />
+  <h3>
+    freight/production
+  </h3>
+  <div
+    className="ref"
+  >
+    <div
+      className="sha"
+    >
+      af56f6b
+    </div>
+    master
+  </div>
+  <div
+    className="meta"
+  >
+    <small>
+      Finished
+       
+      <time>
+        a day ago
+      </time>
+       — 
+      <span
+        className="duration"
+      >
+        12 sec
+      </span>
+    </small>
+    <small>
+       — by 
+      james.andrews@sentry.io
+    </small>
+  </div>
+</div>
+`;
