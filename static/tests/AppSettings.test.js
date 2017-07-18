@@ -1,10 +1,9 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
-import CreateDeploy from '../components/CreateDeploy.jsx';
-import { shallow } from 'enzyme';
-import sinon from 'sinon';
+import AppSettings from '../components/AppSettings.jsx';
 
-test('CreateDeploy Snapshot', () => {
+
+test('AppSettings Snapshot', () => {
   const appList = [{
     "environments": {
       "production": {
@@ -19,7 +18,7 @@ test('CreateDeploy Snapshot', () => {
     "repository": "https://github.com/getsentry/freight.git"
   }];
   const component = renderer.create(
-    (<CreateDeploy appList={appList} />)
+    <AppSettings params={appList} />
   );
   let tree = component.toJSON();
   expect(tree).toMatchSnapshot();
