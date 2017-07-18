@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Layout /> should render <Layout /> 1`] = `
+<div>
+  <Indicators />
+  <header>
+    <div
+      className="container"
+    >
+      <div
+        className="pull-right"
+      >
+        <Link
+          className="btn btn-sm btn-default"
+          onlyActiveOnIndex={false}
+          style={Object {}}
+          to="/deploy"
+        >
+          Deploy
+        </Link>
+      </div>
+      <h1>
+        <Link
+          onlyActiveOnIndex={false}
+          style={Object {}}
+          to="/"
+        >
+          Freight
+        </Link>
+      </h1>
+    </div>
+  </header>
+  <div
+    className="body"
+  >
+    <div
+      className="container"
+    >
+      <Unknown
+        appList={null}
+      />
+    </div>
+  </div>
+</div>
+`;
