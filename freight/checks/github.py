@@ -32,7 +32,8 @@ class GitHubContextCheck(Check):
             config.get('api_root') or current_app.config['GITHUB_API_ROOT']
         ).rstrip('/')
 
-        contexts = set(config.get('contexts') or [])
+        all_contexts = set(config.get('contexts') or [])
+        contexts = all_contexts.copy()
         repo = config['repo']
 
         url = '{api_root}/repos/{repo}/commits/{ref}/statuses'.format(
@@ -54,6 +55,8 @@ class GitHubContextCheck(Check):
 
         valid_contexts = set()
         for data in context_list:
+            if all_contexts and data['context'] not in all_contexts:
+                continue
             if data['state'] == 'success':
                 valid_contexts.add(data['context'])
                 try:
