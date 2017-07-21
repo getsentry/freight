@@ -9,7 +9,7 @@ test('TaskSummary Snapshot', () => {
       id: "1",
       "name": "freight"
     },
-    "dataCreated": "2017-07-13T18:30:29.941695Z",
+    "dateCreated": "2017-07-13T18:30:29.941695Z",
     "dateFinished": "2017-07-13T18:30:45.484661Z",
     "dateStarted": "2017-07-13T18:30:33.481500Z",
     "duration": 12,
