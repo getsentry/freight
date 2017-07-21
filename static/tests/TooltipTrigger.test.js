@@ -15,23 +15,23 @@ describe('<TooltipTrigger />', () => {
     }
     }
 
-  const appList = [{
-    "environments": {
-      "production": {
-        "defaultRef": "master"
+    const appList = [{
+      "environments": {
+        "production": {
+          "defaultRef": "master"
+        },
+        "staging": {
+          "defaultRef": "HEAD"
+        },
       },
-      "staging": {
-        "defaultRef": "HEAD"
-      },
-    },
-    "id": "1",
-    "name": "freight",
-    "repository": "https://github.com/getsentry/freight.git"
-  }]
+      "id": "1",
+      "name": "freight",
+      "repository": "https://github.com/getsentry/freight.git"
+    }]
 
 
-const shallowRenderer = ReactTestUtils.createRenderer();
-const result = shallowRenderer.render(<TooltipTrigger {...props} children={props.title} />);
-expect(result).toMatchSnapshot();
+    const shallowRenderer = ReactTestUtils.createRenderer();
+    const result = shallowRenderer.render(<TooltipTrigger {...props} children={props.title} />);
+    expect(result).toMatchSnapshot();
   })
 })
