@@ -54,7 +54,7 @@ var TaskDetails = React.createClass({
     this.fetchData();
   },
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
     if (this.state.liveScroll) {
       this.scrollLog();
     }

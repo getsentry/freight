@@ -6,8 +6,10 @@ import DeployChart from "./DeployChart";
 import LoadingIndicator from './LoadingIndicator';
 import PollingMixin from '../mixins/polling';
 import TaskSummary from './TaskSummary';
+import { browserHistory } from 'react-router';
 
 var Overview = React.createClass({
+  mixins: [PollingMixin],
 
   contextTypes: {
     router: React.PropTypes.func
@@ -19,7 +21,7 @@ var Overview = React.createClass({
     };
   },
 
-  componentWillMount() {
+  componentWillMount(){
     api.request(this.getPollingUrl(), {
       success: (data) => {
         this.setState({
@@ -28,7 +30,11 @@ var Overview = React.createClass({
       }
     });
   },
-
+  componentDidUpdate(prevProps, prevState){
+    if(this.state.deploys[0].status === 'finished' && prevState.deploys[0].status === 'in_progress'){
+      this.pushNotification()
+    }
+  },
   getPollingUrl() {
     return '/deploys/';
   },
@@ -37,6 +43,7 @@ var Overview = React.createClass({
     this.setState({
       deploys: data
     });
+    //console.log(data[0])
   },
 
   deployInProgress(deploy) {
