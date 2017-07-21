@@ -3,75 +3,35 @@ import renderer from 'react-test-renderer';
 import Layout from '../components/Layout.jsx';
 import {shallow} from 'enzyme';
 import ReactTestUtils from 'react-dom/test-utils';
+import TaskDetails from '../components/TaskDetails.jsx'
 
 describe('<Layout />', () => {
   it('should render <Layout />', () => {
 
-  const appList = [{
-    "environments": {
-      "production": {
-        "defaultRef": "master"
-      },
-      "staging": {
-        "defaultRef": "HEAD"
-      },
+  const task = [{
+  "task": {
+    "status": "finished",
+    "app": {
+      "id": "1",
+      "name": "freight"
     },
-    "id": "1",
-    "name": "freight",
-    "repository": "https://github.com/getsentry/freight.git"
-  }]
-
-  const children = {
-  "history": {
-    "listenBefore": {},
-    "listen": {},
-    "transitionTo": {},
-    "push": {},
-    "replace": {},
-    "go": {},
-    "goBack": {},
-    "goForward": {},
-    "createKey": {},
-    "createPath": {},
-    "createHref": {},
-    "createLocation": {},
-    "setState": {},
-    "registerTransitionHook": {},
-    "unregisterTransitionHook": {},
-    "pushState": {},
-    "replaceState": {},
-    "isActive": {},
-    "match": {},
-    "listenBeforeLeavingRoute": {}
-  },
-  "location": {
-    "pathname": "/",
-    "search": "",
-    "hash": "",
-    "state": null,
-    "action": "PUSH",
-    "key": "m0qx3x",
-    "basename": "/",
-    "query": {},
-    "$searchBase": {}
-  },
-  "params": {},
-  "route": {
-    "exact": true,
-    "path": "/",
-    "component": {},
-    "indexRoute": {},
-    "childRoutes": {}
-  },
-  "routeParams": {},
-  "routes": [
-    {},
-    {}
-  ]
-}
-
-const shallowRenderer = ReactTestUtils.createRenderer();
-const result = shallowRenderer.render(<Layout children={children} />);
-expect(result).toMatchSnapshot();
+    "number": 1108,
+    "dateCreated": "2017-07-21T21:40:31.056181Z",
+    "duration": 3.19,
+    "dateFinished": "2017-07-21T21:40:36.546140Z",
+    "id": "1115",
+    "estimatedDuration": 3.19,
+    "name": "freight/production#1108",
+    "environment": "production",
+    "sha": "af008c78c235feae22f40bf76ed04747028fac6e",
+    "dateStarted": "2017-07-21T21:40:33.358422Z",
+    "ref": "master",
+    "sha": "af008c78c235feae22f40bf76ed04747028fac6e",
+    "status": "finished"
+  }
+}]
+  const shallowRenderer = ReactTestUtils.createRenderer();
+  const result = shallowRenderer.render(<TaskDetails task={task} />);
+  expect(result).toMatchSnapshot();
   })
 })
