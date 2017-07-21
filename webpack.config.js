@@ -73,7 +73,7 @@ module.exports = {
           JSON.stringify(newObj));
       });
     },
-    new ExtractTextPlugin('style.css'),
+    new ExtractTextPlugin('styles.css'),
     new webpack.ProvidePlugin({
         $: 'jquery',
         jQuery: 'jquery',
