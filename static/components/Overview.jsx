@@ -43,7 +43,6 @@ var Overview = React.createClass({
     this.setState({
       deploys: data
     });
-    //console.log(data[0])
   },
 
   deployInProgress(deploy) {
