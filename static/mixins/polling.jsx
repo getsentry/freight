@@ -9,7 +9,7 @@ var PollingMixin = {
   pushNotification(){
     let body;
     let {app, env, number} = this.props.params;
-    const url = `/deploys/${app}/${env}/${number}`;
+    let url = window.location
 
     if(this.state.task !== undefined){
       body = `${/[^@]*/.exec(this.state.task.user.name)}'s deploy ${this.state.task.status}`;
@@ -27,13 +27,13 @@ var PollingMixin = {
       let notification = new Notification(this.state.task.name, options)
         notification.onclick = function(event){
           event.preventDefault();
-          window.open('http://freight.getsentry.net' + url)
+          window.open(url)
       }
     }
       let notification = new Notification(this.state.deploys[0].name, options)
         notification.onclick = function(event){
           event.preventDefault();
-          window.open('http://freight.getsentry.net' + url)
+          window.open(url)
     }
   }
   else if (Notification.permission !== 'denied') {
@@ -43,13 +43,13 @@ var PollingMixin = {
           let notification = new Notification(this.state.task.name, options)
             notification.onclick = function(event){
               event.preventDefault();
-              window.open('http://freight.getsentry.net' + url)
+              window.open(url)
           }
         }
           let notification = new Notification(this.state.deploys[0].name, options)
             notification.onclick = function(event){
               event.preventDefault();
-              window.open('http://freight.getsentry.net' + url)
+              window.open(url)
           }
         }
       });
