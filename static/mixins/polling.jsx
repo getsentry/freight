@@ -19,22 +19,18 @@ var PollingMixin = {
 
     const options = {
       body: body,
-      icon: "../static/favicon.png"
+      icon: "/static/favicon.png"
     }
 
-    if (!("Notification" in window)) {
-      alert("This browser does not support system notifications");
-    }
-
-  else if (Notification.permission === "granted") {
+  if (Notification.permission === "granted") {
     if(this.state.task != undefined){
-      let notification = new Notification(`${this.state.task.name}`, options)
+      let notification = new Notification(this.state.task.name, options)
         notification.onclick = function(event){
           event.preventDefault();
           window.open('http://freight.getsentry.net' + url)
       }
     }
-      let notification = new Notification(`${this.state.deploys[0].name}`, options)
+      let notification = new Notification(this.state.deploys[0].name, options)
         notification.onclick = function(event){
           event.preventDefault();
           window.open('http://freight.getsentry.net' + url)
@@ -44,13 +40,13 @@ var PollingMixin = {
     Notification.requestPermission(function (permission) {
       if (permission === "granted" ) {
         if(this.state.task != undefined){
-          let notification = new Notification(`${this.state.task.name}`, options)
+          let notification = new Notification(this.state.task.name, options)
             notification.onclick = function(event){
               event.preventDefault();
               window.open('http://freight.getsentry.net' + url)
           }
         }
-          let notification = new Notification(`${this.state.deploys[0].name}`, options)
+          let notification = new Notification(this.state.deploys[0].name, options)
             notification.onclick = function(event){
               event.preventDefault();
               window.open('http://freight.getsentry.net' + url)
