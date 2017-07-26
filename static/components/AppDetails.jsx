@@ -1,11 +1,11 @@
-var React = require('react');
-var Router = require('react-router');
+import React from 'react';
+import Router from 'react-router';
 
-var api = require('../api');
+import api from '../api';
 
 import LoadingIndicator from './LoadingIndicator';
-var PollingMixin = require('../mixins/polling');
-var TaskSummary = require('./TaskSummary');
+import PollingMixin from '../mixins/polling';
+import TaskSummary from './TaskSummary';
 
 
 var AppDetails = React.createClass({
