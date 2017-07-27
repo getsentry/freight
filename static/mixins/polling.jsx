@@ -9,7 +9,7 @@ var PollingMixin = {
   pushNotification(){
     let body;
     let {app, env, number} = this.props.params;
-    let path = `/deploys/${app}/${env}/${number}`;
+    var path = `/deploys/${app}/${env}/${number}`;
 
     let hostname = location.hostname
     let protocol = location.protocol
@@ -19,7 +19,7 @@ var PollingMixin = {
       let {name} = this.state.deploys[0].app
       let {environment, number} = this.state.deploys[0]
 
-      let path = `/deploys/${name}/${environment}/${number}`
+      var path = `/deploys/${name}/${environment}/${number}`
     }
 
     if(hostname == "localhost"){
