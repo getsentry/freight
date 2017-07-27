@@ -9,7 +9,24 @@ var PollingMixin = {
   pushNotification(){
     let body;
     let {app, env, number} = this.props.params;
-    let url = window.location
+
+    let hostname = location.hostname
+    var path = `/deploys/${app}/${env}/${number}`;
+
+    if(this.state.task == undefined){
+      let {name} = this.state.deploys[0].app
+      let {environment, number} = this.state.deploys[0]
+
+      var path = `/deploys/${name}/${environment}/${number}`
+    }
+
+    if(hostname == "localhost"){
+      var url = `${location.protocol}//${location.hostname}:${location.port}${path}`
+      var ourl = `${location.protocol}//${location.hostname}:${location.port}${path}`
+    }else{
+      var url = `${location.protocol}//${location.hostname}${path}`
+      var ourl = `${location.protocol}//${location.hostname}${path}`
+    }
 
     if(this.state.task !== undefined){
       body = `${/[^@]*/.exec(this.state.task.user.name)}'s deploy ${this.state.task.status}`;
@@ -33,7 +50,7 @@ var PollingMixin = {
       let notification = new Notification(this.state.deploys[0].name, options)
         notification.onclick = function(event){
           event.preventDefault();
-          window.open(url)
+          window.open(ourl)
     }
   }
   else if (Notification.permission !== 'denied') {
@@ -49,7 +66,7 @@ var PollingMixin = {
           let notification = new Notification(this.state.deploys[0].name, options)
             notification.onclick = function(event){
               event.preventDefault();
-              window.open(url)
+              window.open(ourl)
           }
         }
       });
