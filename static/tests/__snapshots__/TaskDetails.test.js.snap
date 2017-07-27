@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`TaskDetails Snapshot 1`] = `
+<div
+  style={
+    Object {
+      "textAlign": "center",
+    }
+  }
+>
+  <div
+    className="loading"
+  >
+    <div
+      className="loading-mask"
+    />
+    <div
+      className="loading-indicator"
+    />
+    <div
+      className="loading-message"
+    >
+      Loading task details.
+    </div>
+  </div>
+</div>
+`;

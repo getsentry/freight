@@ -10,7 +10,7 @@ import TaskSummary from './TaskSummary';
 var Overview = React.createClass({
 
   contextTypes: {
-    router: React.PropTypes.func
+    router: React.PropTypes.object
   },
 
   getInitialState() {

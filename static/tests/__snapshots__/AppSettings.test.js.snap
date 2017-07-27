@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AppSettings Snapshot 1`] = `
+<div
+  className="loading"
+>
+  <div
+    className="loading-mask"
+  />
+  <div
+    className="loading-indicator"
+  />
+  <div
+    className="loading-message"
+  />
+</div>
+`;
