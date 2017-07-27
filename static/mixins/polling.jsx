@@ -9,23 +9,25 @@ var PollingMixin = {
   pushNotification(){
     let body;
     let {app, env, number} = this.props.params;
+    let path = `/deploys/${app}/${env}/${number}`;
 
     let hostname = location.hostname
-    var path = `/deploys/${app}/${env}/${number}`;
+    let protocol = location.protocol
+    let port     = location.port
 
     if(this.state.task == undefined){
       let {name} = this.state.deploys[0].app
       let {environment, number} = this.state.deploys[0]
 
-      var path = `/deploys/${name}/${environment}/${number}`
+      let path = `/deploys/${name}/${environment}/${number}`
     }
 
     if(hostname == "localhost"){
-      var url = `${location.protocol}//${location.hostname}:${location.port}${path}`
-      var ourl = `${location.protocol}//${location.hostname}:${location.port}${path}`
+      var url  = `${protocol}//${hostname}:${port}${path}`
+      var ourl = `${protocol}//${hostname}:${port}${path}`
     }else{
-      var url = `${location.protocol}//${location.hostname}${path}`
-      var ourl = `${location.protocol}//${location.hostname}${path}`
+      var url  = `${protocol}//${hostname}${path}`
+      var ourl = `${protocol}//${hostname}${path}`
     }
 
     if(this.state.task !== undefined){
