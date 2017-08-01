@@ -2,9 +2,9 @@
 function pushNotification(task, path){
   let userName = /[^@]*/.exec(task.user.name);
   let body     = `${userName}'s deploy ${task.status}`;
-  let {hostname, protocol,port} = location;
+  let {hostname, protocol,port} = window.location;
 
-  if(hostname == "localhost"){
+  if(port !== ''){
     var url  = `${protocol}//${hostname}:${port}${path}`;
   }else{
     var url  = `${protocol}//${hostname}${path}`;
