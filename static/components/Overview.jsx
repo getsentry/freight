@@ -1,4 +1,4 @@
-var React = require('react');
+import React from 'react';
 
 import api from '../api';
 
@@ -17,7 +17,7 @@ var Overview = React.createClass({
 
   getInitialState() {
     return {
-      deploys: null,
+      deploys: [],
     };
   },
 
@@ -31,9 +31,21 @@ var Overview = React.createClass({
     });
   },
   componentDidUpdate(prevProps, prevState){
-    if(this.state.deploys[0].status === 'finished' && prevState.deploys[0].status === 'in_progress'){
-      this.pushNotification()
-    }
+    let previousTasks = {};
+
+    prevState.deploys.forEach(task=>{
+      previousTasks[task.id] = task;
+    })
+
+    this.state.deploys.forEach(task => {
+      if(task.status === 'finished' && previousTasks[task.id] && previousTasks[task.id].status === 'in_progress'){
+        let {name}                = task.app;
+        let {environment, number} = task;
+        let path                  = `/deploys/${name}/${environment}/${number}`;
+        pushNotification(task, path);
+      }
+    })
+
   },
   getPollingUrl() {
     return '/deploys/';
