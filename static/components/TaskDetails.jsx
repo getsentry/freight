@@ -8,6 +8,7 @@ import PollingMixin from "../mixins/polling";
 import TaskSummary from "./TaskSummary";
 import TimeSince from "./TimeSince";
 import { browserHistory } from 'react-router';
+import {pushNotification} from '../pushNotification'
 
 var moment = require('moment');
 
@@ -33,6 +34,7 @@ var TaskDetails = React.createClass({
       task: null,
       logNextOffset: 0,
       liveScroll: true,
+      lines: []
     };
   },
 
@@ -58,6 +60,7 @@ var TaskDetails = React.createClass({
     if (this.state.liveScroll) {
       this.scrollLog();
     }
+  //this.pushNotification()
   },
 
   componentWillReceiveProps(nextProps) {
@@ -120,6 +123,10 @@ var TaskDetails = React.createClass({
     var objLength  = data.chunks.length
 
     for(var i = 0; i < objLength; i++){
+      this.setState({
+        lines: [...this.state.lines, ...text[i].text.split(/\n/)]
+      })
+
       var timer    = new Date(data.chunks[i].date)
       var timeMil  = timer.getTime()
 
@@ -131,16 +138,23 @@ var TaskDetails = React.createClass({
       var div  = document.createElement('div');
       var time = document.createElement('div');
 
-      div.className  = 'line';
+      //div.className  = 'line';
       time.className = 'time';
 
       div.innerHTML  = ansi_up.ansi_to_html(data.chunks[i].text)
       time.innerHTML = moment(newDate).parseZone().format("h:mm:ss a")
-
+      //console.log(this.state.lines)
       frag.appendChild(time)
+      //frag.appendChild(div)
+    }
+    for(var i = 0; i < this.state.lines.length; i++){
+      var div = document.createElement('div')
+      div.className = 'line'
+      div.id = i
+      div.innerHTML = ansi_up.ansi_to_html(this.state.lines[i])
+
       frag.appendChild(div)
     }
-
     this.refs.log.appendChild(frag);
 
     if (this.state.liveScroll) {
@@ -270,6 +284,7 @@ var TaskDetails = React.createClass({
   },
 
   render() {
+    console.log(this.state.task)
     if (this.state.loading) {
       return (
         <div style={{textAlign: "center"}}>
