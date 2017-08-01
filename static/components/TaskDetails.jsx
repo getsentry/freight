@@ -8,6 +8,7 @@ import PollingMixin from "../mixins/polling";
 import TaskSummary from "./TaskSummary";
 import TimeSince from "./TimeSince";
 import { browserHistory } from 'react-router';
+import pushNotification from '../pushNotification';
 
 var moment = require('moment');
 

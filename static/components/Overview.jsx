@@ -7,7 +7,7 @@ import LoadingIndicator from './LoadingIndicator';
 import PollingMixin from '../mixins/polling';
 import TaskSummary from './TaskSummary';
 import { browserHistory } from 'react-router';
-
+import pushNotification from '../pushNotification';
 var Overview = React.createClass({
   mixins: [PollingMixin],
 
