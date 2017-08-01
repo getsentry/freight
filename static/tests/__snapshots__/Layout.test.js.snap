@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Layout /> should render <Layout /> 1`] = `
+<div
+  style={
+    Object {
+      "textAlign": "center",
+    }
+  }
+>
+  <LoadingIndicator
+    style={
+      Object {
+        "marginBottom": 20,
+      }
+    }
+  >
+    Loading task details.
+  </LoadingIndicator>
+</div>
+`;

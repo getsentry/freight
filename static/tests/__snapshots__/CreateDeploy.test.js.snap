@@ -1,0 +1,83 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CreateDeploy Snapshot 1`] = `
+<div
+  className="create-deploy"
+>
+  <div
+    className="section"
+  >
+    <div
+      className="section-header"
+    >
+      <h2>
+        Create Deploy
+      </h2>
+    </div>
+    <form
+      onSubmit={[Function]}
+    >
+      <div
+        className="form-group"
+      >
+        <label>
+          Application
+        </label>
+        <select
+          className="form-control"
+          onChange={[Function]}
+          value="freight"
+        >
+          <option>
+            freight
+          </option>
+        </select>
+      </div>
+      <div
+        className="form-group"
+      >
+        <label>
+          Environment
+        </label>
+        <select
+          className="form-control"
+          onChange={[Function]}
+          value={undefined}
+        >
+          <option>
+            production
+          </option>
+          <option>
+            staging
+          </option>
+        </select>
+      </div>
+      <div
+        className="form-group"
+      >
+        <label>
+          Ref
+        </label>
+        <input
+          className="form-control"
+          onChange={[Function]}
+          placeholder="e.g. master"
+          type="text"
+          value="master"
+        />
+      </div>
+      <div
+        className="submit-group"
+      >
+        <button
+          className="btn btn-primary"
+          disabled={false}
+          type="submit"
+        >
+          Ship It!
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+`;

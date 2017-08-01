@@ -9,14 +9,11 @@ import TaskSummary from "./TaskSummary";
 import TimeSince from "./TimeSince";
 import { browserHistory } from 'react-router';
 import pushNotification from '../pushNotification';
+import PropTypes from 'prop-types';
 
 var moment = require('moment');
 
 var Progress = React.createClass({
-  propTypes: {
-    value: React.PropTypes.number.isRequired,
-  },
-
   render() {
     return (
       <span className="progress" style={{width: this.props.value + '%'}} />
@@ -24,6 +21,9 @@ var Progress = React.createClass({
   }
 });
 
+Progress.propTypes = {
+  value: PropTypes.number.isRequired,
+}
 var TaskDetails = React.createClass({
   mixins: [PollingMixin],
 

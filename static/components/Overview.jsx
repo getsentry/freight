@@ -12,7 +12,7 @@ var Overview = React.createClass({
   mixins: [PollingMixin],
 
   contextTypes: {
-    router: React.PropTypes.func
+    router: React.PropTypes.object
   },
 
   getInitialState() {

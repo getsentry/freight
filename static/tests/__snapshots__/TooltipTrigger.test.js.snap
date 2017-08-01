@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<TooltipTrigger /> should render a snapshot of <TooltipTrigger /> 1`] = `
+<div>
+  foo
+</div>
+`;
