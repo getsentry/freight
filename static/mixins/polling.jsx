@@ -6,8 +6,7 @@ var PollingMixin = {
       pollingActive: true
     };
   },
-
-  componentWillMount() {
+  componentWillMount(prevProps, prevState) {
     this._timeoutId = window.setTimeout(this.pollForChanges, 3000);
   },
 

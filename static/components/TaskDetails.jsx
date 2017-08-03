@@ -8,6 +8,7 @@ import PollingMixin from "../mixins/polling";
 import TaskSummary from "./TaskSummary";
 import TimeSince from "./TimeSince";
 import { browserHistory } from 'react-router';
+import pushNotification from '../pushNotification';
 import PropTypes from 'prop-types';
 
 var moment = require('moment');
@@ -54,7 +55,17 @@ var TaskDetails = React.createClass({
     this.fetchData();
   },
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
+    let task = this.state.task
+
+    if(prevState.task !== null && task.status === 'finished' && prevState.task.status === 'in_progress'){
+      let {name}                = task.app
+      let {environment, number} = task
+      let path                  = `/deploys/${name}/${environment}/${number}`
+
+      pushNotification(task, path)
+    }
+
     if (this.state.liveScroll) {
       this.scrollLog();
     }
