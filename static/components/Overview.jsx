@@ -77,11 +77,7 @@ var Overview = React.createClass({
     }
 
     if(Notification.permission !== 'denied'){
-      Notification.requestPermission(function(permission){
-        if(permission === 'granted'){
-          return;
-        }
-      })
+      Notification.requestPermission()
     }
 
     var activedeployNodes = [];
