@@ -289,6 +289,10 @@ var TaskDetails = React.createClass({
       );
     }
 
+    if(Notification.permission !== 'denied'){
+      Notification.requestPermission()
+    }
+
     let task = this.state.task;
     let inProgress = this.taskInProgress(task);
 
