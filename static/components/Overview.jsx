@@ -76,7 +76,7 @@ var Overview = React.createClass({
       );
     }
 
-    if(Notification.permission !== 'denied' || Notification.permission === "default"){
+    if(Notification.permission !== 'denied'){
       Notification.requestPermission(function(permission){
         if(permission === 'granted'){
           return;
