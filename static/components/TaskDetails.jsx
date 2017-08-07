@@ -8,15 +8,13 @@ import PollingMixin from "../mixins/polling";
 import TaskSummary from "./TaskSummary";
 import TimeSince from "./TimeSince";
 import { browserHistory } from 'react-router';
-import {pushNotification} from '../pushNotification'
+import pushNotification from '../pushNotification';
+import PropTypes from 'prop-types';
+
 
 var moment = require('moment');
 
 var Progress = React.createClass({
-  propTypes: {
-    value: React.PropTypes.number.isRequired,
-  },
-
   render() {
     return (
       <span className="progress" style={{width: this.props.value + '%'}} />
@@ -24,6 +22,9 @@ var Progress = React.createClass({
   }
 });
 
+Progress.propTypes = {
+  value: PropTypes.number.isRequired,
+}
 var TaskDetails = React.createClass({
   mixins: [PollingMixin],
 
@@ -57,6 +58,16 @@ var TaskDetails = React.createClass({
   },
 
   componentDidUpdate(prevProps, prevState) {
+    let task = this.state.task
+
+    if(prevState.task !== null && task.status === 'finished' && prevState.task.status === 'in_progress'){
+      let {name}                = task.app
+      let {environment, number} = task
+      let path                  = `/deploys/${name}/${environment}/${number}`
+
+      pushNotification(task, path)
+    }
+
     if (this.state.liveScroll) {
       this.scrollLog();
     }
@@ -291,6 +302,10 @@ var TaskDetails = React.createClass({
           <LoadingIndicator style={{marginBottom: 20}}>Loading task details.</LoadingIndicator>
         </div>
       );
+    }
+
+    if(Notification.permission !== 'denied'){
+      Notification.requestPermission()
     }
 
     let task = this.state.task;

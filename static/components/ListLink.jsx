@@ -1,13 +1,13 @@
 var React = require("react");
 var Router = require("react-router");
 
-var classSet = require('react/lib/cx');
+var classSet = require('classnames');
 
 var ListLink = React.createClass({
   displayName: 'ListLink',
 
   contextTypes: {
-    router: React.PropTypes.func
+    router: React.PropTypes.object,
   },
 
   propTypes: {

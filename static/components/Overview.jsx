@@ -1,4 +1,4 @@
-var React = require('react');
+import React from 'react';
 
 import api from '../api';
 
@@ -7,17 +7,17 @@ import LoadingIndicator from './LoadingIndicator';
 import PollingMixin from '../mixins/polling';
 import TaskSummary from './TaskSummary';
 import { browserHistory } from 'react-router';
-
+import pushNotification from '../pushNotification';
 var Overview = React.createClass({
   mixins: [PollingMixin],
 
   contextTypes: {
-    router: React.PropTypes.func
+    router: React.PropTypes.object
   },
 
   getInitialState() {
     return {
-      deploys: null,
+      deploys: [],
     };
   },
 
@@ -31,9 +31,21 @@ var Overview = React.createClass({
     });
   },
   componentDidUpdate(prevProps, prevState){
-    if(this.state.deploys[0].status === 'finished' && prevState.deploys[0].status === 'in_progress'){
-      this.pushNotification()
-    }
+    let previousTasks = {};
+
+    prevState.deploys.forEach(task=>{
+      previousTasks[task.id] = task;
+    })
+
+    this.state.deploys.forEach(task => {
+      if(task.status === 'finished' && previousTasks[task.id] && previousTasks[task.id].status === 'in_progress'){
+        let {name}                = task.app;
+        let {environment, number} = task;
+        let path                  = `/deploys/${name}/${environment}/${number}`;
+        pushNotification(task, path);
+      }
+    })
+
   },
   getPollingUrl() {
     return '/deploys/';
@@ -62,6 +74,10 @@ var Overview = React.createClass({
           </LoadingIndicator>
         </div>
       );
+    }
+
+    if(Notification.permission !== 'denied'){
+      Notification.requestPermission()
     }
 
     var activedeployNodes = [];
