@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/getsentry/freight",
   "dependencies": {
+    "anchor-js": "^4.0.0",
     "ansi_up": "^1.1.3",
     "arr-diff": "^1.1.0",
     "babel-core": "6.21.0",

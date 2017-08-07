@@ -12,7 +12,8 @@ import pushNotification from '../pushNotification';
 import PropTypes from 'prop-types';
 
 
-var moment = require('moment');
+var moment   = require('moment');
+var anchorJS = require('anchor-js');
 
 var Progress = React.createClass({
   render() {
@@ -35,7 +36,8 @@ var TaskDetails = React.createClass({
       task: null,
       logNextOffset: 0,
       liveScroll: true,
-      lines: []
+      lines: [],
+      timeStamp: []
     };
   },
 
@@ -130,46 +132,54 @@ var TaskDetails = React.createClass({
   updateBuildLog(data) {
     // add each additional new line
     var frag       = document.createDocumentFragment();
-    var text       = data.chunks
-    var objLength  = data.chunks.length
-
+    var text       = data.chunks;
+    var objLength  = data.chunks.length;
+    var id         = 1;
+    var anchors = new anchorJS();
+    //console.log(anchors.add('a'))
+    //anchors.add('a')
     for(var i = 0; i < objLength; i++){
+      if(data.chunks[i] != undefined){
       this.setState({
-        lines: [...this.state.lines, ...text[i].text.split(/\n/)]
+        lines: [...this.state.lines,text[i].text.split(/\n/)],
+        timeStamp: [...this.state.timeStamp, data.chunks[i].date]
       })
 
-      var timer    = new Date(data.chunks[i].date)
-      var timeMil  = timer.getTime()
+      var lineItem = this.state.lines[i]
 
-      //Multiple by 60000 to convert offset to milliseconds
-      var offset   = timer.getTimezoneOffset() * 60000
-      var timezone = timeMil - offset
-      var newDate  = new Date(timezone)
+      for(var j = 0; j < lineItem.length; j++){
+        var div = document.createElement('div')
+        var time = document.createElement('a');
 
-      var div  = document.createElement('div');
-      var time = document.createElement('div');
+        div.className  = 'line';
+        time.className = 'time';
 
-      //div.className  = 'line';
-      time.className = 'time';
+        div.id         = "L" + id++
 
-      div.innerHTML  = ansi_up.ansi_to_html(data.chunks[i].text)
-      time.innerHTML = moment(newDate).parseZone().format("h:mm:ss a")
-      //console.log(this.state.lines)
-      frag.appendChild(time)
-      //frag.appendChild(div)
-    }
-    for(var i = 0; i < this.state.lines.length; i++){
-      var div = document.createElement('div')
-      div.className = 'line'
-      div.id = i
-      div.innerHTML = ansi_up.ansi_to_html(this.state.lines[i])
+        var task = this.state.task;
+        time.href      = '/deploys/' + task.app.name + '/' + task.environment + '/' + task.number + '#' + div.id
 
-      frag.appendChild(div)
+
+        var timer    = new Date(this.state.timeStamp[i])
+        var timeMil  = timer.getTime()
+        //Multiple by 60000 to convert offset to milliseconds
+        var offset   = timer.getTimezoneOffset() * 60000
+        var timezone = timeMil - offset
+        var newDate  = new Date(timezone)
+
+        div.innerHTML  = ansi_up.ansi_to_html(lineItem[j])
+        time.innerHTML = moment(newDate).parseZone().format("h:mm:ss a")
+
+        div.appendChild(time)
+        // frag.appendChild(time)
+        frag.appendChild(div)
+      }
     }
     this.refs.log.appendChild(frag);
 
     if (this.state.liveScroll) {
       this.scrollLog();
+      }
     }
   },
 
@@ -295,7 +305,6 @@ var TaskDetails = React.createClass({
   },
 
   render() {
-    console.log(this.state.task)
     if (this.state.loading) {
       return (
         <div style={{textAlign: "center"}}>
