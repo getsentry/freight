@@ -13,7 +13,6 @@ import PropTypes from 'prop-types';
 
 
 var moment   = require('moment');
-var anchorJS = require('anchor-js');
 
 var Progress = React.createClass({
   render() {
@@ -37,7 +36,8 @@ var TaskDetails = React.createClass({
       logNextOffset: 0,
       liveScroll: true,
       lines: [],
-      timeStamp: []
+      timeStamp: [],
+      index: 0
     };
   },
 
@@ -62,30 +62,35 @@ var TaskDetails = React.createClass({
   componentDidUpdate(prevProps, prevState) {
     let task = this.state.task
 
-    if(prevState.task !== null && task.status === 'finished' && prevState.task.status === 'in_progress'){
-      let {name}                = task.app
-      let {environment, number} = task
-      let path                  = `/deploys/${name}/${environment}/${number}`
+    if(task){
+      if(prevState.task !== null && task.status === 'finished' && prevState.task.status === 'in_progress'){
+        let {name}                = task.app
+        let {environment, number} = task
+        let path                  = `/deploys/${name}/${environment}/${number}`
 
-      pushNotification(task, path)
+        pushNotification(task, path)
+      }
     }
+    var hash = window.location.hash
 
-    if (this.state.liveScroll) {
+    if (this.state.liveScroll && hash == '') {
       this.scrollLog();
     }
-  //this.pushNotification()
   },
 
   componentWillReceiveProps(nextProps) {
     var params = this.props.params;
     var task = this.state.task;
-    if (params.app !== task.app.name || params.env !== task.environment || params.number !== task.number) {
-      this.setState({
-        loading: true,
-        error: false,
-        task: null
-      }, this.fetchData());
-    }
+
+    if(task){
+      if (params.app !== task.app.name || params.env !== task.environment || params.number !== task.number) {
+        this.setState({
+          loading: true,
+          error: false,
+          task: null
+          }, this.fetchData());
+        }
+      }
   },
 
   fetchData() {
@@ -134,53 +139,110 @@ var TaskDetails = React.createClass({
     var frag       = document.createDocumentFragment();
     var text       = data.chunks;
     var objLength  = data.chunks.length;
-    var id         = 1;
-    var anchors = new anchorJS();
-    //console.log(anchors.add('a'))
-    //anchors.add('a')
+    var id         = 0;
+    var timeid     = 0;
+    var index      = 0;
+
     for(var i = 0; i < objLength; i++){
       if(data.chunks[i] != undefined){
-      this.setState({
-        lines: [...this.state.lines,text[i].text.split(/\n/)],
-        timeStamp: [...this.state.timeStamp, data.chunks[i].date]
-      })
+        this.setState({
+          lines: [...this.state.lines, text[i].text.split(/\n/)],
+          timeStamp: [...this.state.timeStamp, data.chunks[i].date],
+        })
+      }
+    }
 
-      var lineItem = this.state.lines[i]
+    var lineItem = this.state.lines;
 
-      for(var j = 0; j < lineItem.length; j++){
-        var div = document.createElement('div')
+    for(var j = this.state.index; j < lineItem.length; j++){
+      for(var k = 0; k < lineItem[j].length; k++){
+
+        var div  = document.createElement('div');
         var time = document.createElement('a');
 
         div.className  = 'line';
         time.className = 'time';
+        div.id         = 'L' + id++;
 
-        div.id         = "L" + id++
+        let {environment, number} = this.state.task;
+        let {name}                = this.state.task.app;
 
-        var task = this.state.task;
-        time.href      = '/deploys/' + task.app.name + '/' + task.environment + '/' + task.number + '#' + div.id
+        time.href      = `/deploys/${name}/${environment}/${number}#${div.id}`;
+        time.id        = 'L' + timeid++;
 
+        time.addEventListener('click', (e) => {
+          var div                   = document.getElementById(e.target.id);
+          var highlightedlines      = document.getElementsByClassName('line highLighted');
+          var lines                 = document.getElementsByClassName('line');
 
-        var timer    = new Date(this.state.timeStamp[i])
-        var timeMil  = timer.getTime()
-        //Multiple by 60000 to convert offset to milliseconds
-        var offset   = timer.getTimezoneOffset() * 60000
-        var timezone = timeMil - offset
-        var newDate  = new Date(timezone)
+          this.stopRefresh(e.target.href);
 
-        div.innerHTML  = ansi_up.ansi_to_html(lineItem[j])
-        time.innerHTML = moment(newDate).parseZone().format("h:mm:ss a")
+          if(div.className == 'line'){
+            div.className = 'line highLighted';
 
-        div.appendChild(time)
-        // frag.appendChild(time)
-        frag.appendChild(div)
+          } else if(div.className == 'line highLighted'){
+            div.className = 'line';
+            this.stopRefresh(e.target.href);
+          }
+
+          for(var l = 0 ; l < highlightedlines.length; l++){
+            if(highlightedlines[l].className == 'line highLighted'){
+              highlightedlines[l].className = 'line';
+              div.className = 'line highLighted';
+            }else{
+              div.className = 'line';
+            }
+          }
+        });
+
+          var timer    = new Date(this.state.timeStamp[j]);
+          var timeMil  = timer.getTime();
+          //Multiple by 60000 to convert offset to milliseconds
+          var offset   = timer.getTimezoneOffset() * 60000;
+          var timezone = timeMil - offset;
+          var newDate  = new Date(timezone);
+
+          div.innerHTML  = ansi_up.ansi_to_html(lineItem[j][k]);
+          time.innerHTML = moment(newDate).parseZone().format('h:mm:ss a');
+
+          div.appendChild(time);
+          frag.appendChild(div);
+        }
       }
-    }
     this.refs.log.appendChild(frag);
 
-    if (this.state.liveScroll) {
+    this.centerHighligthedDiv();
+
+    var hash = window.location.hash
+
+    if (this.state.liveScroll && hash == '') {
       this.scrollLog();
       }
+      this.setState({
+        index: lineItem.length
+      })
+  },
+
+  centerHighligthedDiv() {
+    var hash = window.location.hash;
+    var href = window.location.href;
+
+    if(hash !== ''){
+      var divID = hash.replace(/[^\w\s]/g, '');
+      var div   = document.getElementById(divID);
+
+      if(div){
+        div.scrollIntoView();
+
+        var top = div.offsetTop - ( window.innerHeight / 4 );
+        window.scrollTo( 0, top );
+      }
+      div.className = "line highLighted";
     }
+  },
+  stopRefresh(timeId){
+    event.preventDefault();
+    window.history.replaceState(null, null, `${timeId}`);
   },
 
   scrollLog() {
@@ -207,30 +269,32 @@ var TaskDetails = React.createClass({
 
   pollLog() {
     var task = this.state.task;
-    var url = '/deploys/' + task.app.name + '/' + task.environment + '/' + task.number + '/log/?offset=' + this.state.logNextOffset;
+    if(task){
+      var url = '/deploys/' + task.app.name + '/' + task.environment + '/' + task.number + '/log/?offset=' + this.state.logNextOffset;
 
-    api.request(url, {
-      success: (data) => {
-        if (data.chunks.length > 0) {
-          this.setState({
-            logLoading: false,
-            logNextOffset: data.nextOffset
-          });
-          this.updateBuildLog(data);
-        }
-        if (this.state.logLoading) {
-          this.setState({
-            logLoading: false
-          });
-        }
-        if (this.taskInProgress(this.state.task)) {
-          this.logTimer = window.setTimeout(this.pollLog, 1000);
-        }
-      },
-      error: () => {
-        this.logTimer = window.setTimeout(this.pollLog, 10000);
-      }
-    });
+      api.request(url, {
+        success: (data) => {
+          if (data.chunks.length > 0) {
+            this.setState({
+              logLoading: false,
+              logNextOffset: data.nextOffset
+            });
+            this.updateBuildLog(data);
+          }
+          if (this.state.logLoading) {
+            this.setState({
+              logLoading: false
+            });
+          }
+          if (this.taskInProgress(this.state.task)) {
+            this.logTimer = window.setTimeout(this.pollLog, 1000);
+          }
+        },
+        error: () => {
+          this.logTimer = window.setTimeout(this.pollLog, 10000);
+          }
+        });
+    }
   },
 
   cancelTask() {
