@@ -37,7 +37,8 @@ var TaskDetails = React.createClass({
       liveScroll: true,
       lines: [],
       timeStamp: [],
-      index: 0
+      index: 0,
+      id: 0,
     };
   },
 
@@ -62,15 +63,16 @@ var TaskDetails = React.createClass({
   componentDidUpdate(prevProps, prevState) {
     let task = this.state.task
 
-    if(task){
-      if(prevState.task !== null && task.status === 'finished' && prevState.task.status === 'in_progress'){
-        let {name}                = task.app
-        let {environment, number} = task
-        let path                  = `/deploys/${name}/${environment}/${number}`
+    if(!task) return;
 
-        pushNotification(task, path)
-      }
+    if(prevState.task !== null && task.status === 'finished' && prevState.task.status === 'in_progress'){
+      let {name}                = task.app
+      let {environment, number} = task
+      let path                  = `/deploys/${name}/${environment}/${number}`
+
+      pushNotification(task, path)
     }
+
     var hash = window.location.hash
 
     if (this.state.liveScroll && hash == '') {
@@ -82,16 +84,16 @@ var TaskDetails = React.createClass({
     var params = this.props.params;
     var task = this.state.task;
 
-    if(task){
-      if (params.app !== task.app.name || params.env !== task.environment || params.number !== task.number) {
-        this.setState({
-          loading: true,
-          error: false,
-          task: null
-          }, this.fetchData());
-        }
+    if(!task) return;
+
+    if (params.app !== task.app.name || params.env !== task.environment || params.number !== task.number) {
+      this.setState({
+        loading: true,
+        error: false,
+        task: null
+        }, this.fetchData());
       }
-  },
+    },
 
   fetchData() {
     if (this.logTimer) {
@@ -134,14 +136,10 @@ var TaskDetails = React.createClass({
       task: data
     });
   },
-  updateBuildLog(data) {
-    // add each additional new line
-    var frag       = document.createDocumentFragment();
+
+  splitLogData(data){
     var text       = data.chunks;
     var objLength  = data.chunks.length;
-    var id         = 0;
-    var timeid     = 0;
-    var index      = 0;
 
     for(var i = 0; i < objLength; i++){
       if(data.chunks[i] != undefined){
@@ -151,76 +149,88 @@ var TaskDetails = React.createClass({
         })
       }
     }
+  },
 
-    var lineItem = this.state.lines;
+  highLightDiv(div){
+    div.addEventListener('click', (e) => {
+      var div                   = document.getElementById(e.target.id);
+      var highlightedlines      = document.getElementsByClassName('line highLighted');
+      var lines                 = document.getElementsByClassName('line');
+
+      this.stopRefresh(e, e.target.href);
+
+      if(div.className == 'line'){
+        div.className = 'line highLighted';
+
+      } else if(div.className == 'line highLighted'){
+        div.className = 'line';
+        this.stopRefresh(e, e.target.href);
+      }
+
+      for(var l = 0 ; l < highlightedlines.length; l++){
+        if(highlightedlines[l].className == 'line highLighted'){
+          highlightedlines[l].className = 'line';
+          div.className = 'line highLighted';
+        }else{
+          div.className = 'line';
+        }
+      }
+    });
+  },
+
+  updateBuildLog(data) {
+    // add each additional new line
+    this.splitLogData(data);
+    var frag       = document.createDocumentFragment();
+    var timeid     = 0;
+    var index      = 0;
+    var lineItem   = this.state.lines;
+    var hash       = window.location.hash;
 
     for(var j = this.state.index; j < lineItem.length; j++){
       for(var k = 0; k < lineItem[j].length; k++){
 
-        var div  = document.createElement('div');
-        var time = document.createElement('a');
+        let div         = document.createElement('div');
+        let time        = document.createElement('a');
+        let idIncrement = this.state.id++;
 
         div.className  = 'line';
         time.className = 'time';
-        div.id         = 'L' + id++;
+        div.id         = 'L' + idIncrement;
 
         let {environment, number} = this.state.task;
         let {name}                = this.state.task.app;
 
-        time.href      = `/deploys/${name}/${environment}/${number}#${div.id}`;
-        time.id        = 'L' + timeid++;
+        time.href = `/deploys/${name}/${environment}/${number}#${div.id}`;
+        time.id   = div.id;
 
-        time.addEventListener('click', (e) => {
-          var div                   = document.getElementById(e.target.id);
-          var highlightedlines      = document.getElementsByClassName('line highLighted');
-          var lines                 = document.getElementsByClassName('line');
+        this.highLightDiv(time);
 
-          this.stopRefresh(e.target.href);
+        var timer    = new Date(this.state.timeStamp[j]);
+        var timeMil  = timer.getTime();
+        //Multiple by 60000 to convert offset to milliseconds
+        var offset   = timer.getTimezoneOffset() * 60000;
+        var timezone = timeMil - offset;
+        var newDate  = new Date(timezone);
 
-          if(div.className == 'line'){
-            div.className = 'line highLighted';
+        div.innerHTML  = ansi_up.ansi_to_html(lineItem[j][k]);
+        time.innerHTML = moment(newDate).parseZone().format('h:mm:ss a');
 
-          } else if(div.className == 'line highLighted'){
-            div.className = 'line';
-            this.stopRefresh(e.target.href);
-          }
-
-          for(var l = 0 ; l < highlightedlines.length; l++){
-            if(highlightedlines[l].className == 'line highLighted'){
-              highlightedlines[l].className = 'line';
-              div.className = 'line highLighted';
-            }else{
-              div.className = 'line';
-            }
-          }
-        });
-
-          var timer    = new Date(this.state.timeStamp[j]);
-          var timeMil  = timer.getTime();
-          //Multiple by 60000 to convert offset to milliseconds
-          var offset   = timer.getTimezoneOffset() * 60000;
-          var timezone = timeMil - offset;
-          var newDate  = new Date(timezone);
-
-          div.innerHTML  = ansi_up.ansi_to_html(lineItem[j][k]);
-          time.innerHTML = moment(newDate).parseZone().format('h:mm:ss a');
-
-          div.appendChild(time);
-          frag.appendChild(div);
+        div.appendChild(time);
+        frag.appendChild(div);
         }
       }
     this.refs.log.appendChild(frag);
 
     this.centerHighligthedDiv();
 
-    var hash = window.location.hash
-
     if (this.state.liveScroll && hash == '') {
       this.scrollLog();
       }
-      this.setState({
-        index: lineItem.length
-      })
+
+    this.setState({
+      index: lineItem.length
+    })
   },
 
   centerHighligthedDiv() {
@@ -232,15 +242,15 @@ var TaskDetails = React.createClass({
       var div   = document.getElementById(divID);
 
       if(div){
-        div.scrollIntoView();
-
         var top = div.offsetTop - ( window.innerHeight / 4 );
+
+        div.scrollIntoView();
         window.scrollTo( 0, top );
       }
       div.className = "line highLighted";
     }
   },
-  stopRefresh(timeId){
+  stopRefresh(event, timeId){
     event.preventDefault();
     window.history.replaceState(null, null, `${timeId}`);
   },
