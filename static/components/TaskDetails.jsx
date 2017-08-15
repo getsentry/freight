@@ -11,7 +11,8 @@ import { browserHistory } from 'react-router';
 import pushNotification from '../pushNotification';
 import PropTypes from 'prop-types';
 
-var moment = require('moment');
+
+var moment   = require('moment');
 
 var Progress = React.createClass({
   render() {
@@ -34,6 +35,7 @@ var TaskDetails = React.createClass({
       task: null,
       logNextOffset: 0,
       liveScroll: true,
+      id: 0
     };
   },
 
@@ -58,6 +60,8 @@ var TaskDetails = React.createClass({
   componentDidUpdate(prevProps, prevState) {
     let task = this.state.task
 
+    if(!task) return;
+
     if(prevState.task !== null && task.status === 'finished' && prevState.task.status === 'in_progress'){
       let {name}                = task.app
       let {environment, number} = task
@@ -66,7 +70,9 @@ var TaskDetails = React.createClass({
       pushNotification(task, path)
     }
 
-    if (this.state.liveScroll) {
+    var hash = window.location.hash
+
+    if (this.state.liveScroll && hash == '') {
       this.scrollLog();
     }
   },
@@ -74,14 +80,17 @@ var TaskDetails = React.createClass({
   componentWillReceiveProps(nextProps) {
     var params = this.props.params;
     var task = this.state.task;
+
+    if(!task) return;
+
     if (params.app !== task.app.name || params.env !== task.environment || params.number !== task.number) {
       this.setState({
         loading: true,
         error: false,
         task: null
-      }, this.fetchData());
-    }
-  },
+        }, this.fetchData());
+      }
+    },
 
   fetchData() {
     if (this.logTimer) {
@@ -124,39 +133,128 @@ var TaskDetails = React.createClass({
       task: data
     });
   },
-  updateBuildLog(data) {
-    // add each additional new line
-    var frag       = document.createDocumentFragment();
-    var text       = data.chunks
-    var objLength  = data.chunks.length
+
+  splitLogData(data){
+    var text       = data.chunks;
+    var objLength  = data.chunks.length;
+
+    var obj = {
+      lines: [],
+      timeStamp: []
+    }
 
     for(var i = 0; i < objLength; i++){
-      var timer    = new Date(data.chunks[i].date)
-      var timeMil  = timer.getTime()
-
-      //Multiple by 60000 to convert offset to milliseconds
-      var offset   = timer.getTimezoneOffset() * 60000
-      var timezone = timeMil - offset
-      var newDate  = new Date(timezone)
-
-      var div  = document.createElement('div');
-      var time = document.createElement('div');
-
-      div.className  = 'line';
-      time.className = 'time';
-
-      div.innerHTML  = ansi_up.ansi_to_html(data.chunks[i].text)
-      time.innerHTML = moment(newDate).parseZone().format("h:mm:ss a")
-
-      frag.appendChild(time)
-      frag.appendChild(div)
+      if(data.chunks[i] !== undefined){
+        obj.lines = [...obj.lines, text[i].text.split(/\n/)]
+        obj.timeStamp = [...obj.timeStamp, data.chunks[i].date]
+      }
     }
+    return obj;
+  },
 
+  highLightDiv(div){
+    div.addEventListener('click', (e) => {
+      var div                   = document.getElementById(e.target.id);
+      var highlightedlines      = document.getElementsByClassName('line highLighted');
+      var lines                 = document.getElementsByClassName('line');
+
+      this.stopRefresh(e, e.target.href);
+
+      if(div.className === 'line'){
+        div.className = 'line highLighted';
+
+      } else if(div.className === 'line highLighted'){
+        div.className = 'line';
+        this.stopRefresh(e, e.target.href);
+      }
+
+      for(var l = 0 ; l < highlightedlines.length; l++){
+        if(highlightedlines[l].className === 'line highLighted'){
+          highlightedlines[l].className = 'line';
+          div.className = 'line highLighted';
+        }else{
+          div.className = 'line';
+          }
+        }
+    });
+  },
+
+  updateBuildLog(data) {
+    // add each additional new line
+    var logDataResults = this.splitLogData(data);
+    var frag           = document.createDocumentFragment();
+    var timeid         = 0;
+    var index          = 0;
+    var lineItem       = logDataResults.lines;
+    var hash           = window.location.hash;
+
+    for(var j = 0; j < lineItem.length; j++){
+      for(var k = 0; k < lineItem[j].length; k++){
+
+        let div         = document.createElement('div');
+        let time        = document.createElement('a');
+        let idIncrement = this.state.id++;
+
+        div.className  = 'line';
+        time.className = 'time';
+        div.id         = 'L' + idIncrement;
+
+        let {environment, number} = this.state.task;
+        let {name}                = this.state.task.app;
+
+        time.href = `/deploys/${name}/${environment}/${number}#${div.id}`;
+        time.id   = div.id;
+
+        /***********************************************************************
+        This creates an eventlistener for each time element.
+        Fine for current average log size(8-15-17), but memory usuage will spike
+        for really big logs.
+        ***********************************************************************/
+        this.highLightDiv(time);
+
+        var timer    = new Date(logDataResults.timeStamp[j]);
+        var timeMil  = timer.getTime();
+        //Multiple by 60000 to convert offset to milliseconds
+        var offset   = timer.getTimezoneOffset() * 60000;
+        var timezone = timeMil - offset;
+        var newDate  = new Date(timezone);
+
+        div.innerHTML  = ansi_up.ansi_to_html(lineItem[j][k]);
+        time.innerHTML = moment(newDate).parseZone().format('h:mm:ss a');
+
+        div.appendChild(time);
+        frag.appendChild(div);
+        }
+      }
     this.refs.log.appendChild(frag);
 
-    if (this.state.liveScroll) {
+    this.centerHighlightedDiv();
+
+    if (this.state.liveScroll && hash === '') {
       this.scrollLog();
+      }
+  },
+
+  centerHighlightedDiv() {
+    var hash = window.location.hash;
+    var href = window.location.href;
+
+    if(hash !== ''){
+      var divID = hash.replace(/[^\w\s]/g, '');
+      var div   = document.getElementById(divID);
+
+      if(div){
+        var top = div.offsetTop - ( window.innerHeight / 4 );
+
+        div.scrollIntoView();
+        window.scrollTo( 0, top );
+      }
+      div.className = "line highLighted";
     }
+  },
+  stopRefresh(event, timeId){
+    event.preventDefault();
+    window.history.replaceState(null, null, `${timeId}`);
   },
 
   scrollLog() {
@@ -164,7 +262,7 @@ var TaskDetails = React.createClass({
   },
 
   taskInProgress(task) {
-    return task.status == 'in_progress' || task.status == 'pending';
+    return task.status === 'in_progress' || task.status === 'pending';
   },
 
   getEstimatedProgress(task) {
@@ -183,31 +281,33 @@ var TaskDetails = React.createClass({
 
   pollLog() {
     var task = this.state.task;
-    var url = '/deploys/' + task.app.name + '/' + task.environment + '/' + task.number + '/log/?offset=' + this.state.logNextOffset;
+    var url  = '/deploys/' + task.app.name + '/' + task.environment + '/' + task.number + '/log/?offset=' + this.state.logNextOffset;
 
-    api.request(url, {
-      success: (data) => {
-        if (data.chunks.length > 0) {
-          this.setState({
-            logLoading: false,
-            logNextOffset: data.nextOffset
-          });
-          this.updateBuildLog(data);
+    if(!task) return;
+
+      api.request(url, {
+        success: (data) => {
+          if (data.chunks.length > 0) {
+            this.setState({
+              logLoading: false,
+              logNextOffset: data.nextOffset
+            });
+            this.updateBuildLog(data);
+          }
+          if (this.state.logLoading) {
+            this.setState({
+              logLoading: false
+            });
+          }
+          if (this.taskInProgress(this.state.task)) {
+            this.logTimer = window.setTimeout(this.pollLog, 1000);
+          }
+        },
+        error: () => {
+          this.logTimer = window.setTimeout(this.pollLog, 10000);
         }
-        if (this.state.logLoading) {
-          this.setState({
-            logLoading: false
-          });
-        }
-        if (this.taskInProgress(this.state.task)) {
-          this.logTimer = window.setTimeout(this.pollLog, 1000);
-        }
-      },
-      error: () => {
-        this.logTimer = window.setTimeout(this.pollLog, 10000);
-      }
-    });
-  },
+      });
+    },
 
   cancelTask() {
     var task = this.state.task;
