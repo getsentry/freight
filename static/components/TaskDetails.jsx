@@ -283,7 +283,8 @@ var TaskDetails = React.createClass({
     var task = this.state.task;
     var url  = '/deploys/' + task.app.name + '/' + task.environment + '/' + task.number + '/log/?offset=' + this.state.logNextOffset;
 
-    if(task){
+    if(!task) return;
+
       api.request(url, {
         success: (data) => {
           if (data.chunks.length > 0) {
@@ -304,10 +305,9 @@ var TaskDetails = React.createClass({
         },
         error: () => {
           this.logTimer = window.setTimeout(this.pollLog, 10000);
-          }
-        });
-    }
-  },
+        }
+      });
+    },
 
   cancelTask() {
     var task = this.state.task;
