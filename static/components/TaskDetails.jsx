@@ -35,10 +35,7 @@ var TaskDetails = React.createClass({
       task: null,
       logNextOffset: 0,
       liveScroll: true,
-      lines: [],
-      timeStamp: [],
-      index: 0,
-      id: 0,
+      id: 0
     };
   },
 
@@ -141,14 +138,18 @@ var TaskDetails = React.createClass({
     var text       = data.chunks;
     var objLength  = data.chunks.length;
 
+    var obj = {
+      lines: [],
+      timeStamp: []
+    }
+
     for(var i = 0; i < objLength; i++){
-      if(data.chunks[i] != undefined){
-        this.setState({
-          lines: [...this.state.lines, text[i].text.split(/\n/)],
-          timeStamp: [...this.state.timeStamp, data.chunks[i].date],
-        })
+      if(data.chunks[i] !== undefined){
+        obj.lines = [...obj.lines, text[i].text.split(/\n/)]
+        obj.timeStamp = [...obj.timeStamp, data.chunks[i].date]
       }
     }
+    return obj;
   },
 
   highLightDiv(div){
@@ -159,35 +160,35 @@ var TaskDetails = React.createClass({
 
       this.stopRefresh(e, e.target.href);
 
-      if(div.className == 'line'){
+      if(div.className === 'line'){
         div.className = 'line highLighted';
 
-      } else if(div.className == 'line highLighted'){
+      } else if(div.className === 'line highLighted'){
         div.className = 'line';
         this.stopRefresh(e, e.target.href);
       }
 
       for(var l = 0 ; l < highlightedlines.length; l++){
-        if(highlightedlines[l].className == 'line highLighted'){
+        if(highlightedlines[l].className === 'line highLighted'){
           highlightedlines[l].className = 'line';
           div.className = 'line highLighted';
         }else{
           div.className = 'line';
+          }
         }
-      }
     });
   },
 
   updateBuildLog(data) {
     // add each additional new line
-    this.splitLogData(data);
-    var frag       = document.createDocumentFragment();
-    var timeid     = 0;
-    var index      = 0;
-    var lineItem   = this.state.lines;
-    var hash       = window.location.hash;
+    var logDataResults = this.splitLogData(data);
+    var frag           = document.createDocumentFragment();
+    var timeid         = 0;
+    var index          = 0;
+    var lineItem       = logDataResults.lines;
+    var hash           = window.location.hash;
 
-    for(var j = this.state.index; j < lineItem.length; j++){
+    for(var j = 0; j < lineItem.length; j++){
       for(var k = 0; k < lineItem[j].length; k++){
 
         let div         = document.createElement('div');
@@ -204,9 +205,14 @@ var TaskDetails = React.createClass({
         time.href = `/deploys/${name}/${environment}/${number}#${div.id}`;
         time.id   = div.id;
 
+        /***********************************************************************
+        This creates an eventlistener for each time element.
+        Fine for current average log size(8-15-17), but memory usuage will spike
+        for really big logs.
+        ***********************************************************************/
         this.highLightDiv(time);
 
-        var timer    = new Date(this.state.timeStamp[j]);
+        var timer    = new Date(logDataResults.timeStamp[j]);
         var timeMil  = timer.getTime();
         //Multiple by 60000 to convert offset to milliseconds
         var offset   = timer.getTimezoneOffset() * 60000;
@@ -222,18 +228,14 @@ var TaskDetails = React.createClass({
       }
     this.refs.log.appendChild(frag);
 
-    this.centerHighligthedDiv();
+    this.centerHighlightedDiv();
 
-    if (this.state.liveScroll && hash == '') {
+    if (this.state.liveScroll && hash === '') {
       this.scrollLog();
       }
-
-    this.setState({
-      index: lineItem.length
-    })
   },
 
-  centerHighligthedDiv() {
+  centerHighlightedDiv() {
     var hash = window.location.hash;
     var href = window.location.href;
 
@@ -260,7 +262,7 @@ var TaskDetails = React.createClass({
   },
 
   taskInProgress(task) {
-    return task.status == 'in_progress' || task.status == 'pending';
+    return task.status === 'in_progress' || task.status === 'pending';
   },
 
   getEstimatedProgress(task) {
@@ -279,9 +281,9 @@ var TaskDetails = React.createClass({
 
   pollLog() {
     var task = this.state.task;
-    if(task){
-      var url = '/deploys/' + task.app.name + '/' + task.environment + '/' + task.number + '/log/?offset=' + this.state.logNextOffset;
+    var url  = '/deploys/' + task.app.name + '/' + task.environment + '/' + task.number + '/log/?offset=' + this.state.logNextOffset;
 
+    if(task){
       api.request(url, {
         success: (data) => {
           if (data.chunks.length > 0) {
