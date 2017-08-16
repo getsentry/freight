@@ -58,7 +58,7 @@ module.exports = {
 
         var styles = stats.toJson({
           assetsSort: true
-        }).assets[2].name
+        }).assetsByChunkName.styles[1]
 
         var newObj = {
           "assets": {
@@ -73,7 +73,10 @@ module.exports = {
           JSON.stringify(newObj));
       });
     },
-    new ExtractTextPlugin('styles.css'),
+    new ExtractTextPlugin({
+      filename: 'styles.[chunkhash].css',
+      allChunks: true
+    }),
     new webpack.ProvidePlugin({
         $: 'jquery',
         jQuery: 'jquery',
