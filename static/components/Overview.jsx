@@ -76,7 +76,7 @@ var Overview = React.createClass({
       );
     }
 
-    if(Notification.permission !== 'denied'){
+    if(window.Notification && Notification.permission !== 'denied'){
       Notification.requestPermission()
     }
 

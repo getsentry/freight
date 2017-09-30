@@ -23,7 +23,7 @@ function pushNotification(task, path){
     }
   }
 
-  if(Notification.permission !== 'denied'){
+  if(window.Notification && Notification.permission !== 'denied'){
     Notification.requestPermission(function(permission){
       if(permission === 'granted'){
         createNotification(task.name, url, options);
