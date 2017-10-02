@@ -389,7 +389,7 @@ var TaskDetails = React.createClass({
       );
     }
 
-    if(Notification && Notification.permission !== 'denied'){
+    if(window.Notification && Notification.permission !== 'denied'){
       Notification.requestPermission()
     }
 
