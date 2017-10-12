@@ -72,7 +72,7 @@ var TaskDetails = React.createClass({
 
     var hash = window.location.hash
 
-    if (this.state.liveScroll && hash == '') {
+    if (this.state.liveScroll && hash == '' && (prevState.logNextOffset !== this.state.logNextOffset)) {
       this.scrollLog();
     }
   },
