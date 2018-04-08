@@ -55,7 +55,7 @@
     "style-loader": "^0.8.3",
     "url-loader": "^0.5.5",
     "webpack": "2.2.0",
-    "webpack-dev-server": "^2.0.0"
+    "webpack-dev-server": "^3.1.2"
   },
   "jest": {
     "setupTestFrameworkScriptFile": "./node_modules/jest-enzyme/lib/index.js",
