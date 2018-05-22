@@ -123,5 +123,7 @@ ENV PATH /usr/src/app/bin:$PATH
 EXPOSE 5000
 VOLUME /workspace
 
+RUN gcloud auth configure-docker
+
 ENTRYPOINT ["/usr/src/app/docker-entrypoint.sh"]
 CMD ["web", "--no-debug", "--addr", "0.0.0.0:5000"]
