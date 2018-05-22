@@ -97,11 +97,11 @@ RUN set -x \
     && apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
     && wget -O gcloud.tgz "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-201.0.0-linux-x86_64.tar.gz" \
     && echo "${GCLOUD_SHA256} *gcloud.tgz" | sha256sum -c - \
-    && tar -zxvf gcloud.tgz \
-    && mv gcloud/* /opt \
-    && rmdir gcloud \
+    && tar -zxvf gcloud.tgz -C /opt \
     && rm gcloud.tgz \
     && apt-get purge -y --auto-remove wget
+
+ENV PATH="${PATH}:/opt/google-cloud-sdk/bin"
 
 ENV DOCKER_HOST tcp://docker:2375
 
