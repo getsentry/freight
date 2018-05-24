@@ -18,15 +18,15 @@ if [ "$DOCKER_CONFIG" ]; then
 fi
 
 if [ "$GCP_PROJECT" ]; then
-    mkdir -p ~/.config/gcloud/configurations/
-    cat <<- 'HERE' > ~/.config/gcloud/configurations/config_default
+    gosu freight bash -c 'mkdir -p ~/.config/gcloud/configurations/'
+    gosu freight bash -c "cat <<- 'HERE' > ~/.config/gcloud/configurations/config_default
 	[core]
 	project = $GCP_PROJECT
 
 	[compute]
 	zone = $GCP_ZONE
 	region = $GCP_REGION
-HERE
+HERE"
 fi
 
 # Check if we're trying to execute a freight bin
