@@ -18,8 +18,9 @@ if [ "$DOCKER_CONFIG" ]; then
 fi
 
 if [ "$GCP_PROJECT" ]; then
-    gosu freight bash -c 'mkdir -p ~/.config/gcloud/configurations/'
-    gosu freight bash -c "cat <<- 'HERE' > ~/.config/gcloud/configurations/config_default
+    gosu freight bash -c 'gcloud auth configure-docker'
+    gosu freight bash -c 'mkdir -p ~freight/.config/gcloud/configurations/'
+    gosu freight bash -c "cat <<- 'HERE' > ~freight/.config/gcloud/configurations/config_default
 	[core]
 	project = $GCP_PROJECT
 
