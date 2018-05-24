@@ -125,13 +125,5 @@ VOLUME /workspace
 
 RUN gcloud auth configure-docker
 
-RUN mkdir -p ~/.config/gcloud/configurations/ \
-    && echo [core] > ~/.config/gcloud/configurations/config_default \
-    && echo project = internal-sentry >> ~/.config/gcloud/configurations/config_default \
-    && echo >> ~/.config/gcloud/configurations/config_default \
-    && echo [compute] >> ~/.config/gcloud/configurations/config_default \
-    && echo zone = us-central1-b >> ~/.config/gcloud/configurations/config_default \
-    && echo region = us-central1 >> ~/.config/gcloud/configurations/config_default
-
 ENTRYPOINT ["/usr/src/app/docker-entrypoint.sh"]
 CMD ["web", "--no-debug", "--addr", "0.0.0.0:5000"]
