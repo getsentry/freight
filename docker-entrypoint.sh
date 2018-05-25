@@ -20,14 +20,14 @@ fi
 if [ "$GCP_PROJECT" ]; then
     gosu freight bash -c 'gcloud auth configure-docker'
     gosu freight bash -c 'mkdir -p ~freight/.config/gcloud/configurations/'
-    gosu freight bash -c "cat <<- 'HERE' > ~freight/.config/gcloud/configurations/config_default
+    cat<<-HERE | gosu freight bash -c 'tee > ~freight/.config/gcloud/configurations/config_default'
 	[core]
 	project = $GCP_PROJECT
 
 	[compute]
 	zone = $GCP_ZONE
 	region = $GCP_REGION
-HERE"
+HERE
 fi
 
 # Check if we're trying to execute a freight bin
