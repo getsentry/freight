@@ -5,6 +5,9 @@ services:
   - redis-server
 python:
   - "2.7"
+addons:
+  apt:
+    update: true
 cache:
   directories:
     - node_modules
