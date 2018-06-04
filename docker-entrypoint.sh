@@ -17,8 +17,8 @@ if [ "$DOCKER_CONFIG" ]; then
     unset DOCKER_CONFIG
 fi
 
-if [ -f /etc/freight/gcr-auth.sh ]; then
-    . /etc/freight/gcr-auth.sh
+if [ -f /etc/freight/auth-helpers.sh ]; then
+    . /etc/freight/auth-helpers.sh
 fi
 
 # Check if we're trying to execute a freight bin
