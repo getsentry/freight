@@ -17,17 +17,8 @@ if [ "$DOCKER_CONFIG" ]; then
     unset DOCKER_CONFIG
 fi
 
-if [ "$GCP_PROJECT" ]; then
-    gosu freight bash -c 'gcloud auth configure-docker'
-    gosu freight bash -c 'mkdir -p ~freight/.config/gcloud/configurations/'
-    cat<<-HERE | gosu freight bash -c 'tee > ~freight/.config/gcloud/configurations/config_default'
-	[core]
-	project = $GCP_PROJECT
-
-	[compute]
-	zone = $GCP_ZONE
-	region = $GCP_REGION
-HERE
+if [ -f /etc/freight/auth-helpers.sh ]; then
+    . /etc/freight/auth-helpers.sh
 fi
 
 # Check if we're trying to execute a freight bin
