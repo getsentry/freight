@@ -80,10 +80,10 @@ RUN set -x \
     && rm -r /usr/src/redis
 
 RUN set -x \
-    && export DOCKER_VERSION=1.13.1 \
-    && export DOCKER_SHA256=97892375e756fd29a304bd8cd9ffb256c2e7c8fd759e12a55a6336e15100ad75 \
+    && export DOCKER_VERSION=18.03.1 \
+    && export DOCKER_SHA256=0e245c42de8a21799ab11179a4fce43b494ce173a8a2d6567ea6825d6c5265aa \
     && apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
-    && wget -O docker.tgz "https://get.docker.com/builds/Linux/x86_64/docker-$DOCKER_VERSION.tgz" \
+    && wget -O docker.tgz "https://download.docker.com/linux/static/stable/x86_64/docker-$DOCKER_VERSION-ce.tgz" \
     && echo "${DOCKER_SHA256} *docker.tgz" | sha256sum -c - \
     && tar -zxvf docker.tgz \
     && mv docker/* /usr/local/bin/ \
