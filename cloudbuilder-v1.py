@@ -30,17 +30,22 @@ REPO = "github-getsentry-brain"
 SHA = "61ca573635fc6c7265baea7cba189a1a153ee955"  # only hardcoded now for testing purposes
 SHA_NOT = "8888888888888888888888888" # fake SHA 
 
-gcloud container builds list --filter "source.repo_source.repo_name=$REPO AND source_provenance.resolved_repo_source.commit_sha=$COMMIT_SHA"
-
-COMMAND = "gcloud container builds list --filter 'source.repo_source.repo_name=" + REPO + " AND source_provenance.resolved_repo_source.commit_sha=" + SHA + " AND status=SUCCESS' --format=value(id)"
-# command = 'gcloud container builds list --filter "source.repo_source.repo_name=github-getsentry-brain AND source_provenance.resolved_repo_source.commit_sha=61ca573635fc6c7265baea7cba189a1a153ee955 AND status=SUCCESS" --format="value(id)"'
-GCP_PROJECT = "internal-sentry"
-GCP_ID = 225313812765
-DATA = subprocess.check_output(shlex.split(COMMAND))
 print("""
-ID created.
-See URL:
-https://console.cloud.google.com/gcr/builds/{}?project={}&organizationId={}""".format(DATA.strip(), GCP_PROJECT, GCP_ID))
+Does this build exist?
+""")
+EXISTENCE = """gcloud container builds list --filter 'source.repo_source.repo_name={} AND source_provenance.resolved_repo_source.commit_sha={}'""".format(REPO, SHA)
 
-# def track_cloud_builder():
-#     pass
+try:
+    print EXISTENCE
+    subprocess.call(shlex.split(EXISTENCE))
+    print('YES')
+    COMMAND = """gcloud container builds list --filter 'source.repo_source.repo_name={} AND source_provenance.resolved_repo_source.commit_sha={} AND status=SUCCESS' --format=value(id)""".format(REPO, SHA)
+    GCP_PROJECT = "internal-sentry"
+    GCP_ID = 225313812765
+    GCP_ID = subprocess.check_output(shlex.split(COMMAND))
+    print("""
+ID saved to GCB_ID.
+See URL:
+    https://console.cloud.google.com/gcr/builds/{}?project={}&organizationId={}""".format(DATA.strip(), GCP_PROJECT, GCP_ID))
+except ValueError:
+    print('NO')
