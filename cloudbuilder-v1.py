@@ -39,13 +39,26 @@ try:
     print EXISTENCE
     subprocess.call(shlex.split(EXISTENCE))
     print('YES')
+
+    # Save unique gcloud build ID to use in future commands
     COMMAND = """gcloud container builds list --filter 'source.repo_source.repo_name={} AND source_provenance.resolved_repo_source.commit_sha={} AND status=SUCCESS' --format=value(id)""".format(REPO, SHA)
     GCP_PROJECT = "internal-sentry"
     GCP_ID = 225313812765
-    GCP_ID = subprocess.check_output(shlex.split(COMMAND))
+    GCB_ID = subprocess.check_output(shlex.split(COMMAND))
+
     print("""
-ID saved to GCB_ID.
+ID is {} saved to GCB_ID.
 See URL:
-    https://console.cloud.google.com/gcr/builds/{}?project={}&organizationId={}""".format(DATA.strip(), GCP_PROJECT, GCP_ID))
+    https://console.cloud.google.com/gcr/builds/{}?project={}&organizationId={}""".format(GCB_ID.strip(), GCB_ID.strip(), GCP_PROJECT, GCP_ID))
+    
+    # Show currently progress of build
+    # GCB_ID = $(gcloud container builds list - -filter "source.repo_source.repo_name=" github - getsentry - brain " AND source_provenance.resolved_repo_source.commit_sha=$(git show-ref master --hash --heads) AND status=SUCCESS" - -format = "value(id)")
+    # gcloud container builds list --filter $GCB_ID --ongoing
+    STATUS = """gcloud container builds describe {} --format='value(status)'""".format(GCB_ID.strip())
+    subprocess.call(shlex.split(STATUS))
+    # print last 10 lines of log
+    LOG = "gcloud container builds log {}".format(GCB_ID.strip())
+    subprocess.call(shlex.split(LOG))
+
 except ValueError:
     print('NO')
