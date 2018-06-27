@@ -27,38 +27,51 @@ import sys
 
 REPO = "github-getsentry-brain"
 # SHA = $(git show-ref master --hash --heads) this command assumes that it is being run from same filesystem
-SHA = "61ca573635fc6c7265baea7cba189a1a153ee955"  # only hardcoded now for testing purposes
+SHA = "82cce810fa298d99dabd176df9086a4ea043229d"  # only hardcoded now for testing purposes
 SHA_NOT = "8888888888888888888888888" # fake SHA 
 
 print("""
 Does this build exist?
 """)
-EXISTENCE = """gcloud container builds list --filter 'source.repo_source.repo_name={} AND source_provenance.resolved_repo_source.commit_sha={}'""".format(REPO, SHA)
+COMMAND = """gcloud container builds list --filter 'source.repo_source.repo_name={} AND source_provenance.resolved_repo_source.commit_sha={}' --format='json' """.format(REPO, SHA)
+print("""
 
-try:
-    print EXISTENCE
-    subprocess.call(shlex.split(EXISTENCE))
-    print('YES')
+{}
 
-    # Save unique gcloud build ID to use in future commands
-    COMMAND = """gcloud container builds list --filter 'source.repo_source.repo_name={} AND source_provenance.resolved_repo_source.commit_sha={} AND status=SUCCESS' --format=value(id)""".format(REPO, SHA)
-    GCP_PROJECT = "internal-sentry"
-    GCP_ID = 225313812765
-    GCB_ID = subprocess.check_output(shlex.split(COMMAND))
+""".format(COMMAND))
+BUILD_DATA = json.loads(subprocess.check_output(shlex.split(COMMAND)))[0]
+print("""
 
-    print("""
-ID is {} saved to GCB_ID.
-See URL:
-    https://console.cloud.google.com/gcr/builds/{}?project={}&organizationId={}""".format(GCB_ID.strip(), GCB_ID.strip(), GCP_PROJECT, GCP_ID))
+{}
+
+""".format(BUILD_DATA))
+BUILD_ID = BUILD_DATA['id']
+BUILD_STATUS = BUILD_DATA['status']
+# note to self - top level status key returns overall status of build while steps[].status returns SUCCESS only once build is completed
+BUILD_COMPLETE = BUILD_DATA['steps[].status']
+
+print("""
+
+build id is {}
+build status is {}
+build completion is {}
+
+""".format(BUILD_ID, BUILD_STATUS, BUILD_COMPLETE))
+# # Save unique gcloud build ID to use in future commands
+# print("""
+# Build ID is {}.
+# See URL:
+#     https://console.cloud.google.com/gcr/builds/{}""".format(GCB_ID.strip())
     
-    # Show currently progress of build
-    # GCB_ID = $(gcloud container builds list - -filter "source.repo_source.repo_name=" github - getsentry - brain " AND source_provenance.resolved_repo_source.commit_sha=$(git show-ref master --hash --heads) AND status=SUCCESS" - -format = "value(id)")
-    # gcloud container builds list --filter $GCB_ID --ongoing
-    STATUS = """gcloud container builds describe {} --format='value(status)'""".format(GCB_ID.strip())
-    subprocess.call(shlex.split(STATUS))
-    # print last 10 lines of log
-    LOG = "gcloud container builds log {}".format(GCB_ID.strip())
-    subprocess.call(shlex.split(LOG))
+#     # Show currently progress of build
+#     # GCB_ID = $(gcloud container builds list - -filter "source.repo_source.repo_name=" github - getsentry - brain " AND source_provenance.resolved_repo_source.commit_sha=$(git show-ref master --hash --heads) AND status=SUCCESS" - -format = "value(id)")
+#     # gcloud container builds list --filter $GCB_ID --ongoing
+#     STATUS = """gcloud container builds describe {} --format='value(status)'""".format(GCB_ID.strip())
+#     subprocess.call(shlex.split(STATUS))
+#     # print last 10 lines of log
+#     LOG = "gcloud container builds log {}".format(GCB_ID.strip())
+#     subprocess.call(shlex.split(LOG))
+# try:
 
-except ValueError:
-    print('NO')
+# except ValueError:
+#     print('NO')
