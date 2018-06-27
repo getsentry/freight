@@ -28,36 +28,21 @@ import sys
 REPO = "github-getsentry-brain"
 # SHA = $(git show-ref master --hash --heads) this command assumes that it is being run from same filesystem
 SHA = "82cce810fa298d99dabd176df9086a4ea043229d"  # only hardcoded now for testing purposes
-SHA_NOT = "8888888888888888888888888" # fake SHA 
+SHA_FAIL = "8474ed8fe807d4ec594606eeac8c551f24483f52" # SHA of build already failed
 
 print("""
 Does this build exist?
 """)
 COMMAND = """gcloud container builds list --filter 'source.repo_source.repo_name={} AND source_provenance.resolved_repo_source.commit_sha={}' --format='json' """.format(REPO, SHA)
-print("""
-
-{}
-
-""".format(COMMAND))
 BUILD_DATA = json.loads(subprocess.check_output(shlex.split(COMMAND)))[0]
-print("""
-
-{}
-
-""".format(BUILD_DATA))
 BUILD_ID = BUILD_DATA['id']
 BUILD_STATUS = BUILD_DATA['status']
-# note to self - top level status key returns overall status of build while steps[].status returns SUCCESS only once build is completed
-BUILD_COMPLETE = BUILD_DATA['steps'][0]['status']
-# names = [item['name'] for item in data]
 
 print("""
+Build id is {}
 
-build id is {}
-build status is {}
-build completion is {}
+Build status is {}""".format(BUILD_ID, BUILD_STATUS))
 
-""".format(BUILD_ID, BUILD_STATUS, BUILD_COMPLETE))
 # # Save unique gcloud build ID to use in future commands
 # print("""
 # Build ID is {}.
