@@ -48,7 +48,8 @@ print("""
 BUILD_ID = BUILD_DATA['id']
 BUILD_STATUS = BUILD_DATA['status']
 # note to self - top level status key returns overall status of build while steps[].status returns SUCCESS only once build is completed
-BUILD_COMPLETE = BUILD_DATA['steps[].status']
+BUILD_COMPLETE = BUILD_DATA['steps'][0]['status']
+# names = [item['name'] for item in data]
 
 print("""
 
