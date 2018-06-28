@@ -11,22 +11,14 @@ from .base import Check
 __all__ = ['GCPContainerBuilderCheck']
 
 
-ERR_CHECK = '[{state}] {context}: {description} ({target_url})'
-ERR_MISSING_CONTEXT = '{} context was not found'
-
-
 class GCPContainerBuilderCheck(Check):
     """Track progress of builds created by Google Cloud Container Builder
     Jira ticket: https: // getsentry.atlassian.net / browse / OPS - 111
 
-    Arguments:
-        Check {[type]} -- [description]
-
     Raises:
-        CheckPending -- [description]
-        CheckFailed -- [description]
+        CheckPending -- exception if build is in progress
+        CheckFailed -- exception if build fails
     """
-
     def check_build(self, app, sha, config, repo):
         """Check build status
         """
