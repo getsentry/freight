@@ -38,7 +38,6 @@ class GCPContainerBuilderCheck(Check):
             subprocess.check_output(shlex.split(COMMAND)))[0]
         BUILD_ID = BUILD_DATA['id']
         BUILD_STATUS = BUILD_DATA['status']
-        # if build status is successful, do nothing; if not successful, print log.
 
         if BUILD_STATUS is not 'FAILURE':
             print("""Build status is {} and ID is {}.
