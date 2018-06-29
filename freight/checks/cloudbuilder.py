@@ -1,6 +1,5 @@
 from __future__ import absolute_import
 
-import json
 import shlex
 import subprocess
 
@@ -30,7 +29,7 @@ class GCPContainerBuilderCheck(Check):
         """Check build status
         """
         api_root = 'https://cloudbuild.googleapis.com/v1/projects/internal-sentry/builds'
-        commit_sha = "f8626d73efdd496c101f386179616c6229194a8e" # this comes from the check() method
+        commit_sha = "f8626d73efdd496c101f386179616c6229194a8e"   # this comes from the check() method
 
         oauth_command = "gcloud auth application-default print-access-token"
         oauth_token = subprocess.check_output(shlex.split(oauth_command)).rstrip()
@@ -41,10 +40,6 @@ class GCPContainerBuilderCheck(Check):
         build_data = http.get(api_root, headers=headers, params=params).json()
 
         repo = config['repo']
-        command = """gcloud container builds list
-            --filter 'source.repo_source.repo_name={} AND
-            source_provenance.resolved_repo_source.commit_sha={}'
-            --format='json' """.format(repo, sha)
 
         build_id = build_data['builds'][0]['id']
         build_status = build_data['builds'][0]['status']
