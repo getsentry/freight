@@ -9,7 +9,7 @@ from flask import current_app
 
 USER_AGENT = 'freight/{version} (https://github.com/getsentry/freight)'.format(
     version=freight.VERSION,
-),
+)
 
 
 def build_session():
