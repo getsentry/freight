@@ -35,20 +35,25 @@ class GCPContainerBuilderCheck(Check):
         oauth_token = subprocess.check_output(shlex.split(oauth_command)).rstrip()
 
         params = {'filter': 'sourceProvenance.resolvedRepoSource.commitSha = "{}"'.format(commit_sha)}
-        headers = {'Accepts': 'application/json', 'Authorization': 'Bearer {}'.format(oauth_token)}
+        headers = {
+            'Accepts': 'application/json',
+            'Authorization': 'Bearer {}'.format(oauth_token)
+        }
 
         build_data = http.get(api_root, headers=headers, params=params).json()
-
-        repo = config['repo']
+        if not build_data:
+            raise CheckFailed('No data for build present')
+        # repo = config['repo']
 
         build_id = build_data['builds'][0]['id']
         build_status = build_data['builds'][0]['status']
+        build_url = build_data['builds'][0]['logUrl']
 
         if build_status is not 'Failure':
             print("""Build status is {} and ID is {}.
             See more details here:
-            https://console.cloud.google.com/gcr/builds/{}
-            """.format(build_status, build_id, build_id))
+            {}
+            """.format(build_status, build_id, build_url))
             raise CheckPending
         else:
             log = subprocess.check_output(shlex.split("gcloud container builds log {}".format(build_id)))
