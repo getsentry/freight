@@ -29,12 +29,11 @@ class GCPContainerBuilderCheck(Check):
         """Check build status
         """
         api_root = 'https://cloudbuild.googleapis.com/v1/projects/internal-sentry/builds'
-        commit_sha = "f8626d73efdd496c101f386179616c6229194a8e"   # this comes from the check() method
-
         oauth_command = "gcloud auth application-default print-access-token"
         oauth_token = subprocess.check_output(shlex.split(oauth_command)).rstrip()
 
-        params = {'filter': 'sourceProvenance.resolvedRepoSource.commitSha = "{}"'.format(commit_sha)}
+        params = {
+            'filter': 'sourceProvenance.resolvedRepoSource.commitSha = "{}"'.format(sha)}
         headers = {
             'Accepts': 'application/json',
             'Authorization': 'Bearer {}'.format(oauth_token)
@@ -43,20 +42,20 @@ class GCPContainerBuilderCheck(Check):
         build_data = http.get(api_root, headers=headers, params=params).json()
         if not build_data:
             raise CheckFailed('No data for build present')
-        # repo = config['repo']
 
         build_id = build_data['builds'][0]['id']
         build_status = build_data['builds'][0]['status']
         build_url = build_data['builds'][0]['logUrl']
 
-        if build_status is not 'Failure':
-            print("""Build status is {} and ID is {}.
+        if build_status == 'Failure':
+            log = subprocess.check_output(shlex.split("gcloud container builds log {}".format(build_id)))
+            raise CheckFailed("""Build failed. Printing log...
+
+{}""".format(log))
+        if build_status != 'SUCCESS':
+            raise CheckPending("""Build status is {} and ID is {}.
             See more details here:
             {}
             """.format(build_status, build_id, build_url))
-            raise CheckPending
-        else:
-            log = subprocess.check_output(shlex.split("gcloud container builds log {}".format(build_id)))
-            print("""Build failed. Printing log...
-            {} """.format(log))
-            raise CheckFailed
+        if build_status == 'SUCCESS':
+            print "Build succeeded. See details: {}".format(build_url)
