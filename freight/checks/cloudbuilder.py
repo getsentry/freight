@@ -24,8 +24,8 @@ class GCPContainerBuilderCheck(Check):
     4) Print a sensible (50 lines to start) amount of the log if the build fails.
 
     Raises:
-        CheckPending -- exception if build is in progress
-        CheckFailed -- exception if build fails
+        CheckPending -- exception to raise if build status is in progress
+        CheckFailed -- exception to raise when check for build status fails
     """
     def check_build(self, app, sha, config):
         """Check build status
@@ -34,10 +34,6 @@ class GCPContainerBuilderCheck(Check):
             app {str} -- optional
             sha {str} -- required, commit SHA of build to check
             config {dict} -- optional dict to pass additional args
-
-        Raises:
-            CheckFailed -- exception to raise when check for build status fails
-            CheckPending -- exception to raise if build status is in progress
         """
         api_root = 'https://cloudbuild.googleapis.com/v1/projects/internal-sentry/builds'
 
