@@ -37,9 +37,10 @@ class GCPContainerBuilderCheck(Check):
         """
         api_root = 'https://cloudbuild.googleapis.com/v1/projects/internal-sentry/builds'
 
-        oauth_token = current_app.config['OAUTH_TOKEN']
         oauth_command = "gcloud auth application-default print-access-token"
-        if not oauth_token:
+        try:
+            oauth_token = current_app.config['OAUTH_TOKEN']
+        except:
             oauth_token = subprocess.check_output(shlex.split(oauth_command)).rstrip()
 
         params = {
