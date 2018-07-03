@@ -27,6 +27,15 @@ class GCPContainerBuilderCheck(Check):
     """
     def check_build(self, app, sha, config):
         """Check build status
+
+        Arguments:
+            app {str} -- optional
+            sha {str} -- required, commit SHA of build to check
+            config {dict} -- optional dict to pass additional args
+
+        Raises:
+            CheckFailed -- exception to raise when check for build status fails
+            CheckPending -- exception to raise if build status is in progress
         """
         api_root = 'https://cloudbuild.googleapis.com/v1/projects/internal-sentry/builds'
         oauth_command = "gcloud auth application-default print-access-token"
