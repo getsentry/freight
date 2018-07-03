@@ -23,9 +23,8 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
             {
                 u'builds': [
                     {
-                        u'buildTriggerId':u'a83e295b-8dbc-4b45-b430-50f94e78a27b',
-                        u'id':u'e6fc46d0-f0e3-4fe4-9134-ca6c8b3111f2',
-                        u'logUrl':            u'https://console.cloud.google.com/gcr/builds/e6fc46d0-f0e3-4fe4-9134-ca6c8b3111f2?project=294472738882',
+                        u'id':u'thisisabuildid',
+                        u'logUrl':            u'https://console.cloud.google.com/gcr/builds/thisisabuildid?project=294472738882',
                         u'logsBucket':            u'gs://294472738882.cloudbuild-logs.googleusercontent.com',
                         u'status':u'SUCCESS',
                     },
