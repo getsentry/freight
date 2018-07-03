@@ -24,8 +24,8 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
                 u'builds': [
                     {
                         u'id':u'thisisabuildid',
-                        u'logUrl':            u'https://console.cloud.google.com/gcr/builds/thisisabuildid?project=294472738882',
-                        u'logsBucket':            u'gs://294472738882.cloudbuild-logs.googleusercontent.com',
+                        u'logUrl':            u'https://console.cloud.google.com/gcr/builds/thisisabuildid?project=mycoolproject',
+                        u'logsBucket':            u'gs://mycoolproject.cloudbuild-logs.googleusercontent.com',
                         u'status':u'SUCCESS',
                     },
                 ]
