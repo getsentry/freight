@@ -3,6 +3,8 @@ from __future__ import absolute_import
 import shlex
 import subprocess
 
+from flask import current_app
+
 from freight import http
 from freight.exceptions import CheckFailed, CheckPending
 
@@ -38,8 +40,11 @@ class GCPContainerBuilderCheck(Check):
             CheckPending -- exception to raise if build status is in progress
         """
         api_root = 'https://cloudbuild.googleapis.com/v1/projects/internal-sentry/builds'
+
+        oauth_token = current_app.config['OAUTH_TOKEN']
         oauth_command = "gcloud auth application-default print-access-token"
-        oauth_token = subprocess.check_output(shlex.split(oauth_command)).rstrip()
+        if not oauth_token:
+            oauth_token = subprocess.check_output(shlex.split(oauth_command)).rstrip()
 
         params = {
             'filter': 'sourceProvenance.resolvedRepoSource.commitSha = "{}"'.format(sha)}
