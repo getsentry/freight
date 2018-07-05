@@ -27,7 +27,7 @@ class GCPContainerBuilderCheck(Check):
         CheckPending -- exception to raise if build status is in progress
         CheckFailed -- exception to raise when check for build status fails
     """
-    def check_build(self, app, sha, config):
+    def check(self, app, sha, config):
         """Check build status
 
         Arguments:
