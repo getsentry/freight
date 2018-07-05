@@ -24,20 +24,21 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
                 "builds":[
                     {
                         "id":"thisisabuildid",
-                        "logUrl":"https://console.cloud.google.com/gcr/builds/thisisabuildid?project=mycoolproject",
-                        "logsBucket":"gs://mycoolproject.cloudbuild-logs.googleusercontent.com",
+                        # "logUrl":"https://console.cloud.google.com/gcr/builds/thisisabuildid?project=mycoolproject",
+                        # "logsBucket":"gs://mycoolproject.cloudbuild-logs.googleusercontent.com",
                         "status":"SUCCESS",
                     },
                 ]
             }
         ])
 
-        responses.add(responses.GET, 'https://api.github.com/repos/getsentry/freight/commits/{}/statuses'.format("abcdefg"),
-                      body=body)
+        responses.add(responses.GET, 'sometrashurl.com', body=body)
+        # responses.add(responses.GET, 'https://cloudbuild.googleapis.com/v1/projects/internal-sentry/builds?filter=sourceProvenance.resolvedRepoSource.commitSha="abcdefg"', body=body)
 
-        config = {'contexts': ['travisci'], 'repo': 'getsentry/freight'}
+        config = {'contexts': ['cloudbuilder']}
 
         self.check.check(self.app, 'abcdefg', config)
+
 
     @responses.activate
     def test_missing_repo(self):
