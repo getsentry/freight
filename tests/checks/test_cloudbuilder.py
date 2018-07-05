@@ -33,11 +33,12 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         ])
 
         responses.add(responses.GET, 'sometrashurl.com', body=body)
+        
         # responses.add(responses.GET, 'https://cloudbuild.googleapis.com/v1/projects/internal-sentry/builds?filter=sourceProvenance.resolvedRepoSource.commitSha="abcdefg"', body=body)
 
         config = {'contexts': ['cloudbuilder']}
 
-        self.check.check(self.app, 'abcdefg', config)
+        self.check.check(self.app, 'heyo', config)
 
 
     @responses.activate
