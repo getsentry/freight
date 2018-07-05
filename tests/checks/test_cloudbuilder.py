@@ -21,18 +21,18 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
     def test_success(self):
         body = json.dumps([
             {
-                u'builds': [
+                "builds":[
                     {
-                        u'id':u'thisisabuildid',
-                        u'logUrl':            u'https://console.cloud.google.com/gcr/builds/thisisabuildid?project=mycoolproject',
-                        u'logsBucket':            u'gs://mycoolproject.cloudbuild-logs.googleusercontent.com',
-                        u'status':u'SUCCESS',
+                        "id":"thisisabuildid",
+                        "logUrl":"https://console.cloud.google.com/gcr/builds/thisisabuildid?project=mycoolproject",
+                        "logsBucket":"gs://mycoolproject.cloudbuild-logs.googleusercontent.com",
+                        "status":"SUCCESS",
                     },
                 ]
             }
         ])
 
-        responses.add(responses.GET, 'https://api.github.com/repos/getsentry/freight/commits/{}/statuses'.format(sha),
+        responses.add(responses.GET, 'https://api.github.com/repos/getsentry/freight/commits/{}/statuses'.format("abcdefg"),
                       body=body)
 
         config = {'contexts': ['travisci'], 'repo': 'getsentry/freight'}
