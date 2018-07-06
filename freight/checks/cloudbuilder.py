@@ -51,7 +51,7 @@ class GCPContainerBuilderCheck(Check):
 
         oauth_command = "gcloud auth application-default print-access-token"
         try:
-            oauth_token = current_app.config['OAUTH_TOKEN']
+            oauth_token = current_app.config['oauth_token'] or config.get('oauth_token')
         except:
             oauth_token = subprocess.check_output(shlex.split(oauth_command)).rstrip()
 
@@ -76,10 +76,12 @@ class GCPContainerBuilderCheck(Check):
             log = http.get(build_logtext, headers=headers)
             log = subprocess.check_output(shlex.split("gcloud container builds log {}".format(build_id)))
             raise CheckFailed("""Build failed. Printing log...\n\n\n{}""".format(log.text))
+
         if build_status != 'SUCCESS':
             raise CheckPending("""Build status is {} and ID is {}.
             See more details here:
             {}
             """.format(build_status, build_id, build_url))
+
         if build_status == 'SUCCESS':
             print "Build succeeded. See details: {}".format(build_url)
