@@ -41,13 +41,15 @@ class GCPContainerBuilderCheck(Check):
             sha {str} -- required, commit SHA of build to check
             config {dict} -- optional dict to pass additional args
         """
-        project = (
-            config.get('project')
-        )
+        project = config.get('project')
 
         api_root = 'https://cloudbuild.googleapis.com/v1/projects/{}/builds'.format(
             project
         )
+
+        all_contexts = set(config.get('contexts') or [])
+        contexts = all_contexts.copy()
+        repo = config['repo']
 
         oauth_command = "gcloud auth application-default print-access-token"
         try:
@@ -56,7 +58,8 @@ class GCPContainerBuilderCheck(Check):
             oauth_token = subprocess.check_output(shlex.split(oauth_command)).rstrip()
 
         params = {
-            'filter': 'sourceProvenance.resolvedRepoSource.commitSha = "{}"'.format(sha)}
+            'filter': 'sourceProvenance.resolvedRepoSource.commitSha={}'.format(sha)
+        }
         headers = {
             'Accepts': 'application/json',
             'Authorization': 'Bearer {}'.format(oauth_token)
