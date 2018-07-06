@@ -49,7 +49,6 @@ class GCPContainerBuilderCheck(Check):
 
         all_contexts = set(config.get('contexts') or [])
         contexts = all_contexts.copy()
-        repo = config['repo']
 
         oauth_command = "gcloud auth application-default print-access-token"
         try:

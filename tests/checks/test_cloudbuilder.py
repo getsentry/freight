@@ -21,7 +21,10 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
     def test_success(self):
         project = "mycoolproject"
         sha = "0987654321"
-        body = json.dumps([{
+        body = json.dumps({
+
+            "builds": [
+            {
                 "id":"thisisabuildid",
                 "logUrl":"https://console.cloud.google.com/gcr/builds/thisisabuildid?project={}".format(project),
                 "logsBucket":"gs://{}.cloudbuild-logs.googleusercontent.com".format(project),
@@ -29,14 +32,11 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
                 "context": "cloudbuilder",
                 "description": "we did it",
                 "target_url": "example.com/build",
-        }])
+            },
+            ]})
+        responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(project), body=body)
 
-        # responses.add(responses.GET, 'sometrashurl.com', body=body)
-        
-        responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds?filter=sourceProvenance.resolvedRepoSource.commitSha={}".format(
-            project, sha), body=body)
-
-        config = {'contexts': ['cloudbuilder'], 'project': project, 'repo': 'getsentry/freight'}
+        config = {'contexts': ['cloudbuilder'], 'project': project}
 
         self.check.check(self.app, sha, config)
 
