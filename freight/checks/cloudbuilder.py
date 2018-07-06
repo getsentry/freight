@@ -27,6 +27,12 @@ class GCPContainerBuilderCheck(Check):
         CheckPending -- exception to raise if build status is in progress
         CheckFailed -- exception to raise when check for build status fails
     """
+    def get_options(self):
+        return {
+            'project': {'required': True},
+            'oauth_token': {'required': False},
+        }
+
     def check(self, app, sha, config):
         """Check build status
 
@@ -35,7 +41,13 @@ class GCPContainerBuilderCheck(Check):
             sha {str} -- required, commit SHA of build to check
             config {dict} -- optional dict to pass additional args
         """
-        api_root = 'https://cloudbuild.googleapis.com/v1/projects/internal-sentry/builds'
+        project = (
+            config.get('project')
+        )
+
+        api_root = 'https://cloudbuild.googleapis.com/v1/projects/{}/builds'.format(
+            project
+        )
 
         oauth_command = "gcloud auth application-default print-access-token"
         try:
