@@ -80,6 +80,8 @@ class GCPContainerBuilderCheck(Check):
             raise CheckFailed("""Build failed. Printing log...\n\n\n{}""".format(log.text))
 
         if build_status != 'SUCCESS':
+            print("""Build status is {} and ID is {}.\n\nSee more details here:\n{}
+            """.format(build_status, build_id, build_url))
             raise CheckPending("""Build status is {} and ID is {}.
             See more details here:
             {}
