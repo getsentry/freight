@@ -9,3 +9,4 @@ LICENSE
 .env
 .travis.yml
 .gitignore
+node_modules/
