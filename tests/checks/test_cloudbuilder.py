@@ -4,6 +4,8 @@ import json
 import responses
 import pytest
 
+from textwrap import dedent
+
 from freight import checks
 from freight.exceptions import CheckFailed, CheckPending
 from freight.testutils import TestCase
@@ -66,13 +68,27 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         config = {'contexts': ['cloudbuilder'], 'project': self.test_project}
 
         with pytest.raises(CheckFailed):
+            failed_log_text = """\
+            LOG TEXT HERE
+
+
+            THIS HERE IS A MOCK OF LOG.TEXT THAT WILL BE PRINTED
+
+
+            build build build build build build steps
+
+
+
+
+            MORE LOGS HERE.
+            """
             responses.add(
                 responses.GET,
                 'https://storage.googleapis.com/{build_logs}/log-{build_id}.txt'.format(
                     build_logs="mycoolproject.cloudbuild-logs.googleusercontent.com",
                     build_id="failed_build_id"
-                    )
-                # body="heyo this is a text string"
+                    ),
+                body = dedent(failed_log_text)
             )
             self.check.check(self.app, self.test_sha, config)
 

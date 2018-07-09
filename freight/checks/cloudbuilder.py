@@ -77,15 +77,13 @@ class GCPContainerBuilderCheck(Check):
             build_logtext = 'https://storage.googleapis.com/{}/log-{}.txt'.format(build_logs, build_id)
             log = http.get(build_logtext, headers=headers)
             # log = subprocess.check_output(shlex.split("gcloud container builds log {}".format(build_id)))
-            raise CheckFailed("""Build failed. Printing log...\n\n\n{}""".format(log.text))
+            print("Build failed. Printing log...\n\n\n{}".format(log.text))
+            raise CheckFailed()
 
         if build_status != 'SUCCESS':
-            print("""Build status is {} and ID is {}.\n\nSee more details here:\n{}
-            """.format(build_status, build_id, build_url))
-            raise CheckPending("""Build status is {} and ID is {}.
-            See more details here:
-            {}
-            """.format(build_status, build_id, build_url))
+            print("Build status is {} and ID is {}.\n\n".format(build_status, build_id))
+            # raise CheckPending("See more details here:\n{}".format(build_url))
+            raise CheckPending('build not complete')
 
         if build_status == 'SUCCESS':
             print "Build succeeded. See details: {}".format(build_url)
