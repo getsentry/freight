@@ -77,7 +77,8 @@ RUN set -x \
     && rm redis.tar.gz \
     && make -C /usr/src/redis \
     && make -C /usr/src/redis install \
-    && rm -r /usr/src/redis
+    && rm -r /usr/src/redis \
+    && apt-get purge -y --auto-remove wget
 
 RUN set -x \
     && export DOCKER_VERSION=18.03.1 \
@@ -99,6 +100,16 @@ RUN set -x \
     && echo "${GCLOUD_SHA256} *gcloud.tgz" | sha256sum -c - \
     && tar -zxvf gcloud.tgz -C /opt \
     && rm gcloud.tgz \
+    && apt-get purge -y --auto-remove wget
+
+RUN set -x \
+    && export KUBECTL_VERSION=v1.11.0 \
+    && export KUBECTL_SHA256=7fc84102a20aba4c766245714ce9555e3bf5d4116aab38a15b11419070a0fa90 \
+    && apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
+    && wget -O kubectl "https://storage.googleapis.com/kubernetes-release/release/$KUBECTL_VERSION/bin/linux/amd64/kubectl" \
+    && echo "${KUBECTL_SHA256} *kubectl" | sha256sum -c - \
+    && install -m 755 kubectl /usr/local/bin/ \
+    && kubectl --help \
     && apt-get purge -y --auto-remove wget
 
 ENV PATH="${PATH}:/opt/google-cloud-sdk/bin"
