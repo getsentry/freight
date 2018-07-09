@@ -44,7 +44,38 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
     @responses.activate
     def test_missing_oauth(self):
         pass
-    
+
+    @responses.activate
+    def test_build_fail(self):
+        body = json.dumps({
+            "builds": [
+                {
+                    "id": "failed_build_id",
+                    "logUrl":"https://console.cloud.google.com/gcr/builds/thisisabuildid?project={}".format(self.test_project),
+                    "logsBucket":"gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
+                    "status": "Failure",
+                },
+            ]
+        })
+        responses.add(
+            responses.GET,
+             "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project),
+             body=body
+        )
+
+        config = {'contexts': ['cloudbuilder'], 'project': self.test_project}
+
+        with pytest.raises(CheckFailed):
+            responses.add(
+                responses.GET,
+                'https://storage.googleapis.com/{build_logs}/log-{build_id}.txt'.format(
+                    build_logs="mycoolproject.cloudbuild-logs.googleusercontent.com",
+                    build_id="failed_build_id"
+                    )
+                # body="heyo this is a text string"
+            )
+            self.check.check(self.app, self.test_sha, config)
+
     @responses.activate
     def test_build_pending(self):
         body = json.dumps({
@@ -63,7 +94,3 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
 
         with pytest.raises(CheckPending):
             self.check.check(self.app, self.test_sha, config)
-    
-    @responses.activate
-    def test_build_fail(self):
-        pass
