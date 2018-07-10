@@ -115,20 +115,6 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         with pytest.raises(Exception):
             self.check.check(self.app, self.test_sha, config)
 
-
-    @responses.activate
-    def test_missing_oauth(self):
-        config = {
-            "contexts": ['cloudbuilder'],
-            "project": self.test_project,
-            "oauth_token": this_token_is_fake
-        }
-        responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project))
-
-
-        # with pytest.raises(Exception):
-        self.check.check(self.app, self.test_sha, config)
-
     @responses.activate
     def test_key_error(self):
         id = "keyerror"
