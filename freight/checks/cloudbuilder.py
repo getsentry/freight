@@ -75,7 +75,7 @@ class GCPContainerBuilderCheck(Check):
         build_url = build_data['builds'][0]['logUrl']
         build_logs = build_data['builds'][0]['logsBucket'].lstrip('gs:/')
 
-        if build_status == None:
+        if build_status is None:
             print ("what")
             raise Exception
 

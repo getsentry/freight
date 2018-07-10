@@ -20,16 +20,16 @@ class CloudbuilderCheckBase(TestCase):
         self.test_project = "mycoolproject"
         self.test_sha = "0987654321"
 
+
 class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
     @responses.activate
     def test_build_success(self):
         id = "successful_build_id"
         body = json.dumps({
-            "builds": [
-            {
+            "builds": [{
                 "id": "{}".format(id),
-                "logUrl":"https://console.cloud.google.com/gcr/builds/{}?project={}".format(id, self.test_project),
-                "logsBucket":"gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
+                "logUrl": "https://console.cloud.google.com/gcr/builds/{}?project={}".format(id, self.test_project),
+                "logsBucket": "gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
                 "status": "SUCCESS",
             },
             ]
@@ -47,8 +47,8 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
             "builds": [
                 {
                     "id": "{}".format(id),
-                    "logUrl":"https://console.cloud.google.com/gcr/builds/{}?project={}".format(id, self.test_project),
-                    "logsBucket":"gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
+                    "logUrl": "https://console.cloud.google.com/gcr/builds/{}?project={}".format(id, self.test_project),
+                    "logsBucket": "gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
                     "status": "Failure",
                 },
             ]
@@ -56,8 +56,8 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
 
         responses.add(
             responses.GET,
-             "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project),
-             body=body
+            "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project),
+            body=body
         )
 
         config = {'contexts': ['cloudbuilder'], 'project': self.test_project}
@@ -82,19 +82,18 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
                 'https://storage.googleapis.com/{build_logs}/log-{build_id}.txt'.format(
                     build_logs="mycoolproject.cloudbuild-logs.googleusercontent.com",
                     build_id="failed_build_id"
-                    ),
-                body = dedent(failed_log_text)
+                ),
+                body=dedent(failed_log_text)
             )
             self.check.check(self.app, self.test_sha, config)
 
     @responses.activate
     def test_build_pending(self):
         body = json.dumps({
-            "builds": [
-            {
-                "id":"thisisabuildid",
-                "logUrl":"https://console.cloud.google.com/gcr/builds/thisisabuildid?project={}".format(self.test_project),
-                "logsBucket":"gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
+            "builds": [{
+                "id": "thisisabuildid",
+                "logUrl": "https://console.cloud.google.com/gcr/builds/thisisabuildid?project={}".format(self.test_project),
+                "logsBucket": "gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
                 "status": "PENDING",
             },
             ]
@@ -111,7 +110,6 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         config = {'contexts': ['cloudbuilder'], 'project': self.test_project}
         responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project), status=400)
 
-
         with pytest.raises(Exception):
             self.check.check(self.app, self.test_sha, config)
 
@@ -119,10 +117,9 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
     def test_key_error(self):
         id = "keyerror"
         body = json.dumps({
-            "builds": [
-            {
+            "builds": [{
                 "id": "{}".format(id),
-                "logsBucket":"gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
+                "logsBucket": "gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
                 "status": "SUCCESS",
             },
             ]
