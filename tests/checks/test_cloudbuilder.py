@@ -23,11 +23,12 @@ class CloudbuilderCheckBase(TestCase):
 class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
     @responses.activate
     def test_build_success(self):
+        id = "successful_build_id"
         body = json.dumps({
             "builds": [
             {
-                "id":"thisisabuildid",
-                "logUrl":"https://console.cloud.google.com/gcr/builds/thisisabuildid?project={}".format(self.test_project),
+                "id": "{}".format(id),
+                "logUrl":"https://console.cloud.google.com/gcr/builds/{}?project={}".format(id, self.test_project),
                 "logsBucket":"gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
                 "status": "SUCCESS",
             },
@@ -41,16 +42,18 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
 
     @responses.activate
     def test_build_fail(self):
+        id = "failed_build_id"
         body = json.dumps({
             "builds": [
                 {
-                    "id": "failed_build_id",
-                    "logUrl":"https://console.cloud.google.com/gcr/builds/thisisabuildid?project={}".format(self.test_project),
+                    "id": "{}".format(id),
+                    "logUrl":"https://console.cloud.google.com/gcr/builds/{}?project={}".format(id, self.test_project),
                     "logsBucket":"gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
                     "status": "Failure",
                 },
             ]
         })
+
         responses.add(
             responses.GET,
              "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project),
@@ -115,4 +118,32 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
 
     @responses.activate
     def test_missing_oauth(self):
-        pass
+        config = {
+            "contexts": ['cloudbuilder'],
+            "project": self.test_project,
+            "oauth_token": this_token_is_fake
+        }
+        responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project))
+
+
+        # with pytest.raises(Exception):
+        self.check.check(self.app, self.test_sha, config)
+
+    @responses.activate
+    def test_key_error(self):
+        id = "keyerror"
+        body = json.dumps({
+            "builds": [
+            {
+                "id": "{}".format(id),
+                "logsBucket":"gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
+                "status": "SUCCESS",
+            },
+            ]
+        })
+        responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project), body=body)
+
+        config = {'contexts': ['cloudbuilder'], 'project': self.test_project}
+
+        with pytest.raises(KeyError):
+            self.check.check(self.app, self.test_sha, config)
