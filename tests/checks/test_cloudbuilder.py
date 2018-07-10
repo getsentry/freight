@@ -1,14 +1,15 @@
 from __future__ import absolute_import
 
 import json
-import responses
-import pytest
-
 from textwrap import dedent
+
+import pytest
+import responses
 
 from freight import checks
 from freight.exceptions import CheckFailed, CheckPending
 from freight.testutils import TestCase
+
 
 class CloudbuilderCheckBase(TestCase):
     def setUp(self):
@@ -21,7 +22,7 @@ class CloudbuilderCheckBase(TestCase):
 
 class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
     @responses.activate
-    def test_success(self):
+    def test_build_success(self):
         body = json.dumps({
             "builds": [
             {
@@ -37,15 +38,6 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         config = {'contexts': ['cloudbuilder'], 'project': self.test_project}
 
         self.check.check(self.app, self.test_sha, config)
-
-
-    @responses.activate
-    def test_missing_repo(self):
-        pass
-
-    @responses.activate
-    def test_missing_oauth(self):
-        pass
 
     @responses.activate
     def test_build_fail(self):
@@ -110,3 +102,17 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
 
         with pytest.raises(CheckPending):
             self.check.check(self.app, self.test_sha, config)
+
+    @responses.activate
+    def test_missing_body(self):
+        config = {'contexts': ['cloudbuilder'], 'project': self.test_project}
+        responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project), status=400)
+
+
+        with pytest.raises(Exception):
+            self.check.check(self.app, self.test_sha, config)
+
+
+    @responses.activate
+    def test_missing_oauth(self):
+        pass

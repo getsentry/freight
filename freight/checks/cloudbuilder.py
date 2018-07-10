@@ -64,19 +64,25 @@ class GCPContainerBuilderCheck(Check):
             'Authorization': 'Bearer {}'.format(oauth_token)
         }
 
-        build_data = http.get(api_root, headers=headers, params=params).json()
-        if not build_data:
+        resp = http.get(api_root, headers=headers, params=params)
+        if resp.status_code != 200:
+            print("status_code is {}\n\nno data for build present".format(resp.status_code))
             raise CheckFailed('No data for build present')
+
+        build_data = resp.json()
 
         build_id = build_data['builds'][0]['id']
         build_status = build_data['builds'][0]['status']
         build_url = build_data['builds'][0]['logUrl']
         build_logs = build_data['builds'][0]['logsBucket'].lstrip('gs:/')
 
+        if build_status == None:
+            print ("what")
+            raise Exception
+
         if build_status == "Failure":
             build_logtext = 'https://storage.googleapis.com/{}/log-{}.txt'.format(build_logs, build_id)
             log = http.get(build_logtext, headers=headers)
-            # log = subprocess.check_output(shlex.split("gcloud container builds log {}".format(build_id)))
             print("Build failed. Printing log...\n\n\n{}".format(log.text))
             raise CheckFailed()
 
@@ -86,4 +92,4 @@ class GCPContainerBuilderCheck(Check):
             raise CheckPending('build not complete')
 
         if build_status == 'SUCCESS':
-            print "Build succeeded. See details: {}".format(build_url)
+            print ("Build [ {} ].\n\n\nsucceeded. See details: {}".format(build_status, build_url))
