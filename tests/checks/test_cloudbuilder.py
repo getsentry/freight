@@ -53,7 +53,7 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
                     "id": "{}".format(id),
                     "logUrl": "https://console.cloud.google.com/gcr/builds/{}?project={}".format(id, self.test_project),
                     "logsBucket": "gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
-                    "status": "Failure",
+                    "status": "FAILURE",
                 },
             ]
         })
@@ -95,13 +95,14 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
             self.check.check(self.app, self.test_sha, config)
 
     @responses.activate
-    def test_build_pending(self):
+    def test_build_in_progress(self):
+        id = "WIP_build_id"
         body = json.dumps({
             "builds": [{
-                "id": "thisisabuildid",
-                "logUrl": "https://console.cloud.google.com/gcr/builds/thisisabuildid?project={}".format(self.test_project),
+                "id": "{}".format(id),
+                "logUrl": "https://console.cloud.google.com/gcr/builds/{}?project={}".format(id, self.test_project),
                 "logsBucket": "gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
-                "status": "PENDING",
+                "status": "WORKING",
             },
             ]
         })
@@ -124,26 +125,5 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
 
         responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project), status=400)
 
-        with pytest.raises(Exception):
-            self.check.check(self.app, self.test_sha, config)
-
-    @responses.activate
-    def test_key_error(self):
-        id = "keyerror"
-        body = json.dumps({
-            "builds": [{
-                "id": "{}".format(id),
-                "logsBucket": "gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
-                "status": "SUCCESS",
-            },
-            ]
-        })
-        responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project), body=body)
-
-        config = {
-            "contexts": ["cloudbuilder"],
-            "project": self.test_project,
-            "oauth_token": self.test_token}
-
-        with pytest.raises(KeyError):
+        with pytest.raises(CheckFailed):
             self.check.check(self.app, self.test_sha, config)

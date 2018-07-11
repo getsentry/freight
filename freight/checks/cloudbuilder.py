@@ -8,7 +8,7 @@ from freight.exceptions import CheckFailed, CheckPending
 
 from .base import Check
 
-__all__ = ['GCPContainerBuilderCheck']
+__all__ = ["GCPContainerBuilderCheck"]
 
 
 class GCPContainerBuilderCheck(Check):
@@ -25,10 +25,11 @@ class GCPContainerBuilderCheck(Check):
         CheckPending -- exception to raise if build status is in progress
         CheckFailed -- exception to raise when check for build status fails
     """
+
     def get_options(self):
         return {
-            'project': {'required': True},
-            'oauth_token': {'required': False},
+            "project": {"required": True},
+            "oauth_token": {"required": False},
         }
 
     def check(self, app, sha, config):
@@ -39,33 +40,28 @@ class GCPContainerBuilderCheck(Check):
             sha {str} -- required, commit SHA of build to check
             config {dict} -- optional dict to pass additional args
         """
-        project = config.get('project')
-
-        api_root = 'https://cloudbuild.googleapis.com/v1/projects/{}/builds'.format(
-            project
+        api_root = "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(
+            config["project"]
         )
-
-        all_contexts = set(config.get('contexts') or [])
-        contexts = all_contexts.copy()
 
         oauth_command = "gcloud auth application-default print-access-token"
         try:
-            oauth_token = config.get('oauth_token')
+            oauth_token = config["oauth_token"]
         except:
             oauth_token = subprocess.check_output(shlex.split(oauth_command)).rstrip()
 
         params = {
-            'filter': 'sourceProvenance.resolvedRepoSource.commitSha={}'.format(sha)
+            "filter": "sourceProvenance.resolvedRepoSource.commitSha={}".format(sha)
         }
         headers = {
-            'Accepts': 'application/json',
-            'Authorization': 'Bearer {}'.format(oauth_token)
+            "Accepts": "application/json",
+            "Authorization": "Bearer {}".format(oauth_token)
         }
 
         resp = http.get(api_root, headers=headers, params=params)
         if resp.status_code != 200:
             print("[ ERROR {} ]\tNo data for build present".format(resp.status_code))
-            raise CheckFailed('No data for build present')
+            raise CheckFailed("No data for build present")
 
         build_data = resp.json()
         build_id = build_data["builds"][0]["id"]
@@ -83,17 +79,17 @@ class GCPContainerBuilderCheck(Check):
             "CANCELLED": "Build or step was canceled by a user."
         }
 
-        if build_status == "Failure":
-            build_logtext = 'https://storage.googleapis.com/{}/log-{}.txt'.format(build_logs, build_id)
+        if build_status == "FAILURE":
+            build_logtext = "https://storage.googleapis.com/{}/log-{}.txt".format(build_logs, build_id)
             log = http.get(build_logtext, headers=headers)
-            print("[ {} ]\tSee details: {}".format(build_status.upper(), build_url))
+            print("[ {} ]\t{}\nSee details: {}".format(build_status, gcloudstatus["FAILURE"], build_url))
             print("Printing log...\n\n\n{}".format(log.text))
             raise CheckFailed()
 
-        if build_status != 'SUCCESS':
-            print("[ {} ]\tSee details: {}".format(build_status.upper(), build_url))
-            raise CheckPending('build incomplete')
+        if build_status == "WORKING":
+            print("[ {} ]\t{}\nSee details: {}".format(build_status, gcloudstatus["WORKING"], build_url))
+            raise CheckPending("build incomplete")
 
-        if build_status == 'SUCCESS':
-            print("[ {} ]\tSee details: {}".format(build_status.upper(), build_url))
+        if build_status == "SUCCESS":
+            print("[ {} ]\t{}\nSee details: {}".format(build_status, gcloudstatus["SUCCESS"], build_url))
             return
