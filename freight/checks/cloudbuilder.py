@@ -68,14 +68,20 @@ class GCPContainerBuilderCheck(Check):
             raise CheckFailed('No data for build present')
 
         build_data = resp.json()
-        build_id = build_data['builds'][0]['id']
-        build_status = build_data['builds'][0]['status']
-        build_url = build_data['builds'][0]['logUrl']
-        build_logs = build_data['builds'][0]['logsBucket'].lstrip('gs:/')
-
-        if build_status is None:
-            print ("what")
-            raise Exception
+        build_id = build_data["builds"][0]["id"]
+        build_status = build_data["builds"][0]["status"]
+        build_url = build_data["builds"][0]["logUrl"]
+        build_logs = build_data["builds"][0]["logsBucket"].lstrip("gs:/")
+        gcloudstatus = {
+            "STATUS_UNKNOWN": "Status of the build is unknown.",
+            "QUEUED": "Build or step is queued; work has not yet begun.",
+            "WORKING": "Build or step is being executed.",
+            "SUCCESS": "Build or step finished successfully.",
+            "FAILURE": "Build or step failed to complete successfully.",
+            "INTERNAL_ERROR": "Build or step failed due to an internal cause.",
+            "TIMEOUT": "Build or step took longer than was allowed.",
+            "CANCELLED": "Build or step was canceled by a user."
+        }
 
         if build_status == "Failure":
             build_logtext = 'https://storage.googleapis.com/{}/log-{}.txt'.format(build_logs, build_id)
