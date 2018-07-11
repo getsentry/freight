@@ -13,12 +13,13 @@ from freight.testutils import TestCase
 
 class CloudbuilderCheckBase(TestCase):
     def setUp(self):
-        self.check = checks.get('cloudbuilder')
+        self.check = checks.get("cloudbuilder")
         self.user = self.create_user()
         self.repo = self.create_repo()
         self.app = self.create_app(repository=self.repo)
         self.test_project = "mycoolproject"
         self.test_sha = "0987654321"
+        self.test_token = "mysuperfaketoken"
 
 
 class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
@@ -36,7 +37,10 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         })
         responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project), body=body)
 
-        config = {'contexts': ['cloudbuilder'], 'project': self.test_project}
+        config = {
+            "contexts": ["cloudbuilder"],
+            "project": self.test_project,
+            "oauth_token": self.test_token}
 
         self.check.check(self.app, self.test_sha, config)
 
@@ -60,7 +64,10 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
             body=body
         )
 
-        config = {'contexts': ['cloudbuilder'], 'project': self.test_project}
+        config = {
+            "contexts": ["cloudbuilder"],
+            "project": self.test_project,
+            "oauth_token": self.test_token}
 
         with pytest.raises(CheckFailed):
             failed_log_text = """\
@@ -79,7 +86,7 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
             """
             responses.add(
                 responses.GET,
-                'https://storage.googleapis.com/{build_logs}/log-{build_id}.txt'.format(
+                "https://storage.googleapis.com/{build_logs}/log-{build_id}.txt".format(
                     build_logs="mycoolproject.cloudbuild-logs.googleusercontent.com",
                     build_id="failed_build_id"
                 ),
@@ -100,14 +107,21 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         })
         responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project), body=body)
 
-        config = {'contexts': ['cloudbuilder'], 'project': self.test_project}
+        config = {
+            "contexts": ["cloudbuilder"],
+            "project": self.test_project,
+            "oauth_token": self.test_token}
 
         with pytest.raises(CheckPending):
             self.check.check(self.app, self.test_sha, config)
 
     @responses.activate
     def test_missing_body(self):
-        config = {'contexts': ['cloudbuilder'], 'project': self.test_project}
+        config = {
+            "contexts": ["cloudbuilder"],
+            "project": self.test_project,
+            "oauth_token": self.test_token}
+
         responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project), status=400)
 
         with pytest.raises(Exception):
@@ -126,7 +140,10 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         })
         responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project), body=body)
 
-        config = {'contexts': ['cloudbuilder'], 'project': self.test_project}
+        config = {
+            "contexts": ["cloudbuilder"],
+            "project": self.test_project,
+            "oauth_token": self.test_token}
 
         with pytest.raises(KeyError):
             self.check.check(self.app, self.test_sha, config)
