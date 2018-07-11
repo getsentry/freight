@@ -45,9 +45,9 @@ class GCPContainerBuilderCheck(Check):
         )
 
         oauth_command = "gcloud auth application-default print-access-token"
-        try:
-            oauth_token = config["oauth_token"]
-        except:
+
+        oauth_token = config.get("oauth_token")
+        if oauth_token is None:
             oauth_token = subprocess.check_output(shlex.split(oauth_command)).rstrip()
 
         params = {
