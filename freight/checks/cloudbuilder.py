@@ -3,8 +3,6 @@ from __future__ import absolute_import
 import shlex
 import subprocess
 
-from flask import current_app
-
 from freight import http
 from freight.exceptions import CheckFailed, CheckPending
 
@@ -52,7 +50,7 @@ class GCPContainerBuilderCheck(Check):
 
         oauth_command = "gcloud auth application-default print-access-token"
         try:
-            oauth_token = current_app.config['oauth_token'] or config.get('oauth_token')
+            oauth_token = config.get('oauth_token')
         except:
             oauth_token = subprocess.check_output(shlex.split(oauth_command)).rstrip()
 
