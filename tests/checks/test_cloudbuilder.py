@@ -25,11 +25,11 @@ class CloudbuilderCheckBase(TestCase):
 class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
     @responses.activate
     def test_build_success(self):
-        id = "successful_build_id"
+        test_id = "successful_build_id"
         body = json.dumps({
             "builds": [{
-                "id": "{}".format(id),
-                "logUrl": "https://console.cloud.google.com/gcr/builds/{}?project={}".format(id, self.test_project),
+                "id": test_id,
+                "logUrl": "https://console.cloud.google.com/gcr/builds/{}?project={}".format(test_id, self.test_project),
                 "logsBucket": "gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
                 "status": "SUCCESS",
             },
@@ -46,12 +46,12 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
 
     @responses.activate
     def test_build_fail(self):
-        id = "failed_build_id"
+        test_id = "failed_build_id"
         body = json.dumps({
             "builds": [
                 {
-                    "id": "{}".format(id),
-                    "logUrl": "https://console.cloud.google.com/gcr/builds/{}?project={}".format(id, self.test_project),
+                    "id": test_id,
+                    "logUrl": "https://console.cloud.google.com/gcr/builds/{}?project={}".format(test_id, self.test_project),
                     "logsBucket": "gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
                     "status": "FAILURE",
                 },
@@ -69,38 +69,38 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
             "project": self.test_project,
             "oauth_token": self.test_token}
 
+        failed_log_text = """\
+        LOG TEXT HERE
+
+
+        THIS HERE IS A MOCK OF LOG.TEXT THAT WILL BE PRINTED
+
+
+        build build build build build build steps
+
+
+
+
+        MORE LOGS HERE.
+        """
+        responses.add(
+            responses.GET,
+            "https://storage.googleapis.com/{build_logs}/log-{build_id}.txt".format(
+                build_logs="mycoolproject.cloudbuild-logs.googleusercontent.com",
+                build_id="failed_build_id"
+            ),
+            body=dedent(failed_log_text)
+        )
         with pytest.raises(CheckFailed):
-            failed_log_text = """\
-            LOG TEXT HERE
-
-
-            THIS HERE IS A MOCK OF LOG.TEXT THAT WILL BE PRINTED
-
-
-            build build build build build build steps
-
-
-
-
-            MORE LOGS HERE.
-            """
-            responses.add(
-                responses.GET,
-                "https://storage.googleapis.com/{build_logs}/log-{build_id}.txt".format(
-                    build_logs="mycoolproject.cloudbuild-logs.googleusercontent.com",
-                    build_id="failed_build_id"
-                ),
-                body=dedent(failed_log_text)
-            )
             self.check.check(self.app, self.test_sha, config)
 
     @responses.activate
     def test_build_in_progress(self):
-        id = "WIP_build_id"
+        test_id = "WIP_build_id"
         body = json.dumps({
             "builds": [{
-                "id": "{}".format(id),
-                "logUrl": "https://console.cloud.google.com/gcr/builds/{}?project={}".format(id, self.test_project),
+                "id": test_id,
+                "logUrl": "https://console.cloud.google.com/gcr/builds/{}?project={}".format(test_id, self.test_project),
                 "logsBucket": "gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
                 "status": "WORKING",
             },
