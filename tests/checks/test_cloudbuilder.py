@@ -171,8 +171,9 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
 
         config = {"project": self.test_project, "oauth_token": self.test_token}
 
-        with pytest.raises(CheckFailed):
+        with pytest.raises(CheckFailed) as exception_info:
             self.check.check(self.app, self.test_sha, config)
+        print (exception_info.value)
 
     @responses.activate
     def test_build_status_queued(self):
@@ -204,8 +205,9 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
 
         config = {"project": self.test_project, "oauth_token": self.test_token}
 
-        with pytest.raises(CheckFailed):
+        with pytest.raises(CheckFailed) as exception_info:
             self.check.check(self.app, self.test_sha, config)
+        print (exception_info.value)
 
     @responses.activate
     def test_build_status_internal_error(self):
@@ -237,8 +239,9 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
 
         config = {"project": self.test_project, "oauth_token": self.test_token}
 
-        with pytest.raises(CheckFailed):
+        with pytest.raises(CheckFailed) as exception_info:
             self.check.check(self.app, self.test_sha, config)
+        print (exception_info.value)
 
     @responses.activate
     def test_build_status_timeout(self):
@@ -274,8 +277,9 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
 
         config = {"project": self.test_project, "oauth_token": self.test_token}
 
-        with pytest.raises(CheckFailed):
+        with pytest.raises(CheckFailed) as exception_info:
             self.check.check(self.app, self.test_sha, config)
+        print (exception_info.value)
 
     @responses.activate
     def test_build_status_cancelled(self):
@@ -309,8 +313,9 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
 
         config = {"project": self.test_project, "oauth_token": self.test_token}
 
-        with pytest.raises(CheckFailed):
+        with pytest.raises(CheckFailed) as exception_info:
             self.check.check(self.app, self.test_sha, config)
+        print (exception_info.value)
 
     @responses.activate
     def test_missing_body(self):
