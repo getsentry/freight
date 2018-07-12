@@ -114,6 +114,122 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
             self.check.check(self.app, self.test_sha, config)
 
     @responses.activate
+    def test_build_status_unknown(self):
+        """    "STATUS_UNKNOWN": "Status of the build is unknown."""
+        test_id = "unknown_build_id"
+        body = json.dumps({
+            "builds": [{
+                "id": test_id,
+                "logUrl": "https://console.cloud.google.com/gcr/builds/{}?project={}".format(test_id, self.test_project),
+                "logsBucket": "gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
+                "status": "STATUS_UNKNOWN",
+            },
+            ]
+        })
+        responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project), body=body)
+
+        config = {
+            "project": self.test_project,
+            "oauth_token": self.test_token}
+
+        with pytest.raises(CheckFailed):
+            self.check.check(self.app, self.test_sha, config)
+
+    @responses.activate
+    def test_build_status_queued(self):
+        """QUEUED": "Build or step is queued; work has not yet begun."""
+        test_id = "build_id"
+        body = json.dumps({
+            "builds": [{
+                "id": test_id,
+                "logUrl": "https://console.cloud.google.com/gcr/builds/{}?project={}".format(test_id, self.test_project),
+                "logsBucket": "gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
+                "status": "QUEUED",
+            },
+            ]
+        })
+        responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project), body=body)
+
+        config = {
+            "project": self.test_project,
+            "oauth_token": self.test_token}
+
+        with pytest.raises(CheckFailed):
+            self.check.check(self.app, self.test_sha, config)
+
+    @responses.activate
+    def test_build_status_internal_error(self):
+        """INTERNAL_ERROR": "Build or step failed due to an internal cause."""
+        test_id = "build_id"
+        body = json.dumps({
+            "builds": [{
+                "id": test_id,
+                "logUrl": "https://console.cloud.google.com/gcr/builds/{}?project={}".format(test_id, self.test_project),
+                "logsBucket": "gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
+                "status": "INTERNAL_ERROR",
+            },
+            ]
+        })
+        responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project), body=body)
+
+        config = {
+            "project": self.test_project,
+            "oauth_token": self.test_token}
+
+        with pytest.raises(CheckFailed):
+            self.check.check(self.app, self.test_sha, config)
+
+    @responses.activate
+    def test_build_status_timeout(self):
+        """[summary]
+            "TIMEOUT": "Build or step took longer than was allowed.",
+        Arguments:
+            self {[type]} -- [description]
+        """
+        test_id = "build_id"
+        body = json.dumps({
+            "builds": [{
+                "id": test_id,
+                "logUrl": "https://console.cloud.google.com/gcr/builds/{}?project={}".format(test_id, self.test_project),
+                "logsBucket": "gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
+                "status": "TIMEOUT",
+            },
+            ]
+        })
+        responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project), body=body)
+
+        config = {
+            "project": self.test_project,
+            "oauth_token": self.test_token}
+
+        with pytest.raises(CheckFailed):
+            self.check.check(self.app, self.test_sha, config)
+
+    @responses.activate
+    def test_build_status_cancelled(self):
+        """[summary]
+            "CANCELLED": "Build or step was canceled by a user.",
+        """
+        test_id = "build_id"
+        body = json.dumps({
+            "builds": [{
+                "id": test_id,
+                "logUrl": "https://console.cloud.google.com/gcr/builds/{}?project={}".format(test_id, self.test_project),
+                "logsBucket": "gs://{}.cloudbuild-logs.googleusercontent.com".format(self.test_project),
+                "status": "CANCELLED",
+            },
+            ]
+        })
+        responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project), body=body)
+
+        config = {
+            "project": self.test_project,
+            "oauth_token": self.test_token}
+
+        with pytest.raises(CheckFailed):
+            self.check.check(self.app, self.test_sha, config)
+
+    @responses.activate
     def test_missing_body(self):
         config = {
             "project": self.test_project,
