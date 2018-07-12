@@ -38,7 +38,6 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project), body=body)
 
         config = {
-            "contexts": ["cloudbuilder"],
             "project": self.test_project,
             "oauth_token": self.test_token}
 
@@ -65,7 +64,6 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         )
 
         config = {
-            "contexts": ["cloudbuilder"],
             "project": self.test_project,
             "oauth_token": self.test_token}
 
@@ -109,7 +107,6 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         responses.add(responses.GET, "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(self.test_project), body=body)
 
         config = {
-            "contexts": ["cloudbuilder"],
             "project": self.test_project,
             "oauth_token": self.test_token}
 
@@ -119,7 +116,6 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
     @responses.activate
     def test_missing_body(self):
         config = {
-            "contexts": ["cloudbuilder"],
             "project": self.test_project,
             "oauth_token": self.test_token}
 
