@@ -97,4 +97,5 @@ class GCPContainerBuilderCheck(Check):
             )
         if build_status == "SUCCESS":
             return
-        raise CheckFailed
+
+        raise CheckFailed("[ {} ]\t{}\n".format(build_status, gcloudstatus[build_status]))
