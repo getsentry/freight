@@ -15,3 +15,5 @@ npm-debug.log
 /dist
 .vagrant
 .env
+venv/
+freight_venv
