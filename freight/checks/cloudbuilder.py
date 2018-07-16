@@ -78,9 +78,8 @@ class GCPContainerBuilderCheck(Check):
         }
 
         if build_status == "FAILURE":
-            print(build_id)
             build_logtext = "https://storage.googleapis.com/{}/log-{}.txt".format(
-                build_logs[slice(5, None)], build_id
+                build_logs[5:], build_id
             )
             log = http.get(build_logtext, headers=headers)
             raise CheckFailed(
