@@ -37,7 +37,7 @@ class GCPContainerBuilderCheck(Check):
             sha {str} -- required, commit SHA of build to check
             config {dict} -- optional dict to pass additional args
         """
-        api_root = "https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(
+        api_root = u"https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(
             config["project"]
         )
 
@@ -48,17 +48,17 @@ class GCPContainerBuilderCheck(Check):
             oauth_token = subprocess.check_output(shlex.split(oauth_command)).rstrip()
 
         params = {
-            "filter": "sourceProvenance.resolvedRepoSource.commitSha={}".format(sha)
+            "filter": u"sourceProvenance.resolvedRepoSource.commitSha={}".format(sha)
         }
         headers = {
             "Accepts": "application/json",
-            "Authorization": "Bearer {}".format(oauth_token),
+            u"Authorization": "Bearer {}".format(oauth_token),
         }
 
         resp = http.get(api_root, headers=headers, params=params)
         if resp.status_code != 200:
             raise CheckFailed(
-                "[ ERROR {} ]\tNo data for build present".format(resp.status_code)
+                u"[ ERROR {} ]\tNo data for build present".format(resp.status_code)
             )
 
         build_data = resp.json()
@@ -78,24 +78,23 @@ class GCPContainerBuilderCheck(Check):
         }
 
         if build_status == "FAILURE":
-            print(build_id)
-            build_logtext = "https://storage.googleapis.com/{}/log-{}.txt".format(
-                build_logs[slice(5, None)], build_id
+            build_logtext = u"https://storage.googleapis.com/{}/log-{}.txt".format(
+                build_logs[5:], build_id
             )
             log = http.get(build_logtext, headers=headers)
             raise CheckFailed(
-                "[ {} ]\t{}\nSee details: {}\nPrinting log...\n\n\n{}".format(
+                u"[ {} ]\t{}\nSee details: {}\nPrinting log...\n\n\n{}".format(
                     build_status, gcloudstatus["FAILURE"], build_url, log.text
                 )
             )
 
         if build_status == "WORKING":
             raise CheckPending(
-                "[ {} ]\t{}\nSee details: {}".format(
+                u"[ {} ]\t{}\nSee details: {}".format(
                     build_status, gcloudstatus["WORKING"], build_url
                 )
             )
         if build_status == "SUCCESS":
             return
 
-        raise CheckFailed("[ {} ]\t{}\n".format(build_status, gcloudstatus[build_status]))
+        raise CheckFailed(u"[ {} ]\t{}\n".format(build_status, gcloudstatus[build_status]))
