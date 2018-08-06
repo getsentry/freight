@@ -47,7 +47,7 @@
     "moment": "^2.9.0",
     "prop-types": "^15.5.10",
     "react": "^15.6.1",
-    "react-dom": "^15.6.1",
+    "react-dom": "^16.0.1",
     "react-router": "2.8.1",
     "react-test-renderer": "^15.6.1",
     "reflux": "^6.4.1",
