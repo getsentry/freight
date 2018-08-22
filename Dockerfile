@@ -1,4 +1,4 @@
-FROM python:2.7.12
+FROM python:2.7.15-jessie
 
 # add our user and group first to make sure their IDs get assigned consistently
 RUN groupadd -r freight && useradd -r -m -g freight freight
