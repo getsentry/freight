@@ -91,10 +91,10 @@ class GCPContainerBuilderCheck(Check):
                 )
             )
 
-        if build_status == "WORKING":
+        if build_status in ["QUEUED", "WORKING"]:
             raise CheckPending(
                 u"[ {} ]\t{}\nSee details: {}".format(
-                    build_status, gcloudstatus["WORKING"], build_url
+                    build_status, gcloudstatus[build_status], build_url
                 )
             )
         if build_status == "SUCCESS":

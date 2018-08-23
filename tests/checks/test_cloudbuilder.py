@@ -204,7 +204,7 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
 
         config = {"project": self.test_project, "oauth_token": self.test_token}
 
-        with pytest.raises(CheckFailed) as exception_info:
+        with pytest.raises(CheckPending) as exception_info:
             self.check.check(self.app, self.test_sha, config)
 
     @responses.activate
