@@ -79,7 +79,8 @@ class AppIndexApiView(ApiView):
         # on the app at all times.
         deploy_config = TaskConfig(
             app_id=app.id,
-            type=TaskConfigType.deploy,
+            # FIXME This should be included in API
+            type=TaskConfigType.release if 'release' in args.name else TaskConfigType.deploy,
             provider=args.provider,
             data={
                 'provider_config': provider_config,

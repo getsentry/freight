@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from freight.models import App, Repository
+from freight.models import App, Repository, TaskConfig
 
 from .base import Serializer
 from .manager import add
@@ -25,9 +25,15 @@ class AppSerializer(Serializer):
         else:
             repo = None
 
+        # Let's assume that we have only one TaskConfig per App for now
+        task_config = TaskConfig.query.filter(
+            TaskConfig.app_id == item.id,
+        ).first()
+
         return {
             'id': str(item.id),
             'name': item.name,
             'environments': env_map,
+            'type': task_config.type,
             'repository': repo,
         }

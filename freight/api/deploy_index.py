@@ -11,7 +11,7 @@ from freight.config import db, redis
 from freight.exceptions import CheckError, CheckPending
 from freight.models import (
     App, Repository, Task, Deploy, DeploySequence, TaskStatus, User,
-    TaskConfig, TaskConfigType,
+    TaskConfig,
 )
 from freight.notifiers import NotifierEvent
 from freight.notifiers.utils import send_task_notifications
@@ -116,9 +116,9 @@ class DeployIndexApiView(ApiView):
             return self.error('Invalid app', name='invalid_resource', status_code=404)
 
         deploy_config = TaskConfig.query.filter(
-            TaskConfig.app_id == app.id,
-            TaskConfig.type == TaskConfigType.deploy,
+            TaskConfig.app_id == app.id
         ).first()
+
         if not deploy_config:
             return self.error('Missing deploy config', name='missing_conf', status_code=404)
 
