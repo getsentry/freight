@@ -26,6 +26,8 @@ class GCPContainerBuilderCheck(Check):
         CheckFailed -- exception to raise when check for build status fails
     """
 
+    required = True
+
     def get_options(self):
         return {"project": {"required": True}, "oauth_token": {"required": False}}
 
