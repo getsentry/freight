@@ -4,6 +4,8 @@ __all__ = ['Check']
 
 
 class Check(object):
+    required = False
+
     def get_default_options(self):
         return {
         }

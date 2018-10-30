@@ -20,6 +20,7 @@ from freight.utils.redis import lock
 from freight.utils.workspace import TemporaryWorkspace, Workspace
 
 INFO_CHECK_FINISHED = 'Check has passed: {check}'
+INFO_CHECK_SKIPPED = 'Check was skipped due to force: {check}'
 
 INFO_CHECK_PENDING = 'Waiting on check {check}:\n  {message}'
 INFO_CHECK_STALE = 'Check {check} has spent {timer}s in its current state.'
@@ -40,30 +41,39 @@ def checks_are_passing(app, task, log):
         for check_id in set(pending_checks):
             check_config = checks_with_ids[check_id]
             check = checks.get(check_config['type'])
-            try:
-                check.check(app, task.sha, check_config['config'])
+            # Forced tasks still need to go through checks
+            # to make sure none of them are required.
+            if task.was_forced and not check.required:
+                pending_checks.remove(check_id)
 
-            except CheckPending as e:
-                if check_config['type'] not in announced_checks:
-                    log.info(INFO_CHECK_PENDING.format(
+                log.info(INFO_CHECK_SKIPPED.format(
+                    check=check_config['type'],
+                ))
+            else:
+                try:
+                    check.check(app, task.sha, check_config['config'])
+
+                except CheckPending as e:
+                    if check_config['type'] not in announced_checks:
+                        log.info(INFO_CHECK_PENDING.format(
+                            check=check_config['type'],
+                            message=unicode(e),
+                        ))
+                        announced_checks.add(check_config['type'])
+
+                except CheckError as e:
+                    log.error(ERR_CHECK_FAILED.format(
                         check=check_config['type'],
                         message=unicode(e),
                     ))
-                    announced_checks.add(check_config['type'])
+                    return False
 
-            except CheckError as e:
-                log.error(ERR_CHECK_FAILED.format(
-                    check=check_config['type'],
-                    message=unicode(e),
-                ))
-                return False
+                else:
+                    pending_checks.remove(check_id)
 
-            else:
-                pending_checks.remove(check_id)
-
-                log.info(INFO_CHECK_FINISHED.format(
-                    check=check_config['type'],
-                ))
+                    log.info(INFO_CHECK_FINISHED.format(
+                        check=check_config['type'],
+                    ))
 
         if pending_checks:
             sleep(interval)
@@ -91,7 +101,7 @@ def main(task_id, log):
     db.session.add(task)
     db.session.commit()
 
-    if not task.was_forced and not checks_are_passing(app, task, log):
+    if not checks_are_passing(app, task, log):
         task.status = TaskStatus.failed
         task.date_finished = datetime.utcnow()
         db.session.add(task)
