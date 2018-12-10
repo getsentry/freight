@@ -30,7 +30,7 @@ class DatadogNotifier(Notifier):
 
         payload = {
             'title': app.name,
-            'text': task.sha, 
+            'text': task.sha,
             'priority': "normal",
             'alert_type': "info",
             'tags': [{
