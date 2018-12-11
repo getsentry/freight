@@ -11,7 +11,7 @@ from .base import Notifier, NotifierEvent
 class DatadogNotifier(Notifier):
     def get_options(self):
         return {
-            'api_webhook_url': {'required': True},
+            'webhook_url': {'required': True},
         }
 
     def should_send_deploy(self, deploy, task, config, event):
@@ -26,7 +26,7 @@ class DatadogNotifier(Notifier):
 # https://docs.datadoghq.com/api/?lang=bash#post-an-event
 # This provides a bunch of tags to refine searches in datadog, as well as a title for the deployment
     def send_deploy(self, deploy, task, config, event):
-        api_webhook_url = config['api_webhook_url']
+        webhook_url = config['webhook_url']
 
         app = App.query.get(deploy.app_id)
 
@@ -50,4 +50,4 @@ class DatadogNotifier(Notifier):
             }]
         }
 
-        http.post(api_webhook_url, json=payload)
+        http.post(webhook_url, json=payload)
