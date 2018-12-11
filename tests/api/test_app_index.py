@@ -54,7 +54,7 @@ class AppCreateTest(AppIndexBase):
             'name': 'foobar',
             'provider': 'shell',
             'provider_config': '{"command": "/usr/bin/true", "timeout": 50}',
-            'notifiers': '[{"type": "slack", "config": {"webhook_url": "https://example.com"}},{"type": "datadog", "config": {"webhook_url": "https://example.com"}},]',
+            'notifiers': '[{"type": "datadog", "config": {"webhook_url": "https://example.com"}}]',
             'checks': '[{"type": "github", "config": {"contexts": ["travisci"], "repo": "getsentry/freight"}}]',
             'repository': 'git@example.com:repo-name.git',
             'environments': '{"staging": {"default_ref": "develop"}}',
@@ -70,8 +70,7 @@ class AppCreateTest(AppIndexBase):
         assert deploy_config.provider_config['command'] == '/usr/bin/true'
         assert deploy_config.provider_config['timeout'] == 50
         assert deploy_config.notifiers == [
-            {'type': 'slack', 'config': {'webhook_url': 'https://example.com'}},
-            {'type': 'datadog', 'config': {'webhook_url': 'https://example.com'}},
+            {'type': 'datadog', 'config': {'webhook_url': 'https://example.com'}}
         ]
         assert len(deploy_config.checks) == 1
         assert deploy_config.checks[0]['type'] == 'github'
