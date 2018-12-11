@@ -27,7 +27,7 @@ class DatadogNotifierBase(TestCase):
         )
 
 
-class SentryNotifierTest(SentryNotifierBase):
+class DatadogNotifierTest(DatadogNotifierBase):
     @responses.activate
     def test_send_finished_task(self):
         responses.add(responses.POST, 'http://example.com/')
