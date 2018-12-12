@@ -31,20 +31,20 @@ class DatadogNotifier(Notifier):
         app = App.query.get(deploy.app_id)
 
         payload = {
-            'title': app.name,
-            'text': task.sha,
+            'title': "[{app_name}/{env}] deployed by {user}".format(**params)
+            'text': "[{app_name}/{env}] {user} deployed <{link}|#{number}> ({sha})".format(**params)
             'priority': "normal",
             'alert_type': "info",
             'tags': [{
                 'number': deploy.number,
-                'app_name': app.name,
-                'params': dict(task.params or {}),
-                'env': deploy.environment,
-                'ref': task.ref,
-                'sha': task.sha,
-                'duration': task.duration,
-                'event': 'started' if event == NotifierEvent.TASK_STARTED else 'finished',
-                'dateStarted': task.date_started.isoformat() + 'Z' if task.date_started else None,
+                'freight_deploy_name': app.name + "/" + deploy.environment + "#" + deploy.number,
+                'freight_deploy_status': event,
+                'freight_app': app.name,
+                'freight_ref': task.ref,
+                'freight_sha': task.sha,
+                'freight_deploy_duration': task.duration,
+                'freight_event': 'started' if event == NotifierEvent.TASK_STARTED else 'finished',
+                'freight_deploy_dateStarted': task.date_started.isoformat() + 'Z' if task.date_started else None,
                 'dateReleased': task.date_finished.isoformat() + 'Z' if task.date_finished else None,
                 'link': http.absolute_uri('/deploys/{}/{}/{}/'.format(app.name, deploy.environment, deploy.number))
             }]
