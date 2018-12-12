@@ -36,18 +36,12 @@ class DatadogNotifier(Notifier):
             'priority': "normal",
             'alert_type': "info",
             'tags': [{
-                'number': deploy.number,
                 'freight_deploy_name': app.name + "/" + deploy.environment + "#" + deploy.number,
                 'freight_deploy_status': event,
                 'freight_app': app.name,
                 'freight_ref': task.ref,
-                'freight_sha': task.sha,
-                'freight_deploy_duration': task.duration,
-                'freight_event': 'started' if event == NotifierEvent.TASK_STARTED else 'finished',
-                'freight_deploy_dateStarted': task.date_started.isoformat() + 'Z' if task.date_started else None,
-                'dateReleased': task.date_finished.isoformat() + 'Z' if task.date_finished else None,
-                'link': http.absolute_uri('/deploys/{}/{}/{}/'.format(app.name, deploy.environment, deploy.number))
-            }]
+                'freight_sha': task.sha
+           }]
         }
 
         http.post(webhook_url, json=payload)
