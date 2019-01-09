@@ -39,7 +39,7 @@ class DatadogNotifier(Notifier):
             'priority': "normal",
             'alert_type': "info",
             'tags': [
-                'freight_deploy_name:' + app.name + "/" + deploy.environment + "#" + deploy.number,
+                'freight_deploy_name:' + app.name + "/" + deploy.environment + "#" + str(deploy.number),
                 'freight_deploy_status:' + event,
                 'freight_app:' +  app.name,
                 'freight_ref:' + task.ref,
