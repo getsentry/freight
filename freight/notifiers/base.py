@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from freight.models import Deploy, Task, TaskStatus
+from freight.models import Deploy, TaskStatus
 from freight import http
 
 __all__ = ['Notifier', 'NotifierEvent']
@@ -61,7 +61,6 @@ def generate_event_title(app, deploy, task, user, event):
         'link': http.absolute_uri('/deploys/{}/{}/{}'.format(app.name, deploy.environment, deploy.number)),
     }
 
- 
     # TODO(dcramer): show the ref when it differs from the sha
     if event == NotifierEvent.TASK_QUEUED:
         return "[{app_name}/{env}] {user} queued deploy <{link}|#{number}> ({sha})".format(**params)

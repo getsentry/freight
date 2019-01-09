@@ -5,7 +5,7 @@ __all__ = ['SlackNotifier']
 import json
 
 from freight import http
-from freight.models import App, Task, TaskStatus, User
+from freight.models import App, Task, User
 
 from .base import Notifier, generate_event_title
 

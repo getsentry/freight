@@ -40,11 +40,11 @@ class DatadogNotifier(Notifier):
             'alert_type': "info",
             'tags': [
                 'freight_deploy_name:' + app.name + "/" + deploy.environment + "#" + str(deploy.number),
-                'freight_deploy_status:' + event,
-                'freight_app:' +  app.name,
+                'freight_deploy_status:' + str(event),
+                'freight_app:' + app.name,
                 'freight_ref:' + task.ref,
                 'freight_sha:' + task.sha
-           ]
+            ]
         }
 
         http.post(webhook_url, json=payload)
