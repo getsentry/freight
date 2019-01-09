@@ -22,7 +22,7 @@ class SlackNotifier(Notifier):
         app = App.query.get(deploy.app_id)
         task = Task.query.get(deploy.task_id)
         user = User.query.get(task.user_id)
-        title = generate_event_title(app, deploy, task, user)
+        title = generate_event_title(app, deploy, task, user, event)
 
         payload = {
             'parse': 'none',

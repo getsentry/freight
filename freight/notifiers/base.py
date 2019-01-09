@@ -47,7 +47,7 @@ class Notifier(object):
         return event in config.get('events', self.DEFAULT_EVENTS)
 
 
-def generate_event_title(app, deploy, task, user):
+def generate_event_title(app, deploy, task, user, event):
     params = {
         'number': deploy.number,
         'app_name': app.name,

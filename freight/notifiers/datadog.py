@@ -29,7 +29,7 @@ class DatadogNotifier(Notifier):
         app = App.query.get(deploy.app_id)
         task = Task.query.get(deploy.task_id)
         user = User.query.get(task.user_id)
-        title = generate_event_title(app, deploy, task, user)
+        title = generate_event_title(app, deploy, task, user, event)
 
         # https://docs.datadoghq.com/api/?lang=bash#post-an-event
         # This provides a bunch of tags to refine searches in datadog, as well as a title for the deployment
