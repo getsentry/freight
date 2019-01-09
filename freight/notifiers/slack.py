@@ -7,7 +7,7 @@ import json
 from freight import http
 from freight.models import App, Task, TaskStatus, User
 
-from .base import Notifier, NotifierEvent, generate_event_title
+from .base import Notifier, generate_event_title
 
 
 class SlackNotifier(Notifier):
