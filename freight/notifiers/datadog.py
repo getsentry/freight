@@ -3,7 +3,7 @@ from __future__ import absolute_import
 __all__ = ['DatadogNotifier']
 
 from freight import http
-from freight.models import App, TaskStatus
+from freight.models import App, Task, TaskStatus, User
 
 from .base import Notifier, NotifierEvent, generate_event_title
 

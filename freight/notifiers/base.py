@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from freight.models import Deploy
+from freight.models import Deploy, Task, TaskStatus
 from freight import http
 
 __all__ = ['Notifier', 'NotifierEvent']
