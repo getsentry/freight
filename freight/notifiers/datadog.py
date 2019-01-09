@@ -5,7 +5,7 @@ __all__ = ['DatadogNotifier']
 from freight import http
 from freight.models import App, TaskStatus
 
-from .base import Notifier, NotifierEvent
+from .base import Notifier, NotifierEvent, generate_event_title
 
 
 class DatadogNotifier(Notifier):
@@ -23,25 +23,28 @@ class DatadogNotifier(Notifier):
 
         return False
 
-# https://docs.datadoghq.com/api/?lang=bash#post-an-event
-# This provides a bunch of tags to refine searches in datadog, as well as a title for the deployment
     def send_deploy(self, deploy, task, config, event):
         webhook_url = config['webhook_url']
 
         app = App.query.get(deploy.app_id)
+        task = Task.query.get(deploy.task_id)
+        user = User.query.get(task.user_id)
+        title = generate_event_title(app, deploy, task, user)
 
+        # https://docs.datadoghq.com/api/?lang=bash#post-an-event
+        # This provides a bunch of tags to refine searches in datadog, as well as a title for the deployment
         payload = {
-            'title': "[{app_name}/{env}] deployed by {user}".format(**params)
-            'text': "[{app_name}/{env}] {user} deployed <{link}|#{number}> ({sha})".format(**params)
+            'title': title,
+            'text': title,
             'priority': "normal",
             'alert_type': "info",
-            'tags': [{
-                'freight_deploy_name': app.name + "/" + deploy.environment + "#" + deploy.number,
-                'freight_deploy_status': event,
-                'freight_app': app.name,
-                'freight_ref': task.ref,
-                'freight_sha': task.sha
-           }]
+            'tags': [
+                'freight_deploy_name:' + app.name + "/" + deploy.environment + "#" + deploy.number,
+                'freight_deploy_status:' + event,
+                'freight_app:' +  app.name,
+                'freight_ref:' + task.ref,
+                'freight_sha:' + task.sha
+           ]
         }
 
         http.post(webhook_url, json=payload)
