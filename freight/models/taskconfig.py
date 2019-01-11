@@ -54,6 +54,12 @@ class TaskConfig(db.Model):
                 "config": {
                     "webhook_url": "..."
                 }
+            },
+            {
+                "type": "datadog",
+                "config": {
+                    "webhook_url": "..."
+                }
             }
         ]
     }
