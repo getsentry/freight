@@ -25,6 +25,10 @@ class Fixtures(object):
                     'type': 'slack',
                     'config': {'webhook_url': 'https://example.com'},
                 },
+                {
+                    'type': 'datadog',
+                    'config': {'webhook_url': 'https://example.com'},
+                },
             ],
         })
 

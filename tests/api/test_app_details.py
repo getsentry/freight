@@ -31,7 +31,7 @@ class AppUpdateTest(AppDetailsBase):
             'name': 'foobar',
             'provider': 'shell',
             'provider_config': '{"command": "/usr/bin/true", "timeout": 50}',
-            'notifiers': '[{"type": "slack", "config": {"webhook_url": "https://example.com"}}]',
+            'notifiers': '[{"type": "slack", "config": {"webhook_url": "https://example.com"}},{"type": "datadog", "config": {"webhook_url": "https://example.com"}}]',
             'checks': '[{"type": "github", "config": {"contexts": ["travisci"], "repo": "getsentry/freight"}}]',
             'repository': 'git@example.com:repo-name.git',
             'environments': '{"staging": {"default_ref": "develop"}}',
@@ -48,6 +48,7 @@ class AppUpdateTest(AppDetailsBase):
         assert deploy_config.provider_config['timeout'] == 50
         assert deploy_config.notifiers == [
             {'type': 'slack', 'config': {'webhook_url': 'https://example.com'}},
+            {'type': 'datadog', 'config': {'webhook_url': 'https://example.com'}}
         ]
 
         assert len(deploy_config.checks) == 1
@@ -95,7 +96,7 @@ class AppUpdateTest(AppDetailsBase):
 
     def test_invalid_notifier_config(self):
         resp = self.client.put(self.path, data={
-            'notifiers': '[{"type": "slack", "config": {}}]',
+            'notifiers': '[{"type": "slack", "config": {}},{"type": "datadog", "config": {}}]'
         })
         assert resp.status_code == 400
         data = json.loads(resp.data)

@@ -70,7 +70,7 @@ class AppCreateTest(AppIndexBase):
         assert deploy_config.provider_config['command'] == '/usr/bin/true'
         assert deploy_config.provider_config['timeout'] == 50
         assert deploy_config.notifiers == [
-            {'type': 'slack', 'config': {'webhook_url': 'https://example.com'}},
+            {'type': 'slack', 'config': {'webhook_url': 'https://example.com'}}
         ]
         assert len(deploy_config.checks) == 1
         assert deploy_config.checks[0]['type'] == 'github'
