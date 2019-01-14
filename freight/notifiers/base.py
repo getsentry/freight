@@ -1,7 +1,6 @@
 from __future__ import absolute_import
 
 from freight.models import Deploy, TaskStatus
-from freight import http
 
 __all__ = ['Notifier', 'NotifierEvent']
 
@@ -47,7 +46,14 @@ class Notifier(object):
         return event in config.get('events', self.DEFAULT_EVENTS)
 
 
-def generate_event_title(app, deploy, task, user, event):
+def format_link(link, deploy, notifier):
+    if notifier == 'datadog':
+        return '{link}'                        # datadog parses the text and auto-generates links
+    else:
+        return '<{link}|#{deploy.number}>'     # default to slack style formatting
+
+
+def generate_event_title(app, deploy, task, user, event, link):
     params = {
         'number': deploy.number,
         'app_name': app.name,
@@ -57,19 +63,19 @@ def generate_event_title(app, deploy, task, user, event):
         'sha': task.sha[:7] if task.sha else task.ref,
         'status_label': task.status_label,
         'duration': task.duration,
-        'user': user.name.split('@', 1)[0],  # Usernames can either be 'user' or 'user@example.com'
-        'link': http.absolute_uri('/deploys/{}/{}/{}'.format(app.name, deploy.environment, deploy.number)),
+        'user': user.name.split('@', 1)[0],  # Usernames can either be 'user' or 'user@example.com',
+        'display_link': link
     }
 
     # TODO(dcramer): show the ref when it differs from the sha
     if event == NotifierEvent.TASK_QUEUED:
-        return "[{app_name}/{env}] {user} queued deploy <{link}|#{number}> ({sha})".format(**params)
+        return "[{app_name}/{env}] {user} queued deploy {display_link} ({sha})".format(**params)
     if event == NotifierEvent.TASK_STARTED:
-        return "[{app_name}/{env}] {user} started deploy <{link}|#{number}> ({sha})".format(**params)
+        return "[{app_name}/{env}] {user} started deploy {display_link} ({sha})".format(**params)
     if task.status == TaskStatus.failed:
-        return "[{app_name}/{env}] Failed to finish {user}'s deploy <{link}|#{number}> ({sha}) after {duration}s".format(**params)
+        return "[{app_name}/{env}] Failed to finish {user}'s deploy {display_link} ({sha}) after {duration}s".format(**params)
     if task.status == TaskStatus.cancelled:
-        return "[{app_name}/{env}] {user}'s deploy <{link}|#{number}> ({sha}) was cancelled after {duration}s".format(**params)
+        return "[{app_name}/{env}] {user}'s deploy {display_link} ({sha}) was cancelled after {duration}s".format(**params)
     if task.status == TaskStatus.finished:
-        return "[{app_name}/{env}] Successfully finished {user}'s deploy <{link}|#{number}> ({sha}) after {duration}s".format(**params)
+        return "[{app_name}/{env}] Successfully finished {user}'s deploy {display_link} ({sha}) after {duration}s".format(**params)
     raise NotImplementedError(task.status)

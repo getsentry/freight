@@ -5,7 +5,7 @@ __all__ = ['DatadogNotifier']
 from freight import http
 from freight.models import App, Task, TaskStatus, User
 
-from .base import Notifier, NotifierEvent, generate_event_title
+from .base import Notifier, NotifierEvent, format_link, generate_event_title
 
 
 class DatadogNotifier(Notifier):
@@ -29,7 +29,10 @@ class DatadogNotifier(Notifier):
         app = App.query.get(deploy.app_id)
         task = Task.query.get(deploy.task_id)
         user = User.query.get(task.user_id)
-        title = generate_event_title(app, deploy, task, user, event)
+        link_format = 'datadog'
+        link = http.absolute_uri('/deploys/{}/{}/{}'.format(app.name, deploy.environment, deploy.number))
+        display_link = format_link(link, deploy.number, link_format)
+        title = generate_event_title(app, deploy, task, user, event, display_link)
 
         # https://docs.datadoghq.com/api/?lang=bash#post-an-event
         # This provides a bunch of tags to refine searches in datadog, as well as a title for the deployment
@@ -43,7 +46,8 @@ class DatadogNotifier(Notifier):
                 'freight_deploy_status:' + str(event),
                 'freight_app:' + app.name,
                 'freight_ref:' + task.ref,
-                'freight_sha:' + task.sha
+                'freight_sha:' + task.sha,
+                'source_type:' + "freight_deploy"
             ]
         }
 
