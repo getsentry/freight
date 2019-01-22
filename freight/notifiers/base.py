@@ -45,15 +45,11 @@ class Notifier(object):
     def should_send_deploy(self, deploy, task, config, event):
         return event in config.get('events', self.DEFAULT_EVENTS)
 
-
-def format_link(link, deploy, notifier):
-    if notifier == 'datadog':
-        return '{link}'                        # datadog parses the text and auto-generates links
-    else:
-        return '<{link}|#{deploy.number}>'     # default to slack style formatting
+    def link_format(link, deploy_number):
+        return '<{link}|#{deploy_number}>'
 
 
-def generate_event_title(app, deploy, task, user, event, link):
+def generate_event_title(notifier, app, deploy, task, user, event, link):
     params = {
         'number': deploy.number,
         'app_name': app.name,
@@ -64,7 +60,7 @@ def generate_event_title(app, deploy, task, user, event, link):
         'status_label': task.status_label,
         'duration': task.duration,
         'user': user.name.split('@', 1)[0],  # Usernames can either be 'user' or 'user@example.com',
-        'display_link': link
+        'display_link': notifier.link_format(link, deploy.number)
     }
 
     # TODO(dcramer): show the ref when it differs from the sha
