@@ -31,7 +31,7 @@
     "babel-loader": "7.0.0",
     "babel-preset-es2015": "^6.24.1",
     "babel-preset-react": "^6.24.1",
-    "bootstrap": "~3.3.0",
+    "bootstrap": "~3.4.1",
     "bundle-loader": "^0.5.3",
     "classnames": "^2.2.1",
     "copy-webpack-plugin": "^1.1.1",
