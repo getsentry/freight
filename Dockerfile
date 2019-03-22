@@ -80,6 +80,17 @@ RUN set -x \
     && rm -r /usr/src/redis \
     && apt-get purge -y --auto-remove wget
 
+# Install sentry-cli so the builds can register deploys, upload sourcemaps, etc.
+RUN set -x \
+    && export SENTRY_CLI_VERSION=1.40.0 \
+    && export SENTRY_CLI_SHA256=3312dbd7d4f7cec8f1980ba09ef741eadfa5d74315fac6f09812e4b307740432 \
+    && apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
+    && wget -O /tmp/sentry-cli "https://github.com/getsentry/sentry-cli/releases/download/$SENTRY_CLI_VERSION/sentry-cli-Linux-x86_64" \
+    && echo "$SENTRY_CLI_SHA256 /tmp/sentry-cli" | sha256sum -c - \
+    && chmod +x /tmp/sentry-cli \
+    && mv /tmp/sentry-cli /usr/local/bin \
+    && apt-get purge -y --auto-remove wget
+
 RUN set -x \
     && export DOCKER_VERSION=18.03.1 \
     && export DOCKER_SHA256=0e245c42de8a21799ab11179a4fce43b494ce173a8a2d6567ea6825d6c5265aa \
