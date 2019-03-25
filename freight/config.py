@@ -10,7 +10,7 @@ from flask_redis import Redis
 from flask_sslify import SSLify
 from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
-from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_webpack import Webpack
 
 from freight.queue import Queue
@@ -116,7 +116,7 @@ def create_app(_read_config=True, **config):
     ]
 
     # We don't support non-proxied installs
-    app.wsgi_app = ProxyFix(app.wsgi_app)
+    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 
     # Pull in Heroku configuration
     heroku.init_app(app)
