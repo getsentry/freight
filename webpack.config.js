@@ -1,9 +1,13 @@
 /*eslint-env node*/
 
-var path = require("path"),
-    webpack = require("webpack");
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
-var CopyWebpackPlugin = require('copy-webpack-plugin');
+const path = require("path"),
+      webpack = require("webpack");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const ManifestPlugin = require('webpack-manifest-plugin');
+
+
 
 module.exports = {
   context: __dirname + "/static",
@@ -19,64 +23,59 @@ module.exports = {
     ]
   },
   module: {
-    loaders: [
+    rules: [
       {
         test: /\.jsx?$/,
-        loader: "babel-loader"
+        exclude: /(dist|node_modules)/,
+        use: {
+          loader: 'babel-loader',
+          options: {cacheDirectory: true},
+        },
       },
       {
         test: /\.less$/,
-        loader: ExtractTextPlugin.extract({
-          fallback: "style-loader",
-          use: "css-loader!less-loader"
-        })
+        use: [
+          MiniCssExtractPlugin.loader,
+          "css-loader",
+          "less-loader",
+        ]
       },
       {
         test: /\.css$/,
-        loader: ExtractTextPlugin.extract({
-          fallback: "style-loader",
-          use: "css-loader"
-        })
+        use: [
+          MiniCssExtractPlugin.loader,
+          "css-loader",
+          "style-loader",
+        ]
       },
       // inline base64 URLs for <=8k images, direct URLs for the rest
       {
         test: /\.(png|jpg)$/,
-        loader: "url-loader?limit=8192"
+        use: {
+          loader: 'url-loader',
+          options: {
+            limit: 8192,
+          }
+        }
       }
     ]
   },
   plugins: [
-    function() {
-      this.plugin("done", function(stats) {
-        var app = stats.toJson({
-          assetsSort: true
-        }).assets[1].name
-
-        var vendor = stats.toJson({
-          assetsSort: true
-        }).assets[0].name
-
-        var styles = stats.toJson({
-          assetsSort: true
-        }).assetsByChunkName.styles[1]
-
-        var newObj = {
-          "assets": {
-            "vendor.js": vendor,
-            "app.js": app,
-            "styles.css": styles
-          },
-          "publicPath": "/static/"
-        };
-        require("fs").writeFileSync(
-          path.join(__dirname, "/", "stats.json"),
-          JSON.stringify(newObj));
-      });
-    },
-    new ExtractTextPlugin({
-      filename: 'styles.[chunkhash].css',
-      allChunks: true
+    new CleanWebpackPlugin(),
+    new ManifestPlugin({
+      fileName: '../stats.json',
+      publicPath: '',
+      basePath: '',
+      generate: (seed, files) => ({
+        assets: files.reduce((manifest, {name, path}) => ({...manifest, [name]: path}), seed),
+        publicPath: '/static/',
+      })
     }),
+		new MiniCssExtractPlugin({
+			filename: 'styles.[chunkhash].css',
+			chunkFilename: "[id].css",
+			allChunks: true,
+		}),
     new webpack.ProvidePlugin({
         $: 'jquery',
         jQuery: 'jquery',
