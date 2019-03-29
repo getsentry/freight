@@ -18,7 +18,7 @@
     "url": "https://github.com/getsentry/freight.git"
   },
   "author": "David Cramer <dcramer@gmail.com> (https://github.com/dcramer)",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/getsentry/freight/issues"
   },
@@ -51,7 +51,6 @@
     "react-router": "2.8.1",
     "react-test-renderer": "^15.6.1",
     "reflux": "^6.4.1",
-    "sinon": "^2.3.8",
     "style-loader": "^0.8.3",
     "url-loader": "^0.5.5",
     "webpack": "2.2.0",
