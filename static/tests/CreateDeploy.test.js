@@ -2,7 +2,6 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import CreateDeploy from '../components/CreateDeploy.jsx';
 import { shallow } from 'enzyme';
-import sinon from 'sinon';
 
 test('CreateDeploy Snapshot', () => {
   const appList = [{
