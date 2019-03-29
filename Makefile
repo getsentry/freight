@@ -1,6 +1,6 @@
 develop: update-submodules setup-git
 	@echo "--> Installing dependencies"
-	npm install
+	yarn install
 	pip install -e .
 	pip install "file://`pwd`#egg=freight[test]"
 
@@ -22,7 +22,7 @@ update-submodules:
 	git submodule update
 	@echo ""
 
-test: develop lint-python test-python validate-heroku
+test: develop lint-python test-python validate-heroku test-webpack
 
 test-python:
 	@echo "--> Running Python tests"
@@ -36,4 +36,9 @@ lint-python:
 
 validate-heroku:
 	@echo "--> Validating app.json"
-	npm run validate-app.json
+	yarn validate-app.json
+
+test-webpack:
+	@echo "--> Running webpack"
+	yarn webpack --mode production
+	@echo ""

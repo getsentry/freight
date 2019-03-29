@@ -7,9 +7,9 @@
   },
   "scripts": {
     "test": "jest",
-    "prevalidate-app.json": "npm install",
-    "prestart": "npm install",
     "postinstall": "webpack -p",
+    "prevalidate-app.json": "yarn install",
+    "prestart": "yarn install",
     "start": "webpack-dev-server --content-base freight-frontend/",
     "validate-app.json": "app.json validate"
   },
