@@ -7,7 +7,7 @@ import api from '../api';
 
 class CreateDeploy extends React.Component {
   static propTypes = {
-    appList: PropTypes.array(),
+    appList: PropTypes.array,
   };
 
   static contextTypes = {
