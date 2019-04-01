@@ -1,5 +1,6 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import {mount} from 'enzyme';
+
 import TaskSummary from '../components/TaskSummary.jsx';
 
 //TODO: figure out why snapshots are rendering null.
@@ -32,9 +33,8 @@ test('TaskSummary Snapshot', () => {
     }
   }
 
-  const component = renderer.create(
+  const wrapper = mount(
     <TaskSummary contextTypes={context.contextTypes} task={task} />
   );
-  let tree = component.toJSON();
-  expect(tree).toMatchSnapshot();
+  expect(wrapper).toMatchSnapshot();
 })

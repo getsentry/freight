@@ -42,7 +42,6 @@ exports[`CreateDeploy Snapshot 1`] = `
         <select
           className="form-control"
           onChange={[Function]}
-          value={undefined}
         >
           <option>
             production

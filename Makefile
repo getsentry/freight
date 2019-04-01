@@ -22,7 +22,12 @@ update-submodules:
 	git submodule update
 	@echo ""
 
-test: develop lint-python test-python validate-heroku
+test: develop lint-python test-python validate-heroku test-javascript
+
+test-javascript:
+	@echo "--> Running javascript tests"
+	npm run test
+	@echo ""
 
 test-python:
 	@echo "--> Running Python tests"
