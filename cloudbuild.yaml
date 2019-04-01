@@ -1,0 +1,26 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    entrypoint: "bash"
+    args:
+      [
+        "-c",
+        "docker pull us.gcr.io/$PROJECT_ID/freight:latest || true"
+      ]
+
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      [
+        "build",
+        "--pull",
+        "-t", "us.gcr.io/$PROJECT_ID/freight:latest",
+        "-t", "us.gcr.io/$PROJECT_ID/freight:$COMMIT_SHA",
+        "--cache-from", "us.gcr.io/$PROJECT_ID/freight:latest",
+        ".",
+      ]
+
+images:
+  [
+    "us.gcr.io/$PROJECT_ID/freight:$COMMIT_SHA",
+    "us.gcr.io/$PROJECT_ID/freight:latest",
+  ]
+timeout: 60m
