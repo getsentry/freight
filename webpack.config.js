@@ -13,14 +13,7 @@ module.exports = {
   context: __dirname + "/static",
   entry: {
     "styles": "./less/base.less",
-    "app": "./main",
-    "vendor": [
-      "ansi_up",
-      "@babel/polyfill",
-      "jquery",
-      "moment",
-      "react-router"
-    ]
+    "app": ["@babel/polyfill", "./main"],
   },
   module: {
     rules: [
@@ -87,6 +80,11 @@ module.exports = {
   resolve: {
     modules: ["node_modules"],
     extensions: [".jsx", ".js", ".json"]
+  },
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+    },
   },
   output: {
     publicPath: "/dist/",
