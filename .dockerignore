@@ -10,3 +10,4 @@ LICENSE
 .travis.yml
 .gitignore
 node_modules/
+cloudbuild.yaml

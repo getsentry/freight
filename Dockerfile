@@ -1,4 +1,4 @@
-FROM python:2.7.15-jessie
+FROM python:2.7.16-jessie
 
 # add our user and group first to make sure their IDs get assigned consistently
 RUN groupadd -r freight && useradd -r -m -g freight freight
@@ -15,12 +15,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # grab gosu for easy step-down from root
 RUN set -x \
-    && export GOSU_VERSION=1.10 \
+    && export GOSU_VERSION=1.11 \
     && apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
     && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
     && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
     && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 \
+    && for key in \
+      B42F6819007F00F88E364FD4036A9C25BF357DD4 \
+    ; do \
+      gpg --batch --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
+      gpg --batch --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
+      gpg --batch --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" ; \
+    done \
     && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
     && rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu \
@@ -29,12 +35,18 @@ RUN set -x \
 
 # grab tini for signal processing and zombie killing
 RUN set -x \
-    && export TINI_VERSION=0.14.0 \
+    && export TINI_VERSION=0.18.0 \
     && apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
     && wget -O /usr/local/bin/tini "https://github.com/krallin/tini/releases/download/v$TINI_VERSION/tini" \
     && wget -O /usr/local/bin/tini.asc "https://github.com/krallin/tini/releases/download/v$TINI_VERSION/tini.asc" \
     && export GNUPGHOME="$(mktemp -d)" \
-    && gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys 6380DC428747F6C393FEACA59A84159D7001A4E5 \
+    && for key in \
+      595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
+    ; do \
+      gpg --batch --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
+      gpg --batch --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
+      gpg --batch --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" ; \
+    done \
     && gpg --batch --verify /usr/local/bin/tini.asc /usr/local/bin/tini \
     && rm -r "$GNUPGHOME" /usr/local/bin/tini.asc \
     && chmod +x /usr/local/bin/tini \
@@ -67,12 +79,12 @@ RUN set -x \
     && apt-get purge -y --auto-remove wget
 
 RUN set -x \
-    && export REDIS_VERSION=3.2.6 \
-    && export REDIS_DOWNLOAD_SHA1=0c7bc5c751bdbc6fabed178db9cdbdd948915d1b \
+    && export REDIS_VERSION=4.0.14 \
+    && export REDIS_DOWNLOAD_SHA256=1e1e18420a86cfb285933123b04a82e1ebda20bfb0a289472745a087587e93a7 \
     && apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /usr/src/redis \
     && wget -O redis.tar.gz "http://download.redis.io/releases/redis-$REDIS_VERSION.tar.gz" \
-    && echo "$REDIS_DOWNLOAD_SHA1 *redis.tar.gz" | sha1sum -c - \
+    && echo "$REDIS_DOWNLOAD_SHA256 *redis.tar.gz" | sha256sum -c - \
     && tar -xzf redis.tar.gz -C /usr/src/redis --strip-components=1 \
     && rm redis.tar.gz \
     && make -C /usr/src/redis \
@@ -128,7 +140,7 @@ ENV PATH="${PATH}:/opt/google-cloud-sdk/bin"
 ENV DOCKER_HOST tcp://docker:2375
 
 COPY package.json /usr/src/app/
-RUN npm install && npm cache clear
+RUN npm install && npm cache clear --force
 
 COPY requirements.txt /usr/src/app/
 RUN pip install --no-cache-dir -r requirements.txt
