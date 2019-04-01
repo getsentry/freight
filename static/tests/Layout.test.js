@@ -1,8 +1,7 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import {mount} from 'enzyme';
+
 import Layout from '../components/Layout.jsx';
-import {shallow} from 'enzyme';
-import ReactTestUtils from 'react-dom/test-utils';
 import TaskDetails from '../components/TaskDetails.jsx'
 
 describe('<Layout />', () => {
@@ -30,8 +29,7 @@ describe('<Layout />', () => {
     "status": "finished"
   }
 }]
-  const shallowRenderer = ReactTestUtils.createRenderer();
-  const result = shallowRenderer.render(<TaskDetails task={task} />);
+  const result = mount(<TaskDetails params={{}} task={task} />);
   expect(result).toMatchSnapshot();
   })
 })

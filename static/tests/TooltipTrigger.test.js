@@ -1,8 +1,7 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import {mount} from 'enzyme';
+
 import TooltipTrigger from '../components/TooltipTrigger.jsx';
-import {shallow} from 'enzyme';
-import ReactTestUtils from 'react-dom/test-utils';
 
 describe('<TooltipTrigger />', () => {
   it('should render a snapshot of <TooltipTrigger />', () => {
@@ -30,8 +29,7 @@ describe('<TooltipTrigger />', () => {
     }]
 
 
-    const shallowRenderer = ReactTestUtils.createRenderer();
-    const result = shallowRenderer.render(<TooltipTrigger {...props} children={props.title} />);
+    const result = mount(<TooltipTrigger {...props} children={props.title} />);
     expect(result).toMatchSnapshot();
   })
 })

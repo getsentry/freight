@@ -1,9 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Duration Snapshot 1`] = `
-<span
+<Duration
   className="duration"
+  seconds="13.67"
 >
-  14 sec
-</span>
+  <span
+    className="duration"
+  >
+    14 sec
+  </span>
+</Duration>
 `;

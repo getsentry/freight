@@ -1,24 +1,40 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`DeployChart Snapshot 1`] = `
-<div
-  className="section"
+<DeployChart
+  params={
+    Object {
+      "app": "freight",
+      "env": "production",
+      "number": "798",
+    }
+  }
 >
-  <figure
-    className=" barchart"
-    height={undefined}
-    width={undefined}
+  <div
+    className="section"
   >
-    <span
-      className="max-y"
+    <BarChart
+      label="deploys"
+      placement="bottom"
+      points={Array []}
     >
-      10
-    </span>
-    <span
-      className="min-y"
-    >
-      0
-    </span>
-  </figure>
-</div>
+      <figure
+        className=" barchart"
+      >
+        <span
+          className="max-y"
+          key="max-y"
+        >
+          10
+        </span>
+        <span
+          className="min-y"
+          key="min-y"
+        >
+          0
+        </span>
+      </figure>
+    </BarChart>
+  </div>
+</DeployChart>
 `;

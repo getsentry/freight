@@ -1,5 +1,6 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import {mount} from 'enzyme';
+
 import DeployChart from '../components/DeployChart.jsx';
 
 test('DeployChart Snapshot', () => {
@@ -8,9 +9,8 @@ test('DeployChart Snapshot', () => {
     "env": "production",
     "number": "798"
   }
-  const component = renderer.create(
-    (<DeployChart params={params} />)
+  const wrapper = mount(
+    <DeployChart params={params} />
   );
-  let tree = component.toJSON();
-  expect(tree).toMatchSnapshot();
+  expect(wrapper).toMatchSnapshot();
 })
