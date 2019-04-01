@@ -17,11 +17,11 @@ const IndicatorStore = Reflux.createStore({
   },
 
   remove(indicator) {
-    this.items = this.items.filter((item) => {
+    this.items = this.items.filter(item => {
       return item !== indicator;
     });
     this.trigger(this.items);
-  }
+  },
 });
 
 export default IndicatorStore;

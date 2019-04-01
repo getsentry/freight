@@ -1,63 +1,62 @@
-import React from "react";
-import {Link} from "react-router";
+import PropTypes from 'prop-types';
+import React from 'react';
+import {Link} from 'react-router';
 
-import api from "../api";
+import api from '../api';
 import Indicators from './Indicators';
 import LoadingIndicator from './LoadingIndicator';
 
-const Layout = React.createClass({
-  childContextTypes: {
-    setHeading: React.PropTypes.func
-  },
+class Layout extends React.Component {
+  static childContextTypes = {
+    setHeading: PropTypes.func,
+  };
+
+  state = {
+    heading: null,
+    appList: null,
+    loading: true,
+    error: false,
+  };
 
   getChildContext() {
     return {
-      setHeading: this.setHeading
+      setHeading: this.setHeading,
     };
-  },
-
-  getInitialState() {
-    return {
-      heading: null,
-      appList: null,
-      loading: true,
-      error: false
-    };
-  },
+  }
 
   componentWillMount() {
     this.fetchData();
-  },
+  }
 
-  setHeading(value) {
+  setHeading = value => {
     this.setState({
-      heading: value
+      heading: value,
     });
-  },
+  };
 
-  fetchData() {
-    api.request("/apps/", {
-      success: (data) => {
+  fetchData = () => {
+    api.request('/apps/', {
+      success: data => {
         this.setState({
           appList: data,
           loading: false,
-          error: false
+          error: false,
         });
       },
       error: () => {
         this.setState({
           loading: false,
-          error: true
+          error: true,
         });
-      }
+      },
     });
-  },
+  };
 
   render() {
     if (this.state.loading) {
       return (
         <div>
-          <div className="container" style={{textAlign: "center"}}>
+          <div className="container" style={{textAlign: 'center'}}>
             <LoadingIndicator>
               <p>Loading application data. Hold on to your pants!</p>
             </LoadingIndicator>
@@ -72,24 +71,26 @@ const Layout = React.createClass({
         <header>
           <div className="container">
             <div className="pull-right">
-              <Link to="/deploy" className="btn btn-sm btn-default">Deploy</Link>
+              <Link to="/deploy" className="btn btn-sm btn-default">
+                Deploy
+              </Link>
             </div>
-            <h1><Link to="/">Freight</Link></h1>
-            {this.state.heading &&
-              <h2>{this.state.heading}</h2>
-            }
+            <h1>
+              <Link to="/">Freight</Link>
+            </h1>
+            {this.state.heading && <h2>{this.state.heading}</h2>}
           </div>
         </header>
         <div className="body">
           <div className="container">
             {React.cloneElement(this.props.children, {
-              appList: this.state.appList
+              appList: this.state.appList,
             })}
           </div>
         </div>
       </div>
     );
   }
-});
+}
 
 export default Layout;

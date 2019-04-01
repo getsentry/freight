@@ -1,27 +1,27 @@
-var jQuery = require("jquery");
+const jQuery = require('jquery');
 
 class Client {
   constructor(options) {
     if (typeof options === 'undefined') {
       options = {};
     }
-    this.baseUrl = options.baseUrl || "/api/0";
+    this.baseUrl = options.baseUrl || '/api/0';
   }
 
   request(path, options) {
-    var query = jQuery.param(options.query || "", true);
-    var method = options.method || (options.data ? "POST" : "GET");
-    var data = options.data;
-    var contentType;
+    const query = jQuery.param(options.query || '', true);
+    const method = options.method || (options.data ? 'POST' : 'GET');
+    let data = options.data;
+    let contentType;
 
-    if (typeof data !== "undefined") {
+    if (typeof data !== 'undefined') {
       data = JSON.stringify(data);
       contentType = 'application/json';
     } else {
       contentType = undefined;
     }
 
-    var fullUrl = this.baseUrl + path;
+    let fullUrl = this.baseUrl + path;
     if (query) {
       if (fullUrl.indexOf('?') !== -1) {
         fullUrl += '&' + query;
@@ -32,12 +32,12 @@ class Client {
 
     jQuery.ajax({
       url: fullUrl,
-      method: method,
-      data: data,
-      contentType: contentType,
+      method,
+      data,
+      contentType,
       success: options.success,
       error: options.error,
-      complete: options.complete
+      complete: options.complete,
     });
   }
 }

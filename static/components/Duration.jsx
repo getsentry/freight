@@ -1,15 +1,16 @@
-var React = require("react");
+const PropTypes = require('prop-types');
+const React = require('react');
 
-var Duration = React.createClass({
-  propTypes: {
-    seconds: React.PropTypes.number.isRequired
-  },
+class Duration extends React.Component {
+  static propTypes = {
+    seconds: PropTypes.number.isRequired,
+  };
 
-  getDuration() {
-    var result, neg;
-    var value = this.props.seconds * 1000;
+  getDuration = () => {
+    let result;
+    let value = this.props.seconds * 1000;
+    const neg = value < 0 ? true : false;
 
-    neg = value < 0 ? true : false;
     if (neg) {
       value = -value;
     }
@@ -31,13 +32,11 @@ var Duration = React.createClass({
     }
 
     return result;
-  },
+  };
 
   render() {
-    return (
-      <span className={this.props.className}>{this.getDuration()}</span>
-    );
+    return <span className={this.props.className}>{this.getDuration()}</span>;
   }
-});
+}
 
 export default Duration;

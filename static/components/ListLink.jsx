@@ -1,41 +1,43 @@
-var React = require("react");
-var Router = require("react-router");
+const PropTypes = require('prop-types');
+const React = require('react');
+const createReactClass = require('create-react-class');
+const Router = require('react-router');
 
-var classSet = require('classnames');
+const classSet = require('classnames');
 
-var ListLink = React.createClass({
+const ListLink = createReactClass({
   displayName: 'ListLink',
 
-  contextTypes: {
-    router: React.PropTypes.object,
+  propTypes: {
+    activeClassName: PropTypes.string.isRequired,
+    to: PropTypes.string.isRequired,
+    params: PropTypes.object,
+    query: PropTypes.object,
+    onClick: PropTypes.func,
   },
 
-  propTypes: {
-    activeClassName: React.PropTypes.string.isRequired,
-    to: React.PropTypes.string.isRequired,
-    params: React.PropTypes.object,
-    query: React.PropTypes.object,
-    onClick: React.PropTypes.func
+  contextTypes: {
+    router: PropTypes.object,
   },
+
+  mixins: [Router.Navigation],
 
   getDefaultProps() {
     return {
-      activeClassName: 'active'
+      activeClassName: 'active',
     };
   },
 
-  mixins: [
-    Router.Navigation,
-  ],
-
   getClassName() {
-    var classNames = {};
+    const classNames = {};
 
-    if (this.props.className)
+    if (this.props.className) {
       classNames[this.props.className] = true;
+    }
 
-    if (this.isActive(this.props.to, this.props.params, this.props.query))
+    if (this.isActive(this.props.to, this.props.params, this.props.query)) {
       classNames[this.props.activeClassName] = true;
+    }
 
     return classSet(classNames);
   },
@@ -43,12 +45,10 @@ var ListLink = React.createClass({
   render() {
     return (
       <li className={this.getClassName()}>
-        <Router.Link {...this.props}>
-          {this.props.children}
-        </Router.Link>
+        <Router.Link {...this.props}>{this.props.children}</Router.Link>
       </li>
     );
-  }
+  },
 });
 
 export default ListLink;

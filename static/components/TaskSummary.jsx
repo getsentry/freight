@@ -1,47 +1,58 @@
+import {browserHistory} from 'react-router';
+import PropTypes from 'prop-types';
 import React from 'react';
-import {Link} from 'react-router';
 import classnames from 'classnames';
+
 import Duration from './Duration';
 import TimeSince from './TimeSince';
 
-import { browserHistory } from 'react-router';
-
-var Progress = React.createClass({
-  propTypes: {
-    value: React.PropTypes.number.isRequired,
-  },
+class Progress extends React.Component {
+  static propTypes = {
+    value: PropTypes.number.isRequired,
+  };
 
   render() {
-    return (
-      <span className="progress" style={{width: this.props.value + '%'}} />
-    );
+    return <span className="progress" style={{width: this.props.value + '%'}} />;
   }
-});
+}
 
-var TaskSummary = React.createClass({
-   contextTypes: {
-    router: React.PropTypes.object.isRequired
-  },
+class TaskSummary extends React.Component {
+  static propTypes = {
+    task: PropTypes.shape({
+      app: PropTypes.shape({
+        name: PropTypes.string,
+      }),
+      environment: PropTypes.string,
+      number: PropTypes.number,
+    }),
+  };
 
-  taskInProgress(task) {
+  static contextTypes = {
+    router: PropTypes.object.isRequired,
+  };
+
+  taskInProgress = task => {
     return task.status == 'in_progress' || task.status == 'pending';
-  },
+  };
 
-  getEstimatedProgress(task) {
+  getEstimatedProgress = task => {
     if (task.dateFinished) {
       return 100;
     }
 
-    var started = new Date(task.dateStarted).getTime();
+    const started = new Date(task.dateStarted).getTime();
     if (!started) {
       return 0;
     }
 
-    var now = Math.max(new Date().getTime(), started);
-    return parseInt(Math.min((now - started) / 1000 / task.estimatedDuration * 100, 95), 10);
-  },
+    const now = Math.max(new Date().getTime(), started);
+    return parseInt(
+      Math.min(((now - started) / 1000 / task.estimatedDuration) * 100, 95),
+      10
+    );
+  };
 
-  getStatusLabel(task) {
+  getStatusLabel = task => {
     switch (task.status) {
       case 'cancelled':
         return 'Cancelled';
@@ -53,21 +64,24 @@ var TaskSummary = React.createClass({
         return 'Pending';
       case 'in_progress':
         return 'In progress';
+      default:
+        return 'Unknown';
     }
-  },
-  gotoTask(e) {
+  };
+
+  gotoTask = e => {
     if (e) {
       e.preventDefault();
     }
 
-    let {app, environment, number} = this.props.task;
+    const {app, environment, number} = this.props.task;
 
     browserHistory.push(`/deploys/${app.name}/${environment}/${number}`);
-  },
+  };
 
   render() {
-    var task = this.props.task;
-    var className = 'deploy';
+    const task = this.props.task;
+    let className = 'deploy';
     if (this.taskInProgress(task)) {
       className += ' active';
     } else {
@@ -80,32 +94,41 @@ var TaskSummary = React.createClass({
     }
 
     return (
-      <div className={classnames(this.props.className, className)}
-           onClick={this.gotoTask}>
+      <div
+        className={classnames(this.props.className, className)}
+        onClick={this.gotoTask}
+      >
         <Progress value={this.getEstimatedProgress(task)} />
-        <h3>
-          {task.name}
-        </h3>
+        <h3>{task.name}</h3>
         <div className="ref">
           <div className="sha">{task.sha.substr(0, 7)}</div>
           {task.ref}
         </div>
         <div className="meta">
-          {task.status == 'pending' &&
-            <small><strong>QUEUED</strong> &mdash; </small>
-          }
-          {task.dateFinished ?
-            <small>{this.getStatusLabel(task)} <TimeSince date={task.dateFinished} /> &mdash; <Duration seconds={task.duration} className="duration" /></small>
-          : (task.dateStarted ?
-            <small>Started <TimeSince date={task.dateStarted} /></small>
-          :
-            <small>Created <TimeSince date={task.dateCreated} /></small>
+          {task.status == 'pending' && (
+            <small>
+              <strong>QUEUED</strong> &mdash;{' '}
+            </small>
+          )}
+          {task.dateFinished ? (
+            <small>
+              {this.getStatusLabel(task)} <TimeSince date={task.dateFinished} /> &mdash;{' '}
+              <Duration seconds={task.duration} className="duration" />
+            </small>
+          ) : task.dateStarted ? (
+            <small>
+              Started <TimeSince date={task.dateStarted} />
+            </small>
+          ) : (
+            <small>
+              Created <TimeSince date={task.dateCreated} />
+            </small>
           )}
           <small> &mdash; by {task.user.name}</small>
         </div>
       </div>
     );
   }
-});
+}
 
 export default TaskSummary;
