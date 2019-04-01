@@ -42,7 +42,7 @@ RUN set -x \
     && apt-get purge -y --auto-remove wget
 
 RUN set -x \
-    && export NODE_VERSION=4.7.0 \
+    && export NODE_VERSION=8.15.1 \
     && export GNUPGHOME="$(mktemp -d)" \
     # gpg keys listed at https://github.com/nodejs/node
     && for key in \
