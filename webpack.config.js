@@ -16,7 +16,7 @@ module.exports = {
     "app": "./main",
     "vendor": [
       "ansi_up",
-      "babel-polyfill",
+      "@babel/polyfill",
       "jquery",
       "moment",
       "react-router"
