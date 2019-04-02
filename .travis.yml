@@ -21,5 +21,5 @@ before_script:
   - psql -c 'create database test_freight;' -U postgres
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
 script:
-  - bin/lint
-  - bin/test
+  - make lint
+  - make test
