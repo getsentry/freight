@@ -11,7 +11,6 @@ from flask_sslify import SSLify
 from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
 from werkzeug.middleware.proxy_fix import ProxyFix
-from flask_webpack import Webpack
 
 from freight.queue import Queue
 from freight.api.controller import ApiController
@@ -24,7 +23,6 @@ heroku = Heroku()
 redis = Redis()
 sentry = Sentry(logging=True, level=logging.WARN)
 queue = Queue()
-webpack = Webpack()
 
 
 def configure_logging(app):
@@ -153,7 +151,6 @@ def create_app(_read_config=True, **config):
     configure_queue(app)
     configure_sqlalchemy(app)
     configure_web_routes(app)
-    configure_webpack(app)
 
     return app
 
@@ -162,6 +159,7 @@ def configure_api(app):
     from freight.api.controller import ApiCatchall
     from freight.api.app_details import AppDetailsApiView
     from freight.api.app_index import AppIndexApiView
+    from freight.api.config import ConfigApiView
     from freight.api.stats import StatsApiView
     from freight.api.deploy_details import DeployDetailsApiView
     from freight.api.deploy_index import DeployIndexApiView
@@ -169,6 +167,7 @@ def configure_api(app):
 
     api.add_resource(AppIndexApiView, '/apps/')
     api.add_resource(AppDetailsApiView, '/apps/<app>/')
+    api.add_resource(ConfigApiView, '/config/')
     api.add_resource(StatsApiView, '/stats/')
     api.add_resource(DeployIndexApiView, '/tasks/',
                      endpoint='deploy-index-deprecated')
@@ -221,11 +220,6 @@ def configure_sqlalchemy(app):
     db.init_app(app)
 
 
-def configure_webpack(app):
-    app.config['WEBPACK_MANIFEST_PATH'] = '../stats.json'
-    webpack.init_app(app)
-
-
 def configure_web_routes(app):
     from freight.web.auth import AuthorizedView, LoginView, LogoutView
     from freight.web.index import IndexView
@@ -250,7 +244,7 @@ def configure_web_routes(app):
         '/auth/complete/',
         view_func=AuthorizedView.as_view(b'authorized', authorized_url='authorized', complete_url='index'))
 
-    index_view = IndexView.as_view(b'index', login_url='login')
+    index_view = IndexView.as_view(b'index', root=static_root)
     app.add_url_rule('/', view_func=index_view)
     app.add_url_rule('/<path:path>', view_func=index_view)
 

@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import {Link} from 'react-router';
+import {init} from '@sentry/browser';
 
 import api from '../api';
 import Indicators from './Indicators';
@@ -35,6 +36,16 @@ class Layout extends React.Component {
   };
 
   fetchData = () => {
+    api.request('/config/', {
+      success: data => {
+        console.log('success', data);
+        if (data && data.SENTRY_PUBLIC_DSN) {
+          init({
+            dsn: data.SENTRY_PUBLIC_DSN,
+          });
+        }
+      },
+    });
     api.request('/apps/', {
       success: data => {
         this.setState({
