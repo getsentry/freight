@@ -105,10 +105,10 @@ module.exports = {
       index: '/static/',
     },
     overlay: true,
-    port: 5555,
+    port: 5000,
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: 'http://localhost:5002',
       },
     },
   },
