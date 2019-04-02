@@ -4,7 +4,6 @@ const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const ManifestPlugin = require('webpack-manifest-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
@@ -60,18 +59,6 @@ module.exports = {
       template: path.join(__dirname + '/templates/index.html'),
     }),
     new CleanWebpackPlugin(),
-    new ManifestPlugin({
-      fileName: '../stats.json',
-      publicPath: '',
-      basePath: '',
-      generate: (seed, files) => ({
-        assets: files.reduce(
-          (manifest, {name, path: p}) => ({...manifest, [name]: p}),
-          seed
-        ),
-        publicPath: '/static/',
-      }),
-    }),
     new MiniCssExtractPlugin({
       filename: 'styles.[chunkhash].css',
       chunkFilename: '[id].css',
