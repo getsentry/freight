@@ -1,50 +1,55 @@
-var React = require("react");
-import ReactDOM from "react-dom";
-import {findDOMNode} from 'react';
+import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
 import ReactDOMServer from 'react-dom/server';
 
-var $ = require("jquery");
-require("bootstrap/js/tooltip");
+const React = require('react');
 
-var TooltipTrigger = React.createClass({
-  propTypes: {
-    title: React.PropTypes.node.isRequired,
-    placement: React.PropTypes.string,
-    viewport: React.PropTypes.shape({
-      selector: React.PropTypes.string,
-      padding: React.PropTypes.number
-    })
-  },
+const $ = require('jquery');
+require('bootstrap/js/tooltip');
 
-  getDefaultProps() {
-    return {
-      placement: "left",
-      viewport: {
-        selector: "body",
-        padding: 5
-      }
-    };
-  },
+class TooltipTrigger extends React.Component {
+  static propTypes = {
+    title: PropTypes.node.isRequired,
+    placement: PropTypes.string,
+    viewport: PropTypes.shape({
+      selector: PropTypes.string,
+      padding: PropTypes.number,
+    }),
+  };
+
+  static defaultProps = {
+    placement: 'left',
+    viewport: {
+      selector: 'body',
+      padding: 5,
+    },
+  };
 
   componentDidMount() {
     // These can be configured via options; this is just a demo
-  $(ReactDOM.findDOMNode(this)).tooltip({
+    $(ReactDOM.findDOMNode(this)).tooltip({
+      // eslint-disable-line
       html: true,
       placement: this.props.placement,
       title: ReactDOMServer.renderToString(this.props.title),
-      viewport: this.props.viewport
+      viewport: this.props.viewport,
     });
-  },
+  }
 
   componentWillUnmount() {
-    var node = $(ReactDOM.findDOMNode(this));
-    node.tooltip("destroy");
-    node.unbind("show.bs.tooltip", "shown.bs.tooltip", "hide.bs.tooltip", "hidden.bs.tooltip");
-  },
+    const node = $(ReactDOM.findDOMNode(this)); // eslint-disable-line
+    node.tooltip('destroy');
+    node.unbind(
+      'show.bs.tooltip',
+      'shown.bs.tooltip',
+      'hide.bs.tooltip',
+      'hidden.bs.tooltip'
+    );
+  }
 
   render() {
     return this.props.children;
   }
-});
+}
 
 export default TooltipTrigger;

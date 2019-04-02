@@ -1,40 +1,39 @@
-var React  = require("react");
-var moment = require("moment");
+import PropTypes from 'prop-types';
+import React from 'react';
+import moment from 'moment';
 
-var TimeSince = React.createClass({
-  propTypes: {
-    date: React.PropTypes.any.isRequired
-  },
+class TimeSince extends React.Component {
+  static propTypes = {
+    date: PropTypes.any.isRequired,
+  };
 
-  componentDidMount: function() {
-    var delay = 2600;
+  componentDidMount() {
+    const delay = 2600;
 
     this.ticker = setInterval(this.ensureValidity, delay);
-  },
+  }
 
-  componentWillUnmount: function() {
+  componentWillUnmount() {
     if (this.ticker) {
       clearInterval(this.ticker);
       this.ticker = null;
     }
-  },
+  }
 
-  ensureValidity: function() {
+  ensureValidity = () => {
     // TODO(dcramer): this should ensure we actually *need* to update the value
     this.forceUpdate();
-  },
+  };
 
-  render: function() {
-    var date = this.props.date;
+  render() {
+    let date = this.props.date;
 
-    if (typeof date === "string" || typeof date === "number") {
+    if (typeof date === 'string' || typeof date === 'number') {
       date = new Date(date);
     }
 
-    return (
-      <time>{moment.utc(date).fromNow()}</time>
-    );
+    return <time>{moment.utc(date).fromNow()}</time>;
   }
-});
+}
 
 export default TimeSince;

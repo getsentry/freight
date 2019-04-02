@@ -1,14 +1,16 @@
-import React from "react";
+import React from 'react';
 
-var RouteNotFound = React.createClass({
+class RouteNotFound extends React.Component {
   render() {
     return (
       <div>
         <h1>Page Not Found</h1>
-        <p className="alert-message notice">The page you are looking for was not found.</p>
+        <p className="alert-message notice">
+          The page you are looking for was not found.
+        </p>
       </div>
     );
   }
-});
+}
 
 export default RouteNotFound;

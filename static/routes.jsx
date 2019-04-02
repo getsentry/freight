@@ -1,15 +1,15 @@
-import React from "react";
-import {Route, IndexRoute} from "react-router";
+import React from 'react';
+import {Route, IndexRoute} from 'react-router';
 
-import AppDetails from "./components/AppDetails";
-import AppSettings from "./components/AppSettings";
-import CreateDeploy from "./components/CreateDeploy";
-import Layout from "./components/Layout";
-import Overview from "./components/Overview";
-import RouteNotFound from "./components/RouteNotFound";
-import TaskDetails from "./components/TaskDetails";
+import AppDetails from './components/AppDetails';
+import AppSettings from './components/AppSettings';
+import CreateDeploy from './components/CreateDeploy';
+import Layout from './components/Layout';
+import Overview from './components/Overview';
+import RouteNotFound from './components/RouteNotFound';
+import TaskDetails from './components/TaskDetails';
 
-var routes = () => {
+const routes = () => {
   return (
     <Route exact path="/" component={Layout}>
       <IndexRoute component={Overview} />
@@ -19,9 +19,7 @@ var routes = () => {
       <Route path="/:app/settings" component={AppSettings} />
       <Route path="/:app/:env/:number" component={TaskDetails} />
       <Route path="/:app" component={AppDetails} />
-      <Route
-       path="*"
-       component={RouteNotFound} />
+      <Route path="*" component={RouteNotFound} />
     </Route>
   );
 };

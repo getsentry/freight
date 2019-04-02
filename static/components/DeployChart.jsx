@@ -1,12 +1,14 @@
 import React from 'react';
 
+import createReactClass from 'create-react-class';
+
 import api from '../api';
 
-import BarChart     from "./BarChart";
+import BarChart from './BarChart';
 import PollingMixin from '../mixins/polling';
-import TaskSummary  from './TaskSummary';
 
-var DeployChart = React.createClass({
+const DeployChart = createReactClass({
+  displayName: 'DeployChart',
   mixins: [PollingMixin],
 
   getInitialState() {
@@ -18,12 +20,12 @@ var DeployChart = React.createClass({
 
   componentWillMount() {
     api.request(this.getPollingUrl(), {
-      success: (data) => {
+      success: data => {
         this.setState({
           points: this.dataToPoints(data),
-          loading: false
+          loading: false,
         });
-      }
+      },
     });
   },
 
@@ -33,12 +35,12 @@ var DeployChart = React.createClass({
 
   pollingReceiveData(data) {
     this.setState({
-      points: this.dataToPoints(data)
+      points: this.dataToPoints(data),
     });
   },
 
   dataToPoints(data) {
-    return data.map((point) => {
+    return data.map(point => {
       return {x: point[0], y: point[1]};
     });
   },
@@ -49,7 +51,7 @@ var DeployChart = React.createClass({
         <BarChart points={this.state.points} label="deploys" />
       </div>
     );
-  }
+  },
 });
 
 export default DeployChart;

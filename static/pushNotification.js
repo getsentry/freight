@@ -1,34 +1,34 @@
+function createNotification(message, url, options) {
+  const notification = new Notification(message, options);
+  notification.onclick = function(event) {
+    event.preventDefault();
+    window.open(url);
+  };
+}
 
-function pushNotification(task, path){
-  let userName = /[^@]*/.exec(task.user.name);
-  let body     = `${userName}'s deploy ${task.status}`;
-  let {hostname, protocol,port} = window.location;
+function pushNotification(task, path) {
+  const userName = /[^@]*/.exec(task.user.name);
+  const body = `${userName}'s deploy ${task.status}`;
+  const {hostname, protocol, port} = window.location;
+  let url;
 
-  if(port !== ''){
-    var url  = `${protocol}//${hostname}:${port}${path}`;
-  }else{
-    var url  = `${protocol}//${hostname}${path}`;
+  if (port !== '') {
+    url = `${protocol}//${hostname}:${port}${path}`;
+  } else {
+    url = `${protocol}//${hostname}${path}`;
   }
 
   const options = {
-    body: body,
-    icon: "/static/favicon.png"
+    body,
+    icon: '/static/favicon.png',
   };
 
-  function createNotification(message, url, options){
-    let notification = new Notification(message, options);
-    notification.onclick = function(event){
-      event.preventDefault();
-      window.open(url);
-    }
-  }
-
-  if(window.Notification && Notification.permission !== 'denied'){
-    Notification.requestPermission(function(permission){
-      if(permission === 'granted'){
+  if (window.Notification && Notification.permission !== 'denied') {
+    Notification.requestPermission(function(permission) {
+      if (permission === 'granted') {
         createNotification(task.name, url, options);
       }
-    })
+    });
   }
 }
 

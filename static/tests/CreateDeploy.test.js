@@ -1,25 +1,24 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import {mount} from 'enzyme';
+
 import CreateDeploy from '../components/CreateDeploy.jsx';
-import { shallow } from 'enzyme';
 
 test('CreateDeploy Snapshot', () => {
-  const appList = [{
-    "environments": {
-      "production": {
-        "defaultRef": "master"
+  const appList = [
+    {
+      environments: {
+        production: {
+          defaultRef: 'master',
+        },
+        staging: {
+          defaultRef: 'HEAD',
+        },
       },
-      "staging": {
-        "defaultRef": "HEAD"
-      },
+      id: '1',
+      name: 'freight',
+      repository: 'https://github.com/getsentry/freight.git',
     },
-    "id": "1",
-    "name": "freight",
-    "repository": "https://github.com/getsentry/freight.git"
-  }];
-  const component = renderer.create(
-    (<CreateDeploy appList={appList} />)
-  );
-  let tree = component.toJSON();
-  expect(tree).toMatchSnapshot();
-})
+  ];
+  const wrapper = mount(<CreateDeploy appList={appList} />);
+  expect(wrapper).toMatchSnapshot();
+});

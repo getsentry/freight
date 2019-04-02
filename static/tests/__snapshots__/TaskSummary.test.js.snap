@@ -1,51 +1,97 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`TaskSummary Snapshot 1`] = `
-<div
-  className="deploy finished"
-  onClick={[Function]}
->
-  <span
-    className="progress"
-    style={
-      Object {
-        "width": "100%",
-      }
+<TaskSummary
+  contextTypes={
+    Object {
+      "router": [Function],
     }
-  />
-  <h3>
-    freight/production
-  </h3>
+  }
+  task={
+    Object {
+      "app": Object {
+        "id": "1",
+        "name": "freight",
+      },
+      "dateCreated": "2017-07-13T18:30:29.941695Z",
+      "dateFinished": "2017-07-13T18:30:45.484661Z",
+      "dateStarted": "2017-07-13T18:30:33.481500Z",
+      "duration": 12,
+      "environment": "production",
+      "estimatedDuration": 12,
+      "id": "797",
+      "name": "freight/production",
+      "number": 791,
+      "ref": "master",
+      "sha": "af56f6bc9843956c3ce92f9e7f9abb8c196340ee",
+      "status": "finished",
+      "user": Object {
+        "dateCreated": "2017-06-21T17:39:22.706427Z",
+        "id": "3",
+        "name": "james.andrews@sentry.io",
+      },
+    }
+  }
+>
   <div
-    className="ref"
+    className="deploy finished"
+    onClick={[Function]}
   >
-    <div
-      className="sha"
+    <Progress
+      value={100}
     >
-      af56f6b
-    </div>
-    master
-  </div>
-  <div
-    className="meta"
-  >
-    <small>
-      Finished
-       
-      <time>
-        4 days ago
-      </time>
-       — 
       <span
-        className="duration"
+        className="progress"
+        style={
+          Object {
+            "width": "100%",
+          }
+        }
+      />
+    </Progress>
+    <h3>
+      freight/production
+    </h3>
+    <div
+      className="ref"
+    >
+      <div
+        className="sha"
       >
-        12 sec
-      </span>
-    </small>
-    <small>
-       — by 
-      james.andrews@sentry.io
-    </small>
+        af56f6b
+      </div>
+      master
+    </div>
+    <div
+      className="meta"
+    >
+      <small>
+        Finished
+         
+        <TimeSince
+          date="2017-07-13T18:30:45.484661Z"
+        >
+          <time>
+            2 years ago
+          </time>
+        </TimeSince>
+         — 
+        <Duration
+          className="duration"
+          seconds={12}
+        >
+          <span
+            className="duration"
+          >
+            12 sec
+          </span>
+        </Duration>
+      </small>
+      <small>
+         — by 
+        james.andrews@sentry.io
+      </small>
+    </div>
   </div>
-</div>
+</TaskSummary>
 `;

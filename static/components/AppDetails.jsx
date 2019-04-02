@@ -1,5 +1,6 @@
+import PropTypes from 'prop-types';
 import React from 'react';
-import Router from 'react-router';
+import createReactClass from 'create-react-class';
 
 import api from '../api';
 
@@ -7,13 +8,14 @@ import LoadingIndicator from './LoadingIndicator';
 import PollingMixin from '../mixins/polling';
 import TaskSummary from './TaskSummary';
 
-
-var AppDetails = React.createClass({
-  mixins: [PollingMixin],
+const AppDetails = createReactClass({
+  displayName: 'AppDetails',
 
   contextTypes: {
-    setHeading: React.PropTypes.func,
+    setHeading: PropTypes.func,
   },
+
+  mixins: [PollingMixin],
 
   getInitialState() {
     return {
@@ -25,19 +27,19 @@ var AppDetails = React.createClass({
 
   componentWillMount() {
     api.request(this.getAppUrl(), {
-      success: (data) => {
+      success: data => {
         this.setState({
-          app: data
+          app: data,
         });
         this.context.setHeading(data.name);
-      }
+      },
     });
     api.request(this.getPollingUrl(), {
-      success: (data) => {
+      success: data => {
         this.setState({
-          tasks: data
+          tasks: data,
         });
-      }
+      },
     });
   },
 
@@ -55,7 +57,7 @@ var AppDetails = React.createClass({
 
   pollingReceiveData(data) {
     this.setState({
-      tasks: data
+      tasks: data,
     });
   },
 
@@ -72,13 +74,13 @@ var AppDetails = React.createClass({
       return <LoadingIndicator />;
     }
 
-    var {app, tasks} = this.state;
-    var activeTaskNodes = [];
-    var pendingTaskNodes = [];
-    var previousTaskNodes = [];
+    const {app, tasks} = this.state;
+    const activeTaskNodes = [];
+    const pendingTaskNodes = [];
+    const previousTaskNodes = [];
 
-    tasks.forEach((task) => {
-      var node = <TaskSummary key={task.id} task={task} />;
+    tasks.forEach(task => {
+      const node = <TaskSummary key={task.id} task={task} />;
       if (this.taskInProgress(task)) {
         activeTaskNodes.unshift(node);
       } else if (this.taskPending(task)) {
@@ -94,19 +96,19 @@ var AppDetails = React.createClass({
           <div className="section-header">
             <h2>{app.name} Deploys</h2>
           </div>
-          {tasks.length ?
+          {tasks.length ? (
             <ul className="task-list">
               {activeTaskNodes}
               {pendingTaskNodes}
               {previousTaskNodes}
             </ul>
-          :
+          ) : (
             <p>There have been no deploys for this app.</p>
-          }
+          )}
         </div>
       </div>
     );
-  }
+  },
 });
 
 export default AppDetails;

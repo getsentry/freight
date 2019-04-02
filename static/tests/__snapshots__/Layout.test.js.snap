@@ -1,21 +1,63 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<Layout /> should render <Layout /> 1`] = `
-<div
-  style={
-    Object {
-      "textAlign": "center",
-    }
+<TaskDetails
+  params={Object {}}
+  task={
+    Array [
+      Object {
+        "task": Object {
+          "app": Object {
+            "id": "1",
+            "name": "freight",
+          },
+          "dateCreated": "2017-07-21T21:40:31.056181Z",
+          "dateFinished": "2017-07-21T21:40:36.546140Z",
+          "dateStarted": "2017-07-21T21:40:33.358422Z",
+          "duration": 3.19,
+          "environment": "production",
+          "estimatedDuration": 3.19,
+          "id": "1115",
+          "name": "freight/production#1108",
+          "number": 1108,
+          "ref": "master",
+          "sha": "af008c78c235feae22f40bf76ed04747028fac6e",
+          "status": "finished",
+        },
+      },
+    ]
   }
 >
-  <LoadingIndicator
+  <div
     style={
       Object {
-        "marginBottom": 20,
+        "textAlign": "center",
       }
     }
   >
-    Loading task details.
-  </LoadingIndicator>
-</div>
+    <LoadingIndicator
+      style={
+        Object {
+          "marginBottom": 20,
+        }
+      }
+    >
+      <div
+        className="loading"
+      >
+        <div
+          className="loading-mask"
+        />
+        <div
+          className="loading-indicator"
+        />
+        <div
+          className="loading-message"
+        >
+          Loading task details.
+        </div>
+      </div>
+    </LoadingIndicator>
+  </div>
+</TaskDetails>
 `;
