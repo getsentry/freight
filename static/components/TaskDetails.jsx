@@ -13,7 +13,6 @@ import PollingMixin from '../mixins/polling';
 import TimeSince from './TimeSince';
 import pushNotification from '../pushNotification';
 
-
 class Progress extends React.Component {
   static propTypes = {
     value: PropTypes.number.isRequired,
@@ -232,7 +231,14 @@ const TaskDetails = createReactClass({
         const timezone = timeMil - offset;
         const newDate = new Date(timezone);
 
-        div.innerHTML = ansi_up.ansi_to_html(linkifyUrls(lineItem[j][k]));
+        div.innerHTML = ansi_up.ansi_to_html(
+          linkifyUrls(lineItem[j][k], {
+            attributes: {
+              target: '_blank',
+              rel: 'noreferrer noopener',
+            },
+          })
+        );
         time.innerHTML = moment(newDate)
           .parseZone()
           .format('h:mm:ss a');
