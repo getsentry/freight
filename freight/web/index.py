@@ -5,8 +5,7 @@ from flask.views import MethodView
 
 
 class IndexView(MethodView):
-    def __init__(self, login_url, root):
-        self.login_url = login_url
+    def __init__(self, root):
         self.root = root
         super(IndexView, self).__init__()
 
