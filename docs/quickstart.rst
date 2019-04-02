@@ -145,6 +145,11 @@ At this point you should have a working installation. To test this, launch the w
 
 You should then be able to access the frontend: http://localhost:5000
 
+Alternatively, if you're looking to develop on the frontend stack as well, you can run:
+
+.. code-block:: bash
+  npm start
+
 
 Creating an Application
 -----------------------

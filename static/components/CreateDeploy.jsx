@@ -10,10 +10,6 @@ class CreateDeploy extends React.Component {
     appList: PropTypes.array,
   };
 
-  static contextTypes = {
-    router: PropTypes.func,
-  };
-
   constructor(props) {
     super(props);
     const appList = props.appList;
