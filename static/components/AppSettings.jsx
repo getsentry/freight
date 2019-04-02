@@ -8,7 +8,6 @@ import LoadingIndicator from './LoadingIndicator';
 class AppSettings extends React.Component {
   static contextTypes = {
     setHeading: PropTypes.func,
-    router: PropTypes.func.isRequired,
   };
 
   state = {

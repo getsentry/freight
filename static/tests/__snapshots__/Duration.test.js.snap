@@ -3,7 +3,7 @@
 exports[`Duration Snapshot 1`] = `
 <Duration
   className="duration"
-  seconds="13.67"
+  seconds={13.67}
 >
   <span
     className="duration"

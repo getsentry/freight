@@ -2,11 +2,6 @@
 
 exports[`TaskSummary Snapshot 1`] = `
 <TaskSummary
-  contextTypes={
-    Object {
-      "router": [Function],
-    }
-  }
   task={
     Object {
       "app": Object {
@@ -75,7 +70,8 @@ exports[`TaskSummary Snapshot 1`] = `
             2 years ago
           </time>
         </TimeSince>
-         — 
+         —
+         
         <Duration
           className="duration"
           seconds={12}

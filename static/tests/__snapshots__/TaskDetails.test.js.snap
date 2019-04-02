@@ -1,27 +1,45 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`TaskDetails Snapshot 1`] = `
-<div
-  style={
+<TaskDetails
+  params={
     Object {
-      "textAlign": "center",
+      "app": "freight",
+      "env": "production",
+      "number": "798",
     }
   }
 >
   <div
-    className="loading"
+    style={
+      Object {
+        "textAlign": "center",
+      }
+    }
   >
-    <div
-      className="loading-mask"
-    />
-    <div
-      className="loading-indicator"
-    />
-    <div
-      className="loading-message"
+    <LoadingIndicator
+      style={
+        Object {
+          "marginBottom": 20,
+        }
+      }
     >
-      Loading task details.
-    </div>
+      <div
+        className="loading"
+      >
+        <div
+          className="loading-mask"
+        />
+        <div
+          className="loading-indicator"
+        />
+        <div
+          className="loading-message"
+        >
+          Loading task details.
+        </div>
+      </div>
+    </LoadingIndicator>
   </div>
-</div>
+</TaskDetails>
 `;

@@ -1,63 +1,36 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`<Layout /> should render <Layout /> 1`] = `
-<TaskDetails
-  params={Object {}}
-  task={
-    Array [
-      Object {
-        "task": Object {
-          "app": Object {
-            "id": "1",
-            "name": "freight",
-          },
-          "dateCreated": "2017-07-21T21:40:31.056181Z",
-          "dateFinished": "2017-07-21T21:40:36.546140Z",
-          "dateStarted": "2017-07-21T21:40:33.358422Z",
-          "duration": 3.19,
-          "environment": "production",
-          "estimatedDuration": 3.19,
-          "id": "1115",
-          "name": "freight/production#1108",
-          "number": 1108,
-          "ref": "master",
-          "sha": "af008c78c235feae22f40bf76ed04747028fac6e",
-          "status": "finished",
-        },
-      },
-    ]
-  }
->
-  <div
-    style={
-      Object {
-        "textAlign": "center",
-      }
-    }
-  >
-    <LoadingIndicator
+<Layout>
+  <div>
+    <div
+      className="container"
       style={
         Object {
-          "marginBottom": 20,
+          "textAlign": "center",
         }
       }
     >
-      <div
-        className="loading"
-      >
+      <LoadingIndicator>
         <div
-          className="loading-mask"
-        />
-        <div
-          className="loading-indicator"
-        />
-        <div
-          className="loading-message"
+          className="loading"
         >
-          Loading task details.
+          <div
+            className="loading-mask"
+          />
+          <div
+            className="loading-indicator"
+          />
+          <div
+            className="loading-message"
+          >
+            <p>
+              Loading application data. Hold on to your pants!
+            </p>
+          </div>
         </div>
-      </div>
-    </LoadingIndicator>
+      </LoadingIndicator>
+    </div>
   </div>
-</TaskDetails>
+</Layout>
 `;

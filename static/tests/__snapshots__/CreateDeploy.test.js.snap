@@ -1,82 +1,108 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`CreateDeploy Snapshot 1`] = `
-<div
-  className="create-deploy"
+<CreateDeploy
+  appList={
+    Array [
+      Object {
+        "environments": Object {
+          "production": Object {
+            "defaultRef": "master",
+          },
+          "staging": Object {
+            "defaultRef": "HEAD",
+          },
+        },
+        "id": "1",
+        "name": "freight",
+        "repository": "https://github.com/getsentry/freight.git",
+      },
+    ]
+  }
 >
   <div
-    className="section"
+    className="create-deploy"
   >
     <div
-      className="section-header"
+      className="section"
     >
-      <h2>
-        Create Deploy
-      </h2>
+      <div
+        className="section-header"
+      >
+        <h2>
+          Create Deploy
+        </h2>
+      </div>
+      <form
+        onSubmit={[Function]}
+      >
+        <div
+          className="form-group"
+        >
+          <label>
+            Application
+          </label>
+          <select
+            className="form-control"
+            onChange={[Function]}
+            value="freight"
+          >
+            <option
+              key="freight"
+            >
+              freight
+            </option>
+          </select>
+        </div>
+        <div
+          className="form-group"
+        >
+          <label>
+            Environment
+          </label>
+          <select
+            className="form-control"
+            onChange={[Function]}
+          >
+            <option
+              key="production"
+            >
+              production
+            </option>
+            <option
+              key="staging"
+            >
+              staging
+            </option>
+          </select>
+        </div>
+        <div
+          className="form-group"
+        >
+          <label>
+            Ref
+          </label>
+          <input
+            className="form-control"
+            onChange={[Function]}
+            placeholder="e.g. master"
+            type="text"
+            value="master"
+          />
+        </div>
+        <div
+          className="submit-group"
+        >
+          <button
+            className="btn btn-primary"
+            disabled={false}
+            type="submit"
+          >
+            Ship It!
+          </button>
+        </div>
+      </form>
     </div>
-    <form
-      onSubmit={[Function]}
-    >
-      <div
-        className="form-group"
-      >
-        <label>
-          Application
-        </label>
-        <select
-          className="form-control"
-          onChange={[Function]}
-          value="freight"
-        >
-          <option>
-            freight
-          </option>
-        </select>
-      </div>
-      <div
-        className="form-group"
-      >
-        <label>
-          Environment
-        </label>
-        <select
-          className="form-control"
-          onChange={[Function]}
-        >
-          <option>
-            production
-          </option>
-          <option>
-            staging
-          </option>
-        </select>
-      </div>
-      <div
-        className="form-group"
-      >
-        <label>
-          Ref
-        </label>
-        <input
-          className="form-control"
-          onChange={[Function]}
-          placeholder="e.g. master"
-          type="text"
-          value="master"
-        />
-      </div>
-      <div
-        className="submit-group"
-      >
-        <button
-          className="btn btn-primary"
-          disabled={false}
-          type="submit"
-        >
-          Ship It!
-        </button>
-      </div>
-    </form>
   </div>
-</div>
+</CreateDeploy>
 `;
