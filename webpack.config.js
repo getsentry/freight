@@ -40,16 +40,6 @@ module.exports = {
           },
         },
       },
-      // inline base64 URLs for <=8k images, direct URLs for the rest
-      {
-        test: /\.(png|jpg)$/,
-        use: {
-          loader: 'url-loader',
-          options: {
-            limit: 8192,
-          },
-        },
-      },
     ],
   },
   plugins: [
