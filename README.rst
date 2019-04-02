@@ -17,10 +17,6 @@ It's not designed to replace something like Heroku, or other PaaS
 services, but rather to work *with* your existing processes, no matter
 what they are.
 
-.. image:: https://www.herokucdn.com/deploy/button.png
-  :alt: Deploy
-  :target: https://heroku.com/deploy
-
 Current Features
 ================
 
