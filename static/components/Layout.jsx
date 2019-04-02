@@ -35,32 +35,56 @@ class Layout extends React.Component {
     });
   };
 
-  fetchData = () => {
-    api.request('/config/', {
-      success: data => {
-        console.log('success', data);
-        if (data && data.SENTRY_PUBLIC_DSN) {
-          init({
-            dsn: data.SENTRY_PUBLIC_DSN,
-          });
-        }
-      },
+  fetchConfig = () => {
+    const error = new Error('Error fetching /config/');
+
+    return new Promise((resolve, reject) => {
+      api.request('/config/', {
+        success: resolve,
+        error: resp => {
+          error.resp = resp;
+          reject(error);
+        },
+      });
     });
-    api.request('/apps/', {
-      success: data => {
-        this.setState({
-          appList: data,
-          loading: false,
-          error: false,
-        });
-      },
-      error: () => {
-        this.setState({
-          loading: false,
-          error: true,
-        });
-      },
+  };
+
+  fetchApps = () => {
+    const error = new Error('Error fetching /apps/');
+
+    return new Promise((resolve, reject) => {
+      api.request('/apps/', {
+        success: resolve,
+        error: resp => {
+          error.resp = resp;
+          reject(error);
+        },
+      });
     });
+  };
+
+  fetchData = async () => {
+    try {
+      const [appList, config] = await Promise.all([this.fetchApps(), this.fetchConfig()]);
+
+      if (config && config.SENTRY_PUBLIC_DSN) {
+        init({
+          dsn: config.SENTRY_PUBLIC_DSN,
+        });
+      }
+
+      this.setState({
+        appList,
+        loading: false,
+        error: false,
+      });
+    } catch (err) {
+      console.error(err); // eslint-disable-line no-console
+      this.setState({
+        loading: false,
+        error: true,
+      });
+    }
   };
 
   render() {
