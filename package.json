@@ -29,7 +29,6 @@
     "@babel/preset-env": "^7.4.2",
     "@babel/preset-react": "^7.0.0",
     "ansi_up": "^1.1.3",
-    "arr-diff": "^1.1.0",
     "babel-loader": "^8.0.5",
     "bootstrap": "~3.3.0",
     "classnames": "^2.2.1",
