@@ -22,7 +22,7 @@ update-submodules:
 	git submodule update
 	@echo ""
 
-test: develop lint-python test-python validate-heroku test-javascript
+test: develop lint-python test-python test-javascript
 
 test-javascript:
 	@echo "--> Running javascript tests"
@@ -38,7 +38,3 @@ lint-python:
 	@echo "--> Linting Python files"
 	bin/lint
 	@echo ""
-
-validate-heroku:
-	@echo "--> Validating app.json"
-	npm run validate-app.json

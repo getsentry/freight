@@ -7,11 +7,9 @@
   },
   "scripts": {
     "test": "jest",
-    "prevalidate-app.json": "npm install",
     "prestart": "npm install",
     "postinstall": "webpack -p",
-    "start": "webpack-dev-server --content-base freight-frontend/",
-    "validate-app.json": "app.json validate"
+    "start": "webpack-dev-server --content-base freight-frontend/"
   },
   "repository": {
     "type": "git",
@@ -68,8 +66,6 @@
     ]
   },
   "devDependencies": {
-    "acorn": "^6.1.1",
-    "app.json": "^1.3.0",
     "babel-eslint": "^10.0.1",
     "babel-jest": "^24.1.0",
     "enzyme": "^3.9.0",
