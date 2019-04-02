@@ -1,5 +1,5 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import {shallow} from 'enzyme';
 import AppSettings from '../components/AppSettings.jsx';
 
 test('AppSettings Snapshot', () => {
@@ -18,7 +18,6 @@ test('AppSettings Snapshot', () => {
       repository: 'https://github.com/getsentry/freight.git',
     },
   ];
-  const component = renderer.create(<AppSettings params={appList} />);
-  const tree = component.toJSON();
-  expect(tree).toMatchSnapshot();
+  const wrapper = shallow(<AppSettings params={appList} />, {context: {}});
+  expect(wrapper).toMatchSnapshot();
 });

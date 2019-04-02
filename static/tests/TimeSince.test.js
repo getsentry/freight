@@ -1,10 +1,9 @@
 import React from 'react';
-import renderer from 'react-test-renderer';
+import {shallow} from 'enzyme';
 import TimeSince from '../components/TimeSince.jsx';
 
 test('TimeSince Snapshot', () => {
   const date = 1482363367071;
-  const component = renderer.create(<TimeSince date={date} />);
-  const tree = component.toJSON();
-  expect(tree).toMatchSnapshot();
+  const wrapper = shallow(<TimeSince date={date} />);
+  expect(wrapper).toMatchSnapshot();
 });

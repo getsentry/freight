@@ -30,11 +30,14 @@ test('TaskSummary Snapshot', () => {
     },
   };
   const context = {
+    context: {
+      router: {},
+    },
     contextTypes: {
       router: PropTypes.object.isRequired,
     },
   };
 
-  const wrapper = mount(<TaskSummary contextTypes={context.contextTypes} task={task} />);
+  const wrapper = mount(<TaskSummary task={task} />, context);
   expect(wrapper).toMatchSnapshot();
 });
