@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from flask import current_app, redirect, url_for
+from flask import current_app
 
 from freight import get_version
 from freight.api.base import ApiView
@@ -13,9 +13,6 @@ class ConfigApiView(ApiView):
         """
         Returns a configuration object
         """
-
-        if not self.is_authorized():
-            return redirect(url_for('login'))
 
         if current_app.config['SENTRY_DSN']:
             parsed = urlparse(current_app.config['SENTRY_DSN'])

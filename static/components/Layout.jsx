@@ -64,15 +64,32 @@ class Layout extends React.Component {
   };
 
   fetchData = async () => {
+    // try to fetch config first
     try {
-      const [appList, config] = await Promise.all([this.fetchApps(), this.fetchConfig()]);
-
-      if (config && config.SENTRY_PUBLIC_DSN) {
+      const config = await this.fetchConfig();
+      if (config?.SENTRY_PUBLIC_DSN) {
         init({
           dsn: config.SENTRY_PUBLIC_DSN,
         });
       }
+    } catch (err) {
+      console.error(err); // eslint-disable-line no-console
 
+      if (err?.resp?.status === 403) {
+        if (err?.resp?.responseJSON?.data?.next) {
+          window.location.assign(err.resp.responseJSON.data.next);
+        }
+        this.setState({
+          loading: false,
+          error: 'Not Authorized',
+        });
+      }
+
+      return;
+    }
+
+    try {
+      const appList = await this.fetchApps();
       this.setState({
         appList,
         loading: false,
@@ -80,6 +97,7 @@ class Layout extends React.Component {
       });
     } catch (err) {
       console.error(err); // eslint-disable-line no-console
+
       this.setState({
         loading: false,
         error: true,
@@ -88,21 +106,12 @@ class Layout extends React.Component {
   };
 
   render() {
-    if (this.state.loading) {
-      return (
-        <div>
-          <div className="container" style={{textAlign: 'center'}}>
-            <LoadingIndicator>
-              <p>Loading application data. Hold on to your pants!</p>
-            </LoadingIndicator>
-          </div>
-        </div>
-      );
-    }
+    const {loading, error, heading, appList} = this.state;
 
     return (
       <div>
         <Indicators />
+
         <header>
           <div className="container">
             <div className="pull-right">
@@ -113,14 +122,26 @@ class Layout extends React.Component {
             <h1>
               <Link to="/">Freight</Link>
             </h1>
-            {this.state.heading && <h2>{this.state.heading}</h2>}
+            {heading && <h2>{heading}</h2>}
           </div>
         </header>
+
         <div className="body">
           <div className="container">
-            {React.cloneElement(this.props.children, {
-              appList: this.state.appList,
-            })}
+            {loading && (
+              <div style={{textAlign: 'center'}}>
+                <LoadingIndicator>
+                  <p>Loading application data. Hold on to your pants!</p>
+                </LoadingIndicator>
+              </div>
+            )}
+
+            {!loading &&
+              (error
+                ? error
+                : React.cloneElement(this.props.children, {
+                    appList,
+                  }))}
           </div>
         </div>
       </div>

@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 import json
 
-from flask import current_app, request, Response
+from flask import current_app, request, Response, url_for
 from flask_restful import Resource
 from urllib import quote
 from hmac import compare_digest
@@ -43,6 +43,10 @@ class ApiView(Resource):
             return self.error(
                 message='You are not authorized.',
                 name='unauthorized',
+                data={
+                    'next': url_for('login')
+                },
+                status_code=403
             )
 
         try:
@@ -61,12 +65,16 @@ class ApiView(Resource):
             db.session.commit()
         return response
 
-    def error(self, message, name=None, status_code=400):
+    def error(self, message, name=None, status_code=400, data=None):
         context = {
             'error': message,
         }
+
         if name:
             context['error_name'] = name
+
+        if data:
+            context['data'] = data
 
         return self.respond(context, status_code=status_code)
 
