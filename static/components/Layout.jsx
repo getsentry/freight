@@ -117,7 +117,8 @@ class Layout extends React.Component {
             <div className="pull-right">
               <Link
                 to="/deploy"
-                className={`btn btn-sm btn-default ${loading && 'btn-disabled'}`}
+                className={`btn btn-sm btn-default ${(loading || error) &&
+                  'btn-disabled'}`}
               >
                 Deploy
               </Link>
