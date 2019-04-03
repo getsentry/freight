@@ -46,7 +46,7 @@ class ApiView(Resource):
                 data={
                     'next': url_for('login')
                 },
-                status_code=403
+                status_code=401
             )
 
         try:

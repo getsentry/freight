@@ -75,7 +75,7 @@ class Layout extends React.Component {
     } catch (err) {
       console.error(err); // eslint-disable-line no-console
 
-      if (err?.resp?.status === 403) {
+      if (err?.resp?.status === 401) {
         if (err?.resp?.responseJSON?.data?.next) {
           window.location.assign(err.resp.responseJSON.data.next);
         }
