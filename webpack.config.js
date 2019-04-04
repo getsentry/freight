@@ -84,7 +84,13 @@ module.exports = {
     overlay: true,
     port: 5000,
     proxy: {
-      '/api': {
+      '/api/*': {
+        target: 'http://localhost:5002',
+      },
+      '/auth/*': {
+        target: 'http://localhost:5002',
+      },
+      '/webhooks/*': {
         target: 'http://localhost:5002',
       },
     },
