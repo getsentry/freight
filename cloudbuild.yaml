@@ -4,7 +4,7 @@ steps:
     args:
       [
         "-c",
-        "docker pull us.gcr.io/$PROJECT_ID/freight:latest || true"
+        "docker pull us.gcr.io/$PROJECT_ID/freight:master || true"
       ]
 
   - name: "gcr.io/cloud-builders/docker"
@@ -12,15 +12,15 @@ steps:
       [
         "build",
         "--pull",
-        "-t", "us.gcr.io/$PROJECT_ID/freight:latest",
+        "-t", "us.gcr.io/$PROJECT_ID/freight:master",
         "-t", "us.gcr.io/$PROJECT_ID/freight:$COMMIT_SHA",
-        "--cache-from", "us.gcr.io/$PROJECT_ID/freight:latest",
+        "--cache-from", "us.gcr.io/$PROJECT_ID/freight:master",
         ".",
       ]
 
 images:
   [
     "us.gcr.io/$PROJECT_ID/freight:$COMMIT_SHA",
-    "us.gcr.io/$PROJECT_ID/freight:latest",
+    "us.gcr.io/$PROJECT_ID/freight:$BRANCH_NAME",
   ]
 timeout: 60m
