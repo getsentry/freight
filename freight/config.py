@@ -140,8 +140,8 @@ def create_app(_read_config=True, **config):
             # FREIGHT_CONF=/etc/freight.conf.py
             app.config.from_envvar('FREIGHT_CONF')
         else:
-            # Look for ~/.freight/freight.conf.py
-            path = os.path.normpath(os.path.expanduser('~/.freight/freight.conf.py'))
+            # Look for ~/.config/freight/freight.conf.py
+            path = os.path.normpath(os.path.expanduser('~/.config/freight/freight.conf.py'))
             app.config.from_pyfile(path, silent=True)
 
     configure_logging(app)
