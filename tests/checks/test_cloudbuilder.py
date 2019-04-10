@@ -101,7 +101,7 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         responses.add(
             responses.GET,
             u"https://storage.googleapis.com/{build_logs}/log-{build_id}.txt".format(
-                build_logs="mycoolproject.cloudbuild-logs.googleusercontent.com",
+                build_logs="mycoolbucket/mycoolproject/",
                 build_id="failed_build_id",
             ),
             body=dedent(failed_log_text),
