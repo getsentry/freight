@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import logging
 import os
 import shlex
@@ -15,7 +13,7 @@ from freight.exceptions import CommandError
 
 
 class Workspace(object):
-    log = logging.getLogger('workspace')
+    log = logging.getLogger("workspace")
 
     def __init__(self, path, log=None):
         self.path = path
@@ -23,42 +21,43 @@ class Workspace(object):
             self.log = log
 
     def whereis(self, program, env):
-        for path in env.get('PATH', '').split(':'):
-            if os.path.exists(os.path.join(path, program)) and \
-               not os.path.isdir(os.path.join(path, program)):
+        for path in env.get("PATH", "").split(":"):
+            if os.path.exists(os.path.join(path, program)) and not os.path.isdir(
+                os.path.join(path, program)
+            ):
                 return os.path.join(path, program)
         return None
 
     def _get_writer(self, pipe):
         if not isinstance(pipe, int):
             pipe = pipe.fileno()
-        return os.fdopen(pipe, 'w')
+        return os.fdopen(pipe, "w")
 
     def _run_process(self, command, *args, **kwargs):
-        stdout = kwargs.get('stdout', sys.stdout)
-        stderr = kwargs.get('stderr', sys.stderr)
+        stdout = kwargs.get("stdout", sys.stdout)
+        stderr = kwargs.get("stderr", sys.stderr)
 
-        kwargs.setdefault('cwd', self.path)
+        kwargs.setdefault("cwd", self.path)
 
-        if isinstance(command, basestring):
+        if isinstance(command, str):
             command = shlex.split(command)
-        command = map(str, command)
+        command = list(map(str, command))
 
         env = os.environ.copy()
-        env['PYTHONUNBUFFERED'] = '1'
-        if kwargs.get('env'):
-            for key, value in kwargs['env'].iteritems():
+        env["PYTHONUNBUFFERED"] = "1"
+        if kwargs.get("env"):
+            for key, value in list(kwargs["env"].items()):
                 env[key] = value
 
-        kwargs['env'] = env
-        kwargs['bufsize'] = 0
+        kwargs["env"] = env
+        kwargs["bufsize"] = 0
 
-        self.log.info('Running {}'.format(command))
+        self.log.info(f"Running {command}")
         try:
             proc = Popen(command, *args, **kwargs)
         except OSError as exc:
             if not self.whereis(command[0], env):
-                msg = 'ERROR: Command not found: {}'.format(command[0])
+                msg = f"ERROR: Command not found: {command[0]}"
             else:
                 msg = traceback.format_exc()
             raise CommandError(command, 1, stdout=None, stderr=msg)
@@ -66,8 +65,8 @@ class Workspace(object):
         return proc
 
     def capture(self, command, *args, **kwargs):
-        kwargs['stdout'] = PIPE
-        kwargs['stderr'] = STDOUT
+        kwargs["stdout"] = PIPE
+        kwargs["stderr"] = STDOUT
         proc = self._run_process(command, *args, **kwargs)
         (stdout, stderr) = proc.communicate()
 
@@ -91,7 +90,6 @@ class Workspace(object):
 class TemporaryWorkspace(Workspace):
     def __init__(self, *args, **kwargs):
         path = os.path.join(
-            current_app.config['WORKSPACE_ROOT'],
-            'freight-workspace-{}'.format(uuid1().hex),
+            current_app.config["WORKSPACE_ROOT"], f"freight-workspace-{uuid1().hex}"
         )
         super(TemporaryWorkspace, self).__init__(path, *args, **kwargs)

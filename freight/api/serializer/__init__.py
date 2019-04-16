@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from .manager import serialize  # NOQA
 
 # TODO(dcramer): we cant seem to use import_submodules here as something is

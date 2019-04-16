@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.schema import Index, UniqueConstraint
 
@@ -19,12 +17,8 @@ class TaskConfigType(object):
         return TYPE_LABELS_REV[label]
 
 
-TYPE_LABELS = {
-    TaskConfigType.deploy: 'deploy',
-}
-TYPE_LABELS_REV = {
-    v: k for k, v in TYPE_LABELS.items()
-}
+TYPE_LABELS = {TaskConfigType.deploy: "deploy"}
+TYPE_LABELS_REV = {v: k for k, v in list(TYPE_LABELS.items())}
 
 
 class TaskConfig(db.Model):
@@ -65,35 +59,34 @@ class TaskConfig(db.Model):
     }
     """
 
-    __tablename__ = 'taskconfig'
+    __tablename__ = "taskconfig"
     __table_args__ = (
-        Index('idx_taskconfig_app_id', 'app_id'),
-        Index('idx_taskconfig_type', 'type'),
-        UniqueConstraint('app_id', 'type', name='unq_app_id_type'),
+        Index("idx_taskconfig_app_id", "app_id"),
+        Index("idx_taskconfig_type", "type"),
+        UniqueConstraint("app_id", "type", name="unq_app_id_type"),
     )
 
     id = Column(Integer, primary_key=True)
-    app_id = Column(Integer, ForeignKey('app.id', ondelete="CASCADE"),
-                    nullable=False)
+    app_id = Column(Integer, ForeignKey("app.id", ondelete="CASCADE"), nullable=False)
     provider = Column(String(64), nullable=False)
     type = Column(Integer)
     data = Column(JSONEncodedDict)
 
     @property
     def checks(self):
-        return self.data.get('checks', [])
+        return self.data.get("checks", [])
 
     @property
     def notifiers(self):
-        return self.data.get('notifiers', [])
+        return self.data.get("notifiers", [])
 
     @property
     def provider_config(self):
-        return self.data.get('provider_config', {})
+        return self.data.get("provider_config", {})
 
     @property
     def environments(self):
-        return self.data.get('environments', {})
+        return self.data.get("environments", {})
 
     @property
     def type_label(self):

@@ -1,20 +1,16 @@
-from __future__ import absolute_import
-
-__all__ = ['build_session', 'delete', 'get', 'post', 'put']
+__all__ = ["build_session", "delete", "get", "post", "put"]
 
 import freight
 import requests
 
 from flask import current_app
 
-USER_AGENT = 'freight/{version} (https://github.com/getsentry/freight)'.format(
-    version=freight.VERSION,
-)
+USER_AGENT = f"freight/{freight.VERSION} (https://github.com/getsentry/freight)"
 
 
 def build_session():
     session = requests.Session()
-    session.headers.update({'User-Agent': USER_AGENT})
+    session.headers.update({"User-Agent": USER_AGENT})
     return session
 
 
@@ -39,7 +35,7 @@ def put(*args, **kwargs):
 
 
 def absolute_uri(path):
-    base = current_app.config['FREIGHT_URL']
-    if path.startswith(('https:', 'http:')):
+    base = current_app.config["FREIGHT_URL"]
+    if path.startswith(("https:", "http:")):
         return path
-    return '{}{}'.format(base, path)
+    return f"{base}{path}"

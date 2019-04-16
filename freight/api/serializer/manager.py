@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-
-__all__ = ['SerializerManager']
+__all__ = ["SerializerManager"]
 
 
 class SerializerManager(object):
@@ -14,6 +12,7 @@ class SerializerManager(object):
         def wrapped(cls):
             self.registry[type] = cls()
             return cls
+
         return wrapped
 
     def get(self, type):
@@ -34,6 +33,7 @@ class SerializerManager(object):
 
         attrs = serializer.get_attrs(item_list=value)
         return [serializer(o, attrs=attrs.get(o, {})) for o in value]
+
 
 default_manager = SerializerManager()
 add = default_manager.add

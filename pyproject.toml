@@ -1,0 +1,17 @@
+[tool.black]
+target-version = ['py37', 'py38']
+include = '\.py$'
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | _build
+  | build
+  | dist
+  | migrations
+  | docs
+  | node_modules
+)/
+'''
+
+

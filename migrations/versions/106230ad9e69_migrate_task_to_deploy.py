@@ -7,8 +7,8 @@ Create Date: 2016-02-17 00:43:21.608658
 """
 
 # revision identifiers, used by Alembic.
-revision = '106230ad9e69'
-down_revision = '16c1b29dc47c'
+revision = "106230ad9e69"
+down_revision = "16c1b29dc47c"
 
 from alembic import op
 import sqlalchemy as sa
@@ -58,49 +58,58 @@ $$ LANGUAGE plpgsql
 
 def upgrade():
     op.create_table(
-        'deploy',
-        sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('task_id', sa.Integer(), nullable=False),
-        sa.Column('app_id', sa.Integer(), nullable=False),
-        sa.Column('environment', sa.String(64), nullable=False),
-        sa.Column('number', sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(['task_id'], ['task.id'], ondelete='CASCADE'),
-        sa.ForeignKeyConstraint(['app_id'], ['app.id'], ondelete='CASCADE'),
-        sa.PrimaryKeyConstraint('id'),
-        sa.UniqueConstraint('task_id', 'app_id', 'environment', 'number', name='unq_deploy_number')
+        "deploy",
+        sa.Column("id", sa.Integer(), nullable=False),
+        sa.Column("task_id", sa.Integer(), nullable=False),
+        sa.Column("app_id", sa.Integer(), nullable=False),
+        sa.Column("environment", sa.String(64), nullable=False),
+        sa.Column("number", sa.Integer(), nullable=False),
+        sa.ForeignKeyConstraint(["task_id"], ["task.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["app_id"], ["app.id"], ondelete="CASCADE"),
+        sa.PrimaryKeyConstraint("id"),
+        sa.UniqueConstraint(
+            "task_id", "app_id", "environment", "number", name="unq_deploy_number"
+        ),
     )
-    op.create_index('idx_deploy_task_id', 'deploy', ['task_id'], unique=False)
-    op.create_index('idx_deploy_app_id', 'deploy', ['app_id'], unique=False)
+    op.create_index("idx_deploy_task_id", "deploy", ["task_id"], unique=False)
+    op.create_index("idx_deploy_app_id", "deploy", ["app_id"], unique=False)
 
     # Migrate the data from Task to Deploy table
     op.execute(MIGRATE_TASK_TO_DEPLOY)
-    op.execute('ALTER TABLE tasksequence RENAME TO deploysequence')
+    op.execute("ALTER TABLE tasksequence RENAME TO deploysequence")
     op.execute(NEXT_VALUE_FUNCTION)
 
-    op.drop_constraint(u'unq_task_number', 'task', type_='unique')
-    op.drop_column(u'task', 'environment')
-    op.drop_column(u'task', 'number')
+    op.drop_constraint("unq_task_number", "task", type_="unique")
+    op.drop_column("task", "environment")
+    op.drop_column("task", "number")
 
-    op.execute('DROP FUNCTION IF EXISTS next_task_number(int, char)')
+    op.execute("DROP FUNCTION IF EXISTS next_task_number(int, char)")
 
 
 def downgrade():
     # Add back Task.number, as nullable
-    op.add_column(u'task', sa.Column('number', sa.INTEGER(), autoincrement=False, nullable=True))
+    op.add_column(
+        "task", sa.Column("number", sa.INTEGER(), autoincrement=False, nullable=True)
+    )
 
     # Migrate data from Deploy table back
     op.execute(MIGRATE_DEPLOY_TO_TASK)
 
     # Make column not nullable
-    op.alter_column(u'task', sa.Column('number', sa.INTEGER(), autoincrement=False, nullable=False))
-    op.create_unique_constraint(u'unq_task_number', 'task', ['app_id', 'environment', 'number'])
+    op.alter_column(
+        "task", sa.Column("number", sa.INTEGER(), autoincrement=False, nullable=False)
+    )
+    op.create_unique_constraint(
+        "unq_task_number", "task", ["app_id", "environment", "number"]
+    )
 
-    op.drop_index('idx_deploy_task_id', table_name='deploy')
-    op.drop_index('idx_deploy_app_id', table_name='deploy')
-    op.drop_table('deploy')
+    op.drop_index("idx_deploy_task_id", table_name="deploy")
+    op.drop_index("idx_deploy_app_id", table_name="deploy")
+    op.drop_table("deploy")
 
-    op.execute('ALTER TABLE deploysequence RENAME TO tasksequence')
-    op.execute("""
+    op.execute("ALTER TABLE deploysequence RENAME TO tasksequence")
+    op.execute(
+        """
 CREATE OR REPLACE FUNCTION next_task_number(int, char) RETURNS int AS $$
 DECLARE
   cur_app_id ALIAS FOR $1;
@@ -125,4 +134,5 @@ BEGIN
     END;
   END LOOP;
 END;
-$$ LANGUAGE plpgsql""")
+$$ LANGUAGE plpgsql"""
+    )

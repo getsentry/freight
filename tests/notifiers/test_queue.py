@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from freight.models import TaskStatus
 from freight.notifiers import NotifierEvent, NotificationQueue
 from freight.testutils import TestCase
@@ -12,25 +10,23 @@ class NotificationQueueTest(TestCase):
         self.app = self.create_app(repository=self.repo)
         self.deploy_config = self.create_taskconfig(app=self.app)
         self.task = self.create_task(
-            app=self.app,
-            user=self.user,
-            status=TaskStatus.finished,
+            app=self.app, user=self.user, status=TaskStatus.finished
         )
 
     def test_simple(self):
         queue = NotificationQueue(delay=0)
         queue.put(
             task=self.task,
-            type='dummy',
-            config={'foo': 'bar'},
+            type="dummy",
+            config={"foo": "bar"},
             event=NotifierEvent.TASK_STARTED,
         )
         result = queue.get()
         assert result == {
-            'task': str(self.task.id),
-            'type': 'dummy',
-            'config': {'foo': 'bar'},
-            'event': NotifierEvent.TASK_STARTED,
+            "task": str(self.task.id),
+            "type": "dummy",
+            "config": {"foo": "bar"},
+            "event": NotifierEvent.TASK_STARTED,
         }
 
         result = queue.get()

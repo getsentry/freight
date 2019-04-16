@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-
-__all__ = ['DummyNotifier']
+__all__ = ["DummyNotifier"]
 
 from .base import Notifier
 

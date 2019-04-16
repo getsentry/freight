@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-
-__all__ = ['GitHubHooks']
+__all__ = ["GitHubHooks"]
 
 from flask import request, Response
 
@@ -13,33 +11,39 @@ class GitHubHooks(Hook):
 
     def deploy(self, app, env):
         payload = request.get_json()
-        event = request.headers.get('X-GitHub-Event')
+        event = request.headers.get("X-GitHub-Event")
 
-        if event != 'push':
+        if event != "push":
             # Gracefully ignore everything except push events
             return self.ok()
 
         default_ref = app.get_default_ref(env)
-        ref = payload['ref']
+        ref = payload["ref"]
 
-        if ref != 'refs/heads/{}'.format(default_ref):
+        if ref != f"refs/heads/{default_ref}":
             return self.ok()
 
-        head_commit = payload['head_commit']
+        head_commit = payload["head_commit"]
         if not head_commit:
             # Deleting a branch is one case, not sure of others
             return self.ok()
 
-        committer = head_commit['committer']
+        committer = head_commit["committer"]
 
         # If the committer is GitHub and the action was triggered from
         # the web UI, ignore it and use the author instead
-        if committer['email'] == 'noreply@github.com' and committer['username'] == 'web-flow':
-            committer = head_commit['author']
+        if (
+            committer["email"] == "noreply@github.com"
+            and committer["username"] == "web-flow"
+        ):
+            committer = head_commit["author"]
 
-        return self.client().post('/api/0/deploys/', data={
-            'env': env,
-            'app': app.name,
-            'ref': head_commit['id'],
-            'user': committer['email'],
-        })
+        return self.client().post(
+            "/api/0/deploys/",
+            data={
+                "env": env,
+                "app": app.name,
+                "ref": head_commit["id"],
+                "user": committer["email"],
+            },
+        )

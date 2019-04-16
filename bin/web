@@ -8,12 +8,10 @@ import sys
 def main(argv=sys.argv[1:]):
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--addr', default='localhost:5000')
-    parser.add_argument('--dev', dest='dev', action='store_true', default=False)
-    parser.add_argument('--debug', dest='debug', action='store_true',
-                        default=False)
-    parser.add_argument('--no-debug', dest='debug', action='store_false',
-                        default=False)
+    parser.add_argument("--addr", default="localhost:5000")
+    parser.add_argument("--dev", dest="dev", action="store_true", default=False)
+    parser.add_argument("--debug", dest="debug", action="store_true", default=False)
+    parser.add_argument("--no-debug", dest="debug", action="store_false", default=False)
 
     args = parser.parse_args(argv)
 
@@ -23,17 +21,17 @@ def main(argv=sys.argv[1:]):
 def web(addr, debug=True, dev=False):
     from freight.config import create_app
 
-    host, port = addr.split(':')
+    host, port = addr.split(":")
     if not host:
-        host = '0.0.0.0'
+        host = "0.0.0.0"
     port = int(port)
-    addr = '{0}:{1}'.format(host, port)
+    addr = f"{host}:{port}"
 
     app = create_app(DEBUG=debug, DEV=dev)
 
-    print("Listening on http://{0}".format(addr))
+    print(f"Listening on http://{addr}".format(addr))
     app.run(host, port)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

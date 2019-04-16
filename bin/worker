@@ -1,12 +1,8 @@
 #!/usr/bin/env python
 
-from __future__ import absolute_import
-
 import argparse
-import os
 import sys
 
-from datetime import datetime
 from rq.worker import logger
 from rq.logutils import setup_loghandlers
 from multiprocessing import Process
@@ -15,38 +11,37 @@ from multiprocessing import Process
 def main(argv=sys.argv[1:]):
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--dev', dest='dev', action='store_true', default=False)
-    parser.add_argument('--debug', dest='debug', action='store_true',
-                        default=False)
-    parser.add_argument('--no-debug', dest='debug', action='store_false',
-                        default=False)
-    parser.add_argument('--no-scheduler', dest='scheduler', action='store_false',
-                        default=True)
-    parser.add_argument('--scheduler', dest='scheduler', action='store_true',
-                        default=True)
-    parser.add_argument('-n', '--num', dest='num', type=int,
-                        default=1)
-    parser.add_argument('-l', '--log-level', dest='log_level')
+    parser.add_argument("--dev", dest="dev", action="store_true", default=False)
+    parser.add_argument("--debug", dest="debug", action="store_true", default=False)
+    parser.add_argument("--no-debug", dest="debug", action="store_false", default=False)
+    parser.add_argument(
+        "--no-scheduler", dest="scheduler", action="store_false", default=True
+    )
+    parser.add_argument(
+        "--scheduler", dest="scheduler", action="store_true", default=True
+    )
+    parser.add_argument("-n", "--num", dest="num", type=int, default=1)
+    parser.add_argument("-l", "--log-level", dest="log_level")
 
     args = parser.parse_args(argv)
 
-    log_level = args.log_level or ('DEBUG' if args.debug else 'INFO')
+    log_level = args.log_level or ("DEBUG" if args.debug else "INFO")
 
     children = []
     for n in range(args.num):
-        children.append(Process(target=worker, kwargs={
-            'debug': args.debug,
-            'log_level': log_level,
-            'dev': args.dev,
-        }))
+        children.append(
+            Process(
+                target=worker,
+                kwargs={"debug": args.debug, "log_level": log_level, "dev": args.dev},
+            )
+        )
 
     if args.scheduler:
         children.append(
-            Process(target=scheduler, kwargs={
-                'debug': args.debug,
-                'log_level': log_level,
-                'dev': args.dev,
-            })
+            Process(
+                target=scheduler,
+                kwargs={"debug": args.debug, "log_level": log_level, "dev": args.dev},
+            )
         )
 
     for process in children:
@@ -56,7 +51,7 @@ def main(argv=sys.argv[1:]):
         process.join()
 
 
-def scheduler(debug=False, interval=None, log_level='INFO', dev=False):
+def scheduler(debug=False, interval=None, log_level="INFO", dev=False):
     from freight.config import create_app, queue
 
     setup_loghandlers(log_level)
@@ -68,7 +63,7 @@ def scheduler(debug=False, interval=None, log_level='INFO', dev=False):
         scheduler.run()
 
 
-def worker(listen=(), debug=True, log_level='INFO', dev=False):
+def worker(listen=(), debug=True, log_level="INFO", dev=False):
     from freight.config import create_app, queue
 
     setup_loghandlers(log_level)
@@ -79,5 +74,5 @@ def worker(listen=(), debug=True, log_level='INFO', dev=False):
         worker.work()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

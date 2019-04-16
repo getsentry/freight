@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import json
 
 from freight.config import db
@@ -15,21 +13,14 @@ class DeployLogBase(TestCase):
         self.deploy_config = self.create_taskconfig(app=self.app)
         self.task = self.create_task(app=self.app, user=self.user)
         self.deploy = self.create_deploy(app=self.app, task=self.task)
-        self.path = '/api/0/deploys/{}/log/'.format(self.deploy.id)
-        self.alt_path = '/api/0/deploys/{}/{}/{}/log/'.format(
-            self.app.name,
-            self.deploy.environment,
-            self.deploy.number,
-        )
+        self.path = f"/api/0/deploys/{self.deploy.id}/log/"
+        self.alt_path = f"/api/0/deploys/{self.app.name}/{self.deploy.environment}/{self.deploy.number}/log/"
 
         offset = 0
-        for char in 'hello world':
-            db.session.add(LogChunk(
-                task_id=self.task.id,
-                text=char,
-                size=len(char),
-                offset=offset,
-            ))
+        for char in "hello world":
+            db.session.add(
+                LogChunk(task_id=self.task.id, text=char, size=len(char), offset=offset)
+            )
             offset += len(char)
         db.session.commit()
 
@@ -41,38 +32,38 @@ class DeployLogTest(DeployLogBase):
         resp = self.client.get(self.path)
         assert resp.status_code == 200
         data = json.loads(resp.data)
-        assert data['nextOffset'] == 11
-        assert ''.join(chunk['text'] for chunk in data['chunks']) == 'hello world'
+        assert data["nextOffset"] == 11
+        assert "".join(chunk["text"] for chunk in data["chunks"]) == "hello world"
 
     def test_alt_path(self):
         resp = self.client.get(self.alt_path)
         assert resp.status_code == 200
         data = json.loads(resp.data)
-        assert data['nextOffset'] == 11
-        assert ''.join(chunk['text'] for chunk in data['chunks']) == 'hello world'
+        assert data["nextOffset"] == 11
+        assert "".join(chunk["text"] for chunk in data["chunks"]) == "hello world"
 
     def test_limit_and_offset(self):
-        resp = self.client.get(self.path + '?limit=1')
+        resp = self.client.get(self.path + "?limit=1")
         assert resp.status_code == 200
         data = json.loads(resp.data)
-        assert data['chunks'][0]['text'] == 'h'
-        assert data['nextOffset'] == 1
+        assert data["chunks"][0]["text"] == "h"
+        assert data["nextOffset"] == 1
 
-        resp = self.client.get(self.path + '?limit=1&offset=1')
+        resp = self.client.get(self.path + "?limit=1&offset=1")
         assert resp.status_code == 200
         data = json.loads(resp.data)
-        assert data['chunks'][0]['text'] == 'e'
-        assert data['nextOffset'] == 2
+        assert data["chunks"][0]["text"] == "e"
+        assert data["nextOffset"] == 2
 
     def test_tail(self):
-        resp = self.client.get(self.path + '?offset=-1&limit=1')
+        resp = self.client.get(self.path + "?offset=-1&limit=1")
         assert resp.status_code == 200
         data = json.loads(resp.data)
-        assert data['chunks'][0]['text'] == 'd'
-        assert data['nextOffset'] == 11
+        assert data["chunks"][0]["text"] == "d"
+        assert data["nextOffset"] == 11
 
-        resp = self.client.get(self.path + '?offset=-1&limit=11')
+        resp = self.client.get(self.path + "?offset=-1&limit=11")
         assert resp.status_code == 200
         data = json.loads(resp.data)
-        assert ''.join(chunk['text'] for chunk in data['chunks']) == 'hello world'
-        assert data['nextOffset'] == 11
+        assert "".join(chunk["text"] for chunk in data["chunks"]) == "hello world"
+        assert data["nextOffset"] == 11

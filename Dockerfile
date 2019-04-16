@@ -1,4 +1,77 @@
-FROM python:2.7.16-jessie
+FROM python:3.7.3
+
+RUN set -ex \
+    \
+    && PYTHON_VERSION=2.7.16 \
+    && wget -O python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz" \
+    && wget -O python.tar.xz.asc "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz.asc" \
+    && export GNUPGHOME="$(mktemp -d)" \
+    && for key in \
+      C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF \
+    ; do \
+      gpg --batch --keyserver hkps://mattrobenolt-keyserver.global.ssl.fastly.net:443 --recv-keys "$key" ; \
+    done \
+    && gpg --batch --verify python.tar.xz.asc python.tar.xz \
+    && gpgconf --kill all \
+    && rm -rf "$GNUPGHOME" python.tar.xz.asc \
+    && mkdir -p /usr/src/python \
+    && tar -xJC /usr/src/python --strip-components=1 -f python.tar.xz \
+    && rm python.tar.xz \
+    \
+    && cd /usr/src/python \
+    && gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
+    && ./configure \
+        --build="$gnuArch" \
+        --enable-shared \
+        --enable-unicode=ucs4 \
+    && make -j "$(nproc)" \
+    && make install \
+    && ldconfig \
+    \
+    && find /usr/local -depth \
+        \( \
+            \( -type d -a \( -name test -o -name tests \) \) \
+            -o \
+            \( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
+        \) -exec rm -rf '{}' + \
+    && rm -rf /usr/src/python \
+    \
+    && python2 --version
+
+RUN set -ex; \
+    \
+    wget -O get-pip.py 'https://bootstrap.pypa.io/get-pip.py'; \
+    \
+    python2 get-pip.py \
+        --disable-pip-version-check \
+        --no-cache-dir \
+        "pip==$PYTHON_PIP_VERSION" \
+    ; \
+    pip2 --version; \
+    \
+    find /usr/local -depth \
+        \( \
+            \( -type d -a \( -name test -o -name tests \) \) \
+            -o \
+            \( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
+        \) -exec rm -rf '{}' +; \
+    rm get-pip.py
+
+RUN set -ex \
+    \
+    && cd /usr/local/bin \
+    && rm python python-config pip \
+    && ln -s python3 python \
+    && ln -s pip3 pip \
+    && ls -Fla /usr/local/bin/p* \
+    && which python  && python -V \
+    && which python2 && python2 -V \
+    && which python3 && python3 -V \
+    && which pip     && pip -V \
+    && which pip2    && pip2 -V \
+    && which pip3    && pip3 -V
+
+RUN pip2 install --no-cache-dir virtualenv
 
 # add our user and group first to make sure their IDs get assigned consistently
 RUN groupadd -r freight && useradd -r -m -g freight freight
@@ -16,46 +89,60 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # grab gosu for easy step-down from root
 RUN set -x \
     && export GOSU_VERSION=1.11 \
-    && apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
+    && fetchDeps=" \
+        dirmngr \
+        gnupg \
+        wget \
+    " \
+    && apt-get update && apt-get install -y --no-install-recommends $fetchDeps && rm -rf /var/lib/apt/lists/* \
     && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
     && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
     && export GNUPGHOME="$(mktemp -d)" \
     && for key in \
       B42F6819007F00F88E364FD4036A9C25BF357DD4 \
     ; do \
-      gpg --batch --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
-      gpg --batch --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
-      gpg --batch --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" ; \
+      gpg --batch --keyserver hkps://mattrobenolt-keyserver.global.ssl.fastly.net:443 --recv-keys "$key" ; \
     done \
     && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
+    && gpgconf --kill all \
     && rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
     && chmod +x /usr/local/bin/gosu \
     && gosu nobody true \
-    && apt-get purge -y --auto-remove wget
+    && apt-get purge -y --auto-remove $fetchDeps
 
 # grab tini for signal processing and zombie killing
 RUN set -x \
     && export TINI_VERSION=0.18.0 \
-    && apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
+    && fetchDeps=" \
+        dirmngr \
+        gnupg \
+        wget \
+    " \
+    && apt-get update && apt-get install -y --no-install-recommends $fetchDeps && rm -rf /var/lib/apt/lists/* \
     && wget -O /usr/local/bin/tini "https://github.com/krallin/tini/releases/download/v$TINI_VERSION/tini" \
     && wget -O /usr/local/bin/tini.asc "https://github.com/krallin/tini/releases/download/v$TINI_VERSION/tini.asc" \
     && export GNUPGHOME="$(mktemp -d)" \
     && for key in \
       595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
     ; do \
-      gpg --batch --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
-      gpg --batch --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
-      gpg --batch --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" ; \
+      gpg --batch --keyserver hkps://mattrobenolt-keyserver.global.ssl.fastly.net:443 --recv-keys "$key" ; \
     done \
     && gpg --batch --verify /usr/local/bin/tini.asc /usr/local/bin/tini \
+    && gpgconf --kill all \
     && rm -r "$GNUPGHOME" /usr/local/bin/tini.asc \
     && chmod +x /usr/local/bin/tini \
     && tini -h \
-    && apt-get purge -y --auto-remove wget
+    && apt-get purge -y --auto-remove $fetchDeps
 
 RUN set -x \
     && export NODE_VERSION=8.15.1 \
     && export GNUPGHOME="$(mktemp -d)" \
+    && fetchDeps=" \
+        dirmngr \
+        gnupg \
+        wget \
+    " \
+    && apt-get update && apt-get install -y --no-install-recommends $fetchDeps && rm -rf /var/lib/apt/lists/* \
     # gpg keys listed at https://github.com/nodejs/node
     && for key in \
       9554F04D7259F04124DE6B476D5A82AC7E37093B \
@@ -67,16 +154,16 @@ RUN set -x \
       B9AE9905FFD7803F25714661B63B535A4C206CA9 \
       C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \
     ; do \
-      gpg --batch --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
+      gpg --batch --keyserver hkps://mattrobenolt-keyserver.global.ssl.fastly.net:443 --recv-keys "$key" ; \
     done \
-    && apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
     && wget "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
     && wget "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
     && gpg --batch --verify SHASUMS256.txt.asc \
+    && gpgconf --kill all \
     && grep " node-v$NODE_VERSION-linux-x64.tar.gz\$" SHASUMS256.txt.asc | sha256sum -c - \
     && tar -xzf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local --strip-components=1 \
     && rm -r "$GNUPGHOME" "node-v$NODE_VERSION-linux-x64.tar.gz" SHASUMS256.txt.asc \
-    && apt-get purge -y --auto-remove wget
+    && apt-get purge -y --auto-remove $fetchDeps
 
 RUN set -x \
     && export REDIS_VERSION=4.0.14 \

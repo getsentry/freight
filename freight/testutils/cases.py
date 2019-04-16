@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-
-__all__ = ['TestCase', 'TransactionTestCase']
+__all__ = ["TestCase", "TransactionTestCase"]
 
 
 import pytest
@@ -33,9 +31,7 @@ class TestCase(unittest.TestCase, Fixtures):
             session.begin_nested()
 
     def setUp(self):
-        self.client = AuthenticatedTestClient(
-            current_app, current_app.response_class
-        )
+        self.client = AuthenticatedTestClient(current_app, current_app.response_class)
         super(TestCase, self).setUp()
 
 
@@ -45,7 +41,5 @@ class TransactionTestCase(unittest.TestCase, Fixtures):
         request.addfinalizer(reset_database)
 
     def setUp(self):
-        self.client = AuthenticatedTestClient(
-            current_app, current_app.response_class
-        )
+        self.client = AuthenticatedTestClient(current_app, current_app.response_class)
         super(TransactionTestCase, self).setUp()

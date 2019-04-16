@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from datetime import datetime
 from sqlalchemy import Column, DateTime, Integer, String
 
@@ -7,7 +5,7 @@ from freight.config import db
 
 
 class User(db.Model):
-    __tablename__ = 'user'
+    __tablename__ = "user"
 
     id = Column(Integer, primary_key=True)
     name = Column(String(200), nullable=False, unique=True)

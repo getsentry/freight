@@ -17,54 +17,51 @@ app_context.push()
 
 
 def get_repo(url):
-    repo = Repository.query.filter(
-        Repository.url == url,
-    ).first()
+    repo = Repository.query.filter(Repository.url == url).first()
     if not repo:
         print("Repository not found")
         sys.exit(1)
 
     return repo
 
-repo_url = os.environ.get('FREIGHT_SSH_REPO')
+
+repo_url = os.environ.get("FREIGHT_SSH_REPO")
 if not repo_url:
     raise ValueError("No 'FREIGHT_SSH_REPO' in environment")
 
 repo = get_repo(repo_url)
 
 SSH_LOG_LEVEL = {
-    'CRITICAL': 'ERROR',
-    'FATAL': 'ERROR',
-    'ERROR': 'ERROR',
-    'WARN': 'INFO',
-    'WARNING': 'INFO',
-    'INFO': 'INFO',
-    'DEBUG': 'DEBUG',
-}[app.config['LOG_LEVEL'].upper()]
+    "CRITICAL": "ERROR",
+    "FATAL": "ERROR",
+    "ERROR": "ERROR",
+    "WARN": "INFO",
+    "WARNING": "INFO",
+    "INFO": "INFO",
+    "DEBUG": "DEBUG",
+}[app.config["LOG_LEVEL"].upper()]
 
 command = [
-    'ssh',
+    "ssh",
     # Not supported in all ssh client versions
     # '-oUserAuthorizedKeysFile=/dev/null',
-    '-oLogLevel={}'.format(SSH_LOG_LEVEL),
-    '-oStrictHostKeyChecking=no',
-    '-oUserKnownHostsFile=/dev/null',
+    "-oLogLevel={}".format(SSH_LOG_LEVEL),
+    "-oStrictHostKeyChecking=no",
+    "-oUserKnownHostsFile=/dev/null",
 ]
 
-if app.config['SSH_PRIVATE_KEY']:
+if app.config["SSH_PRIVATE_KEY"]:
     f = NamedTemporaryFile()
-    f.write(app.config['SSH_PRIVATE_KEY'])
+    f.write(app.config["SSH_PRIVATE_KEY"])
     f.flush()
 
-    command.append('-i{0}'.format(f.name))
+    command.append("-i{0}".format(f.name))
 
-command.append('--')
+command.append("--")
 command.extend(sys.argv[1:])
 
-sys.exit(subprocess.call(
-    command,
-    cwd=os.getcwd(),
-    env=os.environ,
-    stdout=sys.stdout,
-    stderr=sys.stderr,
-))
+sys.exit(
+    subprocess.call(
+        command, cwd=os.getcwd(), env=os.environ, stdout=sys.stdout, stderr=sys.stderr
+    )
+)

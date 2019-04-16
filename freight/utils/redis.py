@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from contextlib import contextmanager
 from flask import current_app
 from random import random
@@ -21,7 +19,7 @@ def lock(conn, lock_key, timeout=3, expire=None, nowait=False):
     got_lock = None
     while not got_lock and attempt < max_attempts:
         pipe = conn.pipeline()
-        pipe.setnx(lock_key, '')
+        pipe.setnx(lock_key, "")
         pipe.expire(lock_key, expire)
         got_lock = pipe.execute()[0]
         if not got_lock:
@@ -30,15 +28,15 @@ def lock(conn, lock_key, timeout=3, expire=None, nowait=False):
             sleep(delay)
             attempt += 1
 
-    current_app.logger.debug('Acquiring lock on %s', lock_key)
+    current_app.logger.debug("Acquiring lock on %s", lock_key)
 
     if not got_lock:
-        raise UnableToGetLock('Unable to fetch lock on %s' % (lock_key,))
+        raise UnableToGetLock(f"Unable to fetch lock on {lock_key}")
 
     try:
         yield
     finally:
-        current_app.logger.debug('Releasing lock on %s', lock_key)
+        current_app.logger.debug("Releasing lock on %s", lock_key)
 
         try:
             conn.delete(lock_key)

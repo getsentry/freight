@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 
-from __future__ import absolute_import
-
 from freight.config import create_app
+
 app = create_app()
 
 app_context = app.app_context()
@@ -22,41 +21,27 @@ fixtures = Fixtures()
 
 def main():
     repo = Repository.query.filter(
-        Repository.url == 'https://github.com/getsentry/freight.git'
+        Repository.url == "https://github.com/getsentry/freight.git"
     ).first()
     if not repo:
-        repo = fixtures.create_repo(
-            url='https://github.com/getsentry/freight.git',
-        )
+        repo = fixtures.create_repo(url="https://github.com/getsentry/freight.git")
 
-    app = App.query.filter(
-        App.name == 'freight',
-    ).first()
+    app = App.query.filter(App.name == "freight").first()
     if not app:
-        app = fixtures.create_app(
-            repository=repo,
-            name='freight',
-            provider='dummy',
-        )
+        app = fixtures.create_app(repository=repo, name="freight", provider="dummy")
 
-    user = User.query.filter(
-        User.name == 'Freight',
-    ).first()
+    user = User.query.filter(User.name == "Freight").first()
     if not user:
-        user = fixtures.create_user(
-            name='Freight',
-        )
+        user = fixtures.create_user(name="Freight")
 
     Task.query.filter(
-        Task.status.in_([TaskStatus.in_progress, TaskStatus.pending]),
-    ).update({
-        'status': TaskStatus.finished,
-        'date_finished': datetime.utcnow(),
-    }, synchronize_session=False)
+        Task.status.in_([TaskStatus.in_progress, TaskStatus.pending])
+    ).update(
+        {"status": TaskStatus.finished, "date_finished": datetime.utcnow()},
+        synchronize_session=False,
+    )
 
-    task_config = TaskConfig.query.filter(
-        TaskConfig.app_id == app.id
-    ).first()
+    task_config = TaskConfig.query.filter(TaskConfig.app_id == app.id).first()
     if not task_config:
         task_config = fixtures.create_taskconfig(app)
 
@@ -64,7 +49,7 @@ def main():
         app=app,
         user=user,
         sha=uuid4().hex,
-        ref='master',
+        ref="master",
         status=TaskStatus.finished,
         date_started=datetime.utcnow() - timedelta(minutes=3),
         date_finished=datetime.utcnow(),
@@ -72,23 +57,15 @@ def main():
 
     offset = 0
     for line in loremipsum.get_sentences(100):
-        line = line + '\n'
-        db.session.add(LogChunk(
-            task_id=task.id,
-            text=line,
-            size=len(line),
-            offset=offset,
-        ))
+        line = line + "\n"
+        db.session.add(
+            LogChunk(task_id=task.id, text=line, size=len(line), offset=offset)
+        )
         offset += len(line)
 
     # add a colored line for ansi tests
-    line = '\033[1;33;40m 33;40  \033[1;33;41m 33;41  \033[1;33;42m 33;42  \033[1;33;43m 33;43  \033[1;33;44m 33;44  \033[1;33;45m 33;45  \033[1;33;46m 33;46  \033[1m\033[0\n\n\033[1;33;42m >> Deploy OK\n'
-    db.session.add(LogChunk(
-        task_id=task.id,
-        text=line,
-        size=len(line),
-        offset=offset,
-    ))
+    line = "\033[1;33;40m 33;40  \033[1;33;41m 33;41  \033[1;33;42m 33;42  \033[1;33;43m 33;43  \033[1;33;44m 33;44  \033[1;33;45m 33;45  \033[1;33;46m 33;46  \033[1m\033[0\n\n\033[1;33;42m >> Deploy OK\n"
+    db.session.add(LogChunk(task_id=task.id, text=line, size=len(line), offset=offset))
     offset += len(line)
 
     db.session.commit()
@@ -97,12 +74,11 @@ def main():
         app=app,
         user=user,
         sha=uuid4().hex,
-        ref='master',
+        ref="master",
         status=TaskStatus.in_progress,
         date_started=datetime.utcnow(),
     )
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import os
 import os.path
 
@@ -12,7 +10,7 @@ class UnknownRevision(CommandError):
 
 
 class Vcs(object):
-    ssh_connect_path = os.path.join(PROJECT_ROOT, 'bin', 'ssh-connect')
+    ssh_connect_path = os.path.join(PROJECT_ROOT, "bin", "ssh-connect")
 
     def __init__(self, workspace, url, username=None):
         self.url = url
@@ -33,13 +31,13 @@ class Vcs(object):
             workspace = self.workspace
 
         if not self.exists(workspace=workspace):
-            kwargs.setdefault('cwd', None)
+            kwargs.setdefault("cwd", None)
 
-        env = kwargs.pop('env', {})
-        for key, value in self.get_default_env().iteritems():
+        env = kwargs.pop("env", {})
+        for key, value in self.get_default_env().items():
             env.setdefault(key, value)
-        env.setdefault('FREIGHT_SSH_REPO', self.url)
-        kwargs['env'] = env
+        env.setdefault("FREIGHT_SSH_REPO", self.url)
+        kwargs["env"] = env
 
         if capture:
             handler = workspace.capture
@@ -47,7 +45,9 @@ class Vcs(object):
             handler = workspace.run
 
         rv = handler(command, *args, **kwargs)
-        if isinstance(rv, basestring):
+        if isinstance(rv, bytes):
+            rv = rv.decode("utf8")
+        if isinstance(rv, str):
             return rv.strip()
         return rv
 

@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from freight.api.serializer import serialize
 from freight.models import TaskStatus
 from freight.testutils import TestCase
@@ -15,11 +13,11 @@ class DeploySerializerTest(TestCase):
         deploy = self.create_deploy(app=app, task=task)
 
         result = serialize(deploy)
-        assert result['id'] == str(deploy.id)
-        assert result['status'] == 'pending'
-        assert result['ref'] == task.ref
-        assert result['sha'] == task.sha
-        assert result['environment'] == deploy.environment
-        assert result['number'] == deploy.number
-        assert result['app']['id'] == str(app.id)
-        assert result['app']['name'] == app.name
+        assert result["id"] == str(deploy.id)
+        assert result["status"] == "pending"
+        assert result["ref"] == task.ref
+        assert result["sha"] == task.sha
+        assert result["environment"] == deploy.environment
+        assert result["number"] == deploy.number
+        assert result["app"]["id"] == str(app.id)
+        assert result["app"]["name"] == app.name

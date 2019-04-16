@@ -1,4 +1,4 @@
-from __future__ import with_statement
+
 from alembic import context
 from logging.config import fileConfig
 
@@ -17,6 +17,7 @@ from freight.config import create_app, db
 
 import warnings
 from sqlalchemy.exc import SAWarning
+
 warnings.simplefilter("ignore", SAWarning)
 
 if not current_app:
@@ -38,15 +39,13 @@ def run_migrations():
 
     """
     connection = db.engine.connect()
-    context.configure(
-        connection=connection,
-        target_metadata=target_metadata,
-    )
+    context.configure(connection=connection, target_metadata=target_metadata)
 
     try:
         with context.begin_transaction():
             context.run_migrations()
     finally:
         connection.close()
+
 
 run_migrations()
