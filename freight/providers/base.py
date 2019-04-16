@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-
-__all__ = ['Provider']
+__all__ = ["Provider"]
 
 from flask import current_app
 from tempfile import NamedTemporaryFile
@@ -10,10 +8,7 @@ class Provider(object):
     name = None
 
     def get_default_options(self):
-        return {
-            'timeout': {},
-            'read_timeout': {},
-        }
+        return {"timeout": {}, "read_timeout": {}}
 
     def get_options(self):
         return {}
@@ -22,11 +17,11 @@ class Provider(object):
         raise NotImplementedError
 
     def get_ssh_key(self):
-        if not current_app.config['SSH_PRIVATE_KEY']:
+        if not current_app.config["SSH_PRIVATE_KEY"]:
             return
 
         f = NamedTemporaryFile()
-        f.write(current_app.config['SSH_PRIVATE_KEY'])
+        f.write(current_app.config["SSH_PRIVATE_KEY"].encode("utf8"))
         f.flush()
         f.seek(0)
 

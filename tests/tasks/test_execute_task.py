@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from freight import vcs
 from freight.config import db, queue
 from freight.models import LogChunk, TaskStatus
@@ -18,22 +16,16 @@ class ExecuteTaskTestCase(TransactionTestCase):
         deploy = self.create_deploy(app=app, task=task)
         db.session.commit()
 
-        workspace = Workspace(
-            path=repo.get_path(),
-        )
+        workspace = Workspace(path=repo.get_path())
 
-        vcs_backend = vcs.get(
-            repo.vcs,
-            url=repo.url,
-            workspace=workspace,
-        )
+        vcs_backend = vcs.get(repo.vcs, url=repo.url, workspace=workspace)
 
         if vcs_backend.exists():
             vcs_backend.update()
         else:
             vcs_backend.clone()
 
-        queue.apply('freight.jobs.execute_deploy', kwargs={'deploy_id': deploy.id})
+        queue.apply("freight.jobs.execute_deploy", kwargs={"deploy_id": deploy.id})
 
         db.session.expire_all()
 
@@ -41,10 +33,12 @@ class ExecuteTaskTestCase(TransactionTestCase):
         assert task.date_finished is not None
         assert task.status == TaskStatus.finished
 
-        logchunks = list(LogChunk.query.filter(
-            LogChunk.task_id == task.id,
-        ).order_by(LogChunk.offset.asc()))
+        logchunks = list(
+            LogChunk.query.filter(LogChunk.task_id == task.id).order_by(
+                LogChunk.offset.asc()
+            )
+        )
 
         assert len(logchunks) >= 1
-        all_text = ''.join(c.text for c in logchunks)
+        all_text = "".join(c.text for c in logchunks)
         assert ">> Running ['/bin/echo', 'helloworld']" in all_text

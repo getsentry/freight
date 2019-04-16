@@ -1,9 +1,7 @@
-from __future__ import absolute_import
-
 from freight.models import Deploy, TaskStatus
 from freight import http
 
-__all__ = ['Notifier', 'NotifierEvent']
+__all__ = ["Notifier", "NotifierEvent"]
 
 
 class NotifierEvent(object):
@@ -44,32 +42,34 @@ class Notifier(object):
         return self.should_send_deploy(deploy, task, config, event)
 
     def should_send_deploy(self, deploy, task, config, event):
-        return event in config.get('events', self.DEFAULT_EVENTS)
+        return event in config.get("events", self.DEFAULT_EVENTS)
 
 
 def generate_event_title(app, deploy, task, user, event):
-    params = {
-        'number': deploy.number,
-        'app_name': app.name,
-        'params': dict(task.params or {}),
-        'env': deploy.environment,
-        'ref': task.ref,
-        'sha': task.sha[:7] if task.sha else task.ref,
-        'status_label': task.status_label,
-        'duration': task.duration,
-        'user': user.name.split('@', 1)[0],  # Usernames can either be 'user' or 'user@example.com'
-        'link': http.absolute_uri('/deploys/{}/{}/{}'.format(app.name, deploy.environment, deploy.number)),
-    }
+    number = deploy.number
+    app_name = app.name
+    params = dict(task.params or {})
+    env = deploy.environment
+    ref = task.ref
+    sha = task.sha[:7] if task.sha else task.ref
+    status_label = task.status_label
+    duration = task.duration
+    user = user.name.split("@", 1)[
+        0
+    ]  # Usernames can either be 'user' or 'user@example.com'
+    link = http.absolute_uri(
+        f"/deploys/{app.name}/{deploy.environment}/{deploy.number}"
+    )
 
     # TODO(dcramer): show the ref when it differs from the sha
     if event == NotifierEvent.TASK_QUEUED:
-        return "[{app_name}/{env}] {user} queued deploy <{link}|#{number}> ({sha})".format(**params)
+        return f"[{app_name}/{env}] {user} queued deploy <{link}|#{number}> ({sha})"
     if event == NotifierEvent.TASK_STARTED:
-        return "[{app_name}/{env}] {user} started deploy <{link}|#{number}> ({sha})".format(**params)
+        return "[{app_name}/{env}] {user} started deploy <{link}|#{number}> ({sha})"
     if task.status == TaskStatus.failed:
-        return "[{app_name}/{env}] Failed to finish {user}'s deploy <{link}|#{number}> ({sha}) after {duration}s".format(**params)
+        return "[{app_name}/{env}] Failed to finish {user}'s deploy <{link}|#{number}> ({sha}) after {duration}s"
     if task.status == TaskStatus.cancelled:
-        return "[{app_name}/{env}] {user}'s deploy <{link}|#{number}> ({sha}) was cancelled after {duration}s".format(**params)
+        return "[{app_name}/{env}] {user}'s deploy <{link}|#{number}> ({sha}) was cancelled after {duration}s"
     if task.status == TaskStatus.finished:
-        return "[{app_name}/{env}] Successfully finished {user}'s deploy <{link}|#{number}> ({sha}) after {duration}s".format(**params)
+        return "[{app_name}/{env}] Successfully finished {user}'s deploy <{link}|#{number}> ({sha}) after {duration}s"
     raise NotImplementedError(task.status)

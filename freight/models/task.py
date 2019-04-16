@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from datetime import datetime
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.schema import Index
@@ -26,30 +24,26 @@ class TaskStatus(object):
 
 
 STATUS_LABELS = {
-    TaskStatus.unknown: 'unknown',
-    TaskStatus.pending: 'pending',
-    TaskStatus.in_progress: 'in_progress',
-    TaskStatus.finished: 'finished',
-    TaskStatus.failed: 'failed',
-    TaskStatus.cancelled: 'cancelled',
+    TaskStatus.unknown: "unknown",
+    TaskStatus.pending: "pending",
+    TaskStatus.in_progress: "in_progress",
+    TaskStatus.finished: "finished",
+    TaskStatus.failed: "failed",
+    TaskStatus.cancelled: "cancelled",
 }
-STATUS_LABELS_REV = {
-    v: k for k, v in STATUS_LABELS.items()
-}
+STATUS_LABELS_REV = {v: k for k, v in list(STATUS_LABELS.items())}
 
 
 class Task(db.Model):
-    __tablename__ = 'task'
+    __tablename__ = "task"
     __table_args__ = (
-        Index('idx_task_app_id', 'app_id'),
-        Index('idx_task_user_id', 'user_id'),
+        Index("idx_task_app_id", "app_id"),
+        Index("idx_task_user_id", "user_id"),
     )
 
     id = Column(Integer, primary_key=True)
-    app_id = Column(Integer, ForeignKey('app.id', ondelete="CASCADE"),
-                    nullable=False)
-    user_id = Column(Integer, ForeignKey('user.id', ondelete="CASCADE"),
-                     nullable=False)
+    app_id = Column(Integer, ForeignKey("app.id", ondelete="CASCADE"), nullable=False)
+    user_id = Column(Integer, ForeignKey("user.id", ondelete="CASCADE"), nullable=False)
     ref = Column(String(128), nullable=False)
     sha = Column(String(40))
     provider = Column(String(64), nullable=False)
@@ -63,26 +57,26 @@ class Task(db.Model):
 
     @property
     def was_forced(self):
-        return self.data.get('force', False)
+        return self.data.get("force", False)
 
     @property
     def checks(self):
-        return self.data.get('checks', [])
+        return self.data.get("checks", [])
 
     @property
     def notifiers(self):
-        return self.data.get('notifiers', [])
+        return self.data.get("notifiers", [])
 
     @property
     def provider_config(self):
-        return self.data.get('provider_config', {})
+        return self.data.get("provider_config", {})
 
     @property
     def status_label(self):
-        return STATUS_LABELS.get(self.status, 'unknown')
+        return STATUS_LABELS.get(self.status, "unknown")
 
     @property
     def duration(self):
         if not (self.date_finished and self.date_started):
             return
-        return float('%.2f' % (self.date_finished - self.date_started).total_seconds())
+        return float("%.2f" % (self.date_finished - self.date_started).total_seconds())

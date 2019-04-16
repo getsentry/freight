@@ -40,3 +40,13 @@ lint-python:
 	@echo "--> Linting Python files"
 	bin/lint
 	@echo ""
+
+format: format-python
+
+format-python:
+	@echo "--> Formatting Python files"
+	python -m black . bin/run-task bin/load-mocks bin/shell bin/ssh-connect bin/web bin/worker bin/load-mocks
+	@echo ""
+
+docker:
+	docker build --pull --rm -t freight .

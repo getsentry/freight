@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from flask_restful import reqparse
 
 from freight.api.base import ApiView
@@ -36,26 +34,30 @@ class DeployDetailsApiView(ApiView, DeployMixin):
         """
         deploy = self._get_deploy(**kwargs)
         if deploy is None:
-            return self.error('Invalid deploy', name='invalid_resource', status_code=404)
+            return self.error(
+                "Invalid deploy", name="invalid_resource", status_code=404
+            )
 
         return self.respond(serialize(deploy))
 
     put_parser = reqparse.RequestParser()
-    put_parser.add_argument('status', choices=('cancelled',))
+    put_parser.add_argument("status", choices=("cancelled",))
 
     def put(self, **kwargs):
         deploy = self._get_deploy(**kwargs)
         if deploy is None:
-            return self.error('Invalid deploy', name='invalid_resource', status_code=404)
+            return self.error(
+                "Invalid deploy", name="invalid_resource", status_code=404
+            )
 
-        with lock(redis, 'deploy:{}'.format(deploy.id), timeout=5):
+        with lock(redis, f"deploy:{deploy.id}", timeout=5):
             # we have to refetch in order to ensure lock state changes
             deploy = Deploy.query.get(deploy.id)
             task = Task.query.get(deploy.task_id)
             args = self.put_parser.parse_args()
             if args.status:
                 assert task.status in (TaskStatus.pending, TaskStatus.in_progress)
-                assert args.status == 'cancelled'
+                assert args.status == "cancelled"
                 did_cancel = task.status == TaskStatus.pending
                 task.status = TaskStatus.cancelled
 

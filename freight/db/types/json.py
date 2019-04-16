@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import json
 
 from collections import MutableMapping
@@ -52,14 +50,15 @@ class JSONEncodedDict(TypeDecorator):
         if value:
             if isinstance(value, MutableDict):
                 value = value.value
-            return unicode(json.dumps(value))
+            return str(json.dumps(value))
 
-        return u'{}'
+        return "{}"
 
     def process_result_value(self, value, dialect):
         if value:
             return json.loads(value)
 
         return {}
+
 
 MutableDict.associate_with(JSONEncodedDict)

@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import freight
 
 from flask import current_app, redirect, request, session, url_for
@@ -10,9 +8,9 @@ from freight.config import db
 from freight.constants import PYTHON_VERSION
 from freight.models import User
 
-GOOGLE_AUTH_URI = 'https://accounts.google.com/o/oauth2/auth'
-GOOGLE_REVOKE_URI = 'https://accounts.google.com/o/oauth2/revoke'
-GOOGLE_TOKEN_URI = 'https://accounts.google.com/o/oauth2/token'
+GOOGLE_AUTH_URI = "https://accounts.google.com/o/oauth2/auth"
+GOOGLE_REVOKE_URI = "https://accounts.google.com/o/oauth2/revoke"
+GOOGLE_TOKEN_URI = "https://accounts.google.com/o/oauth2/token"
 
 
 def get_auth_flow(redirect_uri=None):
@@ -20,18 +18,15 @@ def get_auth_flow(redirect_uri=None):
     # doesn't want you to set redirect_uri as part of the request, which causes
     # a lot of runtime issues.
     auth_uri = GOOGLE_AUTH_URI
-    if current_app.config['GOOGLE_DOMAIN']:
-        auth_uri = auth_uri + '?hd=' + current_app.config['GOOGLE_DOMAIN']
+    if current_app.config["GOOGLE_DOMAIN"]:
+        auth_uri = auth_uri + "?hd=" + current_app.config["GOOGLE_DOMAIN"]
 
     return OAuth2WebServerFlow(
-        client_id=current_app.config['GOOGLE_CLIENT_ID'],
-        client_secret=current_app.config['GOOGLE_CLIENT_SECRET'],
-        scope='https://www.googleapis.com/auth/userinfo.email',
+        client_id=current_app.config["GOOGLE_CLIENT_ID"],
+        client_secret=current_app.config["GOOGLE_CLIENT_SECRET"],
+        scope="https://www.googleapis.com/auth/userinfo.email",
         redirect_uri=redirect_uri,
-        user_agent='freight/{0} (python {1})'.format(
-            freight.VERSION,
-            PYTHON_VERSION,
-        ),
+        user_agent=f"freight/{freight.VERSION} (python {PYTHON_VERSION})",
         auth_uri=auth_uri,
         token_uri=GOOGLE_TOKEN_URI,
         revoke_uri=GOOGLE_REVOKE_URI,
@@ -59,24 +54,22 @@ class AuthorizedView(MethodView):
     def get(self):
         redirect_uri = url_for(self.authorized_url, _external=True)
         flow = get_auth_flow(redirect_uri=redirect_uri)
-        resp = flow.step2_exchange(request.args['code'])
+        resp = flow.step2_exchange(request.args["code"])
 
-        if current_app.config['GOOGLE_DOMAIN']:
-            if resp.id_token.get('hd') != current_app.config['GOOGLE_DOMAIN']:
+        if current_app.config["GOOGLE_DOMAIN"]:
+            if resp.id_token.get("hd") != current_app.config["GOOGLE_DOMAIN"]:
                 # TODO(dcramer): this should show some kind of error
                 return redirect(url_for(self.complete_url))
 
-        user = User.query.filter(
-            User.name == resp.id_token['email'],
-        ).first()
+        user = User.query.filter(User.name == resp.id_token["email"]).first()
         if user is None:
-            user = User(name=resp.id_token['email'])
+            user = User(name=resp.id_token["email"])
             db.session.add(user)
             db.session.flush()
 
-        session['uid'] = user.id
-        session['access_token'] = resp.access_token
-        session['email'] = resp.id_token['email']
+        session["uid"] = user.id
+        session["access_token"] = resp.access_token
+        session["email"] = resp.id_token["email"]
 
         return redirect(url_for(self.complete_url))
 
@@ -87,7 +80,7 @@ class LogoutView(MethodView):
         super(LogoutView, self).__init__()
 
     def get(self):
-        session.pop('uid', None)
-        session.pop('access_token', None)
-        session.pop('email', None)
+        session.pop("uid", None)
+        session.pop("access_token", None)
+        session.pop("email", None)
         return redirect(url_for(self.complete_url))

@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-
-__all__ = ['ShellProvider']
+__all__ = ["ShellProvider"]
 
 from .base import Provider
 from freight.models import App, Deploy
@@ -8,22 +6,18 @@ from freight.models import App, Deploy
 
 class ShellProvider(Provider):
     def get_options(self):
-        return {
-            'command': {'required': True},
-            'env': {'required': False, 'type': dict},
-        }
+        return {"command": {"required": True}, "env": {"required": False, "type": dict}}
 
     def get_command(self, deploy, task, ssh_key):
         params = task.params or {}
 
         app = App.query.get(task.app_id)
-        prev_sha = app.get_previous_sha(
-            deploy.environment, current_sha=task.sha)
+        prev_sha = app.get_previous_sha(deploy.environment, current_sha=task.sha)
 
-        return task.provider_config['command'].format(
+        return task.provider_config["command"].format(
             environment=deploy.environment,
             sha=task.sha,
-            prev_sha=prev_sha or '',
+            prev_sha=prev_sha or "",
             ref=task.ref,
             ssh_key=ssh_key,
             params=params,
@@ -40,6 +34,6 @@ class ShellProvider(Provider):
         command = self.get_command(
             deploy=deploy,
             task=task,
-            ssh_key=ssh_key.name if ssh_key else '~/.ssh/id_rsa',
+            ssh_key=ssh_key.name if ssh_key else "~/.ssh/id_rsa",
         )
-        return workspace.run(command, env=task.provider_config.get('env'))
+        return workspace.run(command, env=task.provider_config.get("env"))

@@ -1,15 +1,16 @@
-sudo: false
+sudo: true
+dist: xenial
 language: python
 services:
   - postgresql
   - redis-server
 python:
-  - "2.7"
+  - "3.7"
 cache:
   directories:
     - "$HOME/.npm"
     - .pip_download_cache
-    - "$HOME/virtualenv/python2.7.9"
+    - "$HOME/virtualenv/python3.7.1"
 env:
   global:
     - PIP_DOWNLOAD_CACHE=".pip_download_cache"

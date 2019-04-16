@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-
-__all__ = ['ProviderManager']
+__all__ = ["ProviderManager"]
 
 from freight.exceptions import InvalidProvider
 

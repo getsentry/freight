@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import json
 
 from time import time
@@ -9,7 +7,7 @@ from freight.config import redis
 
 class NotificationQueue(object):
     delay = 5000  # ms
-    prefix = 'notif'
+    prefix = "notif"
     conn = redis
 
     def __init__(self, conn=None, prefix=None, delay=None):
@@ -21,25 +19,28 @@ class NotificationQueue(object):
             self.delay = delay
 
     def put(self, task, type, config, event):
-        key = '{}:data:{}:{}'.format(self.prefix, type, task.id)
+        key = f"{self.prefix}:data:{type}:{task.id}"
         pipe = self.conn.pipeline()
         # the score represents the time enqueued, thus the debounce time
         # can be controlled after the fact
-        pipe.zadd('{}:queue'.format(self.prefix), key, time())
-        pipe.hmset(key, {
-            'task': task.id,
-            'type': type,
-            'config': json.dumps(config),
-            'event': event,
-        })
+        pipe.zadd(f"{self.prefix}:queue", {key: time()})
+        pipe.hmset(
+            key,
+            {
+                "task": int(task.id),
+                "type": type,
+                "config": json.dumps(config),
+                "event": event,
+            },
+        )
         pipe.execute()
 
     def remove(self, task, type):
-        key = '{}:data:{}:{}'.format(self.prefix, type, task.id)
+        key = f"{self.prefix}:data:{type}:{task.id}"
         pipe = self.conn.pipeline()
         # the score represents the time enqueued, thus the debounce time
         # can be controlled after the fact
-        pipe.zrem('{}:queue'.format(self.prefix), key)
+        pipe.zrem(f"{self.prefix}:queue", key)
         pipe.rem(key)
         pipe.execute()
 
@@ -49,7 +50,7 @@ class NotificationQueue(object):
 
         If no pending items are available, returns None.
         """
-        queue_key = '{}:queue'.format(self.prefix)
+        queue_key = f"{self.prefix}:queue"
         min_s = 0
         max_s = time() - (self.delay / 1000)
 
@@ -62,7 +63,17 @@ class NotificationQueue(object):
         pipe.hgetall(key)
         pipe.delete(key)
         pipe.zrem(queue_key, key)
-        data = pipe.execute()[0]
-        data['config'] = json.loads(data['config'])
-        data['event'] = int(data['event'])
+        data = decode_response(pipe.execute()[0])
+        data["config"] = json.loads(data["config"])
+        data["event"] = int(data["event"])
         return data
+
+
+def decode_response(data):
+    rv = {}
+    for k, v in data.items():
+        k = k.decode("utf8")
+        if isinstance(v, bytes):
+            v = v.decode("utf8")
+        rv[k] = v
+    return rv

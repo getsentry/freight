@@ -1,3 +1,3 @@
 #!/bin/bash -ex
 
-alembic upgrade head
+exec alembic upgrade head

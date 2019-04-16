@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from flask.helpers import send_from_directory
 from flask.views import MethodView
 
@@ -9,8 +7,5 @@ class IndexView(MethodView):
         self.root = root
         super(IndexView, self).__init__()
 
-    def get(self, path=''):
-        return send_from_directory(
-            self.root,
-            "index.html",
-        )
+    def get(self, path=""):
+        return send_from_directory(self.root, "index.html")

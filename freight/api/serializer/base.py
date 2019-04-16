@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-
-__all__ = ['Serializer']
+__all__ = ["Serializer"]
 
 
 class Serializer(object):
@@ -16,4 +14,4 @@ class Serializer(object):
     def format_datetime(self, datetime):
         if not datetime:
             return
-        return datetime.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        return datetime.strftime("%Y-%m-%dT%H:%M:%S.%fZ")

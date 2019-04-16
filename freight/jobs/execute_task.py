@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import logging
 import sys
 import threading
@@ -19,18 +17,21 @@ from freight.utils.redis import lock
 
 @queue.job()
 def execute_deploy(deploy_id):
-    logging.debug('ExecuteDeploy fired with %d active thread(s)',
-                  threading.active_count())
+    logging.debug(
+        "ExecuteDeploy fired with %d active thread(s)", threading.active_count()
+    )
 
-    with lock(redis, 'deploy:{}'.format(deploy_id), timeout=5):
+    with lock(redis, f"deploy:{deploy_id}", timeout=5):
         deploy = Deploy.query.get(deploy_id)
         task = Task.query.get(deploy.task_id)
         if not task:
-            logging.warning('ExecuteDeploy fired with missing Deploy(id=%s)', deploy_id)
+            logging.warning("ExecuteDeploy fired with missing Deploy(id=%s)", deploy_id)
             return
 
         if task.status not in (TaskStatus.pending, TaskStatus.in_progress):
-            logging.warning('ExecuteDeploy fired with finished Deploy(id=%s)', deploy_id)
+            logging.warning(
+                "ExecuteDeploy fired with finished Deploy(id=%s)", deploy_id
+            )
             return
 
         task.date_started = datetime.utcnow()
@@ -43,14 +44,14 @@ def execute_deploy(deploy_id):
     provider_config = task.provider_config
 
     # wipe the log incase this is a retry
-    LogChunk.query.filter(
-        LogChunk.task_id == task.id,
-    ).delete()
+    LogChunk.query.filter(LogChunk.task_id == task.id).delete()
 
     taskrunner = TaskRunner(
         task=task,
-        timeout=provider_config.get('timeout', current_app.config['DEFAULT_TIMEOUT']),
-        read_timeout=provider_config.get('read_timeout', current_app.config['DEFAULT_READ_TIMEOUT']),
+        timeout=provider_config.get("timeout", current_app.config["DEFAULT_TIMEOUT"]),
+        read_timeout=provider_config.get(
+            "read_timeout", current_app.config["DEFAULT_READ_TIMEOUT"]
+        ),
     )
     taskrunner.start()
     taskrunner.wait()
@@ -60,7 +61,7 @@ def execute_deploy(deploy_id):
     db.session.refresh(task)
 
     if task.status in (TaskStatus.pending, TaskStatus.in_progress):
-        logging.error('Task(id=%s) did not finish cleanly', task.id)
+        logging.error("Task(id=%s) did not finish cleanly", task.id)
         task.status = TaskStatus.failed
         task.date_finished = datetime.utcnow()
         db.session.add(task)
@@ -70,7 +71,7 @@ def execute_deploy(deploy_id):
 
 
 def kill_subprocess(process):
-    logging.debug('Sending kill() to process %s', process.pid)
+    logging.debug("Sending kill() to process %s", process.pid)
     process.kill()
 
 
@@ -78,8 +79,9 @@ def forcefully_stop_process(process, timeout=10):
     timer = threading.Timer(timeout, kill_subprocess, args=[process])
     timer.start()
     try:
-        logging.debug('Sending terminate() to process %s (%ds timeout)',
-                      process.pid, timeout)
+        logging.debug(
+            "Sending terminate() to process %s (%ds timeout)", process.pid, timeout
+        )
         process.terminate()
         process.wait()
     finally:
@@ -101,18 +103,20 @@ class LogReporter(threading.Thread):
 
     def save_chunk(self, text):
         # we also want to pipe this to stdout
+        text = text.decode("utf-8", "replace")
         sys.stdout.write(text)
-
-        text = text.decode('utf-8', 'replace')
+        sys.stdout.flush()
         text_len = len(text)
 
         with self.write_lock:
-            db.session.add(LogChunk(
-                task_id=self.task_id,
-                text=text,
-                offset=self.cur_offset,
-                size=text_len,
-            ))
+            db.session.add(
+                LogChunk(
+                    task_id=self.task_id,
+                    text=text,
+                    offset=self.cur_offset,
+                    size=text_len,
+                )
+            )
 
             # we commit immediately to ensure the API can stream logs
             db.session.commit()
@@ -129,7 +133,7 @@ class LogReporter(threading.Thread):
         self.last_recv = time()
         chunk_size = self.chunk_size
         proc = self.process
-        result = ''
+        result = b""
 
         while self.active:
             is_running = proc.poll() is None
@@ -143,7 +147,7 @@ class LogReporter(threading.Thread):
                 result += chunk
                 self.last_recv = time()
                 while len(result) >= chunk_size or (time() - last_write) > flush_time:
-                    newline_pos = result.rfind('\n', 0, chunk_size)
+                    newline_pos = result.rfind(b"\n", 0, chunk_size)
                     if newline_pos == -1:
                         newline_pos = chunk_size
                     else:
@@ -171,11 +175,11 @@ class TaskRunner(object):
     def start(self):
         # TODO(dcramer): we should probably move the log capture up to this
         # level so we *always* get full/correct logs
-        assert not self.active, 'TaskRunner already started'
+        assert not self.active, "TaskRunner already started"
         self.active = True
         self._started = time()
         self._process = Popen(
-            args=['bin/run-task', str(self.task.id)],
+            args=["bin/run-task", str(self.task.id)],
             cwd=PROJECT_ROOT,
             stdout=PIPE,
             stderr=STDOUT,
@@ -192,16 +196,20 @@ class TaskRunner(object):
     # timeout just for them, or assume this timeout includes both and likely
     # still add another timeout for checks
     def _timeout(self):
-        logging.error('Task(id=%s) exceeded time limit of %ds', self.task.id, self.timeout)
+        logging.error(
+            "Task(id=%s) exceeded time limit of %ds", self.task.id, self.timeout
+        )
 
-        logging.debug('Sending terminate() to LogReporter')
+        logging.debug("Sending terminate() to LogReporter")
         self._logreporter.terminate()
 
         forcefully_stop_process(self._process)
 
-        self._logreporter.save_chunk('>> Process exceeded time limit of %ds\n' % self.timeout)
+        self._logreporter.save_chunk(
+            ">> Process exceeded time limit of %ds\n" % self.timeout
+        )
 
-        with lock(redis, 'task:{}'.format(self.task.id), timeout=5):
+        with lock(redis, f"task:{self.task.id}", timeout=5):
             # TODO(dcramer): ideally we could just send the signal to the subprocess
             # so it can still manage the failure state
             self.task.status = TaskStatus.failed
@@ -210,16 +218,22 @@ class TaskRunner(object):
             db.session.commit()
 
     def _read_timeout(self):
-        logging.error('Task(id=%s) did not receive any updates in %ds', self.task.id, self.read_timeout)
+        logging.error(
+            "Task(id=%s) did not receive any updates in %ds",
+            self.task.id,
+            self.read_timeout,
+        )
 
-        logging.debug('Sending terminate() to LogReporter')
+        logging.debug("Sending terminate() to LogReporter")
         self._logreporter.terminate()
 
         forcefully_stop_process(self._process)
 
-        self._logreporter.save_chunk('>> Process did not receive updates in %ds\n' % self.read_timeout)
+        self._logreporter.save_chunk(
+            f">> Process did not receive updates in {self.read_timeout}s\n"
+        )
 
-        with lock(redis, 'task:{}'.format(self.task.id), timeout=5):
+        with lock(redis, f"task:{self.task.id}", timeout=5):
             # TODO(dcramer): ideally we could just send the signal to the subprocess
             # so it can still manage the failure state
             self.task.status = TaskStatus.failed
@@ -228,16 +242,16 @@ class TaskRunner(object):
             db.session.commit()
 
     def _cancel(self):
-        logging.error('Task(id=%s) was cancelled', self.task.id)
+        logging.error("Task(id=%s) was cancelled", self.task.id)
 
-        logging.debug('Sending terminate() to LogReporter')
+        logging.debug("Sending terminate() to LogReporter")
         self._logreporter.terminate()
 
         forcefully_stop_process(self._process)
 
-        self._logreporter.save_chunk('>> Task was cancelled\n')
+        self._logreporter.save_chunk(">> Task was cancelled\n")
 
-        with lock(redis, 'task:{}'.format(self.task.id), timeout=5):
+        with lock(redis, f"task:{self.task.id}", timeout=5):
             # TODO(dcramer): ideally we could just send the signal to the subprocess
             # so it can still manage the failure state
             self.task.date_finished = datetime.utcnow()
@@ -245,11 +259,9 @@ class TaskRunner(object):
             db.session.commit()
 
     def _is_cancelled(self):
-        cur_status = db.session.query(
-            Task.status,
-        ).filter(
-            Task.id == self.task.id,
-        ).scalar()
+        cur_status = (
+            db.session.query(Task.status).filter(Task.id == self.task.id).scalar()
+        )
         return cur_status == TaskStatus.cancelled
 
     def _should_read_timeout(self):
@@ -260,7 +272,7 @@ class TaskRunner(object):
         return self._logreporter.last_recv < time() - self.read_timeout
 
     def wait(self):
-        assert self._process is not None, 'TaskRunner not started'
+        assert self._process is not None, "TaskRunner not started"
         while self.active and self._process.poll() is None:
             if self._is_cancelled():
                 self._cancel()
@@ -271,6 +283,6 @@ class TaskRunner(object):
             if self._process.poll() is None:
                 sleep(0.1)
         self.active = False
-        logging.debug('Waiting for LogReporter to finish')
+        logging.debug("Waiting for LogReporter to finish")
         self._logreporter.join()
         return self._process.returncode

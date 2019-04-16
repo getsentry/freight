@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-
-__all__ = ['GithubNotifier']
+__all__ = ["GithubNotifier"]
 
 from flask import current_app
 
@@ -12,62 +10,53 @@ from .base import Notifier, NotifierEvent
 
 class GithubNotifier(Notifier):
     def get_options(self):
-        return {
-            'repo': {'required': True},
-            'api_root': {'required': False},
-        }
+        return {"repo": {"required": True}, "api_root": {"required": False}}
 
     def send_deploy(self, deploy, task, config, event):
-        token = current_app.config['GITHUB_TOKEN']
+        token = current_app.config["GITHUB_TOKEN"]
         if not token:
-            raise ValueError('GITHUB_TOKEN is not set')
+            raise ValueError("GITHUB_TOKEN is not set")
         headers = {
-            'Accept': 'application/vnd.github.v3+json',
-            'Authorization': 'token {}'.format(token),
+            "Accept": "application/vnd.github.v3+json",
+            "Authorization": f"token {token}",
         }
 
         app = App.query.get(deploy.app_id)
         task = Task.query.get(deploy.task_id)
 
         api_root = (
-            config.get('api_root') or current_app.config['GITHUB_API_ROOT']
-        ).rstrip('/')
+            config.get("api_root") or current_app.config["GITHUB_API_ROOT"]
+        ).rstrip("/")
 
-        url = '{api_root}/repos/{repo}/statuses/{sha}'.format(
-            api_root=api_root,
-            repo=config['repo'],
-            sha=task.sha,
+        url = f"{api_root}/repos/{config['repo']}/statuses/{task.sha}"
+
+        target_url = http.absolute_uri(
+            f"/deploys/{app.name}/{deploy.environment}/{deploy.number}"
         )
 
-        target_url = http.absolute_uri('/deploys/{}/{}/{}'.format(
-            app.name,
-            deploy.environment,
-            deploy.number
-        ))
-
         if event == NotifierEvent.TASK_QUEUED:
-            state = 'pending'
-            description = 'Freight deploy #{number} is currently queued.'
+            state = "pending"
+            description = f"Freight deploy #{deploy.number} is currently queued."
         elif event == NotifierEvent.TASK_STARTED:
-            state = 'pending'
-            description = 'Freight deploy #{number} has started.'
+            state = "pending"
+            description = f"Freight deploy #{deploy.number} has started."
         elif task.status == TaskStatus.failed:
-            state = 'failure'
-            description = 'Freight deploy #{number} has failed.'
+            state = "failure"
+            description = f"Freight deploy #{deploy.number} has failed."
         elif task.status == TaskStatus.cancelled:
-            state = 'error'
-            description = 'Freight deploy #{number} has been cancelled.'
+            state = "error"
+            description = f"Freight deploy #{deploy.number} has been cancelled."
         elif task.status == TaskStatus.finished:
-            state = 'success'
-            description = 'Freight deploy #{number} has finished successfully.'
+            state = "success"
+            description = f"Freight deploy #{deploy.number} has finished successfully."
         else:
             raise NotImplementedError(task.status)
 
         payload = {
-            'state': state,
-            'target_url': target_url,
-            'description': description.format(number=deploy.number),
-            'context': 'continuous-integration/freight/deploy',
+            "state": state,
+            "target_url": target_url,
+            "description": description,
+            "context": "continuous-integration/freight/deploy",
         }
 
         http.post(url, headers=headers, json=payload)

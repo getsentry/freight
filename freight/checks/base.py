@@ -1,14 +1,11 @@
-from __future__ import absolute_import
-
-__all__ = ['Check']
+__all__ = ["Check"]
 
 
 class Check(object):
     required = False
 
     def get_default_options(self):
-        return {
-        }
+        return {}
 
     def get_options(self):
         return {}

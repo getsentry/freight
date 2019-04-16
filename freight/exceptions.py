@@ -1,6 +1,3 @@
-from __future__ import absolute_import
-
-
 class ApiError(Exception):
     def __init__(self, message, name=None, status_code=400):
         self.message = message
@@ -30,12 +27,16 @@ class CommandError(Exception):
 
     def __unicode__(self):
         if self.stdout is not None or self.stderr is not None:
-            return '%s failed with exit code %d:\nSTDOUT: %r\nSTDERR: %r' % (
-                self.cmd, self.retcode, self.stdout, self.stderr)
-        return '%s failed with exit code %d' % (self.cmd, self.retcode)
+            return "%s failed with exit code %d:\nSTDOUT: %r\nSTDERR: %r" % (
+                self.cmd,
+                self.retcode,
+                self.stdout,
+                self.stderr,
+            )
+        return "%s failed with exit code %d" % (self.cmd, self.retcode)
 
     def __str__(self):
-        return self.__unicode__().encode('utf-8')
+        return self.__unicode__().encode("utf-8")
 
 
 class InvalidProvider(KeyError):

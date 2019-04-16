@@ -7,8 +7,8 @@ Create Date: 2015-02-13 20:42:23.762204
 """
 
 # revision identifiers, used by Alembic.
-revision = '2d96d7a132ce'
-down_revision = '4ab62120b303'
+revision = "2d96d7a132ce"
+down_revision = "4ab62120b303"
 
 from alembic import op
 import sqlalchemy as sa
@@ -50,16 +50,16 @@ SELECT app_id, environment, max(id) FROM task GROUP BY app_id, environment
 
 def upgrade():
     op.create_table(
-        'tasksequence',
-        sa.Column('app_id', sa.Integer(), nullable=False),
-        sa.Column('environment', sa.String(64), nullable=False),
-        sa.Column('value', sa.Integer(), server_default=u'0', nullable=False),
-        sa.PrimaryKeyConstraint('app_id', 'environment', 'value')
+        "tasksequence",
+        sa.Column("app_id", sa.Integer(), nullable=False),
+        sa.Column("environment", sa.String(64), nullable=False),
+        sa.Column("value", sa.Integer(), server_default="0", nullable=False),
+        sa.PrimaryKeyConstraint("app_id", "environment", "value"),
     )
     op.execute(NEXT_VALUE_FUNCTION)
     op.execute(ADD_TASK_SEQUENCES)
 
 
 def downgrade():
-    op.execute('DROP FUNCTION IF EXISTS next_task_number(int, char)')
-    op.drop_table('tasksequence')
+    op.execute("DROP FUNCTION IF EXISTS next_task_number(int, char)")
+    op.drop_table("tasksequence")

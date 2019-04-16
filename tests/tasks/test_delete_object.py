@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 from freight.config import db, queue
 from freight.models import App, Task
 from freight.testutils import TestCase
@@ -13,10 +11,9 @@ class DeleteObjectTest(TestCase):
         deploy_config = self.create_taskconfig(app=app)
         task = self.create_task(app=app, user=user)
 
-        queue.apply('freight.jobs.delete_object', kwargs={
-            'model': 'App',
-            'object_id': app.id,
-        })
+        queue.apply(
+            "freight.jobs.delete_object", kwargs={"model": "App", "object_id": app.id}
+        )
 
         db.session.expire_all()
 

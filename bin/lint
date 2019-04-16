@@ -1,3 +1,4 @@
 #!/bin/bash -ex
 
-PYFLAKES_NODOCTEST=1 flake8 freight tests
+export PYFLAKES_NODOCTEST=1
+exec flake8 freight tests

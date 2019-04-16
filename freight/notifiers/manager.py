@@ -1,6 +1,4 @@
-from __future__ import absolute_import
-
-__all__ = ['NotifierManager']
+__all__ = ["NotifierManager"]
 
 from freight.exceptions import InvalidNotifier
 

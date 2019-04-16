@@ -1,5 +1,3 @@
-from __future__ import absolute_import
-
 import json
 from textwrap import dedent
 
@@ -31,12 +29,8 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
                 "builds": [
                     {
                         "id": test_id,
-                        "logUrl": u"https://console.cloud.google.com/gcr/builds/{}?project={}".format(
-                            test_id, self.test_project
-                        ),
-                        "logsBucket": u"gs://{}.cloudbuild-logs.googleusercontent.com".format(
-                            self.test_project
-                        ),
+                        "logUrl": f"https://console.cloud.google.com/gcr/builds/{test_id}?project={self.test_project}",
+                        "logsBucket": f"gs://{self.test_project}.cloudbuild-logs.googleusercontent.com",
                         "status": "SUCCESS",
                     }
                 ]
@@ -44,9 +38,7 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         )
         responses.add(
             responses.GET,
-            u"https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(
-                self.test_project
-            ),
+            f"https://cloudbuild.googleapis.com/v1/projects/{self.test_project}/builds",
             body=body,
         )
 
@@ -62,12 +54,8 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
                 "builds": [
                     {
                         "id": test_id,
-                        "logUrl": u"https://console.cloud.google.com/gcr/builds/{}?project={}".format(
-                            test_id, self.test_project
-                        ),
-                        "logsBucket": u"gs://{}.cloudbuild-logs.googleusercontent.com".format(
-                            self.test_project
-                        ),
+                        "logUrl": f"https://console.cloud.google.com/gcr/builds/{test_id}?project={self.test_project}",
+                        "logsBucket": f"gs://{self.test_project}.cloudbuild-logs.googleusercontent.com",
                         "status": "FAILURE",
                     }
                 ]
@@ -76,9 +64,7 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
 
         responses.add(
             responses.GET,
-            u"https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(
-                self.test_project
-            ),
+            f"https://cloudbuild.googleapis.com/v1/projects/{self.test_project}/builds",
             body=body,
         )
 
@@ -98,12 +84,11 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
 
         MORE LOGS HERE.
         """
+        build_logs = "mycoolproject.cloudbuild-logs.googleusercontent.com"
+        build_id = "failed_build_id"
         responses.add(
             responses.GET,
-            u"https://storage.googleapis.com/{build_logs}/log-{build_id}.txt".format(
-                build_logs="mycoolproject.cloudbuild-logs.googleusercontent.com",
-                build_id="failed_build_id",
-            ),
+            f"https://storage.googleapis.com/{build_logs}/log-{build_id}.txt",
             body=dedent(failed_log_text),
         )
         with pytest.raises(CheckFailed):
@@ -117,12 +102,8 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
                 "builds": [
                     {
                         "id": test_id,
-                        "logUrl": u"https://console.cloud.google.com/gcr/builds/{}?project={}".format(
-                            test_id, self.test_project
-                        ),
-                        "logsBucket": u"gs://{}.cloudbuild-logs.googleusercontent.com".format(
-                            self.test_project
-                        ),
+                        "logUrl": f"https://console.cloud.google.com/gcr/builds/{test_id}?project={self.test_project}",
+                        "logsBucket": f"gs://{self.test_project}.cloudbuild-logs.googleusercontent.com",
                         "status": "WORKING",
                     }
                 ]
@@ -130,9 +111,7 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         )
         responses.add(
             responses.GET,
-            u"https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(
-                self.test_project
-            ),
+            f"https://cloudbuild.googleapis.com/v1/projects/{self.test_project}/builds",
             body=body,
         )
 
@@ -150,12 +129,8 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
                 "builds": [
                     {
                         "id": test_id,
-                        "logUrl": u"https://console.cloud.google.com/gcr/builds/{}?project={}".format(
-                            test_id, self.test_project
-                        ),
-                        "logsBucket": u"gs://{}.cloudbuild-logs.googleusercontent.com".format(
-                            self.test_project
-                        ),
+                        "logUrl": f"https://console.cloud.google.com/gcr/builds/{test_id}?project={self.test_project}",
+                        "logsBucket": f"gs://{self.test_project}.cloudbuild-logs.googleusercontent.com",
                         "status": "STATUS_UNKNOWN",
                     }
                 ]
@@ -163,9 +138,7 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         )
         responses.add(
             responses.GET,
-            u"https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(
-                self.test_project
-            ),
+            f"https://cloudbuild.googleapis.com/v1/projects/{self.test_project}/builds",
             body=body,
         )
 
@@ -183,12 +156,8 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
                 "builds": [
                     {
                         "id": test_id,
-                        "logUrl": u"https://console.cloud.google.com/gcr/builds/{}?project={}".format(
-                            test_id, self.test_project
-                        ),
-                        "logsBucket": u"gs://{}.cloudbuild-logs.googleusercontent.com".format(
-                            self.test_project
-                        ),
+                        "logUrl": f"https://console.cloud.google.com/gcr/builds/{test_id}?project={self.test_project}",
+                        "logsBucket": f"gs://{self.test_project}.cloudbuild-logs.googleusercontent.com",
                         "status": "QUEUED",
                     }
                 ]
@@ -196,9 +165,7 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         )
         responses.add(
             responses.GET,
-            u"https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(
-                self.test_project
-            ),
+            f"https://cloudbuild.googleapis.com/v1/projects/{self.test_project}/builds",
             body=body,
         )
 
@@ -216,12 +183,8 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
                 "builds": [
                     {
                         "id": test_id,
-                        "logUrl": u"https://console.cloud.google.com/gcr/builds/{}?project={}".format(
-                            test_id, self.test_project
-                        ),
-                        "logsBucket": u"gs://{}.cloudbuild-logs.googleusercontent.com".format(
-                            self.test_project
-                        ),
+                        "logUrl": f"https://console.cloud.google.com/gcr/builds/{test_id}?project={self.test_project}",
+                        "logsBucket": f"gs://{self.test_project}.cloudbuild-logs.googleusercontent.com",
                         "status": "INTERNAL_ERROR",
                     }
                 ]
@@ -229,9 +192,7 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         )
         responses.add(
             responses.GET,
-            u"https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(
-                self.test_project
-            ),
+            f"https://cloudbuild.googleapis.com/v1/projects/{self.test_project}/builds",
             body=body,
         )
 
@@ -253,12 +214,8 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
                 "builds": [
                     {
                         "id": test_id,
-                        "logUrl": u"https://console.cloud.google.com/gcr/builds/{}?project={}".format(
-                            test_id, self.test_project
-                        ),
-                        "logsBucket": u"gs://{}.cloudbuild-logs.googleusercontent.com".format(
-                            self.test_project
-                        ),
+                        "logUrl": f"https://console.cloud.google.com/gcr/builds/{test_id}?project={self.test_project}",
+                        "logsBucket": f"gs://{self.test_project}.cloudbuild-logs.googleusercontent.com",
                         "status": "TIMEOUT",
                     }
                 ]
@@ -266,9 +223,7 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         )
         responses.add(
             responses.GET,
-            u"https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(
-                self.test_project
-            ),
+            f"https://cloudbuild.googleapis.com/v1/projects/{self.test_project}/builds",
             body=body,
         )
 
@@ -288,12 +243,8 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
                 "builds": [
                     {
                         "id": test_id,
-                        "logUrl": u"https://console.cloud.google.com/gcr/builds/{}?project={}".format(
-                            test_id, self.test_project
-                        ),
-                        "logsBucket": u"gs://{}.cloudbuild-logs.googleusercontent.com".format(
-                            self.test_project
-                        ),
+                        "logUrl": f"https://console.cloud.google.com/gcr/builds/{test_id}?project={self.test_project}",
+                        "logsBucket": f"gs://{self.test_project}.cloudbuild-logs.googleusercontent.com",
                         "status": "CANCELLED",
                     }
                 ]
@@ -301,9 +252,7 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
         )
         responses.add(
             responses.GET,
-            u"https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(
-                self.test_project
-            ),
+            f"https://cloudbuild.googleapis.com/v1/projects/{self.test_project}/builds",
             body=body,
         )
 
@@ -318,9 +267,7 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
 
         responses.add(
             responses.GET,
-            u"https://cloudbuild.googleapis.com/v1/projects/{}/builds".format(
-                self.test_project
-            ),
+            f"https://cloudbuild.googleapis.com/v1/projects/{self.test_project}/builds",
             status=400,
         )
 

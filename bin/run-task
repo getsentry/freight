@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 # TODO(dcramer): this needs abstracted into another Python helper and this file
 # should simply be a shell around calling that (it will ensure easier testing)
-from __future__ import absolute_import
 
 import logging
-import os
 import sys
 
 from datetime import datetime
@@ -19,12 +17,12 @@ from freight.utils.logging import ColoredFormatter
 from freight.utils.redis import lock
 from freight.utils.workspace import TemporaryWorkspace, Workspace
 
-INFO_CHECK_FINISHED = 'Check has passed: {check}'
-INFO_CHECK_SKIPPED = 'Check was skipped due to force: {check}'
+INFO_CHECK_FINISHED = "Check has passed: {check}"
+INFO_CHECK_SKIPPED = "Check was skipped due to force: {check}"
 
-INFO_CHECK_PENDING = 'Waiting on check {check}:\n  {message}'
-INFO_CHECK_STALE = 'Check {check} has spent {timer}s in its current state.'
-ERR_CHECK_FAILED = 'Task cancelled due to failing check {check}:\n  {message}'
+INFO_CHECK_PENDING = "Waiting on check {check}:\n  {message}"
+INFO_CHECK_STALE = "Check {check} has spent {timer}s in its current state."
+ERR_CHECK_FAILED = "Task cancelled due to failing check {check}:\n  {message}"
 
 
 def checks_are_passing(app, task, log):
@@ -40,50 +38,47 @@ def checks_are_passing(app, task, log):
     while pending_checks:
         for check_id in set(pending_checks):
             check_config = checks_with_ids[check_id]
-            check = checks.get(check_config['type'])
+            check = checks.get(check_config["type"])
             # Forced tasks still need to go through checks
             # to make sure none of them are required.
             if task.was_forced and not check.required:
                 pending_checks.remove(check_id)
 
-                log.info(INFO_CHECK_SKIPPED.format(
-                    check=check_config['type'],
-                ))
+                log.info(INFO_CHECK_SKIPPED.format(check=check_config["type"]))
             else:
                 try:
-                    check.check(app, task.sha, check_config['config'])
+                    check.check(app, task.sha, check_config["config"])
 
                 except CheckPending as e:
-                    if check_config['type'] not in announced_checks:
-                        log.info(INFO_CHECK_PENDING.format(
-                            check=check_config['type'],
-                            message=unicode(e),
-                        ))
-                        announced_checks.add(check_config['type'])
+                    if check_config["type"] not in announced_checks:
+                        log.info(
+                            INFO_CHECK_PENDING.format(
+                                check=check_config["type"], message=str(e)
+                            )
+                        )
+                        announced_checks.add(check_config["type"])
 
                 except CheckError as e:
-                    log.error(ERR_CHECK_FAILED.format(
-                        check=check_config['type'],
-                        message=unicode(e),
-                    ))
+                    log.error(
+                        ERR_CHECK_FAILED.format(
+                            check=check_config["type"], message=str(e)
+                        )
+                    )
                     return False
 
                 else:
                     pending_checks.remove(check_id)
 
-                    log.info(INFO_CHECK_FINISHED.format(
-                        check=check_config['type'],
-                    ))
+                    log.info(INFO_CHECK_FINISHED.format(check=check_config["type"]))
 
         if pending_checks:
             sleep(interval)
             timer += interval
             # Report that we're still waiting after ten intervals.
             if not timer % (interval * 10):
-                log.info(INFO_CHECK_STALE.format(
-                    check=check_config['type'],
-                    timer=timer,
-                ))
+                log.info(
+                    INFO_CHECK_STALE.format(check=check_config["type"], timer=timer)
+                )
 
     return True
 
@@ -91,7 +86,7 @@ def checks_are_passing(app, task, log):
 def main(task_id, log):
     task = Task.query.get(task_id)
     if not task:
-        raise ValueError('Task(id=%s) not found' % task_id)
+        raise ValueError(f"Task(id={task_id}) not found")
 
     app = App.query.filter(App.id == task.app_id).first()
     repo = Repository.query.filter(Repository.id == app.repository_id).first()
@@ -110,18 +105,11 @@ def main(task_id, log):
 
     provider = providers.get(task.provider)
 
-    repo_home = Workspace(
-        path=repo.get_path(),
-        log=log,
-    )
+    repo_home = Workspace(path=repo.get_path(), log=log)
 
-    vcs_backend = vcs.get(
-        repo.vcs,
-        url=repo.url,
-        workspace=repo_home,
-    )
+    vcs_backend = vcs.get(repo.vcs, url=repo.url, workspace=repo_home)
 
-    with lock(redis, 'repo:update:{}'.format(repo.id)):
+    with lock(redis, f"repo:update:{repo.id}"):
         vcs_backend.clone_or_update()
 
     workspace = TemporaryWorkspace(log=log)
@@ -132,7 +120,7 @@ def main(task_id, log):
         try:
             provider.execute(workspace, task)
         except Exception as exc:
-            current_app.logger.exception(unicode(exc))
+            current_app.logger.exception(str(exc))
             task.status = TaskStatus.failed
         else:
             task.status = TaskStatus.finished
@@ -141,24 +129,25 @@ def main(task_id, log):
         db.session.commit()
     except Exception:
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
     finally:
         workspace.remove()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # add workspace explicit handler
     handler = logging.StreamHandler()
-    handler.setFormatter(ColoredFormatter('>> %(message)s'))
+    handler.setFormatter(ColoredFormatter(">> %(message)s"))
 
-    log = logging.getLogger('freight')
+    log = logging.getLogger("freight")
     log.addHandler(handler)
     log.setLevel(logging.INFO)
 
     # remove buffering on stdout/stderr
-    sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-    sys.stderr = os.fdopen(sys.stderr.fileno(), 'w', 0)
+    # sys.stdout = os.fdopen(sys.stdout.fileno(), "wb", 0)
+    # sys.stderr = os.fdopen(sys.stderr.fileno(), "wb", 0)
 
     app = create_app()
     with app.app_context():
