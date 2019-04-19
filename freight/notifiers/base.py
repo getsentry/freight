@@ -65,11 +65,11 @@ def generate_event_title(app, deploy, task, user, event):
     if event == NotifierEvent.TASK_QUEUED:
         return f"[{app_name}/{env}] {user} queued deploy <{link}|#{number}> ({sha})"
     if event == NotifierEvent.TASK_STARTED:
-        return "[{app_name}/{env}] {user} started deploy <{link}|#{number}> ({sha})"
+        return f"[{app_name}/{env}] {user} started deploy <{link}|#{number}> ({sha})"
     if task.status == TaskStatus.failed:
-        return "[{app_name}/{env}] Failed to finish {user}'s deploy <{link}|#{number}> ({sha}) after {duration}s"
+        return f"[{app_name}/{env}] Failed to finish {user}'s deploy <{link}|#{number}> ({sha}) after {duration}s"
     if task.status == TaskStatus.cancelled:
-        return "[{app_name}/{env}] {user}'s deploy <{link}|#{number}> ({sha}) was cancelled after {duration}s"
+        return f"[{app_name}/{env}] {user}'s deploy <{link}|#{number}> ({sha}) was cancelled after {duration}s"
     if task.status == TaskStatus.finished:
-        return "[{app_name}/{env}] Successfully finished {user}'s deploy <{link}|#{number}> ({sha}) after {duration}s"
+        return f"[{app_name}/{env}] Successfully finished {user}'s deploy <{link}|#{number}> ({sha}) after {duration}s"
     raise NotImplementedError(task.status)
