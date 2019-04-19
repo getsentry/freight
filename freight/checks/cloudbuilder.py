@@ -47,6 +47,9 @@ class GCPContainerBuilderCheck(Check):
         if oauth_token is None:
             oauth_token = subprocess.check_output(shlex.split(oauth_command)).rstrip()
 
+        if isinstance(oauth_token, bytes):
+            oauth_token = oauth_token.decode("utf8")
+
         params = {"filter": f'sourceProvenance.resolvedRepoSource.commitSha="{sha}"'}
         headers = {
             "Accepts": "application/json",
