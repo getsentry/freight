@@ -45,7 +45,7 @@ command = [
     "ssh",
     # Not supported in all ssh client versions
     # '-oUserAuthorizedKeysFile=/dev/null',
-    "-oLogLevel={}".format(SSH_LOG_LEVEL),
+    f"-oLogLevel={SSH_LOG_LEVEL}",
     "-oStrictHostKeyChecking=no",
     "-oUserKnownHostsFile=/dev/null",
 ]
@@ -55,7 +55,7 @@ if app.config["SSH_PRIVATE_KEY"]:
     f.write(app.config["SSH_PRIVATE_KEY"].encode("utf8"))
     f.flush()
 
-    command.append("-i{0}".format(f.name))
+    command.append(f"-i{f.name}")
 
 command.append("--")
 command.extend(sys.argv[1:])
