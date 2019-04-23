@@ -58,6 +58,9 @@ class GCPContainerBuilderCheck(Check):
 
         resp = http.get(api_root, headers=headers, params=params)
         if resp.status_code != 200:
+            if resp.status_code == 503:
+                raise CheckPending("Temporary Google failure")
+
             raise CheckFailed(
                 f"[ ERROR {resp.status_code} ]\tNo data for build present"
             )
