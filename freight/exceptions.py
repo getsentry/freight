@@ -25,18 +25,10 @@ class CommandError(Exception):
         self.stdout = stdout
         self.stderr = stderr
 
-    def __unicode__(self):
-        if self.stdout is not None or self.stderr is not None:
-            return "%s failed with exit code %d:\nSTDOUT: %r\nSTDERR: %r" % (
-                self.cmd,
-                self.retcode,
-                self.stdout,
-                self.stderr,
-            )
-        return "%s failed with exit code %d" % (self.cmd, self.retcode)
-
     def __str__(self):
-        return self.__unicode__().encode("utf-8")
+        if self.stdout is not None or self.stderr is not None:
+            return f"{self.cmd} failed with exit code {self.retcode}:\nSTDOUT: {repr(self.stdout)}\nSTDERR: {repr(self.stderr)}"
+        return f"{self.cmd} failed with exit code {self.retcode}"
 
 
 class InvalidProvider(KeyError):
