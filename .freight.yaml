@@ -1,0 +1,39 @@
+   {
+    "read_timeout": null,
+    "steps": [
+      {
+        "kind": "Shell",
+        "command": "echo ref={ref} environment={environment}"
+      },
+      {
+        "kind": "KubernetesJob",
+        "args": [
+          "bash",
+          "-c",
+          "for i in {{1..30}}; do echo hello $i && sleep 0.5; done"
+        ],
+        "name": "upgrade",
+        "image": "debian"
+      },
+      {
+        "kind": "KubernetesDeployment",
+        "containers": [
+          {
+            "image": "nginx:1.15.0-alpine",
+            "name": "nginx"
+          }
+        ],
+        "selector": {
+          "label_selector": "app=sentry,tier=some-tier"
+        }
+      }
+    ],
+    "kubernetes": {
+      "credentials": {
+        "project": "mattrobenolt-kube",
+        "cluster": "sentry",
+        "kind": "gcloud",
+        "zone": "us-west1-c"
+      }
+    },
+  }
