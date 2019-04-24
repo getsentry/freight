@@ -58,7 +58,7 @@ class KubernetesProvider(Provider):
         )
 
         for step in config["steps"]:
-            run_step(step, api_client, task_context)
+            run_step(workspace, step, api_client, task_context)
 
 
 def load_credentials(config):
@@ -110,9 +110,15 @@ def load_credentials_gcloud(credentials):
     return new_client_from_config(context=context)
 
 
-def run_step(step, api_client, task):
-    assert step["kind"] == "Deployment"
-    watchers = run_step_deployment(step, api_client, task)
+def run_step(workspace, step, api_client, task):
+    assert step["kind"] in ("Deployment", "Shell")
+    if step["kind"] == "Deployment":
+        runner = run_step_deployment
+    else:
+        runner = run_step_shell
+    watchers = runner(workspace, step, api_client, task)
+    if not watchers:
+        return
     changes = bool(watchers)
     while watchers:
         for watcher, state in watchers:
@@ -123,11 +129,13 @@ def run_step(step, api_client, task):
                 state["status"] = status
             if success:
                 watchers.remove((watcher, state))
+                if not watchers:
+                    break
         sleep(0.5)
     return changes
 
 
-def run_step_deployment(step, api_client, task):
+def run_step_deployment(workspace, step, api_client, task):
     api = client.AppsV1beta1Api(api_client)
 
     selector = step["selector"]
@@ -152,7 +160,9 @@ def run_step_deployment(step, api_client, task):
                 deployment.spec.template.metadata.annotations = {}
             for k, v in asdict(task).items():
                 deployment.metadata.annotations[f"freight.sentry.io/{k}"] = v
-                deployment.spec.template.metadata.annotations[f"freight.sentry.io/{k}"] = v
+                deployment.spec.template.metadata.annotations[
+                    f"freight.sentry.io/{k}"
+                ] = v
 
             resp = api.patch_namespaced_deployment(
                 name=deployment.metadata.name,
@@ -174,6 +184,11 @@ def run_step_deployment(step, api_client, task):
             )
 
     return watchers
+
+
+def run_step_shell(workspace, step, api_client, task):
+    command = step["command"].format(**asdict(task))
+    workspace.run(command, env=step.get("env"))
 
 
 def rollout_status_deployment(api, name, namespace, generation):
