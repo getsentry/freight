@@ -329,10 +329,6 @@ def run_step_job(step: dict, context: PipelineContext):
 
 
 def rollout_status_deployment(api, name, namespace, generation):
-    # TODO(mattrobenolt): Need to handle error state better/at all.
-    # Right now, if say, it's an ErrImagePull or something, it just will sit
-    # here forever with no reason why. Need to figure out how to get
-    # this reason becasue there are many reasons why it could fail.
     deployment = api.read_namespaced_deployment(name=name, namespace=namespace)
     if generation <= deployment.status.observed_generation:
         replicas = deployment.spec.replicas
