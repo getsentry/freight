@@ -1,7 +1,8 @@
-__all__ = ["KubernetesProvider"]
+__all__ = ["PipelineProvider"]
 
 import sys
 from time import sleep, time
+from typing import Optional, List, Callable
 from functools import partial
 from dataclasses import dataclass, asdict
 
@@ -9,6 +10,7 @@ from kubernetes import client
 from kubernetes.config import new_client_from_config, ConfigException
 
 from .base import Provider
+from freight.utils.workspace import Workspace
 from freight.models import App, Deploy
 
 
@@ -23,19 +25,30 @@ class TaskContext:
     ref: str
 
 
+@dataclass(frozen=True)
+class KubernetesContext:
+    client: client.ApiClient
+
+
+@dataclass(frozen=True)
+class PipelineContext:
+    task: TaskContext
+    kube: Optional[KubernetesContext]
+    workspace: Workspace
+
+
 class StepFailed(Exception):
     pass
 
 
-class KubernetesProvider(Provider):
+class PipelineProvider(Provider):
     def get_options(self):
         return {
             "steps": {"required": True, "type": list},
-            "context": {"required": False, "type": str},
-            "credentials": {"required": False, "type": dict},
+            "kubernetes": {"required": False, "type": dict},
         }
 
-    def get_config(self, workspace, task):
+    def get_config(self, workspace, task) -> dict:
         # from yaml import safe_load
         # TODO(mattrobenolt): Load and merge config (.freight.yml) from
         # within the workspace, so a config could be left out entirely.
@@ -50,7 +63,12 @@ class KubernetesProvider(Provider):
         prev_sha = app.get_previous_sha(deploy.environment, current_sha=task.sha)
 
         config = self.get_config(workspace, task)
-        api_client = load_credentials(config)
+        if config["kubernetes"]:
+            kube_context = KubernetesContext(
+                load_kube_credentials(config["kubernetes"])
+            )
+        else:
+            kube_context = None
 
         task_context = TaskContext(
             str(deploy.id),
@@ -62,13 +80,17 @@ class KubernetesProvider(Provider):
             task.ref,
         )
 
+        context = PipelineContext(
+            task=task_context, kube=kube_context, workspace=workspace
+        )
+
         for i, step in enumerate(config["steps"]):
             workspace.log.info(f"Running Step {i+1} ({step['kind']})")
-            run_step(workspace, step, api_client, task_context)
+            run_step(step, context)
             workspace.log.info(f"Finished Step {i+1}")
 
 
-def load_credentials(config):
+def load_kube_credentials(config: dict) -> client.ApiClient:
     try:
         return new_client_from_config(context=config["context"])
     except KeyError:
@@ -81,10 +103,10 @@ def load_credentials(config):
 
     assert credentials["kind"] == "gcloud"
 
-    return load_credentials_gcloud(credentials)
+    return load_kube_credentials_gcloud(credentials)
 
 
-def load_credentials_gcloud(credentials):
+def load_kube_credentials_gcloud(credentials: dict) -> client.ApiClient:
     from subprocess import check_call, DEVNULL
 
     cluster = credentials["cluster"]
@@ -117,13 +139,13 @@ def load_credentials_gcloud(credentials):
     return new_client_from_config(context=context)
 
 
-def run_step(workspace, step, api_client, task):
-    assert step["kind"] in ("Deployment", "Shell", "Job")
+def run_step(step: dict, context: PipelineContext) -> bool:
+    assert step["kind"] in ("Shell", "KubernetesDeployment", "KubernetesJob"), step["kind"]
     watchers = {
-        "Deployment": run_step_deployment,
         "Shell": run_step_shell,
-        "Job": run_step_job,
-    }[step["kind"]](workspace, step, api_client, task)
+        "KubernetesDeployment": run_step_deployment,
+        "KubernetesJob": run_step_job,
+    }[step["kind"]](step, context)
     if not watchers:
         return
     changes = bool(watchers)
@@ -144,14 +166,14 @@ def run_step(workspace, step, api_client, task):
     return changes
 
 
-def run_step_deployment(workspace, step, api_client, task):
-    workspace.log.info(f"Running Deployment: {repr(step)}")
+def run_step_deployment(step: dict, context: PipelineContext) -> List[Callable]:
+    context.workspace.log.info(f"Running Deployment: {repr(step)}")
 
-    api = client.AppsV1beta1Api(api_client)
+    api = client.AppsV1beta1Api(context.kube.client)
 
-    selector = step["selector"]
+    selector = format_task(step["selector"], context.task)
     selector.setdefault("namespace", "default")
-    containers = step["containers"]
+    containers = format_task(step["containers"], context.task)
 
     watchers = []
 
@@ -162,18 +184,17 @@ def run_step_deployment(workspace, step, api_client, task):
         for container in deployment.spec.template.spec.containers:
             for c in containers:
                 if container.name == c["name"]:
-                    container.image = format_task(c["image"], task)
+                    container.image = c["image"]
                     changes = True
         if changes:
             if deployment.metadata.annotations is None:
                 deployment.metadata.annotations = {}
             if deployment.spec.template.metadata.annotations is None:
                 deployment.spec.template.metadata.annotations = {}
-            for k, v in asdict(task).items():
-                deployment.metadata.annotations[f"freight.sentry.io/{k}"] = v
-                deployment.spec.template.metadata.annotations[
-                    f"freight.sentry.io/{k}"
-                ] = v
+            for k, v in asdict(context.task).items():
+                k = f"freight.sentry.io/{k}"
+                deployment.metadata.annotations[k] = v
+                deployment.spec.template.metadata.annotations[k] = v
 
             resp = api.patch_namespaced_deployment(
                 name=deployment.metadata.name,
@@ -197,22 +218,22 @@ def run_step_deployment(workspace, step, api_client, task):
     return watchers
 
 
-def run_step_shell(workspace, step, api_client, task):
-    command = format_task(step["command"], task)
-    workspace.run(command, env=step.get("env"))
+def run_step_shell(step: dict, context: PipelineContext):
+    command = format_task(step["command"], context.task)
+    context.workspace.run(command, env=step.get("env"))
 
 
-def format_task(data, task):
+def format_task(data, task: TaskContext):
     if isinstance(data, str):
         return data.format(**asdict(task))
     if isinstance(data, list):
         return [format_task(d, task) for d in data]
     if isinstance(data, dict):
-        return {format_task(k, task): format_task(v, task) for k, v in data.items()}
+        return {k: format_task(v, task) for k, v in data.items()}
     return data
 
 
-def make_job_spec(step, task):
+def make_job_spec(step: dict, task: TaskContext) -> dict:
     return {
         "kind": "Job",
         "metadata": {
@@ -241,30 +262,30 @@ def make_job_spec(step, task):
     }
 
 
-def run_step_job(workspace, step, api_client, task):
-    workspace.log.info(f"Running Job: {repr(step)}")
+def run_step_job(step: dict, context: PipelineContext):
+    context.workspace.log.info(f"Running Job: {repr(step)}")
 
-    job_spec = make_job_spec(step, task)
+    job_spec = make_job_spec(step, context.task)
     name = job_spec["metadata"]["name"]
     namespace = job_spec["metadata"]["namespace"]
 
-    workspace.log.info(f"Creating Job {namespace}/{name}")
-    client.BatchV1Api(api_client).create_namespaced_job(
+    context.workspace.log.info(f"Creating Job {namespace}/{name}")
+    client.BatchV1Api(context.kube.client).create_namespaced_job(
         namespace=namespace, body=job_spec
     )
     pod_name = None
     try:
         pods = (
-            client.CoreV1Api(api_client)
+            client.CoreV1Api(context.kube.client)
             .list_namespaced_pod(namespace=namespace, label_selector=f"job-name={name}")
             .items
         )
         assert len(pods) == 1, len(pods)
         pod_name = pods[0].metadata.name
-        workspace.log.info(f"Waiting for Pod {pod_name}")
+        context.workspace.log.info(f"Waiting for Pod {pod_name}")
         read_logs = False
         while True:
-            pod = client.CoreV1Api(api_client).read_namespaced_pod(
+            pod = client.CoreV1Api(context.kube.client).read_namespaced_pod(
                 namespace=namespace, name=pod_name
             )
             if read_logs:
@@ -285,7 +306,7 @@ def run_step_job(workspace, step, api_client, task):
                     )
 
             if pod.status.phase in ("Running", "Succeeded", "Failed"):
-                resp = client.CoreV1Api(api_client).read_namespaced_pod_log(
+                resp = client.CoreV1Api(context.kube.client).read_namespaced_pod_log(
                     namespace=namespace,
                     name=pod_name,
                     follow=True,
@@ -301,8 +322,8 @@ def run_step_job(workspace, step, api_client, task):
                 sys.stdout.flush()
                 read_logs = True
     finally:
-        workspace.log.info(f"Deleting Job {namespace}/{name}")
-        client.BatchV1Api(api_client).delete_namespaced_job(
+        context.workspace.log.info(f"Deleting Job {namespace}/{name}")
+        client.BatchV1Api(context.kube.client).delete_namespaced_job(
             namespace=namespace, name=name, propagation_policy="Foreground"
         )
 

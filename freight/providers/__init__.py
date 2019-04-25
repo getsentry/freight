@@ -1,9 +1,9 @@
 from .manager import ProviderManager
-from .kubernetes import KubernetesProvider
+from .pipeline import PipelineProvider
 from .shell import ShellProvider
 
 manager = ProviderManager()
-manager.add("kubernetes", KubernetesProvider)
+manager.add("pipeline", PipelineProvider)
 manager.add("shell", ShellProvider)
 
 get = manager.get
