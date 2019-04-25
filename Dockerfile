@@ -1,5 +1,9 @@
 FROM python:3.7.3
 
+# pip 9.1 breaks everything
+ENV PYTHON_PIP_VERSION 9.0.3
+RUN pip install --no-cache-dir "pip==$PYTHON_PIP_VERSION"
+
 RUN set -ex \
     \
     && PYTHON_VERSION=2.7.16 \
