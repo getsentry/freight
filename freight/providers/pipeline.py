@@ -2,7 +2,7 @@ __all__ = ["PipelineProvider"]
 
 import sys
 from time import sleep, time
-from typing import Optional, List, Callable
+from typing import Optional, List, Callable, Tuple
 from functools import partial
 from dataclasses import dataclass, asdict
 
@@ -140,7 +140,9 @@ def load_kube_credentials_gcloud(credentials: dict) -> client.ApiClient:
 
 
 def run_step(step: dict, context: PipelineContext) -> bool:
-    assert step["kind"] in ("Shell", "KubernetesDeployment", "KubernetesJob"), step["kind"]
+    assert step["kind"] in ("Shell", "KubernetesDeployment", "KubernetesJob"), step[
+        "kind"
+    ]
     watchers = {
         "Shell": run_step_shell,
         "KubernetesDeployment": run_step_deployment,
@@ -328,7 +330,9 @@ def run_step_job(step: dict, context: PipelineContext):
         )
 
 
-def rollout_status_deployment(api, name, namespace, generation):
+def rollout_status_deployment(
+    api: client.AppsV1beta1Api, name: str, namespace: str, generation: int
+) -> Tuple[str, bool]:
     deployment = api.read_namespaced_deployment(name=name, namespace=namespace)
     if generation <= deployment.status.observed_generation:
         replicas = deployment.spec.replicas
