@@ -1,10 +1,11 @@
 FROM python:3.7.3
 
+ENV PIP_NO_CACHE_DIR off
+ENV PIP_DISABLE_PIP_VERSION_CHECK on
+
 # pip 9.1 breaks everything
 ENV PYTHON_PIP_VERSION 9.0.3
-RUN pip install --no-cache-dir "pip==$PYTHON_PIP_VERSION"
-
-ENV PIP_DISABLE_PIP_VERSION_CHECK on
+RUN pip install "pip==$PYTHON_PIP_VERSION"
 
 RUN set -ex \
     \
@@ -49,8 +50,6 @@ RUN set -ex; \
     wget -O get-pip.py 'https://bootstrap.pypa.io/get-pip.py'; \
     \
     python2 get-pip.py \
-        --disable-pip-version-check \
-        --no-cache-dir \
         "pip==$PYTHON_PIP_VERSION" \
     ; \
     pip2 --version; \
@@ -77,7 +76,7 @@ RUN set -ex \
     && which pip2    && pip2 -V \
     && which pip3    && pip3 -V
 
-RUN pip2 install --no-cache-dir virtualenv
+RUN pip2 install virtualenv
 
 # add our user and group first to make sure their IDs get assigned consistently
 RUN groupadd -r freight && useradd -r -m -g freight freight
@@ -236,11 +235,11 @@ COPY package.json /usr/src/app/
 RUN npm install && npm cache clear --force
 
 COPY requirements.txt /usr/src/app/
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 COPY . /usr/src/app
 RUN node_modules/.bin/webpack -p \
-    && pip install --no-cache-dir -e .
+    && pip install -e .
 
 ENV WORKSPACE_ROOT /workspace
 RUN mkdir -p $WORKSPACE_ROOT
