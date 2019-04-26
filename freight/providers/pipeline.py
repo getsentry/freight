@@ -126,7 +126,7 @@ def load_kube_credentials_gcloud(credentials: dict) -> client.ApiClient:
 
     try:
         return new_client_from_config(context=context)
-    except ConfigException:
+    except (ConfigException, FileNotFoundError):
         pass
 
     check_call(
