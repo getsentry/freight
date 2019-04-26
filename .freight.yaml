@@ -10,7 +10,7 @@
         "args": [
           "bash",
           "-c",
-          "for i in {{1..30}}; do echo hello $i && sleep 0.5; done"
+          "for i in {{1..10}}; do echo hello $i && sleep 0.5; done"
         ],
         "name": "upgrade",
         "image": "debian"
@@ -24,7 +24,7 @@
           }
         ],
         "selector": {
-          "label_selector": "app=sentry,tier=some-tier"
+          "field_selector": "metadata.name in (hello, hello2)"
         }
       }
     ],
