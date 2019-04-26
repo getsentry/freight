@@ -65,7 +65,7 @@ class PipelineProvider(Provider):
             try:
                 with option.open() as f:
                     extra_config = safe_load(f)
-                    workspace.log(f"Found config file: {option}")
+                    workspace.log.info(f"Found config file: {option}")
                     break
             except FileNotFoundError:
                 pass
@@ -189,7 +189,6 @@ def run_step(step: dict, context: PipelineContext):
             if last_status is None or status != last_status:
                 sys.stdout.write(status)
                 sys.stdout.write("\n")
-                sys.stdout.flush()
                 state["status"] = status
             if success:
                 watchers.remove((watcher, state))
@@ -415,11 +414,9 @@ def run_step_job(step: dict, context: PipelineContext):
                 try:
                     for chunk in resp.stream(32):
                         sys.stdout.write(chunk.decode("utf8"))
-                        sys.stdout.flush()
                 finally:
                     resp.release_conn()
                 sys.stdout.write("\n")
-                sys.stdout.flush()
                 read_logs = True
                 # When finished reading logs, we need to loop back around
                 # so we can query the final state of the Pod, in the case that

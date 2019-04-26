@@ -105,7 +105,6 @@ class LogReporter(threading.Thread):
         # we also want to pipe this to stdout
         text = text.decode("utf-8", "replace")
         sys.stdout.write(text)
-        sys.stdout.flush()
         text_len = len(text)
 
         with self.write_lock:

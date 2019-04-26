@@ -136,6 +136,18 @@ def main(task_id, log):
         workspace.remove()
 
 
+class UnbufferedStream:
+    def __init__(self, stream):
+        self._stream = stream
+
+    def write(self, *args, **kwargs):
+        self._stream.write(*args, **kwargs)
+        self.flush()
+
+    def flush(self):
+        self._stream.flush()
+
+
 if __name__ == "__main__":
     # add workspace explicit handler
     handler = logging.StreamHandler()
@@ -146,8 +158,8 @@ if __name__ == "__main__":
     log.setLevel(logging.INFO)
 
     # remove buffering on stdout/stderr
-    # sys.stdout = os.fdopen(sys.stdout.fileno(), "wb", 0)
-    # sys.stderr = os.fdopen(sys.stderr.fileno(), "wb", 0)
+    sys.stdout = UnbufferedStream(sys.stdout)
+    sys.stderr = UnbufferedStream(sys.stderr)
 
     app = create_app()
     with app.app_context():
