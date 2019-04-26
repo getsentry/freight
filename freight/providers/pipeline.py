@@ -1,6 +1,8 @@
 __all__ = ["PipelineProvider"]
 
+import os
 import sys
+from datetime import datetime
 from time import sleep, time
 from pathlib import Path
 from typing import Optional, List, Callable, Tuple
@@ -9,9 +11,11 @@ from dataclasses import dataclass, asdict
 
 from kubernetes import client
 from kubernetes.config import new_client_from_config, ConfigException
+from requests import Session
 from yaml import safe_load
 
 from .base import Provider
+from freight import http
 from freight.utils.workspace import Workspace
 from freight.models import App, Deploy
 
@@ -25,6 +29,15 @@ class TaskContext:
     sha: str
     prev_sha: str
     ref: str
+    url: str
+
+
+@dataclass(frozen=True)
+class SentryContext:
+    organization: str
+    project: str
+    repository: str
+    client: Session
 
 
 @dataclass(frozen=True)
@@ -52,6 +65,7 @@ class PipelineProvider(Provider):
         return {
             "steps": {"required": False, "type": list},
             "kubernetes": {"required": False, "type": dict},
+            "sentry": {"required": False, "type": dict},
         }
 
     def get_config(self, workspace, task) -> dict:
@@ -77,10 +91,18 @@ class PipelineProvider(Provider):
         return self.execute_deploy(workspace, deploy, task)
 
     def execute_deploy(self, workspace, deploy, task):
+        date_started = datetime.utcnow()
+
         app = App.query.get(task.app_id)
-        prev_sha = app.get_previous_sha(deploy.environment, current_sha=task.sha)
+        prev_sha = app.get_previous_sha(deploy.environment, current_sha=task.sha) or ""
 
         config = self.get_config(workspace, task)
+
+        if config["sentry"]:
+            sentry_context = make_sentry_context(config["sentry"])
+        else:
+            sentry_context = None
+
         if config["kubernetes"]:
             kube_context = KubernetesContext(
                 load_kube_credentials(config["kubernetes"])
@@ -94,8 +116,11 @@ class PipelineProvider(Provider):
             app.name,
             deploy.environment,
             task.sha,
-            prev_sha or "",
+            prev_sha,
             task.ref,
+            http.absolute_uri(
+                f"/deploys/{app.name}/{deploy.environment}/{deploy.number}"
+            ),
         )
 
         context = PipelineContext(
@@ -105,10 +130,62 @@ class PipelineProvider(Provider):
         if not config["steps"]:
             raise StepFailed("No steps to run")
 
+        if sentry_context:
+            workspace.log.info(
+                f"Creating new Sentry release: {sentry_context.repository}@{task_context.sha}"
+            )
+            sentry_context.client.post(
+                f"https://sentry.io/api/0/organizations/{sentry_context.organization}/releases/",
+                json={
+                    "version": task_context.sha,
+                    "refs": [
+                        {
+                            "repository": sentry_context.repository,
+                            "previousCommit": task_context.prev_sha,
+                            "commit": task_context.sha,
+                        }
+                    ],
+                    "projects": [sentry_context.project],
+                },
+            ).raise_for_status()
+
         for i, step in enumerate(config["steps"]):
             workspace.log.info(f"Running Step {i+1} ({step['kind']})")
             run_step(step, context)
             workspace.log.info(f"Finished Step {i+1}")
+
+        date_finished = datetime.utcnow()
+
+        if sentry_context:
+            workspace.log.info(f"Tagging Sentry release as deployed.")
+            sentry_context.client.put(
+                f"https://sentry.io/api/0/organizations/{sentry_context.organization}/releases/{task_context.sha}/",
+                json={"dateReleased": date_finished.isoformat() + "Z"},
+            ).raise_for_status()
+            sentry_context.client.post(
+                f"https://sentry.io/api/0/organizations/{sentry_context.organization}/releases/{task_context.sha}/deploys/",
+                json={
+                    "environment": deploy.environment,
+                    "url": task_context.url,
+                    "dateStarted": date_started.isoformat() + "Z",
+                    "dateFinished": date_finished.isoformat() + "Z",
+                },
+            ).raise_for_status()
+
+
+def make_sentry_context(config: dict) -> SentryContext:
+    client = http.build_session()
+    try:
+        api_token = os.environ["SENTRY_API_TOKEN"]
+    except KeyError:
+        api_token = config["api_token"]
+    client.headers.update({"Authorization": f"Bearer {api_token}"})
+    return SentryContext(
+        organization=config["organization"],
+        project=config["project"],
+        repository=config["repository"],
+        client=client,
+    )
 
 
 def load_kube_credentials(config: dict) -> client.ApiClient:
