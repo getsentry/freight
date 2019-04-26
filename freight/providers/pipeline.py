@@ -2,6 +2,7 @@ __all__ = ["PipelineProvider"]
 
 import os
 import sys
+import copy
 from datetime import datetime
 from time import sleep, time
 from pathlib import Path
@@ -84,7 +85,7 @@ class PipelineProvider(Provider):
             except FileNotFoundError:
                 pass
 
-        return merge_dicts(task.provider_config.copy(), extra_config)
+        return merge_dicts(copy.deepcopy(task.provider_config), extra_config)
 
     def execute(self, workspace, task):
         deploy = Deploy.query.filter(Deploy.task_id == task.id).first()
