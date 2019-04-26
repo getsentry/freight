@@ -84,7 +84,7 @@ class PipelineProvider(Provider):
             except FileNotFoundError:
                 pass
 
-        return {**task.provider_config, **extra_config}
+        return merge_dicts(task.provider_config.copy(), extra_config)
 
     def execute(self, workspace, task):
         deploy = Deploy.query.filter(Deploy.task_id == task.id).first()
@@ -535,3 +535,13 @@ def rollout_status_deployment(
         return f"Deployment {repr(name)} successfully rolled out", True
 
     return f"Waiting for deployment {repr(name)} spec update to be observed...", False
+
+
+def merge_dicts(a: dict, b: dict) -> dict:
+    for k, v in b.items():
+        if isinstance(v, dict):
+            a.setdefault(k, {})
+            merge_dicts(a[k], v)
+        else:
+            a[k] = v
+    return a
