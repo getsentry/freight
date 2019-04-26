@@ -2,12 +2,14 @@ __all__ = ["PipelineProvider"]
 
 import sys
 from time import sleep, time
+from pathlib import Path
 from typing import Optional, List, Callable, Tuple
 from functools import partial
 from dataclasses import dataclass, asdict
 
 from kubernetes import client
 from kubernetes.config import new_client_from_config, ConfigException
+from yaml import safe_load
 
 from .base import Provider
 from freight.utils.workspace import Workspace
@@ -48,15 +50,27 @@ class AuthenticationError(Exception):
 class PipelineProvider(Provider):
     def get_options(self):
         return {
-            "steps": {"required": True, "type": list},
+            "steps": {"required": False, "type": list},
             "kubernetes": {"required": False, "type": dict},
         }
 
     def get_config(self, workspace, task) -> dict:
-        # from yaml import safe_load
-        # TODO(mattrobenolt): Load and merge config (.freight.yml) from
-        # within the workspace, so a config could be left out entirely.
-        return {**task.provider_config, **{}}
+        options = [
+            Path(workspace.path) / ".freight.yml",
+            Path(workspace.path) / ".freight.yaml",
+        ]
+
+        extra_config = {}
+        for option in options:
+            try:
+                with option.open() as f:
+                    extra_config = safe_load(f)
+                    workspace.log(f"Found config file: {option}")
+                    break
+            except FileNotFoundError:
+                pass
+
+        return {**task.provider_config, **extra_config}
 
     def execute(self, workspace, task):
         deploy = Deploy.query.filter(Deploy.task_id == task.id).first()
@@ -87,6 +101,9 @@ class PipelineProvider(Provider):
         context = PipelineContext(
             task=task_context, kube=kube_context, workspace=workspace
         )
+
+        if not config["steps"]:
+            raise StepFailed("No steps to run")
 
         for i, step in enumerate(config["steps"]):
             workspace.log.info(f"Running Step {i+1} ({step['kind']})")
