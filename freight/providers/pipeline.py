@@ -542,6 +542,8 @@ def merge_dicts(a: dict, b: dict) -> dict:
     for k, v in b.items():
         if isinstance(v, dict):
             a.setdefault(k, {})
+            if a[k] is None:
+                a[k] = {}
             merge_dicts(a[k], v)
         else:
             a[k] = v
