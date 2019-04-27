@@ -6,11 +6,12 @@ import copy
 from datetime import datetime
 from time import sleep, time
 from pathlib import Path
-from typing import Optional, List, Callable, Tuple
+from typing import Optional, List, Callable, Tuple, Dict, Any
 from functools import partial
 from dataclasses import dataclass, asdict
 
 from kubernetes import client
+from kubernetes.client import ApiClient
 from kubernetes.config import new_client_from_config, ConfigException
 from requests import Session
 from yaml import safe_load
@@ -43,7 +44,7 @@ class SentryContext:
 
 @dataclass(frozen=True)
 class KubernetesContext:
-    client: client.ApiClient
+    client: ApiClient
 
 
 @dataclass(frozen=True)
@@ -62,20 +63,20 @@ class AuthenticationError(Exception):
 
 
 class PipelineProvider(Provider):
-    def get_options(self):
+    def get_options(self) -> Dict[str, Dict[str, Any]]:
         return {
             "steps": {"required": False, "type": list},
             "kubernetes": {"required": False, "type": dict},
             "sentry": {"required": False, "type": dict},
         }
 
-    def get_config(self, workspace, task) -> dict:
+    def get_config(self, workspace, task) -> Dict[str, Any]:
         options = [
             Path(workspace.path) / ".freight.yml",
             Path(workspace.path) / ".freight.yaml",
         ]
 
-        extra_config = {}
+        extra_config: Dict[str, Any] = {}
         for option in options:
             try:
                 with option.open() as f:
@@ -87,11 +88,11 @@ class PipelineProvider(Provider):
 
         return merge_dicts(copy.deepcopy(task.provider_config), extra_config)
 
-    def execute(self, workspace, task):
+    def execute(self, workspace, task) -> None:
         deploy = Deploy.query.filter(Deploy.task_id == task.id).first()
-        return self.execute_deploy(workspace, deploy, task)
+        self.execute_deploy(workspace, deploy, task)
 
-    def execute_deploy(self, workspace, deploy, task):
+    def execute_deploy(self, workspace, deploy, task) -> None:
         date_started = datetime.utcnow()
 
         app = App.query.get(task.app_id)
@@ -99,15 +100,15 @@ class PipelineProvider(Provider):
 
         config = self.get_config(workspace, task)
 
+        sentry_context: Optional[SentryContext]
         if config["sentry"]:
             sentry_context = make_sentry_context(config["sentry"])
         else:
             sentry_context = None
 
+        kube_context: Optional[KubernetesContext]
         if config["kubernetes"]:
-            kube_context = KubernetesContext(
-                load_kube_credentials(config["kubernetes"])
-            )
+            kube_context = make_kube_context(config["kubernetes"])
         else:
             kube_context = None
 
@@ -174,7 +175,7 @@ class PipelineProvider(Provider):
             ).raise_for_status()
 
 
-def make_sentry_context(config: dict) -> SentryContext:
+def make_sentry_context(config: Dict[str, str]) -> SentryContext:
     client = http.build_session()
     try:
         api_token = os.environ["SENTRY_API_TOKEN"]
@@ -189,7 +190,11 @@ def make_sentry_context(config: dict) -> SentryContext:
     )
 
 
-def load_kube_credentials(config: dict) -> client.ApiClient:
+def make_kube_context(config: Dict[str, Any]) -> KubernetesContext:
+    return KubernetesContext(client=load_kube_credentials(config))
+
+
+def load_kube_credentials(config: Dict[str, Any]) -> ApiClient:
     # If a context is specified, attempt to use this first.
     try:
         return new_client_from_config(context=config["context"])
@@ -207,7 +212,7 @@ def load_kube_credentials(config: dict) -> client.ApiClient:
     return load_kube_credentials_gcloud(credentials)
 
 
-def load_kube_credentials_gcloud(credentials: dict) -> client.ApiClient:
+def load_kube_credentials_gcloud(credentials: Dict[str, str]) -> ApiClient:
     # Try to pull credentials from gcloud, but first checking if there
     # is a context, using their auto generated naming scheme, to avoid
     # calling `gcloud` every time, if we've already authed before.
@@ -243,7 +248,7 @@ def load_kube_credentials_gcloud(credentials: dict) -> client.ApiClient:
     return new_client_from_config(context=context)
 
 
-def run_step(step: dict, context: PipelineContext):
+def run_step(step: Dict[str, Any], context: PipelineContext) -> None:
     if step["kind"] not in ("Shell", "KubernetesDeployment", "KubernetesJob"):
         raise StepFailed(f"Unknown step kind: {step['kind']}")
 
@@ -275,7 +280,9 @@ def run_step(step: dict, context: PipelineContext):
         sleep(0.5)
 
 
-def run_step_deployment(step: dict, context: PipelineContext) -> List[Callable]:
+def run_step_deployment(
+    step: Dict[str, Any], context: PipelineContext
+) -> List[Tuple[Callable, Dict[str, str]]]:
     # Execute a Kubernetes Deployment
     context.workspace.log.info(f"Running Deployment: {repr(step)}")
 
@@ -285,7 +292,7 @@ def run_step_deployment(step: dict, context: PipelineContext) -> List[Callable]:
     selector.setdefault("namespace", "default")
     containers = format_task(step["containers"], context.task)
 
-    watchers = []
+    watchers: List[Tuple[Callable, Dict[str, str]]] = []
 
     # First, we collect a list of Deployments from kubernetes based on
     # the `selector`. This may return 0, 1, or many Deployments.
@@ -348,13 +355,13 @@ def run_step_deployment(step: dict, context: PipelineContext) -> List[Callable]:
     return watchers
 
 
-def run_step_shell(step: dict, context: PipelineContext):
+def run_step_shell(step: Dict[str, Any], context: PipelineContext) -> None:
     # Execute a shell command within our workspace
     command = format_task(step["command"], context.task)
     context.workspace.run(command, env=step.get("env"))
 
 
-def format_task(data, task: TaskContext):
+def format_task(data: Any, task: TaskContext) -> Any:
     # Recursively formatting strings that may
     # contain taskcontext vars.
     if isinstance(data, str):
@@ -366,7 +373,7 @@ def format_task(data, task: TaskContext):
     return data
 
 
-def make_job_spec(step: dict, task: TaskContext) -> dict:
+def make_job_spec(step: Dict[str, Any], task: TaskContext) -> Dict[str, Any]:
     # Translate our customer KubernetesJob, which is just a subset of
     # allowed Kubernetes Job configs, into a real Job spec. This subset is
     # done so that we can control better what a Job means, including an
@@ -402,7 +409,7 @@ def make_job_spec(step: dict, task: TaskContext) -> dict:
     }
 
 
-def run_step_job(step: dict, context: PipelineContext):
+def run_step_job(step: Dict[str, Any], context: PipelineContext) -> None:
     # Run a one-off Job in Kubernetes and track it through to completion.
     # Running a job in Kubernetes is a bit non-trivial, and involves the
     # following:
