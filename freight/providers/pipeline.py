@@ -101,13 +101,13 @@ class PipelineProvider(Provider):
         config = self.get_config(workspace, task)
 
         sentry_context: Optional[SentryContext]
-        if config["sentry"]:
+        if config.get("sentry", {}):
             sentry_context = make_sentry_context(config["sentry"])
         else:
             sentry_context = None
 
         kube_context: Optional[KubernetesContext]
-        if config["kubernetes"]:
+        if config.get("kubernetes", {}):
             kube_context = make_kube_context(config["kubernetes"])
         else:
             kube_context = None
