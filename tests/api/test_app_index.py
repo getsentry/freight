@@ -17,14 +17,17 @@ class AppListTest(AppIndexBase):
     def setUp(self):
         super(AppListTest, self).setUp()
 
-    def test_no_filters(self):
-        app = self.create_app(repository=self.repo)
-        self.create_taskconfig(app=app)
+    def test_simple(self):
+        app_a = self.create_app(repository=self.repo, name="a")
+        app_b = self.create_app(repository=self.repo, name="b")
+        self.create_taskconfig(app=app_a)
+        self.create_taskconfig(app=app_b)
         resp = self.client.get(self.path)
         assert resp.status_code == 200
         data = json.loads(resp.data)
-        assert len(data) == 1
-        assert data[0]["id"] == str(app.id)
+        assert len(data) == 2
+        assert data[0]["id"] == str(app_a.id)
+        assert data[1]["id"] == str(app_b.id)
 
     def test_name_filter(self):
         app = self.create_app(repository=self.repo, name="foobar")

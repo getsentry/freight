@@ -27,9 +27,9 @@ class AppIndexApiView(ApiView):
         if args.name:
             qs_filters.append(App.name == args.name)
 
-        app_qs = App.query.filter(*qs_filters).order_by(App.id.desc())
+        app_qs = App.query.filter(*qs_filters).order_by(App.name.asc())
 
-        return self.paginate(app_qs, on_results=serialize)
+        return self.respond(serialize(list(app_qs)))
 
     post_parser = reqparse.RequestParser()
     post_parser.add_argument("name", required=True)
