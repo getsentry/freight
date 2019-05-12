@@ -1,6 +1,6 @@
 develop: update-submodules setup-git
 	@echo "--> Installing dependencies"
-	npm install
+	yarn install
 	pip install -e .
 	pip install "file://`pwd`#egg=freight[test]"
 
@@ -28,7 +28,7 @@ lint: lint-python
 
 test-javascript:
 	@echo "--> Running javascript tests"
-	npm run test
+	yarn run test
 	@echo ""
 
 test-python:
