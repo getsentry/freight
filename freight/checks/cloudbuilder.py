@@ -1,5 +1,4 @@
-import shlex
-import subprocess
+from subprocess import check_output
 
 from freight import http
 from freight.exceptions import CheckFailed, CheckPending
@@ -41,14 +40,13 @@ class GCPContainerBuilderCheck(Check):
             f"https://cloudbuild.googleapis.com/v1/projects/{config['project']}/builds"
         )
 
-        oauth_command = "gcloud auth application-default print-access-token"
-
         oauth_token = config.get("oauth_token")
         if oauth_token is None:
-            oauth_token = subprocess.check_output(shlex.split(oauth_command)).rstrip()
-
-        if isinstance(oauth_token, bytes):
-            oauth_token = oauth_token.decode("utf8")
+            oauth_token = (
+                check_output(["gcloud", "auth", "print-access-token"])
+                .rstrip()
+                .decode("utf-8")
+            )
 
         params = {"filter": f'sourceProvenance.resolvedRepoSource.commitSha="{sha}"'}
         headers = {
