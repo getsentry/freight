@@ -12,7 +12,7 @@ from dataclasses import dataclass, asdict
 
 from kubernetes import client
 from kubernetes.client import ApiClient
-from kubernetes.config import new_client_from_config, ConfigException
+from kubernetes.config import new_client_from_config
 from requests import Session
 from yaml import safe_load
 
