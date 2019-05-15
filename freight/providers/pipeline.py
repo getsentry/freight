@@ -224,10 +224,11 @@ def load_kube_credentials_gcloud(credentials: Dict[str, str]) -> ApiClient:
 
     context = f"gke_{project}_{zone}_{cluster}"
 
-    try:
-        return new_client_from_config(context=context)
-    except (ConfigException, FileNotFoundError):
-        pass
+    # HACK: I don't know why it needs to keep requesting auth or it breaks
+    # try:
+    #     return new_client_from_config(context=context)
+    # except (ConfigException, FileNotFoundError):
+    #     pass
 
     check_call(
         [
