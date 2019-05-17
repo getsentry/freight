@@ -12,7 +12,7 @@ from dataclasses import dataclass, asdict
 
 from kubernetes import client
 from kubernetes.client import ApiClient
-from kubernetes.config import new_client_from_config
+from kubernetes.config import new_client_from_config, ConfigException
 from requests import Session
 from yaml import safe_load
 
@@ -224,11 +224,10 @@ def load_kube_credentials_gcloud(credentials: Dict[str, str]) -> ApiClient:
 
     context = f"gke_{project}_{zone}_{cluster}"
 
-    # HACK: I don't know why it needs to keep requesting auth or it breaks
-    # try:
-    #     return new_client_from_config(context=context)
-    # except (ConfigException, FileNotFoundError):
-    #     pass
+    try:
+        return new_client_from_config(context=context)
+    except (ConfigException, FileNotFoundError):
+        pass
 
     check_call(
         [
