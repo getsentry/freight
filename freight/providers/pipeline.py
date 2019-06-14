@@ -32,6 +32,7 @@ class TaskContext:
     prev_sha: str
     ref: str
     url: str
+    ssh_key: str
 
 
 @dataclass(frozen=True)
@@ -112,17 +113,19 @@ class PipelineProvider(Provider):
         else:
             kube_context = None
 
+        ssh_key = self.get_ssh_key()
         task_context = TaskContext(
-            str(deploy.id),
-            str(task.date_created),
-            app.name,
-            deploy.environment,
-            task.sha,
-            prev_sha,
-            task.ref,
-            http.absolute_uri(
+            id=str(deploy.id),
+            date_created=str(task.date_created),
+            name=app.name,
+            environment=deploy.environment,
+            sha=task.sha,
+            prev_sha=prev_sha,
+            ref=task.ref,
+            url=http.absolute_uri(
                 f"/deploys/{app.name}/{deploy.environment}/{deploy.number}"
             ),
+            ssh_key=ssh_key.name,
         )
 
         context = PipelineContext(
