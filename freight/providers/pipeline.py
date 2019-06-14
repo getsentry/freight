@@ -332,6 +332,8 @@ def run_step_deployment(
             if deployment.spec.template.metadata.annotations is None:
                 deployment.spec.template.metadata.annotations = {}
             for k, v in asdict(context.task).items():
+                if k == "ssh_key":
+                    continue
                 k = f"freight.sentry.io/{k}"
                 deployment.metadata.annotations[k] = v
                 deployment.spec.template.metadata.annotations[k] = v
