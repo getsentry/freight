@@ -252,12 +252,18 @@ def load_kube_credentials_gcloud(credentials: Dict[str, str]) -> ApiClient:
 
 
 def run_step(step: Dict[str, Any], context: PipelineContext) -> None:
-    if step["kind"] not in ("Shell", "KubernetesDeployment", "KubernetesJob"):
+    if step["kind"] not in (
+        "Shell",
+        "KubernetesDeployment",
+        "KubernetesCronJob",
+        "KubernetesJob",
+    ):
         raise StepFailed(f"Unknown step kind: {step['kind']}")
 
     watchers = {
         "Shell": run_step_shell,
         "KubernetesDeployment": run_step_deployment,
+        "KubernetesCronJob": run_step_cronjob,
         "KubernetesJob": run_step_job,
     }[step["kind"]](step, context)
     if not watchers:
@@ -517,6 +523,49 @@ def run_step_job(step: Dict[str, Any], context: PipelineContext) -> None:
         client.BatchV1Api(context.kube.client).delete_namespaced_job(
             namespace=namespace, name=name, propagation_policy="Foreground"
         )
+
+
+def run_step_cronjob(
+    step: Dict[str, Any], context: PipelineContext
+) -> List[Tuple[Callable, Dict[str, str]]]:
+    # Update a Kubernetes CronJob
+    context.workspace.log.info(f"Updating CronJob: {repr(step)}")
+
+    api = client.BatchV1beta1Api(context.kube.client)
+
+    selector = format_task(step["selector"], context.task)
+    selector.setdefault("namespace", "default")
+    containers = format_task(step["containers"], context.task)
+
+    watchers: List[Tuple[Callable, Dict[str, str]]] = []
+
+    # See comments about Deployments, it's almost identical, with the key
+    # difference being we don't need to need to wait for any rollout, since
+    # this just gets applied immediately to the spec.
+    for cronjob in api.list_namespaced_cron_job(**selector).items:
+        namespace = cronjob.metadata.name
+        name = cronjob.metadata.name
+        changes = False
+        for container in cronjob.spec.job_template.spec.template.spec.containers:
+            for c in containers:
+                if container.name == c["name"]:
+                    container.image = c["image"]
+                    changes = True
+
+        if changes:
+            if cronjob.metadata.annotations is None:
+                cronjob.metadata.annotations = {}
+            for k, v in asdict(context.task).items():
+                if k == "ssh_key":
+                    continue
+                k = f"freight.sentry.io/{k}"
+                cronjob.metadata.annotations[k] = v
+
+            resp = api.patch_namespaced_cron_job(
+                name=cronjob.metadata.name,
+                namespace=cronjob.metadata.namespace,
+                body=cronjob,
+            )
 
 
 def rollout_status_deployment(
