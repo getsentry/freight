@@ -3,10 +3,6 @@ FROM python:3.7.3
 ENV PIP_NO_CACHE_DIR off
 ENV PIP_DISABLE_PIP_VERSION_CHECK on
 
-# pip 9.1 breaks everything
-ENV PYTHON_PIP_VERSION 9.0.3
-RUN pip install "pip==$PYTHON_PIP_VERSION"
-
 RUN set -ex \
     \
     && PYTHON_VERSION=2.7.16 \
