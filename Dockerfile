@@ -209,9 +209,9 @@ RUN set -x \
     && apt-get purge -y --auto-remove wget
 
 RUN set -x \
-    && export GCLOUD_SHA256=71229c3cd2290a60310c5ac9fb2e660cb1a4a0f637704b4b3af0a1f75f649e5f \
+    && export GCLOUD_SHA256=727fa0beae4c15b4b821f6df2381fbed8b2277b77fd74ebc721bd483b49541b5 \
     && apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
-    && wget -O gcloud.tgz "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-201.0.0-linux-x86_64.tar.gz" \
+    && wget -O gcloud.tgz "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-251.0.0-linux-x86_64.tar.gz" \
     && echo "${GCLOUD_SHA256} *gcloud.tgz" | sha256sum -c - \
     && tar -zxvf gcloud.tgz -C /opt \
     && rm gcloud.tgz \
