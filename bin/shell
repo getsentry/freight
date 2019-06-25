@@ -1,26 +1,46 @@
 #!/usr/bin/env python
 
-from freight.config import create_app
 
-app = create_app()
-app_context = app.app_context()
-app_context.push()
+def make_shell():
+    import sys
+    from freight.config import create_app, db
 
-namespace = {"app": app}
-banner = "Freight"
+    app = create_app()
+    app_context = app.app_context()
+    app_context.push()
+    context = {"app": app, "db": db}
 
-try:
+    models = __import__("freight.models", fromlist=["*"])
+    for key, attr in vars(models).items():
+        if isinstance(attr, type) and issubclass(attr, db.Model):
+            context[key] = attr
+
+    def py_version():
+        return sys.version.split("\n", 1)[0]
+
+    banner = f"""\
+- Freight Interactive Shell
+Python {py_version()}"""
+
     try:
-        from IPython.frontend.terminal.embed import InteractiveShellEmbed
+        try:
+            from IPython.frontend.terminal.embed import InteractiveShellEmbed
 
-        sh = InteractiveShellEmbed.instance(banner1=banner)
+            sh = InteractiveShellEmbed.instance(banner1=banner)
+        except ImportError:
+            from IPython.Shell import IPShellEmbed
+
+            sh = IPShellEmbed(banner=banner)
     except ImportError:
-        from IPython.Shell import IPShellEmbed
+        pass
+    else:
+        sh(local_ns=context)
+        return
 
-        sh = IPShellEmbed(banner=banner)
-except ImportError:
     from code import interact
 
-    interact(banner, local=namespace)
-else:
-    sh(local_ns=namespace)
+    interact(banner, local=context)
+
+
+if __name__ == "__main__":
+    make_shell()
