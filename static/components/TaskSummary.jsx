@@ -5,7 +5,6 @@ import classnames from 'classnames';
 
 import Duration from './Duration';
 import TimeSince from './TimeSince';
-import FaviconStatus from './FaviconStatus';
 
 class Progress extends React.Component {
   static propTypes = {
@@ -99,7 +98,6 @@ class TaskSummary extends React.Component {
         className={classnames(this.props.className, className)}
         onClick={this.gotoTask}
       >
-        <FaviconStatus status={task.status} progress={this.getEstimatedProgress(task)} />
         <Progress value={this.getEstimatedProgress(task)} />
         <h3>{task.name}</h3>
         <div className="ref">
