@@ -77,6 +77,10 @@ class FaviconStatus extends React.Component {
       document.title = this.originalTitle;
     }
   }
+
+  render() {
+    return null;
+  }
 }
 
 export default FaviconStatus;
