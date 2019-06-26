@@ -12,6 +12,7 @@ import LoadingIndicator from './LoadingIndicator';
 import PollingMixin from '../mixins/polling';
 import TimeSince from './TimeSince';
 import pushNotification from '../pushNotification';
+import FaviconStatus from './FaviconStatus';
 
 class Progress extends React.Component {
   static propTypes = {
@@ -440,6 +441,7 @@ const TaskDetails = createReactClass({
 
     const task = this.state.task;
     const inProgress = this.taskInProgress(task);
+    const estimatedProgress = this.getEstimatedProgress(task);
 
     let liveScrollClassName = 'btn btn-default btn-sm';
     if (this.state.liveScroll) {
@@ -528,7 +530,8 @@ const TaskDetails = createReactClass({
               )}
             </div>
             <div className="deploy-progress">
-              <Progress value={this.getEstimatedProgress(task)} />
+              <FaviconStatus status={task.status} progress={estimatedProgress} />
+              <Progress value={estimatedProgress} />
             </div>
           </div>
         </div>
