@@ -62,40 +62,34 @@ class FaviconStatus extends React.Component {
   }
 
   updateFavicon(pct, status) {
-    const image = document.createElement('img');
+    const canvas = document.createElement('canvas');
+    canvas.width = 32;
+    canvas.height = 32;
 
-    image.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 32;
-      canvas.height = 32;
+    const ctx = canvas.getContext('2d');
 
-      const ctx = canvas.getContext('2d');
+    ctx.transform(1, 0, 0, 1, 1.467, 0);
+    ctx.clip(new Path2D(MASK));
+    ctx.resetTransform();
+    ctx.fillStyle = this.getColor();
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+    if (status === 'in_progress') {
       ctx.transform(1, 0, 0, 1, 1.467, 0);
-      ctx.clip(new Path2D(MASK));
+      ctx.clip(new Path2D(PROGRESS_MASK));
       ctx.resetTransform();
-      ctx.fillStyle = this.getColor();
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      if (status === 'in_progress') {
-        ctx.transform(1, 0, 0, 1, 1.467, 0);
-        ctx.clip(new Path2D(PROGRESS_MASK));
-        ctx.resetTransform();
+      const start = d2r(-90);
+      const progress = start + d2r(360 * pct);
+      ctx.fillStyle = Colors.progress;
+      ctx.beginPath();
+      ctx.moveTo(16, 16);
+      ctx.arc(16, 16, 32, start, progress);
+      ctx.closePath();
+      ctx.fill();
+    }
 
-        const start = d2r(-90);
-        const progress = start + d2r(360 * pct);
-        ctx.fillStyle = Colors.progress;
-        ctx.beginPath();
-        ctx.moveTo(16, 16);
-        ctx.arc(16, 16, 32, start, progress);
-        ctx.closePath();
-        ctx.fill();
-      }
-
-      this.faviconElement.href = canvas.toDataURL('image/png');
-    };
-
-    image.src = this.originalFaviconUrl;
+    this.faviconElement.href = canvas.toDataURL('image/png');
   }
 
   updateTitle() {
