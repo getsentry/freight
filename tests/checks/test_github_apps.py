@@ -97,6 +97,8 @@ class GitHubAppsContextCheckTest(GitHubAppsCheckBase):
 
         config = {"contexts": ["other"], "repo": "getsentry/freight"}
 
+        with pytest.raises(CheckPending):
+            self.check.check(self.app, "abcdefg", config)
         with pytest.raises(CheckFailed):
             self.check.check(self.app, "abcdefg", config)
 
@@ -137,6 +139,8 @@ class GitHubAppsContextCheckTest(GitHubAppsCheckBase):
 
         config = {"repo": "getsentry/freight"}
 
+        with pytest.raises(CheckPending):
+            self.check.check(self.app, "abcdefg", config)
         with pytest.raises(CheckFailed):
             self.check.check(self.app, "abcdefg", config)
 
