@@ -23,4 +23,4 @@ images:
     "us.gcr.io/$PROJECT_ID/freight:$COMMIT_SHA",
     "us.gcr.io/$PROJECT_ID/freight:latest",
   ]
-timeout: 60m
+timeout: 3600s
