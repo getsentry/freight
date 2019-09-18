@@ -182,8 +182,8 @@ RUN set -x \
 
 # Install sentry-cli so the builds can register deploys, upload sourcemaps, etc.
 RUN set -x \
-    && export SENTRY_CLI_VERSION=1.40.0 \
-    && export SENTRY_CLI_SHA256=3312dbd7d4f7cec8f1980ba09ef741eadfa5d74315fac6f09812e4b307740432 \
+    && export SENTRY_CLI_VERSION=1.47.1 \
+    && export SENTRY_CLI_SHA256=ecd26422a11d61c08d1e7a6f4fb0b26c3c6c3f4f658a6ad74a92468e4f8023f7 \
     && apt-get update && apt-get install -y --no-install-recommends wget && rm -rf /var/lib/apt/lists/* \
     && wget -O /tmp/sentry-cli "https://github.com/getsentry/sentry-cli/releases/download/$SENTRY_CLI_VERSION/sentry-cli-Linux-x86_64" \
     && echo "$SENTRY_CLI_SHA256 /tmp/sentry-cli" | sha256sum -c - \
