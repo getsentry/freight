@@ -357,7 +357,6 @@ def run_step_deployment(
                         api,
                         resp.metadata.name,
                         resp.metadata.namespace,
-                        resp.metadata.generation,
                     ),
                     {},  # empty state dict for this rollout
                 )
@@ -569,12 +568,12 @@ def run_step_cronjob(
 
 
 def rollout_status_deployment(
-    api: client.AppsV1beta1Api, name: str, namespace: str, generation: int
+    api: client.AppsV1beta1Api, name: str, namespace: str,
 ) -> Tuple[str, bool]:
     # tbh this is mostly ported from Go into Python from:
     # https://github.com/kubernetes/kubernetes/blob/master/pkg/kubectl/rollout_status.go#L76-L92
     deployment = api.read_namespaced_deployment(name=name, namespace=namespace)
-    if generation <= deployment.status.observed_generation:
+    if deployment.metadata.generation <= deployment.status.observed_generation:
         replicas = deployment.spec.replicas
         updated_replicas = deployment.status.updated_replicas or 0
         available_replicas = deployment.status.available_replicas or 0
