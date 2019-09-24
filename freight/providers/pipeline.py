@@ -573,29 +573,29 @@ def rollout_status_deployment(
     # tbh this is mostly ported from Go into Python from:
     # https://github.com/kubernetes/kubernetes/blob/master/pkg/kubectl/rollout_status.go#L76-L92
     deployment = api.read_namespaced_deployment(name=name, namespace=namespace)
-    if deployment.metadata.generation <= deployment.status.observed_generation:
-        replicas = deployment.spec.replicas
-        updated_replicas = deployment.status.updated_replicas or 0
-        available_replicas = deployment.status.available_replicas or 0
+    if deployment.metadata.generation > deployment.status.observed_generation:
+        return f"Waiting for deployment {repr(name)} spec update to be observed...", False
 
-        if updated_replicas < replicas:
-            return (
-                f"Waiting for deployment {repr(name)} rollout to finish: {updated_replicas} out of {replicas} new replicas have been updated...",
-                False,
-            )
-        if replicas > updated_replicas:
-            return (
-                f"Waiting for deployment {repr(name)} rollout to finish: {replicas-updated_replicas} old replicas are pending termination...",
-                False,
-            )
-        if available_replicas < updated_replicas:
-            return (
-                f"Waiting for deployment {repr(name)} rollout to finish: {available_replicas} of {updated_replicas} updated replicas are available...",
-                False,
-            )
-        return f"Deployment {repr(name)} successfully rolled out", True
+    replicas = deployment.spec.replicas
+    updated_replicas = deployment.status.updated_replicas or 0
+    available_replicas = deployment.status.available_replicas or 0
 
-    return f"Waiting for deployment {repr(name)} spec update to be observed...", False
+    if updated_replicas < replicas:
+        return (
+            f"Waiting for deployment {repr(name)} rollout to finish: {updated_replicas} out of {replicas} new replicas have been updated...",
+            False,
+        )
+    if replicas > updated_replicas:
+        return (
+            f"Waiting for deployment {repr(name)} rollout to finish: {replicas-updated_replicas} old replicas are pending termination...",
+            False,
+        )
+    if available_replicas < updated_replicas:
+        return (
+            f"Waiting for deployment {repr(name)} rollout to finish: {available_replicas} of {updated_replicas} updated replicas are available...",
+            False,
+        )
+    return f"Deployment {repr(name)} successfully rolled out", True
 
 
 def merge_dicts(a: dict, b: dict) -> dict:
