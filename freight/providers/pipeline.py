@@ -576,6 +576,13 @@ def rollout_status_deployment(
     if deployment.metadata.generation > deployment.status.observed_generation:
         return f"Waiting for deployment {repr(name)} spec update to be observed...", False
 
+    # TimedOutReason is added in a deployment when its newest replica set
+    # fails to show any progress within the given deadline (progressDeadlineSeconds).
+    for condition in deployment.status.conditions:
+        if condition.type == "Progressing":
+            if condition.reason == "ProgressDeadlineExceeded":
+                return f"deployment {repr(name)} exceeded its progress deadline", False
+
     spec_replicas = deployment.spec.replicas
     status_replicas = deployment.status.replicas
     updated_replicas = deployment.status.updated_replicas or 0
