@@ -57,6 +57,7 @@ class DeployIndexApiView(ApiView):
         args = self.get_parser.parse_args()
 
         qs_filters = []
+        needs_join = False
 
         if args.app:
             app = App.query.filter(App.name == args.app).first()
@@ -69,18 +70,23 @@ class DeployIndexApiView(ApiView):
             if not user:
                 return self.respond([])
             qs_filters.append(Task.user_id == user.id)
+            needs_join = True
 
         if args.env:
             qs_filters.append(Deploy.environment == args.env)
 
         if args.ref:
             qs_filters.append(Task.ref == args.ref)
+            needs_join = True
 
         if args.status:
             status_list = list(map(TaskStatus.label_to_id, args.status))
             qs_filters.append(Task.status.in_(status_list))
+            needs_join = True
 
         deploy_qs = Deploy.query.filter(*qs_filters).order_by(Deploy.id.desc())
+        if needs_join:
+            deploy_qs = deploy_qs.join(Task, Task.id == Deploy.task_id)
 
         return self.paginate(deploy_qs, on_results=serialize)
 
