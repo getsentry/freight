@@ -29,7 +29,7 @@ describe('<Layout />', () => {
       },
     ];
     const result = mount(
-      <Layout>
+      <Layout params={{}}>
         <TaskDetails params={{}} task={task} />
       </Layout>
     );
