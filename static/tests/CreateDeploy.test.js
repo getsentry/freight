@@ -19,6 +19,6 @@ test('CreateDeploy Snapshot', () => {
       repository: 'https://github.com/getsentry/freight.git',
     },
   ];
-  const wrapper = mount(<CreateDeploy appList={appList} />);
+  const wrapper = mount(<CreateDeploy appList={appList} location={{}} />);
   expect(wrapper).toMatchSnapshot();
 });

@@ -19,6 +19,7 @@ exports[`CreateDeploy Snapshot 1`] = `
       },
     ]
   }
+  location={Object {}}
 >
   <div
     className="create-deploy"

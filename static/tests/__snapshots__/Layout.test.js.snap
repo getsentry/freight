@@ -19,7 +19,14 @@ exports[`<Layout /> should render <Layout /> 1`] = `
             className="btn btn-sm btn-default btn-disabled"
             onlyActiveOnIndex={false}
             style={Object {}}
-            to="/deploy"
+            to={
+              Object {
+                "pathname": "/deploy",
+                "query": Object {
+                  "app": undefined,
+                },
+              }
+            }
           >
             <a
               className="btn btn-sm btn-default btn-disabled"
