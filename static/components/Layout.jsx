@@ -8,32 +8,15 @@ import Indicators from './Indicators';
 import LoadingIndicator from './LoadingIndicator';
 
 class Layout extends React.Component {
-  static childContextTypes = {
-    setHeading: PropTypes.func,
-  };
-
   state = {
-    heading: null,
     appList: null,
     loading: true,
     error: false,
   };
 
-  getChildContext() {
-    return {
-      setHeading: this.setHeading,
-    };
-  }
-
   componentWillMount() {
     this.fetchData();
   }
-
-  setHeading = value => {
-    this.setState({
-      heading: value,
-    });
-  };
 
   fetchConfig = () => {
     const error = new Error('Error fetching /config/');
@@ -106,7 +89,8 @@ class Layout extends React.Component {
   };
 
   render() {
-    const {loading, error, heading, appList} = this.state;
+    const {app} = this.props.params;
+    const {loading, error, appList} = this.state;
 
     return (
       <div>
@@ -126,7 +110,11 @@ class Layout extends React.Component {
             <h1>
               <Link to="/">Freight</Link>
             </h1>
-            {heading && <h2>{heading}</h2>}
+            {app && (
+              <h2>
+                <Link to={`/${app}`}>{app}</Link>
+              </h2>
+            )}
           </div>
         </header>
 
