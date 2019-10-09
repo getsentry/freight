@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import createReactClass from 'create-react-class';
@@ -9,6 +10,9 @@ import PollingMixin from '../mixins/polling';
 
 const DeployChart = createReactClass({
   displayName: 'DeployChart',
+  propTypes: {
+    app: PropTypes.string,
+  },
   mixins: [PollingMixin],
 
   getInitialState() {
@@ -30,7 +34,8 @@ const DeployChart = createReactClass({
   },
 
   getPollingUrl() {
-    return '/stats/';
+    const {app} = this.props;
+    return `/stats/${app ? `?app=${app}` : ''}`;
   },
 
   pollingReceiveData(data) {

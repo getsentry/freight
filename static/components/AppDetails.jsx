@@ -4,16 +4,13 @@ import createReactClass from 'create-react-class';
 
 import api from '../api';
 
+import DeployChart from './DeployChart';
 import LoadingIndicator from './LoadingIndicator';
 import PollingMixin from '../mixins/polling';
 import TaskSummary from './TaskSummary';
 
 const AppDetails = createReactClass({
   displayName: 'AppDetails',
-
-  contextTypes: {
-    setHeading: PropTypes.func,
-  },
 
   mixins: [PollingMixin],
 
@@ -31,7 +28,13 @@ const AppDetails = createReactClass({
         this.setState({
           app: data,
         });
-        this.context.setHeading(data.name);
+      },
+      error: err => {
+        const error =
+          err && err.status === 404
+            ? `Invalid application: ${this.props.params.app}`
+            : 'Error fetching data';
+        this.setState({error});
       },
     });
     api.request(this.getPollingUrl(), {
@@ -41,10 +44,6 @@ const AppDetails = createReactClass({
         });
       },
     });
-  },
-
-  componentWillUnmount() {
-    this.context.setHeading(null);
   },
 
   getAppUrl() {
@@ -70,6 +69,10 @@ const AppDetails = createReactClass({
   },
 
   render() {
+    if (this.state.error) {
+      return <h2>{this.state.error}</h2>;
+    }
+
     if (this.state.tasks === null || this.state.app === null) {
       return <LoadingIndicator />;
     }
@@ -94,16 +97,30 @@ const AppDetails = createReactClass({
       <div>
         <div className="section">
           <div className="section-header">
-            <h2>{app.name} Deploys</h2>
+            <h2>{app.name} - Active Deploys</h2>
           </div>
-          {tasks.length ? (
-            <ul className="task-list">
+
+          {activeTaskNodes.length || pendingTaskNodes.length ? (
+            <div className="deploy-list">
               {activeTaskNodes}
               {pendingTaskNodes}
-              {previousTaskNodes}
-            </ul>
+            </div>
           ) : (
-            <p>There have been no deploys for this app.</p>
+            <p>There are no active deploys.</p>
+          )}
+        </div>
+
+        <div className="section">
+          <div className="section-header">
+            <h2>{app.name} - Deploy History</h2>
+          </div>
+
+          <DeployChart app={app.name} />
+
+          {previousTaskNodes.length ? (
+            <div className="deploy-list">{previousTaskNodes}</div>
+          ) : (
+            <p>There are no historical deploys.</p>
           )}
         </div>
       </div>

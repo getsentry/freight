@@ -6,10 +6,6 @@ import IndicatorStore from '../stores/indicatorStore';
 import LoadingIndicator from './LoadingIndicator';
 
 class AppSettings extends React.Component {
-  static contextTypes = {
-    setHeading: PropTypes.func,
-  };
-
   state = {
     appId: this.props.params.app,
     app: null,
@@ -25,13 +21,8 @@ class AppSettings extends React.Component {
           app: data,
           formData: this.getFormData(data),
         });
-        this.context.setHeading(data.name);
       },
     });
-  }
-
-  componentWillUnmount() {
-    this.context.setHeading(null);
   }
 
   getAppUrl = () => {
