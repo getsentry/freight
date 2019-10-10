@@ -20,14 +20,12 @@ class StatsApiView(ApiView):
         args = self.get_parser.parse_args()
         end_date = date.today() - timedelta(days=30)
 
-        qs_filters = [
-            Task.date_started > end_date
-        ]
+        qs_filters = [Task.date_started > end_date]
 
         if args.app:
             try:
-                app = App.query.filter(App.name == args.app)[0]
-                qs_filters.append(App.id == app.id)
+                app = App.query.filter(App.name == args.app).first()
+                qs_filters.append(Task.app_id == app.id)
             except IndexError:
                 # TODO: what to do if app is not found?
                 return []
