@@ -584,7 +584,7 @@ def rollout_status_deployment(
                 return f"deployment {repr(name)} exceeded its progress deadline", False
 
     spec_replicas = deployment.spec.replicas
-    status_replicas = deployment.status.replicas
+    status_replicas = deployment.status.replicas or 0
     updated_replicas = deployment.status.updated_replicas or 0
     available_replicas = deployment.status.available_replicas or 0
 
