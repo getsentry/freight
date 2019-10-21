@@ -1,5 +1,6 @@
 __all__ = ["Fixtures"]
 
+from datetime import datetime
 from uuid import uuid4
 
 from freight.config import db
@@ -70,6 +71,7 @@ class Fixtures(object):
             "data", {"provider_config": app.deploy_config.provider_config}
         )
         kwargs.setdefault("params", {"task": "deploy"})
+        kwargs.setdefault("date_started", datetime.utcnow())
 
         task = Task(app_id=app.id, user_id=user.id, **kwargs)
         db.session.add(task)
