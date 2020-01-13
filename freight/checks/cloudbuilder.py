@@ -59,7 +59,7 @@ class GCPContainerBuilderCheck(Check):
             params["filter"] = f'sourceProvenance.resolvedRepoSource.commitSha="{sha}"'
         else:
             # Should work for both cases ("Cloud Build GitHub App" and "GitHub (mirrored)").
-            # This should be working fine Even if "images" contains multiple entries.
+            # This should be working fine even if "images" contains multiple entries.
             params["filter"] = f'images="{image_name}:{sha}"'
 
         headers = {
