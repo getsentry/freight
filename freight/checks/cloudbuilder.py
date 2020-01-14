@@ -26,7 +26,11 @@ class GCPContainerBuilderCheck(Check):
     required = True
 
     def get_options(self):
-        return {"project": {"required": True}, "oauth_token": {"required": False}}
+        return {
+            "project": {"required": True},
+            "oauth_token": {"required": False},
+            "image_name": {"required": False},
+        }
 
     def check(self, app, sha, config):
         """Check build status
@@ -48,7 +52,16 @@ class GCPContainerBuilderCheck(Check):
                 .decode("utf-8")
             )
 
-        params = {"filter": f'sourceProvenance.resolvedRepoSource.commitSha="{sha}"'}
+        params = {}
+        image_name = config.get("image_name")
+        if image_name is None:
+            # Note: this doesn't work with the new "Cloud Build GitHub App" way of checking out repositories.
+            params["filter"] = f'sourceProvenance.resolvedRepoSource.commitSha="{sha}"'
+        else:
+            # Should work for both cases ("Cloud Build GitHub App" and "GitHub (mirrored)").
+            # This should be working fine even if "images" contains multiple entries.
+            params["filter"] = f'images="{image_name}:{sha}"'
+
         headers = {
             "Accepts": "application/json",
             "Authorization": f"Bearer {oauth_token}",
