@@ -83,7 +83,7 @@ class GCPContainerBuilderCheck(Check):
         build_id = build_data["builds"][0]["id"]
         build_status = build_data["builds"][0]["status"]
         build_url = build_data["builds"][0]["logUrl"]
-        build_logs = build_data["builds"][0]["logsBucket"]
+        build_logs = build_data["builds"][0].get("logsBucket")
         gcloudstatus = {
             "STATUS_UNKNOWN": "Status of the build is unknown.",
             "QUEUED": "Build or step is queued; work has not yet begun.",
@@ -96,10 +96,13 @@ class GCPContainerBuilderCheck(Check):
         }
 
         if build_status == "FAILURE":
-            build_logtext = f"https://storage.googleapis.com/{build_logs[5:].rstrip('/')}/log-{build_id}.txt"
-            log = http.get(build_logtext, headers=headers)
+            if build_logs:
+                build_logtext = f"https://storage.googleapis.com/{build_logs[5:].rstrip('/')}/log-{build_id}.txt"
+                logs_text = http.get(build_logtext, headers=headers).text
+            else:
+                logs_text = "<unknown>"
             raise CheckFailed(
-                f"[ {build_status} ]\t{gcloudstatus['FAILURE']}\nSee details: {build_url}\nPrinting log...\n\n\n{log.text}"
+                f"[ {build_status} ]\t{gcloudstatus['FAILURE']}\nSee details: {build_url}\nPrinting log...\n\n\n{logs_text}"
             )
 
         if build_status in ["QUEUED", "WORKING"]:
