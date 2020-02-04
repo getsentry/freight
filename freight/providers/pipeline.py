@@ -13,7 +13,6 @@ from dataclasses import dataclass, asdict
 from kubernetes import client
 from kubernetes.client import ApiClient
 from kubernetes.config import new_client_from_config, ConfigException
-from requests import Session
 from yaml import safe_load
 
 from .base import Provider
@@ -40,7 +39,7 @@ class SentryContext:
     organization: str
     project: str
     repository: str
-    client: Session
+    client: http.PoolManager
 
 
 @dataclass(frozen=True)
@@ -139,20 +138,22 @@ class PipelineProvider(Provider):
             workspace.log.info(
                 f"Creating new Sentry release: {sentry_context.repository}@{task_context.sha}"
             )
-            sentry_context.client.post(
-                f"https://sentry.io/api/0/organizations/{sentry_context.organization}/releases/",
-                json={
-                    "version": task_context.sha,
-                    "refs": [
-                        {
-                            "repository": sentry_context.repository,
-                            "previousCommit": task_context.prev_sha,
-                            "commit": task_context.sha,
-                        }
-                    ],
-                    "projects": [sentry_context.project],
-                },
-            ).raise_for_status()
+            http.raise_for_status(
+                sentry_context.client.post(
+                    f"https://sentry.io/api/0/organizations/{sentry_context.organization}/releases/",
+                    json={
+                        "version": task_context.sha,
+                        "refs": [
+                            {
+                                "repository": sentry_context.repository,
+                                "previousCommit": task_context.prev_sha,
+                                "commit": task_context.sha,
+                            }
+                        ],
+                        "projects": [sentry_context.project],
+                    },
+                )
+            )
 
         for i, step in enumerate(config["steps"]):
             workspace.log.info(f"Running Step {i+1} ({step['kind']})")
@@ -163,19 +164,23 @@ class PipelineProvider(Provider):
 
         if sentry_context:
             workspace.log.info(f"Tagging Sentry release as deployed.")
-            sentry_context.client.put(
-                f"https://sentry.io/api/0/organizations/{sentry_context.organization}/releases/{task_context.sha}/",
-                json={"dateReleased": date_finished.isoformat() + "Z"},
-            ).raise_for_status()
-            sentry_context.client.post(
-                f"https://sentry.io/api/0/organizations/{sentry_context.organization}/releases/{task_context.sha}/deploys/",
-                json={
-                    "environment": deploy.environment,
-                    "url": task_context.url,
-                    "dateStarted": date_started.isoformat() + "Z",
-                    "dateFinished": date_finished.isoformat() + "Z",
-                },
-            ).raise_for_status()
+            http.raise_for_status(
+                sentry_context.client.put(
+                    f"https://sentry.io/api/0/organizations/{sentry_context.organization}/releases/{task_context.sha}/",
+                    json={"dateReleased": date_finished.isoformat() + "Z"},
+                )
+            )
+            http.raise_for_status(
+                sentry_context.client.post(
+                    f"https://sentry.io/api/0/organizations/{sentry_context.organization}/releases/{task_context.sha}/deploys/",
+                    json={
+                        "environment": deploy.environment,
+                        "url": task_context.url,
+                        "dateStarted": date_started.isoformat() + "Z",
+                        "dateFinished": date_finished.isoformat() + "Z",
+                    },
+                )
+            )
 
 
 def make_sentry_context(config: Dict[str, str]) -> SentryContext:
@@ -568,13 +573,16 @@ def run_step_cronjob(
 
 
 def rollout_status_deployment(
-    api: client.AppsV1beta1Api, name: str, namespace: str,
+    api: client.AppsV1beta1Api, name: str, namespace: str
 ) -> Tuple[str, bool]:
     # tbh this is mostly ported from Go into Python from:
     # https://github.com/kubernetes/kubernetes/blob/master/pkg/kubectl/rollout_status.go#L76-L92
     deployment = api.read_namespaced_deployment(name=name, namespace=namespace)
     if deployment.metadata.generation > deployment.status.observed_generation:
-        return f"Waiting for deployment {repr(name)} spec update to be observed...", False
+        return (
+            f"Waiting for deployment {repr(name)} spec update to be observed...",
+            False,
+        )
 
     # TimedOutReason is added in a deployment when its newest replica set
     # fails to show any progress within the given deadline (progressDeadlineSeconds).

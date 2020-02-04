@@ -1,5 +1,6 @@
 __all__ = ["GitHubAppsContextCheck"]
 
+import json
 
 from flask import current_app
 
@@ -43,7 +44,7 @@ class GitHubAppsContextCheck(Check):
 
         resp = http.get(url, headers=headers)
 
-        check_runs_dict = resp.json()
+        check_runs_dict = json.loads(resp.data.decode("utf8"))
         if not check_runs_dict or not check_runs_dict.get("total_count"):
             raise CheckFailed("No contexts were present in GitHub")
 
