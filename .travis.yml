@@ -5,15 +5,13 @@ services:
   - postgresql
   - redis-server
 python:
-  - "3.7"
+  - "3.8"
 cache:
-  directories:
-    - "$HOME/.npm"
-    - .pip_download_cache
-    - "$HOME/virtualenv/python3.7.1"
+  - pip
+  - npm
+  - yarn
 env:
   global:
-    - PIP_DOWNLOAD_CACHE=".pip_download_cache"
     - TRAVIS_NODE_VERSION=8.15.1
 install:
   - nvm install $TRAVIS_NODE_VERSION
