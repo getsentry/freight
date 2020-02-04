@@ -17,5 +17,7 @@ npm-debug.log
 .vagrant
 .env
 venv/
+.venv/
 freight_venv
 __pycache__
+.mypy_cache/

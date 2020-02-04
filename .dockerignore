@@ -13,3 +13,5 @@ LICENSE
 node_modules/
 cloudbuild.yaml
 __pycache__
+.mypy_cache/
+.venv/
