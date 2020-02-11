@@ -19,13 +19,16 @@ class CreateDeploy extends React.Component {
       : defaultApp
       ? defaultApp.name
       : null;
-    const defaultEnv = app ? Object.keys(app.environments)[0] : null;
-    const envMap = app ? app.environments : {};
-    const defaultRef = defaultEnv ? envMap[defaultEnv].defaultRef : 'master';
+    const envMap = app
+      ? appList.filter(appObj => appObj.name === app)[0].environments || {}
+      : {};
+    const envList = Object.keys(envMap);
+    const env = envList.length ? envList[0] : null;
+    const defaultRef = env ? envMap[env].defaultRef : 'master';
 
     this.state = {
       app,
-      env: defaultEnv ? defaultEnv.name : null,
+      env,
       envMap,
       ref: defaultRef,
       submitInProgress: false,
