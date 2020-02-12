@@ -125,7 +125,7 @@ class PipelineProvider(Provider):
             url=http.absolute_uri(
                 f"/deploys/{app.name}/{deploy.environment}/{deploy.number}"
             ),
-            ssh_key=ssh_key.name,
+            ssh_key=ssh_key.name if ssh_key is not None else "",
         )
 
         context = PipelineContext(
@@ -255,6 +255,7 @@ def run_step(step: Dict[str, Any], context: PipelineContext) -> None:
     if step["kind"] not in (
         "Shell",
         "KubernetesDeployment",
+        "KubernetesStatefulSet",
         "KubernetesCronJob",
         "KubernetesJob",
     ):
@@ -263,6 +264,7 @@ def run_step(step: Dict[str, Any], context: PipelineContext) -> None:
     watchers = {
         "Shell": run_step_shell,
         "KubernetesDeployment": run_step_deployment,
+        "KubernetesStatefulSet": run_step_stateful_set,
         "KubernetesCronJob": run_step_cronjob,
         "KubernetesJob": run_step_job,
     }[step["kind"]](step, context)
@@ -320,7 +322,6 @@ def run_step_deployment(
     # even if the image doesn't change. This means a re-deploy of a service
     # is not entirely a no-op, but will restart all Deployments still.
     for deployment in api.list_namespaced_deployment(**selector).items:
-        namespace = deployment.metadata.name
         name = deployment.metadata.name
         changes = False
         for container in deployment.spec.template.spec.containers:
@@ -354,6 +355,59 @@ def run_step_deployment(
                 (
                     partial(
                         rollout_status_deployment,
+                        api,
+                        resp.metadata.name,
+                        resp.metadata.namespace,
+                    ),
+                    {},  # empty state dict for this rollout
+                )
+            )
+
+    return watchers
+
+
+def run_step_stateful_set(
+    step: Dict[str, Any], context: PipelineContext
+) -> List[Tuple[Callable, Dict[str, str]]]:
+    # Execute a Kubernetes StatefulSet
+    context.workspace.log.info(f"Running StatefulSet: {repr(step)}")
+
+    api = client.AppsV1Api(context.kube.client)
+
+    selector = format_task(step["selector"], context.task)
+    selector.setdefault("namespace", "default")
+    containers = format_task(step["containers"], context.task)
+
+    watchers: List[Tuple[Callable, Dict[str, str]]] = []
+
+    for ss in api.list_namespaced_stateful_set(**selector).items:
+        changes = False
+        for container in ss.spec.template.spec.containers:
+            for c in containers:
+                if container.name == c["name"]:
+                    container.image = c["image"]
+                    changes = True
+
+        if changes:
+            if ss.metadata.annotations is None:
+                ss.metadata.annotations = {}
+            if ss.spec.template.metadata.annotations is None:
+                ss.spec.template.metadata.annotations = {}
+            for k, v in asdict(context.task).items():
+                if k == "ssh_key":
+                    continue
+                k = f"freight.sentry.io/{k}"
+                ss.metadata.annotations[k] = v
+                ss.spec.template.metadata.annotations[k] = v
+
+            resp = api.patch_namespaced_stateful_set(
+                name=ss.metadata.name, namespace=ss.metadata.namespace, body=ss,
+            )
+
+            watchers.append(
+                (
+                    partial(
+                        rollout_status_stateful_set,
                         api,
                         resp.metadata.name,
                         resp.metadata.namespace,
@@ -574,11 +628,14 @@ def rollout_status_deployment(
     # https://github.com/kubernetes/kubernetes/blob/master/pkg/kubectl/rollout_status.go#L76-L92
     deployment = api.read_namespaced_deployment(name=name, namespace=namespace)
     if deployment.metadata.generation > deployment.status.observed_generation:
-        return f"Waiting for deployment {repr(name)} spec update to be observed...", False
+        return (
+            f"Waiting for deployment {repr(name)} spec update to be observed...",
+            False,
+        )
 
     # TimedOutReason is added in a deployment when its newest replica set
     # fails to show any progress within the given deadline (progressDeadlineSeconds).
-    for condition in deployment.status.conditions:
+    for condition in deployment.status.conditions or []:
         if condition.type == "Progressing":
             if condition.reason == "ProgressDeadlineExceeded":
                 return f"deployment {repr(name)} exceeded its progress deadline", False
@@ -604,6 +661,48 @@ def rollout_status_deployment(
             False,
         )
     return f"Deployment {repr(name)} successfully rolled out", True
+
+
+def rollout_status_stateful_set(
+    api: client.AppsV1Api, name: str, namespace: str,
+) -> Tuple[str, bool]:
+    # tbh this is mostly ported from Go into Python from:
+    # https://github.com/kubernetes/kubernetes/blob/master/pkg/kubectl/rollout_status.go#L76-L92
+    ss = api.read_namespaced_stateful_set(name=name, namespace=namespace)
+    if ss.metadata.generation > ss.status.observed_generation:
+        return (
+            f"Waiting for statefulset {repr(name)} spec update to be observed...",
+            False,
+        )
+
+    # TimedOutReason is added in a deployment when its newest replica set
+    # fails to show any progress within the given deadline (progressDeadlineSeconds).
+    for condition in ss.status.conditions or []:
+        if condition.type == "Progressing":
+            if condition.reason == "ProgressDeadlineExceeded":
+                return f"statefulset {repr(name)} exceeded its progress deadline", False
+
+    spec_replicas = ss.spec.replicas
+    status_replicas = ss.status.replicas or 0
+    updated_replicas = ss.status.updated_replicas or 0
+    ready_replicas = ss.status.ready_replicas or 0
+
+    if updated_replicas < spec_replicas:
+        return (
+            f"Waiting for statefulset {repr(name)} rollout to finish: {updated_replicas} out of {spec_replicas} new replicas have been updated...",
+            False,
+        )
+    if status_replicas > updated_replicas:
+        return (
+            f"Waiting for statefulset {repr(name)} rollout to finish: {status_replicas-updated_replicas} old replicas are pending termination...",
+            False,
+        )
+    if ready_replicas < updated_replicas:
+        return (
+            f"Waiting for statefulset {repr(name)} rollout to finish: {ready_replicas} of {updated_replicas} updated replicas are available...",
+            False,
+        )
+    return f"StatefulSet {repr(name)} successfully rolled out", True
 
 
 def merge_dicts(a: dict, b: dict) -> dict:
