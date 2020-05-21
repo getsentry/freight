@@ -7,9 +7,9 @@ from freight.models import TaskStatus
 from freight.testutils import TestCase
 
 
-class GenericNotifierBase(TestCase):
+class WebhookNotifierBase(TestCase):
     def setUp(self):
-        self.notifier = notifiers.get("Generic")
+        self.notifier = notifiers.get("webhook")
         self.user = self.create_user()
         self.repo = self.create_repo()
         self.app = self.create_app(repository=self.repo)
@@ -20,7 +20,7 @@ class GenericNotifierBase(TestCase):
         self.deploy = self.create_deploy(app=self.app, task=self.task)
 
 
-class GenericNotifierTest(GenericNotifierBase):
+class WebhookNotifierTest(WebhookNotifierBase):
     @responses.activate
     def test_send_finished_task(self):
         responses.add(responses.POST, "http://example.com/")
@@ -36,14 +36,13 @@ class GenericNotifierTest(GenericNotifierBase):
         assert responses.calls[0].request.url == "http://example.com/"
         body = responses.calls[0].request.body
         payload = json.loads(body)
-        print(payload)
         assert payload
 
     @responses.activate
     def test_send_started_task(self):
         responses.add(responses.POST, "http://example.com/")
 
-        config = {"webhook_url": "http://example.com/"}
+        config = {"webhook_url": "http://example.com/", "headers": {"secret": "abcxyz"}}
 
         self.notifier.send_deploy(
             self.deploy, self.task, config, NotifierEvent.TASK_STARTED
@@ -53,6 +52,7 @@ class GenericNotifierTest(GenericNotifierBase):
         assert len(responses.calls) == 1
         assert responses.calls[0].request.url == "http://example.com/"
         body = responses.calls[0].request.body
+        headers = responses.calls[0].request.headers
+        assert headers["x-freight-secret"] == "abcxyz"
         payload = json.loads(body)
-        print(payload)
         assert payload

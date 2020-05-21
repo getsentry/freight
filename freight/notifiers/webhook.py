@@ -1,4 +1,4 @@
-__all__ = ["GenericNotifier"]
+__all__ = ["WebhookNotifier"]
 
 from freight import http
 from freight.models import App, Task, TaskStatus, User
@@ -6,18 +6,13 @@ from freight.models import App, Task, TaskStatus, User
 from .base import Notifier, NotifierEvent, generate_event_title
 
 
-class GenericNotifier(Notifier):
+def stringify_date(date):
+    return date.isoformat() + "Z" if date else None
+
+
+class WebhookNotifier(Notifier):
     def get_options(self):
-        return {"webhook_url": {"required": True}}
-
-    def should_send_deploy(self, deploy, task, config, event):
-        if event == NotifierEvent.TASK_STARTED:
-            return True
-
-        if event == NotifierEvent.TASK_FINISHED and task.status == TaskStatus.finished:
-            return True
-
-        return False
+        return {"webhook_url": {"required": True}, "headers": {"required": False}}
 
     def send_deploy(self, deploy, task, config, event):
         webhook_url = config["webhook_url"]
@@ -35,12 +30,18 @@ class GenericNotifier(Notifier):
             "status": str(event),
             "ref": task.ref,
             "sha": task.sha,
-            "previous_sha": app.get_previous_sha(deploy.environment, current_sha=task.sha),
-            "date_created": task.date_created,
-            "date_started": task.date_started,
-            "date_finished": task.date_finished,
+            "previous_sha": app.get_previous_sha(
+                deploy.environment, current_sha=task.sha
+            ),
+            "date_created": stringify_date(task.date_created),
+            "date_started": stringify_date(task.date_started),
+            "date_finished": stringify_date(task.date_finished),
             "user": user.name,
             "user_id": user.id,
         }
 
-        http.post(webhook_url, json=payload)
+        headers = {
+            "x-freight-{}".format(k): v for k, v in config.get("headers", {}).items()
+        }
+
+        http.post(webhook_url, headers=headers, json=payload)
