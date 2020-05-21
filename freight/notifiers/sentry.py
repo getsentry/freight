@@ -11,7 +11,6 @@ class SentryNotifier(Notifier):
         return {"webhook_url": {"required": True}}
 
     def should_send_deploy(self, deploy, task, config, event):
-        return True
         if event == NotifierEvent.TASK_STARTED:
             return True
 
