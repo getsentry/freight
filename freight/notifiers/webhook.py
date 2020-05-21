@@ -24,18 +24,23 @@ class WebhookNotifier(Notifier):
 
         payload = {
             "app_name": app.name,
-            "environment": deploy.environment,
-            "deploy_number": deploy.number,
-            "title": title,
-            "status": str(event),
-            "ref": task.ref,
-            "sha": task.sha,
-            "previous_sha": app.get_previous_sha(
-                deploy.environment, current_sha=task.sha
-            ),
             "date_created": stringify_date(task.date_created),
             "date_started": stringify_date(task.date_started),
             "date_finished": stringify_date(task.date_finished),
+            "deploy_number": deploy.number,
+            "duration": task.duration,
+            "environment": deploy.environment,
+            "link": http.absolute_uri(
+                f"/deploys/{app.name}/{deploy.environment}/{deploy.number}/"
+            ),
+            "params": dict(task.params or {}),
+            "previous_sha": app.get_previous_sha(
+                deploy.environment, current_sha=task.sha
+            ),
+            "ref": task.ref,
+            "sha": task.sha,
+            "status": str(event),
+            "title": title,
             "user": user.name,
             "user_id": user.id,
         }
