@@ -10,15 +10,15 @@ class SentryNotifier(Notifier):
     def get_options(self):
         return {"webhook_url": {"required": True}}
 
-    # def should_send_deploy(self, deploy, task, config, event):
-    #     return True
-    #     if event == NotifierEvent.TASK_STARTED:
-    #         return True
+    def should_send_deploy(self, deploy, task, config, event):
+        return True
+        if event == NotifierEvent.TASK_STARTED:
+            return True
 
-    #     if event == NotifierEvent.TASK_FINISHED and task.status == TaskStatus.finished:
-    #         return True
+        if event == NotifierEvent.TASK_FINISHED and task.status == TaskStatus.finished:
+            return True
 
-    #     return False
+        return False
 
     def send_deploy(self, deploy, task, config, event):
         webhook_url = config["webhook_url"]
@@ -33,7 +33,7 @@ class SentryNotifier(Notifier):
             "ref": task.ref,
             "sha": task.sha,
             "duration": task.duration,
-            "repo": config['repo'], # optional
+            "repo": config["repo"],  # optional
             "event": "started" if event == NotifierEvent.TASK_STARTED else "finished",
             "dateStarted": task.date_started.isoformat() + "Z"
             if task.date_started
