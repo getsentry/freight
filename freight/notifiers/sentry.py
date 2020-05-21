@@ -33,7 +33,6 @@ class SentryNotifier(Notifier):
             "ref": task.ref,
             "sha": task.sha,
             "duration": task.duration,
-            "repo": config["repo"],  # optional
             "event": "started" if event == NotifierEvent.TASK_STARTED else "finished",
             "dateStarted": task.date_started.isoformat() + "Z"
             if task.date_started
