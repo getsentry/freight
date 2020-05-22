@@ -53,6 +53,6 @@ class WebhookNotifierTest(WebhookNotifierBase):
         assert responses.calls[0].request.url == "http://example.com/"
         body = responses.calls[0].request.body
         headers = responses.calls[0].request.headers
-        assert headers["x-freight-secret"] == "abcxyz"
+        assert headers["secret"] == "abcxyz"
         payload = json.loads(body)
         assert payload

@@ -45,8 +45,4 @@ class WebhookNotifier(Notifier):
             "user_id": user.id,
         }
 
-        headers = {
-            "x-freight-{}".format(k): v for k, v in config.get("headers", {}).items()
-        }
-
-        http.post(webhook_url, headers=headers, json=payload)
+        http.post(webhook_url, headers=config.get("headers", {}), json=payload)
