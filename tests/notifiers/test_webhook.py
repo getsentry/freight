@@ -25,7 +25,7 @@ class WebhookNotifierTest(WebhookNotifierBase):
     def test_send_finished_task(self):
         responses.add(responses.POST, "http://example.com/")
 
-        config = {"webhook_url": "http://example.com/"}
+        config = {"url": "http://example.com/"}
 
         self.notifier.send_deploy(
             self.deploy, self.task, config, NotifierEvent.TASK_FINISHED
@@ -42,7 +42,7 @@ class WebhookNotifierTest(WebhookNotifierBase):
     def test_send_started_task(self):
         responses.add(responses.POST, "http://example.com/")
 
-        config = {"webhook_url": "http://example.com/", "headers": {"secret": "abcxyz"}}
+        config = {"url": "http://example.com/", "headers": {"secret": "abcxyz"}}
 
         self.notifier.send_deploy(
             self.deploy, self.task, config, NotifierEvent.TASK_STARTED

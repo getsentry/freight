@@ -12,10 +12,10 @@ def stringify_date(date):
 
 class WebhookNotifier(Notifier):
     def get_options(self):
-        return {"webhook_url": {"required": True}, "headers": {"required": False}}
+        return {"url": {"required": True}, "headers": {"required": False}}
 
     def send_deploy(self, deploy, task, config, event):
-        webhook_url = config["webhook_url"]
+        url = config["url"]
 
         app = App.query.get(deploy.app_id)
         task = Task.query.get(deploy.task_id)
@@ -45,4 +45,4 @@ class WebhookNotifier(Notifier):
             "user_id": user.id,
         }
 
-        http.post(webhook_url, headers=config.get("headers", {}), json=payload)
+        http.post(url, headers=config.get("headers", {}), json=payload)
