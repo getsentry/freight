@@ -42,7 +42,12 @@ class GitHubContextCheck(Check):
 
         context_list = resp.json()
         if not context_list:
-            raise CheckFailed("No contexts were present in GitHub")
+            raise CheckFailed(
+                "No contexts were present in GitHub. "
+                "This means that no statuses, like CI results, "
+                "were found for the commit. You may want to wait a bit, "
+                "or failing that, deploy a new commit."
+            )
 
         valid_contexts = set()
         for data in context_list:

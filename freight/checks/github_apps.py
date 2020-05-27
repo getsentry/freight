@@ -45,7 +45,12 @@ class GitHubAppsContextCheck(Check):
 
         check_runs_dict = resp.json()
         if not check_runs_dict or not check_runs_dict.get("total_count"):
-            raise CheckFailed("No contexts were present in GitHub")
+            raise CheckFailed(
+                "No contexts were present in GitHub. "
+                "This means that no statuses, like CI results, "
+                "were found for the commit. You may want to wait a bit, "
+                "or failing that, deploy a new commit."
+            )
 
         valid_contexts = set()
         for check_run in check_runs_dict.get("check_runs", []):
