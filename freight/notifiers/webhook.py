@@ -11,8 +11,8 @@ def stringify_date(date):
 
 
 notifier_status = {
-    NotifierEvent.TASK_QUEUED: "queued",
-    NotifierEvent.TASK_STARTED: "started",
+    str(NotifierEvent.TASK_QUEUED): "queued",
+    str(NotifierEvent.TASK_STARTED): "started",
 }
 
 
@@ -31,7 +31,7 @@ class WebhookNotifier(Notifier):
         # event can be queued, started, finished
         # task.status is only used if event is `finished` so that we
         # can get the result of the deploy (failed, canceled, finished (succeeded))
-        status = notifier_status.get(event, task.status_label)
+        status = notifier_status.get(str(event), task.status_label)
         payload = {
             "app_name": app.name,
             "date_created": stringify_date(task.date_created),
