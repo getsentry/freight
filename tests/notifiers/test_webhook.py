@@ -36,8 +36,8 @@ class WebhookNotifierTest(WebhookNotifierBase):
         assert responses.calls[0].request.url == "http://example.com/"
         body = responses.calls[0].request.body
         payload = json.loads(body)
-        assert body["status"] == "finished"
         assert payload
+        assert payload["status"] == "finished"
 
     @responses.activate
     def test_send_started_task(self):
@@ -56,5 +56,5 @@ class WebhookNotifierTest(WebhookNotifierBase):
         headers = responses.calls[0].request.headers
         assert headers["secret"] == "abcxyz"
         payload = json.loads(body)
-        assert body["status"] == "started"
         assert payload
+        assert payload["status"] == "started"
