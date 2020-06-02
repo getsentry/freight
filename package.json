@@ -36,7 +36,7 @@
     "bootstrap": "~3.3.0",
     "classnames": "^2.2.1",
     "clean-webpack-plugin": "^2.0.1",
-    "copy-webpack-plugin": "^5.0.2",
+    "copy-webpack-plugin": "^6.0.0",
     "create-react-class": "^15.6.3",
     "css-loader": "^2.1.1",
     "file-loader": "^3.0.1",
