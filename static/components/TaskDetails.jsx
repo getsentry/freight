@@ -2,7 +2,7 @@ import {browserHistory} from 'react-router';
 import ansi_up from 'ansi_up';
 import createReactClass from 'create-react-class';
 import linkifyUrls from 'linkify-urls';
-import moment from 'moment';
+import {format} from 'date-fns';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -240,9 +240,7 @@ const TaskDetails = createReactClass({
             },
           })
         );
-        time.innerHTML = moment(newDate)
-          .parseZone()
-          .format('h:mm:ss a');
+        time.innerHTML = format(newDate, 'h:mm:ss aa');
 
         div.appendChild(time);
         frag.appendChild(div);

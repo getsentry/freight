@@ -1,4 +1,4 @@
-import moment from 'moment';
+import {format, addMinutes, addSeconds} from 'date-fns';
 import PropTypes from 'prop-types';
 import React from 'react';
 
@@ -31,40 +31,39 @@ class BarChart extends React.Component {
   };
 
   timeLabelAsHour = point => {
-    const timeMoment = moment(point.x * 1000);
-    const nextMoment = timeMoment.clone().add(59, 'minute');
+    const date = new Date(point.x * 1000);
+    const nextDate = addMinutes(date, 59);
 
     return (
       <span>
-        {timeMoment.format('LL')}
+        {format(date, 'PPP')}
         <br />
-        {timeMoment.format('LT')} &mdash;&rsaquo; {nextMoment.format('LT')}
+        {format(date, 'p')} &mdash;&rsaquo; {format(nextDate, 'p')}
       </span>
     );
   };
 
   timeLabelAsDay = point => {
-    const timeMoment = moment(point.x * 1000);
-
-    return <span>{timeMoment.format('LL')}</span>;
+    const date = new Date(point.x * 1000);
+    return <span>{format(date, 'PPP')}</span>;
   };
 
   timeLabelAsRange = (interval, point) => {
-    const timeMoment = moment(point.x * 1000);
-    const nextMoment = timeMoment.clone().add(interval - 1, 'second');
+    const date = new Date(point.x * 1000);
+    const nextDate = addSeconds(date, interval - 1);
 
     return (
       <span>
-        {timeMoment.format('lll')}
+        {format(date, 'PPp')}
         <br />
-        &mdash;&rsaquo; {nextMoment.format('lll')}
+        &mdash;&rsaquo; {format(nextDate, 'PPp')}
       </span>
     );
   };
 
   timeLabelAsFull = point => {
-    const timeMoment = moment(point.x * 1000);
-    return timeMoment.format('lll');
+    const date = new Date(point.x * 1000);
+    return format(date, 'PPp');
   };
 
   render() {
