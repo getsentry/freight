@@ -71,9 +71,11 @@ def create_app(_read_config=True, **config):
         os.environ.get("DEFAULT_READ_TIMEOUT", 600)
     )
 
-    app.config["LOG_LEVEL"] = "INFO"
+    app.config["LOG_LEVEL"] = os.environ.get(
+        "LOG_LEVEL", "INFO" if config.get("DEBUG") else "ERROR"
+    )
 
-    app.config["DEV"] = config.get("DEV", True)
+    app.config["DEV"] = config.get("DEV", False)
 
     # Currently authentication requires Google
     app.config["GOOGLE_CLIENT_ID"] = os.environ.get("GOOGLE_CLIENT_ID")
