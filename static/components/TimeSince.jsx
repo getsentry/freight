@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import moment from 'moment';
+import {formatDistanceToNowStrict} from 'date-fns';
 
 class TimeSince extends React.Component {
   static propTypes = {
@@ -26,13 +26,13 @@ class TimeSince extends React.Component {
   };
 
   render() {
-    let date = this.props.date;
+    const date = new Date(this.props.date);
 
-    if (typeof date === 'string' || typeof date === 'number') {
-      date = new Date(date);
-    }
-
-    return <time>{moment.utc(date).fromNow()}</time>;
+    return (
+      <time dateTime={date.toISOString()}>
+        {formatDistanceToNowStrict(date, {addSuffix: true})}
+      </time>
+    );
   }
 }
 
