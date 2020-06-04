@@ -1,0 +1,17 @@
+{
+  "extends": "@snowpack/app-scripts-react",
+  "scripts": {},
+  "plugins": [],
+  "proxy": {
+    "/api": {
+      "target": "http://localhost:5002"
+    },
+    "/auth": {
+      "target": "http://localhost:5002"
+    },
+    "/webhooks": {
+      "target": "http://localhost:5002"
+    }
+  },
+  "exclude": ["*test.js", "tests"]
+}

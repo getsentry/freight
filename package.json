@@ -7,9 +7,10 @@
   },
   "scripts": {
     "test": "jest",
-    "postinstall": "npm run build",
-    "build": "webpack --mode production",
-    "start:ui": "webpack-dev-server",
+    "build": "snowpack build",
+    "run:less": "lessc src/less/base.less src/less/main.css",
+    "run:less::watch": "$1 --watch",
+    "start:ui": "snowpack dev",
     "start:api": "bin/web --addr localhost:5002 --debug",
     "start": "run-p start:api start:ui"
   },
@@ -32,6 +33,7 @@
     "@babel/preset-react": "^7.0.0",
     "@sentry/browser": "^5.0.2",
     "ansi_up": "^1.1.3",
+    "axios": "^0.19.2",
     "babel-loader": "^8.0.5",
     "bootstrap": "~3.3.0",
     "classnames": "^2.2.1",
@@ -70,6 +72,7 @@
     ]
   },
   "devDependencies": {
+    "@snowpack/app-scripts-react": "^1.1.0",
     "@babel/plugin-transform-runtime": "^7.4.3",
     "@babel/runtime": "^7.4.3",
     "babel-eslint": "^10.0.1",
@@ -82,10 +85,11 @@
     "jest": "^24.1.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^1.16.4",
-    "webpack-dev-server": "^3.2.1"
+    "webpack-dev-server": "^3.2.1",
+    "snowpack": "^2.0.0"
   },
   "volta": {
-    "node": "8.15.1",
+    "node": "12.18.0",
     "yarn": "1.22.0"
   }
 }

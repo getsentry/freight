@@ -136,7 +136,7 @@ RUN set -x \
     && apt-get purge -y --auto-remove $fetchDeps
 
 RUN set -x \
-    && export NODE_VERSION=8.15.1 \
+    && export NODE_VERSION=12.18.0 \
     && export GNUPGHOME="$(mktemp -d)" \
     && fetchDeps=" \
         dirmngr \
