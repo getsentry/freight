@@ -297,7 +297,15 @@ def run_step_deployment(
     # Execute a Kubernetes Deployment
     context.workspace.log.info(f"Running Deployment: {repr(step)}")
 
-    api = client.AppsV1beta1Api(context.kube.client)
+    # Try to load kube context from the step.
+    # If found, it will override the global kube context.
+    kube_config = step.get('kubernetes')
+    if kube_config:
+        kube = make_kube_context(kube_config)
+    else:
+        kube = context.kube
+
+    api = client.AppsV1beta1Api(kube.client)
 
     selector = format_task(step["selector"], context.task)
     selector.setdefault("namespace", "default")
