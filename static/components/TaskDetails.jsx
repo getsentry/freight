@@ -225,13 +225,6 @@ const TaskDetails = createReactClass({
         ***********************************************************************/
         this.highLightDiv(time);
 
-        const timer = new Date(logDataResults.timeStamp[j]);
-        const timeMil = timer.getTime();
-        //Multiple by 60000 to convert offset to milliseconds
-        const offset = timer.getTimezoneOffset() * 60000;
-        const timezone = timeMil - offset;
-        const newDate = new Date(timezone);
-
         div.innerHTML = ansi_up.ansi_to_html(
           linkifyUrls(lineItem[j][k], {
             attributes: {
@@ -240,7 +233,8 @@ const TaskDetails = createReactClass({
             },
           })
         );
-        time.innerHTML = format(newDate, 'h:mm:ss aa');
+        const date = new Date(logDataResults.timeStamp[j]);
+        time.innerHTML = format(date, 'h:mm:ss aa');
 
         div.appendChild(time);
         frag.appendChild(div);
