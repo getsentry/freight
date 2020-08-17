@@ -3,11 +3,13 @@ from flask_restful import reqparse
 from freight.api.base import ApiView
 from freight.config import db
 from freight.models import LogChunk
+from freight.api.serializer.base import Serializer
 
 from .deploy_details import DeployMixin
 
 
 class DeployLogApiView(ApiView, DeployMixin):
+    serializer = Serializer()
     get_parser = reqparse.RequestParser()
     get_parser.add_argument("offset", location="args", type=int, default=0)
     get_parser.add_argument("limit", location="args", type=int)
@@ -68,7 +70,7 @@ class DeployLogApiView(ApiView, DeployMixin):
         context = {
             "nextOffset": next_offset,
             "chunks": [
-                {"text": c.text, "date": c.date_created.isoformat()} for c in logchunks
+                {"text": c.text, "date": self.serializer.format_datetime(c.date_created)} for c in logchunks
             ],
         }
 
