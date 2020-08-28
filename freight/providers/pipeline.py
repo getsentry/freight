@@ -53,6 +53,7 @@ class PipelineContext:
     task: TaskContext
     kube: Optional[KubernetesContext]
     workspace: Workspace
+    environment_config: Dict
 
 
 class StepFailed(Exception):
@@ -129,7 +130,10 @@ class PipelineProvider(Provider):
         )
 
         context = PipelineContext(
-            task=task_context, kube=kube_context, workspace=workspace
+            task=task_context,
+            kube=kube_context,
+            workspace=workspace,
+            environment_config=app.environments.get(deploy.environment, {}),
         )
 
         if not config["steps"]:
@@ -385,7 +389,7 @@ def run_step_stateful_set(
     selector = format_task(step["selector"], context.task)
     selector.setdefault("namespace", "default")
     containers = format_task(step["containers"], context.task)
-    num_of_canary_instances = int(step.get("num_of_canary_instances", 0))
+    statefulset_instances = int(context.environment_config.get("statefulset_instances", 0))
 
     watchers: List[Tuple[Callable, Dict[str, str]]] = []
 
@@ -411,8 +415,8 @@ def run_step_stateful_set(
 
             # Rolling update will update only pods with ordinal >= than the `partition` attribute
             # https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#rolling-out-a-canary
-            if num_of_canary_instances:
-                ss.spec.update_strategy.rolling_update.partition = ss.status.replicas - num_of_canary_instances
+            if statefulset_instances:
+                ss.spec.update_strategy.rolling_update.partition = ss.spec.replicas - statefulset_instances
             else:
                 ss.spec.update_strategy.rolling_update.partition = 0
 
@@ -427,6 +431,7 @@ def run_step_stateful_set(
                         api,
                         resp.metadata.name,
                         resp.metadata.namespace,
+                        statefulset_instances or ss.spec.replicas,
                     ),
                     {},  # empty state dict for this rollout
                 )
@@ -680,7 +685,7 @@ def rollout_status_deployment(
 
 
 def rollout_status_stateful_set(
-    api: client.AppsV1Api, name: str, namespace: str,
+        api: client.AppsV1Api, name: str, namespace: str, replicas_to_update: int
 ) -> Tuple[str, bool]:
     # tbh this is mostly ported from Go into Python from:
     # https://github.com/kubernetes/kubernetes/blob/master/pkg/kubectl/rollout_status.go#L76-L92
@@ -698,14 +703,13 @@ def rollout_status_stateful_set(
             if condition.reason == "ProgressDeadlineExceeded":
                 return f"statefulset {repr(name)} exceeded its progress deadline", False
 
-    spec_replicas = ss.spec.replicas
     status_replicas = ss.status.replicas or 0
     updated_replicas = ss.status.updated_replicas or 0
     ready_replicas = ss.status.ready_replicas or 0
 
-    if updated_replicas < spec_replicas:
+    if updated_replicas < replicas_to_update:
         return (
-            f"Waiting for statefulset {repr(name)} rollout to finish: {updated_replicas} out of {spec_replicas} new replicas have been updated...",
+            f"Waiting for statefulset {repr(name)} rollout to finish: {updated_replicas} out of {replicas_to_update} new replicas have been updated...",
             False,
         )
     if status_replicas > updated_replicas:
