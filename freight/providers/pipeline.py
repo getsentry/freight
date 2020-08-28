@@ -385,6 +385,7 @@ def run_step_stateful_set(
     selector = format_task(step["selector"], context.task)
     selector.setdefault("namespace", "default")
     containers = format_task(step["containers"], context.task)
+    num_of_canary_instances = int(step.get("num_of_canary_instances", 0))
 
     watchers: List[Tuple[Callable, Dict[str, str]]] = []
 
@@ -407,6 +408,13 @@ def run_step_stateful_set(
                 k = f"freight.sentry.io/{k}"
                 ss.metadata.annotations[k] = v
                 ss.spec.template.metadata.annotations[k] = v
+
+            # Rolling update will update only pods with ordinal >= than the `partition` attribute
+            # https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#rolling-out-a-canary
+            if num_of_canary_instances:
+                ss.spec.update_strategy.rolling_update.partition = ss.status.replicas - num_of_canary_instances
+            else:
+                ss.spec.update_strategy.rolling_update.partition = 0
 
             resp = api.patch_namespaced_stateful_set(
                 name=ss.metadata.name, namespace=ss.metadata.namespace, body=ss,
