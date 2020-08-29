@@ -53,7 +53,6 @@ class PipelineContext:
     task: TaskContext
     kube: Optional[KubernetesContext]
     workspace: Workspace
-    environment_config: Dict
 
 
 class StepFailed(Exception):
@@ -133,7 +132,6 @@ class PipelineProvider(Provider):
             task=task_context,
             kube=kube_context,
             workspace=workspace,
-            environment_config=app.environments.get(deploy.environment, {}),
         )
 
         if not config["steps"]:
@@ -389,7 +387,7 @@ def run_step_stateful_set(
     selector = format_task(step["selector"], context.task)
     selector.setdefault("namespace", "default")
     containers = format_task(step["containers"], context.task)
-    statefulset_instances = int(context.environment_config.get("statefulset_instances", 0))
+    instances = int(step.get("instances", {}).get(context.task.environment, 0))
 
     watchers: List[Tuple[Callable, Dict[str, str]]] = []
 
@@ -415,8 +413,8 @@ def run_step_stateful_set(
 
             # Rolling update will update only pods with ordinal >= than the `partition` attribute
             # https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#rolling-out-a-canary
-            if statefulset_instances:
-                ss.spec.update_strategy.rolling_update.partition = ss.spec.replicas - statefulset_instances
+            if instances:
+                ss.spec.update_strategy.rolling_update.partition = ss.spec.replicas - instances
             else:
                 ss.spec.update_strategy.rolling_update.partition = 0
 
@@ -431,7 +429,7 @@ def run_step_stateful_set(
                         api,
                         resp.metadata.name,
                         resp.metadata.namespace,
-                        statefulset_instances or ss.spec.replicas,
+                        instances or ss.spec.replicas,
                     ),
                     {},  # empty state dict for this rollout
                 )
