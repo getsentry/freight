@@ -701,14 +701,14 @@ def rollout_status_stateful_set(
 
     if ready_replicas < spec_replicas:
         return (
-            "Waiting for statefulset {repr(name)} rollout to finish:  {spec_replicas - ready_replicas} not ready",
+            f"Waiting for statefulset {repr(name)} rollout to finish:  {spec_replicas - ready_replicas} not ready",
             False,
         )
 
     if rollout_partition:
         if updated_replicas < replicas_to_update:
             return (
-                "Waiting for statefulset {repr(name)} partitioned rollout to finish:  {updated_replicas} out of {replicas_to_update} replicas have been updated",
+                f"Waiting for statefulset {repr(name)} partitioned rollout to finish:  {updated_replicas} out of {replicas_to_update} replicas have been updated",
                 False,
             )
         return (
@@ -718,7 +718,7 @@ def rollout_status_stateful_set(
 
     if ss.status.update_revision != ss.status.current_revision:
         return (
-            "Waiting for statefulset {repr(name)} rollout to finish:  {updated_replicas} out of {replicas_to_update} replicas have been updated",
+            f"Waiting for statefulset {repr(name)} rollout to finish:  {updated_replicas} out of {replicas_to_update} replicas have been updated",
             False,
         )
 
