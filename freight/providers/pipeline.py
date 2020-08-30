@@ -686,7 +686,7 @@ def rollout_status_stateful_set(
         api: client.AppsV1Api, name: str, namespace: str, replicas_to_update: int
 ) -> Tuple[str, bool]:
     # tbh this is mostly ported from Go into Python from:
-    # https://github.com/kubernetes/kubernetes/blob/master/pkg/kubectl/rollout_status.go#L76-L92
+    # https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/kubectl/pkg/polymorphichelpers/rollout_status.go#L119-L152
     ss = api.read_namespaced_stateful_set(name=name, namespace=namespace)
     if ss.metadata.generation > ss.status.observed_generation:
         return (
@@ -694,32 +694,34 @@ def rollout_status_stateful_set(
             False,
         )
 
-    # TimedOutReason is added in a deployment when its newest replica set
-    # fails to show any progress within the given deadline (progressDeadlineSeconds).
-    for condition in ss.status.conditions or []:
-        if condition.type == "Progressing":
-            if condition.reason == "ProgressDeadlineExceeded":
-                return f"statefulset {repr(name)} exceeded its progress deadline", False
-
-    status_replicas = ss.status.replicas or 0
+    spec_replicas = ss.spec.replicas
     updated_replicas = ss.status.updated_replicas or 0
     ready_replicas = ss.status.ready_replicas or 0
+    rollout_partition = ss.spec.update_strategy.rolling_update.partition
 
-    if updated_replicas < replicas_to_update:
+    if ready_replicas < spec_replicas:
         return (
-            f"Waiting for statefulset {repr(name)} rollout to finish: {updated_replicas} out of {replicas_to_update} new replicas have been updated...",
+            "Waiting for statefulset {repr(name)} rollout to finish:  {spec_replicas - ready_replicas} not ready",
             False,
         )
-    if status_replicas > updated_replicas:
+
+    if rollout_partition:
+        if updated_replicas < replicas_to_update:
+            return (
+                "Waiting for statefulset {repr(name)} partitioned rollout to finish:  {updated_replicas} out of {replicas_to_update} replicas have been updated",
+                False,
+            )
         return (
-            f"Waiting for statefulset {repr(name)} rollout to finish: {status_replicas-updated_replicas} old replicas are pending termination...",
+            f"StatefulSet {repr(name)} successfully completed partitioned rollout. {updated_replicas} replicas updated.",
+            True,
+        )
+
+    if ss.status.update_revision != ss.status.current_revision:
+        return (
+            "Waiting for statefulset {repr(name)} rollout to finish:  {updated_replicas} out of {replicas_to_update} replicas have been updated",
             False,
         )
-    if ready_replicas < updated_replicas:
-        return (
-            f"Waiting for statefulset {repr(name)} rollout to finish: {ready_replicas} of {updated_replicas} updated replicas are available...",
-            False,
-        )
+
     return f"StatefulSet {repr(name)} successfully rolled out", True
 
 
