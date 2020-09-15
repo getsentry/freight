@@ -714,7 +714,10 @@ def rollout_status_stateful_set(
     spec_replicas = ss.spec.replicas
     updated_replicas = ss.status.updated_replicas or 0
     ready_replicas = ss.status.ready_replicas or 0
-    rollout_partition = ss.spec.update_strategy.rolling_update.partition
+
+    rollout_partition = None
+    if ss.spec.update_strategy.rolling_update is not None:
+        rollout_partition = ss.spec.update_strategy.rolling_update.partition
 
     if ready_replicas < spec_replicas:
         return (
