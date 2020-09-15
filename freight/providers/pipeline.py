@@ -301,7 +301,7 @@ def run_step_deployment(
 
     # Try to load kube context from the step.
     # If found, it will override the global kube context.
-    kube_config = step.get('kubernetes')
+    kube_config = step.get("kubernetes")
     if kube_config:
         kube = make_kube_context(kube_config)
     else:
@@ -411,15 +411,25 @@ def run_step_stateful_set(
                 ss.metadata.annotations[k] = v
                 ss.spec.template.metadata.annotations[k] = v
 
-            # Rolling update will update only pods with ordinal >= than the `partition` attribute
-            # https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#rolling-out-a-canary
-            if instances:
-                ss.spec.update_strategy.rolling_update.partition = ss.spec.replicas - instances
+            if ss.spec.update_strategy.rolling_update is None:
+                if instances:
+                    context.workspace.log.info(
+                        f"Warning! Partitioned rolling update not possible. Update strategy not defined."
+                    )
             else:
-                ss.spec.update_strategy.rolling_update.partition = 0
+                # Rolling update will update only pods with ordinal >= than the `partition` attribute
+                # https://kubernetes.io/docs/tutorials/stateful-application/basic-stateful-set/#rolling-out-a-canary
+                if instances:
+                    ss.spec.update_strategy.rolling_update.partition = (
+                        ss.spec.replicas - instances
+                    )
+                else:
+                    ss.spec.update_strategy.rolling_update.partition = 0
 
             resp = api.patch_namespaced_stateful_set(
-                name=ss.metadata.name, namespace=ss.metadata.namespace, body=ss,
+                name=ss.metadata.name,
+                namespace=ss.metadata.namespace,
+                body=ss,
             )
 
             watchers.append(
@@ -429,7 +439,12 @@ def run_step_stateful_set(
                         api,
                         resp.metadata.name,
                         resp.metadata.namespace,
-                        instances or ss.spec.replicas,
+                        instances
+                        if (
+                            instances
+                            and ss.spec.update_strategy.rolling_update is not None
+                        )
+                        else ss.spec.replicas,
                     ),
                     {},  # empty state dict for this rollout
                 )
@@ -641,7 +656,9 @@ def run_step_cronjob(
 
 
 def rollout_status_deployment(
-    api: client.AppsV1beta1Api, name: str, namespace: str,
+    api: client.AppsV1beta1Api,
+    name: str,
+    namespace: str,
 ) -> Tuple[str, bool]:
     # tbh this is mostly ported from Go into Python from:
     # https://github.com/kubernetes/kubernetes/blob/master/pkg/kubectl/rollout_status.go#L76-L92
@@ -683,7 +700,7 @@ def rollout_status_deployment(
 
 
 def rollout_status_stateful_set(
-        api: client.AppsV1Api, name: str, namespace: str, replicas_to_update: int
+    api: client.AppsV1Api, name: str, namespace: str, replicas_to_update: int
 ) -> Tuple[str, bool]:
     # tbh this is mostly ported from Go into Python from:
     # https://github.com/kubernetes/kubernetes/blob/master/staging/src/k8s.io/kubectl/pkg/polymorphichelpers/rollout_status.go#L119-L152
