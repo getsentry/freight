@@ -307,7 +307,7 @@ def run_step_deployment(
     else:
         kube = context.kube
 
-    api = client.AppsV1beta1Api(kube.client)
+    api = client.AppsV1Api(kube.client)
 
     selector = format_task(step["selector"], context.task)
     selector.setdefault("namespace", "default")
@@ -656,7 +656,7 @@ def run_step_cronjob(
 
 
 def rollout_status_deployment(
-    api: client.AppsV1beta1Api,
+    api: client.AppsV1Api,
     name: str,
     namespace: str,
 ) -> Tuple[str, bool]:
