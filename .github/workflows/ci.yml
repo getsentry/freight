@@ -9,18 +9,18 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-16.04
-    # services:
-      # postgres:
-        # image: postgres:9.6
-        # env:
-          # POSTGRES_USER: postgres
-        # ports:
-          # - 5432:5432
+    services:
+      postgres:
+        image: postgres:9.6
+        env:
+          POSTGRES_USER: postgres
+        ports:
+          - 5432:5432
 
-      # redis:
-        # image: redis:5.0-alpine
-        # ports:
-          # - 6379:6379
+      redis:
+        image: redis:5.0-alpine
+        ports:
+          - 6379:6379
 
     steps:
       - uses: actions/checkout@v2
@@ -34,8 +34,6 @@ jobs:
           node-version: '8'
 
       - run: make develop
-
-      - run: docker-compose
 
       - run: |
           psql -c 'create database test_freight;' -U postgres
