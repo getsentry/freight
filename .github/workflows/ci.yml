@@ -1,0 +1,50 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  ci:
+    runs-on: ubuntu-16.04
+    # services:
+      # postgres:
+        # image: postgres:9.6
+        # env:
+          # POSTGRES_USER: postgres
+        # ports:
+          # - 5432:5432
+
+      # redis:
+        # image: redis:5.0-alpine
+        # ports:
+          # - 6379:6379
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.8'
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '8'
+
+      - run: make develop
+
+      - run: docker-compose
+
+      - run: |
+          psql -c 'create database test_freight;' -U postgres
+          if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
+
+      - name: Lint
+        run: make lint
+
+      - name: Test
+        run: make test
+
+
