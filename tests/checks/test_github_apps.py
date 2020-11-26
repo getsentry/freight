@@ -199,3 +199,59 @@ class GitHubAppsContextCheckTest(GitHubAppsCheckBase):
         config = {"contexts": ["Travis CI - Branch"], "repo": "getsentry/freight"}
 
         self.check.check(self.app, "abcdefg", config)
+
+    @responses.activate
+    def test_pagination(self):
+        body = json.dumps(
+            {
+                "total_count": 150,
+                "check_runs": [
+                    {
+                        "status": "completed",
+                        "name": "somethingelse",
+                        "conclusion": "failure",
+                        "details_url": "https://travis/87026985",
+                    },
+                ]
+                * 100,
+            }
+        )
+
+        responses.add(
+            responses.GET,
+            "https://api.github.com/repos/getsentry/freight/commits/abcdefg/check-runs",
+            body=body,
+        )
+
+        body = json.dumps(
+            {
+                "total_count": 150,
+                "check_runs": [
+                    {
+                        "status": "completed",
+                        "name": "Travis CI - Branch",
+                        "conclusion": "success",
+                        "details_url": "https://travis/87026985",
+                    },
+                ]
+                + [
+                    {
+                        "status": "completed",
+                        "name": "somethingelse",
+                        "conclusion": "failure",
+                        "details_url": "https://travis/87026985",
+                    },
+                ]
+                * 49,
+            }
+        )
+
+        responses.add(
+            responses.GET,
+            "https://api.github.com/repos/getsentry/freight/commits/abcdefg/check-runs",
+            body=body,
+        )
+
+        config = {"contexts": ["Travis CI - Branch"], "repo": "getsentry/freight"}
+
+        self.check.check(self.app, "abcdefg", config)
