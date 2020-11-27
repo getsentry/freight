@@ -41,19 +41,38 @@ class GitHubAppsContextCheck(Check):
             "Authorization": f"token {token}",
         }
 
-        resp = http.get(url, headers=headers)
+        params = {
+            "per_page": 100,
+            "page": 1,
+        }
 
-        check_runs_dict = resp.json()
-        if not check_runs_dict or not check_runs_dict.get("total_count"):
-            raise CheckFailed(
-                "No contexts were present in GitHub. "
-                "This means that no statuses, like CI results, "
-                "were found for the commit. You may want to wait a bit, "
-                "or failing that, deploy a new commit."
-            )
+        total_count = None
+        check_runs = []
+
+        while True:
+            resp = http.get(url, headers=headers, params=params)
+
+            check_runs_dict = resp.json()
+            if not check_runs_dict or not check_runs_dict.get("total_count"):
+                raise CheckFailed(
+                    "No contexts were present in GitHub. "
+                    "This means that no statuses, like CI results, "
+                    "were found for the commit. You may want to wait a bit, "
+                    "or failing that, deploy a new commit."
+                )
+
+            if total_count is None:
+                total_count = int(check_runs_dict["total_count"])
+
+            check_runs.extend(check_runs_dict.get("check_runs", []))
+
+            if params["per_page"] * params["page"] >= total_count:
+                break
+            else:
+                params["page"] += 1
 
         valid_contexts = set()
-        for check_run in check_runs_dict.get("check_runs", []):
+        for check_run in check_runs:
             check_name = check_run["name"]
             if all_contexts and check_name not in all_contexts:
                 continue
