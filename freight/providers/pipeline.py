@@ -157,6 +157,13 @@ class PipelineProvider(Provider):
             ).raise_for_status()
 
         for i, step in enumerate(config["steps"]):
+            step_environments = step.get("environments")
+            if step_environments and deploy.environment not in step_environments:
+                workspace.log.info(
+                    f"Skipping Step {i+1} ({step['kind']})."
+                    f" Configured for environments {step_environments} this is deploy environment is {deploy.environment}"
+                )
+                continue
             workspace.log.info(f"Running Step {i+1} ({step['kind']})")
             run_step(step, context)
             workspace.log.info(f"Finished Step {i+1}")
