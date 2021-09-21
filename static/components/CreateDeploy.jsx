@@ -13,7 +13,8 @@ class CreateDeploy extends React.Component {
   constructor(props) {
     super(props);
     const appList = props.appList;
-    const defaultApp = appList.length !== 0 ? appList[0] : null;
+    const getsentryApp = appList?.find(app => app.name === 'getsentry');
+    const defaultApp = getsentryApp ? getsentryApp : appList.length !== 0 ? appList[0] : null;
     const app = props.location.query?.app
       ? props.location.query.app
       : defaultApp
