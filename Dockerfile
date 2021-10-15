@@ -35,7 +35,7 @@ RUN set -ex \
 
 RUN set -ex; \
     \
-    curl -sL -o get-pip.py 'https://bootstrap.pypa.io/get-pip.py'; \
+    curl -sL -o get-pip.py 'https://bootstrap.pypa.io/pip/2.7/get-pip.py'; \
     \
     python2 get-pip.py \
         "pip==${PYTHON_PIP_VERSION}" \
