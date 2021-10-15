@@ -6,17 +6,9 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK on
 RUN set -ex \
     \
     && PYTHON_VERSION=2.7.16 \
-    && wget -O python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz" \
-    && wget -O python.tar.xz.asc "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz.asc" \
-    && export GNUPGHOME="$(mktemp -d)" \
-    && for key in \
-      C01E1CAD5EA2C4F0B8E3571504C367C218ADD4FF \
-    ; do \
-      gpg --batch --keyserver hkps://mattrobenolt-keyserver.global.ssl.fastly.net:443 --recv-keys "$key" ; \
-    done \
-    && gpg --batch --verify python.tar.xz.asc python.tar.xz \
-    && gpgconf --kill all \
-    && rm -rf "$GNUPGHOME" python.tar.xz.asc \
+    && PYTHON_SHA256=f222ef602647eecb6853681156d32de4450a2c39f4de93bd5b20235f2e660ed7 \
+    && curl -sL -o python.tar.xz "https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-${PYTHON_VERSION}.tar.xz" \
+    && echo "${PYTHON_SHA256} python.tar.xz" | sha256sum --check --status \
     && mkdir -p /usr/src/python \
     && tar -xJC /usr/src/python --strip-components=1 -f python.tar.xz \
     && rm python.tar.xz \
@@ -89,82 +81,28 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # grab gosu for easy step-down from root
 RUN set -x \
-    && export GOSU_VERSION=1.11 \
-    && fetchDeps=" \
-        dirmngr \
-        gnupg \
-        wget \
-    " \
-    && apt-get update && apt-get install -y --no-install-recommends $fetchDeps && rm -rf /var/lib/apt/lists/* \
-    && wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" \
-    && wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" \
-    && export GNUPGHOME="$(mktemp -d)" \
-    && for key in \
-      B42F6819007F00F88E364FD4036A9C25BF357DD4 \
-    ; do \
-      gpg --batch --keyserver hkps://mattrobenolt-keyserver.global.ssl.fastly.net:443 --recv-keys "$key" ; \
-    done \
-    && gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu \
-    && gpgconf --kill all \
-    && rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc \
+    && GOSU_VERSION=1.11 \
+    && GOSU_SHA256=0b843df6d86e270c5b0f5cbd3c326a04e18f4b7f9b8457fa497b0454c4b138d7 \
+    && curl -sL -o /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/${GOSU_VERSION}/gosu-$(dpkg --print-architecture)" \
+    && echo "${GOSU_SHA256} /usr/local/bin/gosu" | sha256sum --check --status \
     && chmod +x /usr/local/bin/gosu \
-    && gosu nobody true \
-    && apt-get purge -y --auto-remove $fetchDeps
+    && gosu nobody true
 
 # grab tini for signal processing and zombie killing
 RUN set -x \
-    && export TINI_VERSION=0.18.0 \
-    && fetchDeps=" \
-        dirmngr \
-        gnupg \
-        wget \
-    " \
-    && apt-get update && apt-get install -y --no-install-recommends $fetchDeps && rm -rf /var/lib/apt/lists/* \
-    && wget -O /usr/local/bin/tini "https://github.com/krallin/tini/releases/download/v$TINI_VERSION/tini" \
-    && wget -O /usr/local/bin/tini.asc "https://github.com/krallin/tini/releases/download/v$TINI_VERSION/tini.asc" \
-    && export GNUPGHOME="$(mktemp -d)" \
-    && for key in \
-      595E85A6B1B4779EA4DAAEC70B588DFF0527A9B7 \
-    ; do \
-      gpg --batch --keyserver hkps://mattrobenolt-keyserver.global.ssl.fastly.net:443 --recv-keys "$key" ; \
-    done \
-    && gpg --batch --verify /usr/local/bin/tini.asc /usr/local/bin/tini \
-    && gpgconf --kill all \
-    && rm -r "$GNUPGHOME" /usr/local/bin/tini.asc \
+    && TINI_VERSION=0.18.0 \
+    && TINI_SHA256=12d20136605531b09a2c2dac02ccee85e1b874eb322ef6baf7561cd93f93c855 \
+    && curl -sL -o /usr/local/bin/tini "https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini" \
+    && echo "${TINI_SHA256} /usr/local/bin/tini" | sha256sum --check --status \
     && chmod +x /usr/local/bin/tini \
-    && tini -h \
-    && apt-get purge -y --auto-remove $fetchDeps
+    && tini -h
 
 RUN set -x \
-    && export NODE_VERSION=8.15.1 \
-    && export GNUPGHOME="$(mktemp -d)" \
-    && fetchDeps=" \
-        dirmngr \
-        gnupg \
-        wget \
-    " \
-    && apt-get update && apt-get install -y --no-install-recommends $fetchDeps && rm -rf /var/lib/apt/lists/* \
-    # gpg keys listed at https://github.com/nodejs/node
-    && for key in \
-      9554F04D7259F04124DE6B476D5A82AC7E37093B \
-      94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
-      0034A06D9D9B0064CE8ADF6BF1747F4AD2306D93 \
-      FD3A5288F042B6850C66B31F09FE44734EB7990E \
-      71DCFD284A79C3B38668286BC97EC7A07EDE3FC1 \
-      DD8F2338BAE7501E3DD5AC78C273792F7D83545D \
-      B9AE9905FFD7803F25714661B63B535A4C206CA9 \
-      C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \
-    ; do \
-      gpg --batch --keyserver hkps://mattrobenolt-keyserver.global.ssl.fastly.net:443 --recv-keys "$key" ; \
-    done \
-    && wget "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
-    && wget "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
-    && gpg --batch --verify SHASUMS256.txt.asc \
-    && gpgconf --kill all \
-    && grep " node-v$NODE_VERSION-linux-x64.tar.gz\$" SHASUMS256.txt.asc | sha256sum -c - \
-    && tar -xzf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local --strip-components=1 \
-    && rm -r "$GNUPGHOME" "node-v$NODE_VERSION-linux-x64.tar.gz" SHASUMS256.txt.asc \
-    && apt-get purge -y --auto-remove $fetchDeps
+    && NODE_VERSION=8.15.1 \
+    && NODE_SHA256=16e203f2440cffe90522f1e1855d5d7e2e658e759057db070a3dafda445d6d1f \
+    && curl -sL -o "node-linux-x64.tar.gz" "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.gz" \
+    && echo "${NODE_SHA256} node-linux-x64.tar.gz" | sha256sum --check --status \
+    && tar -xzf "node-linux-x64.tar.gz" -C /usr/local --strip-components=1
 
 RUN set -x \
     && export REDIS_VERSION=4.0.14 \
