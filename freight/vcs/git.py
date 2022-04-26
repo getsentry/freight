@@ -34,7 +34,7 @@ class GitVcs(Vcs):
     def run(self, cmd, **kwargs):
         cmd = [self.binary_path] + cmd
         try:
-            return super(GitVcs, self).run(cmd, **kwargs)
+            return super(GitVcs, self).run(cmd, capture=True, **kwargs)
         except CommandError as e:
             if e.stderr and "unknown revision or path" in e.stderr:
                 raise UnknownRevision(
