@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>KeepAlive</key>
+        <true/>
+        <key>Label</key>
+        <string>homebrew.mxcl.postgresql@9.6</string>
+        <key>ProgramArguments</key>
+        <array>
+                <string>/usr/local/opt/postgresql@9.6/bin/postgres</string>
+                <string>-D</string>
+                <string>/usr/local/var/postgresql@9.6</string>
+                <string>-c</string>
+                <string>fsync=off</string>
+                <string>-c</string>
+                <string>full_page_writes=off</string>
+                <string>-c</string>
+                <string>synchronous_commit=off</string>
+        </array>
+        <key>RunAtLoad</key>
+        <true/>
+        <key>StandardErrorPath</key>
+        <string>/usr/local/var/log/postgresql@9.6.log</string>
+        <key>StandardOutPath</key>
+        <string>/usr/local/var/log/postgresql@9.6.log</string>
+        <key>WorkingDirectory</key>
+        <string>/usr/local</string>
+</dict>
+</plist>

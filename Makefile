@@ -1,26 +1,21 @@
-develop: update-submodules setup-git
+develop:
 	@echo "--> Installing dependencies"
 	yarn install
 	pip install -e .
 	pip install "file://`pwd`#egg=freight[test]"
 
-setup-git:
-	@echo "--> Installing git hooks"
-	git config branch.autosetuprebase always
-	cd .git/hooks && ln -sf ../../hooks/* ./
-	@echo ""
+mac-install-postgres-96:
+	# .envrc adds /usr/local/opt/postgresql@9.6/bin/ to PATH.
+	# (the old Cellar path stuff is needed for older homebrews/macos)
+	brew install --build-from-source postgresql@9.6.rb
+	# TODO: postgresql service.
+	#       Also I think, I need redis.
 
 upgrade:
 	@echo "--> Creating default 'freight' database"
 	createdb -E utf-8 freight || true
 	@echo "--> Running migrations"
 	bin/upgrade
-
-update-submodules:
-	@echo "--> Updating git submodules"
-	git submodule init
-	git submodule update
-	@echo ""
 
 test: test-python test-javascript
 
@@ -45,6 +40,7 @@ format: format-python
 
 format-python:
 	@echo "--> Formatting Python files"
+	# TODO: pre-commit
 	python -m black . bin/run-task bin/load-mocks bin/shell bin/ssh-connect bin/web bin/worker bin/load-mocks
 	@echo ""
 
