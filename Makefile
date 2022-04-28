@@ -7,8 +7,6 @@ mac-install-postgres-96:
 	# .envrc adds /usr/local/opt/postgresql@9.6/bin/ to PATH.
 	# (the old Cellar path stuff is needed for older homebrews/macos)
 	brew install --build-from-source postgresql@9.6.rb
-	# TODO: postgresql service.
-	#       Also I think, I need redis.
 
 upgrade:
 	@echo "--> Creating default 'freight' database"
