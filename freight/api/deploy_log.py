@@ -70,7 +70,11 @@ class DeployLogApiView(ApiView, DeployMixin):
         context = {
             "nextOffset": next_offset,
             "chunks": [
-                {"text": c.text, "date": self.serializer.format_datetime(c.date_created)} for c in logchunks
+                {
+                    "text": c.text,
+                    "date": self.serializer.format_datetime(c.date_created),
+                }
+                for c in logchunks
             ],
         }
 

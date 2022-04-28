@@ -122,7 +122,7 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
 
     @responses.activate
     def test_build_status_unknown(self):
-        """    "STATUS_UNKNOWN": "Status of the build is unknown."""
+        """ "STATUS_UNKNOWN": "Status of the build is unknown."""
         test_id = "unknown_build_id"
         body = json.dumps(
             {
@@ -235,7 +235,7 @@ class CloudbuilderContextCheckTest(CloudbuilderCheckBase):
     @responses.activate
     def test_build_status_cancelled(self):
         """[summary]
-            "CANCELLED": "Build or step was canceled by a user.",
+        "CANCELLED": "Build or step was canceled by a user.",
         """
         test_id = "build_id"
         body = json.dumps(

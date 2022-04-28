@@ -1,5 +1,5 @@
 [tool.black]
-target-version = ['py37', 'py38']
+target-version = ['py38']
 include = '\.py$'
 exclude = '''
 /(
@@ -13,5 +13,3 @@ exclude = '''
   | node_modules
 )/
 '''
-
-
