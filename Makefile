@@ -1,8 +1,7 @@
 develop:
 	@echo "--> Installing dependencies"
 	yarn install
-	pip install -e .
-	pip install "file://`pwd`#egg=freight[test]"
+	pip install -e ".[test,pre-commit]"
 
 mac-install-postgres-96:
 	# .envrc adds /usr/local/opt/postgresql@9.6/bin/ to PATH.

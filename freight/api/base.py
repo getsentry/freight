@@ -46,7 +46,7 @@ class ApiView(Resource):
             )
 
         try:
-            response = super(ApiView, self).dispatch_request(*args, **kwargs)
+            response = super().dispatch_request(*args, **kwargs)
         except ApiError as e:
             return self.error(message=e.message, name=e.name, status_code=e.status_code)
 
@@ -93,10 +93,10 @@ class ApiView(Resource):
     def make_links(self, current_page, has_next_page=None):
         links = []
         if current_page > 1:
-            links.append((self.build_cursor_link("previous", current_page - 1)))
+            links.append(self.build_cursor_link("previous", current_page - 1))
 
         if has_next_page:
-            links.append((self.build_cursor_link("next", current_page + 1)))
+            links.append(self.build_cursor_link("next", current_page + 1))
 
         return links
 

@@ -1,7 +1,7 @@
 __all__ = ["SerializerManager"]
 
 
-class SerializerManager(object):
+class SerializerManager:
     def __init__(self):
         self.registry = {}
 

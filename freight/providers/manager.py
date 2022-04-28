@@ -3,7 +3,7 @@ __all__ = ["ProviderManager"]
 from freight.exceptions import InvalidProvider
 
 
-class ProviderManager(object):
+class ProviderManager:
     def __init__(self):
         self.providers = {}
 

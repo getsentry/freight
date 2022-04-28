@@ -32,7 +32,7 @@ class TestCase(unittest.TestCase, Fixtures):
 
     def setUp(self):
         self.client = AuthenticatedTestClient(current_app, current_app.response_class)
-        super(TestCase, self).setUp()
+        super().setUp()
 
 
 class TransactionTestCase(unittest.TestCase, Fixtures):
@@ -42,4 +42,4 @@ class TransactionTestCase(unittest.TestCase, Fixtures):
 
     def setUp(self):
         self.client = AuthenticatedTestClient(current_app, current_app.response_class)
-        super(TransactionTestCase, self).setUp()
+        super().setUp()

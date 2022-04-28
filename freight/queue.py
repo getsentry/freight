@@ -11,7 +11,7 @@ def to_unix(datetime):
     return float(datetime.strftime("%s.%f"))
 
 
-class Queue(object):
+class Queue:
     def init_app(self, app, db, sentry):
         self.config = {
             "queues": app.config["QUEUES"],
@@ -105,7 +105,7 @@ class Queue(object):
         )
 
 
-class Scheduler(object):
+class Scheduler:
     schedule_key = "rq:schedule"
 
     interval = 1.0

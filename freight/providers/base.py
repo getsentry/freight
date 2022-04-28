@@ -4,7 +4,7 @@ from flask import current_app
 from tempfile import NamedTemporaryFile
 
 
-class Provider(object):
+class Provider:
     name = None
 
     def get_default_options(self):

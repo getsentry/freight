@@ -12,7 +12,7 @@ from uuid import uuid1
 from freight.exceptions import CommandError
 
 
-class Workspace(object):
+class Workspace:
     log = logging.getLogger("workspace")
 
     def __init__(self, path, log=None):
@@ -92,4 +92,4 @@ class TemporaryWorkspace(Workspace):
         path = os.path.join(
             current_app.config["WORKSPACE_ROOT"], f"freight-workspace-{uuid1().hex}"
         )
-        super(TemporaryWorkspace, self).__init__(path, *args, **kwargs)
+        super().__init__(path, *args, **kwargs)

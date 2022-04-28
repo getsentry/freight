@@ -24,7 +24,7 @@ class DeployLogBase(TestCase):
             offset += len(char)
         db.session.commit()
 
-        super(DeployLogBase, self).setUp()
+        super().setUp()
 
 
 class DeployLogTest(DeployLogBase):

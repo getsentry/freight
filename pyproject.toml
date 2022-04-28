@@ -1,15 +1,3 @@
 [tool.black]
+# File filtering is taken care of in pre-commit.
 target-version = ['py38']
-include = '\.py$'
-exclude = '''
-/(
-    \.git
-  | \.venv
-  | _build
-  | build
-  | dist
-  | migrations
-  | docs
-  | node_modules
-)/
-'''

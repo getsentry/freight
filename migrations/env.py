@@ -1,4 +1,3 @@
-
 from alembic import context
 from logging.config import fileConfig
 

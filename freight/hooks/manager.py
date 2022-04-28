@@ -3,7 +3,7 @@ __all__ = ["HooksManager"]
 from freight.exceptions import InvalidHook
 
 
-class HooksManager(object):
+class HooksManager:
     def __init__(self):
         self._register = {}
 

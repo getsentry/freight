@@ -4,13 +4,13 @@ from freight import http
 __all__ = ["Notifier", "NotifierEvent"]
 
 
-class NotifierEvent(object):
+class NotifierEvent:
     TASK_STARTED = 0
     TASK_FINISHED = 1
     TASK_QUEUED = 2
 
 
-class Notifier(object):
+class Notifier:
     DEFAULT_EVENTS = [
         NotifierEvent.TASK_QUEUED,
         NotifierEvent.TASK_STARTED,

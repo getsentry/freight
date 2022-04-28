@@ -12,13 +12,12 @@ from .manager import add, serialize
 class DeploySerializer(Serializer):
     def get_attrs(self, item_list):
         apps = {
-            a.id: a
-            for a in App.query.filter(App.id.in_(set(i.app_id for i in item_list)))
+            a.id: a for a in App.query.filter(App.id.in_({i.app_id for i in item_list}))
         }
 
         tasks = {
             t.id: t
-            for t in Task.query.filter(Task.id.in_(set(i.task_id for i in item_list)))
+            for t in Task.query.filter(Task.id.in_({i.task_id for i in item_list}))
         }
 
         estimatedDurations = dict(
@@ -32,7 +31,7 @@ class DeploySerializer(Serializer):
             .group_by(Task.app_id)
         )
 
-        user_ids = set(tasks[d.task_id].user_id for d in item_list)
+        user_ids = {tasks[d.task_id].user_id for d in item_list}
         if user_ids:
             user_map = {u.id: u for u in User.query.filter(User.id.in_(user_ids))}
         else:

@@ -12,7 +12,7 @@ class AppDetailsBase(TestCase):
         self.app = self.create_app(repository=self.repo)
         self.deploy_config = self.create_taskconfig(app=self.app)
         self.path = f"/api/0/apps/{self.app.name}/"
-        super(AppDetailsBase, self).setUp()
+        super().setUp()
 
 
 class AppDetailsTest(AppDetailsBase):

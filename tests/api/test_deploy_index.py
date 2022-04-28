@@ -14,12 +14,12 @@ class DeployIndexBase(TestCase):
         self.repo = self.create_repo()
         self.app = self.create_app(repository=self.repo)
         self.deploy_config = self.create_taskconfig(app=self.app)
-        super(DeployIndexBase, self).setUp()
+        super().setUp()
 
 
 class DeployListTest(DeployIndexBase):
     def setUp(self):
-        super(DeployListTest, self).setUp()
+        super().setUp()
 
     def test_no_filters(self):
         task = self.create_task(app=self.app, user=self.user)

@@ -13,7 +13,7 @@ class HookClient(FlaskClient):
         return FlaskClient.open(self, *args, **kwargs)
 
 
-class Hook(object):
+class Hook:
     def client(self):
         return HookClient(current_app, current_app.response_class)
 

@@ -9,7 +9,7 @@ class UnknownRevision(CommandError):
     pass
 
 
-class Vcs(object):
+class Vcs:
     ssh_connect_path = os.path.join(PROJECT_ROOT, "bin", "ssh-connect")
 
     def __init__(self, workspace, url, username=None):

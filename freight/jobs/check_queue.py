@@ -50,11 +50,11 @@ def check_queue():
 
     deploys = list(
         db.session.query(Deploy.id, Deploy.app_id, Deploy.environment)
-        .filter(Deploy.task_id.in_(set(t.id for t in tasks)))
+        .filter(Deploy.task_id.in_({t.id for t in tasks}))
         .group_by(Deploy.id, Deploy.app_id, Deploy.environment)
     )
 
-    apps = {a.id: a for a in App.query.filter(App.id.in_(set(t.app_id for t in tasks)))}
+    apps = {a.id: a for a in App.query.filter(App.id.in_({t.app_id for t in tasks}))}
 
     for deploy_id, app_id, environment in deploys:
         app = apps[app_id]

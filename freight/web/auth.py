@@ -36,7 +36,7 @@ def get_auth_flow(redirect_uri=None):
 class LoginView(MethodView):
     def __init__(self, authorized_url):
         self.authorized_url = authorized_url
-        super(LoginView, self).__init__()
+        super().__init__()
 
     def get(self):
         redirect_uri = url_for(self.authorized_url, _external=True)
@@ -49,7 +49,7 @@ class AuthorizedView(MethodView):
     def __init__(self, complete_url, authorized_url):
         self.complete_url = complete_url
         self.authorized_url = authorized_url
-        super(AuthorizedView, self).__init__()
+        super().__init__()
 
     def get(self):
         redirect_uri = url_for(self.authorized_url, _external=True)
@@ -77,7 +77,7 @@ class AuthorizedView(MethodView):
 class LogoutView(MethodView):
     def __init__(self, complete_url):
         self.complete_url = complete_url
-        super(LogoutView, self).__init__()
+        super().__init__()
 
     def get(self):
         session.pop("uid", None)

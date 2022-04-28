@@ -3,7 +3,7 @@ __all__ = ["CheckManager"]
 from freight.exceptions import InvalidCheck
 
 
-class CheckManager(object):
+class CheckManager:
     def __init__(self):
         self._register = {}
 

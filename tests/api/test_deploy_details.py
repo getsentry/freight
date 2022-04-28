@@ -15,7 +15,7 @@ class DeployDetailsBase(TestCase):
         self.deploy = self.create_deploy(app=self.app, task=self.task)
         self.path = f"/api/0/deploys/{self.deploy.id}/"
         self.alt_path = f"/api/0/deploys/{self.app.name}/{self.deploy.environment}/{self.deploy.number}/"
-        super(DeployDetailsBase, self).setUp()
+        super().setUp()
 
 
 class DeployDetailsTest(DeployDetailsBase):

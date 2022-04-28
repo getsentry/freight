@@ -9,7 +9,7 @@ from freight.notifiers.utils import send_task_notifications
 from freight.utils.redis import lock
 
 
-class DeployMixin(object):
+class DeployMixin:
     def _get_deploy(self, app=None, env=None, number=None, deploy_id=None):
         if deploy_id:
             return Deploy.query.get(deploy_id)
