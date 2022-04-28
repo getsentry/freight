@@ -18,8 +18,6 @@ upgrade:
 
 test: test-python test-javascript
 
-lint: lint-python
-
 test-javascript:
 	@echo "--> Running javascript tests"
 	yarn run test
@@ -27,20 +25,7 @@ test-javascript:
 
 test-python:
 	@echo "--> Running Python tests"
-	bin/test
-	@echo ""
-
-lint-python:
-	@echo "--> Linting Python files"
-	bin/lint
-	@echo ""
-
-format: format-python
-
-format-python:
-	@echo "--> Formatting Python files"
-	# TODO: pre-commit
-	python -m black . bin/run-task bin/load-mocks bin/shell bin/ssh-connect bin/web bin/worker bin/load-mocks
+	pytest
 	@echo ""
 
 docker:

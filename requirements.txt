@@ -13,7 +13,7 @@ raven==6.10.0
 redis==3.2.1
 requests==2.27.1
 rq==1.0
-urllib3==1.24.3
+urllib3==1.25.11
 Werkzeug==0.15.6
 
 Jinja2==3.0.2
