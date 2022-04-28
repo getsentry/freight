@@ -1,6 +1,9 @@
-develop:
-	@echo "--> Installing dependencies"
+develop: develop-javascript develop-python
+
+develop-javascript:
 	yarn install
+
+develop-python:
 	pip install -e ".[test,pre-commit]"
 
 mac-install-postgres-96:

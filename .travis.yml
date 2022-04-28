@@ -14,11 +14,12 @@ env:
   global:
     - TRAVIS_NODE_VERSION=8.15.1
 install:
+  - make develop-python
+  - pre-commit run --all-files
   - nvm install $TRAVIS_NODE_VERSION
-  - make develop
+  - make develop-javascript
 before_script:
   - psql -c 'create database test_freight;' -U postgres
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
 script:
-  - make lint
   - make test
