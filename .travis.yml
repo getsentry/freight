@@ -5,7 +5,7 @@ services:
   - postgresql
   - redis-server
 python:
-  - "3.8"
+  - "3.8.12"
 cache:
   - pip
   - npm
@@ -15,7 +15,7 @@ env:
     - TRAVIS_NODE_VERSION=8.15.1
 install:
   - nvm install $TRAVIS_NODE_VERSION
-  - time make develop
+  - make develop
 before_script:
   - psql -c 'create database test_freight;' -U postgres
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
