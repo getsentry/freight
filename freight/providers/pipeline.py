@@ -164,7 +164,7 @@ class PipelineProvider(Provider):
         date_finished = datetime.utcnow()
 
         if sentry_context:
-            workspace.log.info(f"Tagging Sentry release as deployed.")
+            workspace.log.info("Tagging Sentry release as deployed.")
             sentry_context.client.put(
                 f"https://sentry.io/api/0/organizations/{sentry_context.organization}/releases/{task_context.sha}/",
                 json={"dateReleased": date_finished.isoformat() + "Z"},
@@ -414,7 +414,7 @@ def run_step_stateful_set(
             if ss.spec.update_strategy.rolling_update is None:
                 if instances:
                     context.workspace.log.info(
-                        f"Warning! Partitioned rolling update not possible. Update strategy not defined."
+                        "Warning! Partitioned rolling update not possible. Update strategy not defined."
                     )
             else:
                 # Rolling update will update only pods with ordinal >= than the `partition` attribute
