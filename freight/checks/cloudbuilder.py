@@ -78,7 +78,7 @@ class GCPContainerBuilderCheck(Check):
 
         build_data = resp.json()
         if "builds" not in build_data:
-            raise CheckPending("Build has not started yet.")
+            raise CheckPending(f"Build has not started yet. Build data: {build_data}")
 
         build_id = build_data["builds"][0]["id"]
         build_status = build_data["builds"][0]["status"]
