@@ -15,6 +15,6 @@ class ColoredFormatter(logging.Formatter):
     }
 
     def format(self, record):
-        message = super(ColoredFormatter, self).format(record)
+        message = super().format(record)
         func = self.colors[record.levelname]
         return func(message)

@@ -5,7 +5,7 @@ from freight.config import db
 from freight.db.types.json import JSONEncodedDict
 
 
-class TaskConfigType(object):
+class TaskConfigType:
     deploy = 0
 
     @classmethod

@@ -1,7 +1,7 @@
 __all__ = ["Check"]
 
 
-class Check(object):
+class Check:
     required = False
 
     def get_default_options(self):

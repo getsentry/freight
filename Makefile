@@ -1,14 +1,15 @@
-develop: update-submodules setup-git
-	@echo "--> Installing dependencies"
-	yarn install
-	pip install -e .
-	pip install "file://`pwd`#egg=freight[test]"
+develop: develop-javascript develop-python
 
-setup-git:
-	@echo "--> Installing git hooks"
-	git config branch.autosetuprebase always
-	cd .git/hooks && ln -sf ../../hooks/* ./
-	@echo ""
+develop-javascript:
+	yarn install
+
+develop-python:
+	pip install -e ".[test,pre-commit]"
+
+mac-install-postgres-96:
+	# .envrc adds /usr/local/opt/postgresql@9.6/bin/ to PATH.
+	# (the old Cellar path stuff is needed for older homebrews/macos)
+	brew install --build-from-source postgresql@9.6.rb
 
 upgrade:
 	@echo "--> Creating default 'freight' database"
@@ -16,15 +17,7 @@ upgrade:
 	@echo "--> Running migrations"
 	bin/upgrade
 
-update-submodules:
-	@echo "--> Updating git submodules"
-	git submodule init
-	git submodule update
-	@echo ""
-
 test: test-python test-javascript
-
-lint: lint-python
 
 test-javascript:
 	@echo "--> Running javascript tests"
@@ -33,19 +26,7 @@ test-javascript:
 
 test-python:
 	@echo "--> Running Python tests"
-	bin/test
-	@echo ""
-
-lint-python:
-	@echo "--> Linting Python files"
-	bin/lint
-	@echo ""
-
-format: format-python
-
-format-python:
-	@echo "--> Formatting Python files"
-	python -m black . bin/run-task bin/load-mocks bin/shell bin/ssh-connect bin/web bin/worker bin/load-mocks
+	pytest
 	@echo ""
 
 docker:

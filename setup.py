@@ -10,22 +10,11 @@ A deploy service.
 """
 
 
-import os.path
-
 from setuptools import setup, find_packages
 
 
-# Hack to prevent stupid "TypeError: 'NoneType' object is not callable" error
-# in multiprocessing/util.py _exit_function when running `python
-# setup.py test` (see
-# http://www.eby-sarna.com/pipermail/peak/2010-May/003357.html)
-for m in ("multiprocessing", "billiard"):
-    try:
-        __import__(m)
-    except ImportError:
-        pass
-
-ROOT = os.path.realpath(os.path.join(os.path.dirname(__file__)))
+with open("requirements-pre-commit.txt") as file:
+    pre_commit_requires = file.read().splitlines()
 
 with open("requirements-test.txt") as file:
     tests_require = file.read().splitlines()
@@ -44,7 +33,10 @@ setup(
     packages=find_packages(exclude=["tests"]),
     zip_safe=False,
     install_requires=install_requires,
-    extras_require={"test": tests_require},
+    extras_require={
+        "test": tests_require,
+        "pre-commit": pre_commit_requires,
+    },
     license="Apache 2.0",
     include_package_data=True,
     classifiers=[

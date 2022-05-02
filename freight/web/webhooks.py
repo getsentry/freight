@@ -23,7 +23,7 @@ class WebhooksView(MethodView):
     def post(self, hook, action, app, env, digest):
         expected = hmac.new(
             current_app.config["API_KEY"].encode("utf8"),
-            f"{hook}/{action}/{app}/{env}".encode("utf8"),
+            f"{hook}/{action}/{app}/{env}".encode(),
             sha256,
         ).hexdigest()
         if not hmac.compare_digest(expected, digest):

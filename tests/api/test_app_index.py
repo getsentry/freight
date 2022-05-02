@@ -10,12 +10,12 @@ class AppIndexBase(TestCase):
     def setUp(self):
         self.user = self.create_user()
         self.repo = self.create_repo()
-        super(AppIndexBase, self).setUp()
+        super().setUp()
 
 
 class AppListTest(AppIndexBase):
     def setUp(self):
-        super(AppListTest, self).setUp()
+        super().setUp()
 
     def test_simple(self):
         app_a = self.create_app(repository=self.repo, name="a")

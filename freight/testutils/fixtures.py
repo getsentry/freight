@@ -18,7 +18,7 @@ from freight.models import (
 )
 
 
-class Fixtures(object):
+class Fixtures:
     def create_taskconfig(self, app, **kwargs):
         kwargs.setdefault("type", TaskConfigType.deploy)
         kwargs.setdefault("provider", "shell")

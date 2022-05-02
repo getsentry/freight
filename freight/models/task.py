@@ -6,7 +6,7 @@ from freight.config import db
 from freight.db.types.json import JSONEncodedDict
 
 
-class TaskStatus(object):
+class TaskStatus:
     unknown = 0
     pending = 1
     in_progress = 2

@@ -1,0 +1,4 @@
+pre-commit==2.18.1
+flake8==4.0.1
+black==22.3.0
+pyupgrade==2.32.0

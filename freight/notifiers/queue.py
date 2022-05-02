@@ -5,7 +5,7 @@ from time import time
 from freight.config import redis
 
 
-class NotificationQueue(object):
+class NotificationQueue:
     delay = 5000  # ms
     prefix = "notif"
     conn = redis

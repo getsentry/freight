@@ -14,10 +14,10 @@ class ConfigApiView(ApiView):
 
         if current_app.config["SENTRY_DSN"]:
             parsed = urlparse(current_app.config["SENTRY_DSN"])
-            dsn = "%s://%s@%s/%s" % (
+            dsn = "{}://{}@{}/{}".format(
                 parsed.scheme.rsplit("+", 1)[-1],
                 parsed.username,
-                parsed.hostname + (":%s" % (parsed.port,) if parsed.port else ""),
+                parsed.hostname + (f":{parsed.port}" if parsed.port else ""),
                 parsed.path,
             )
         else:

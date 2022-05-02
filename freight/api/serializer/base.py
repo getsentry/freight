@@ -1,7 +1,7 @@
 __all__ = ["Serializer"]
 
 
-class Serializer(object):
+class Serializer:
     def __call__(self, *args, **kwargs):
         return self.serialize(*args, **kwargs)
 

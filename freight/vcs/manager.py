@@ -1,7 +1,7 @@
 __all__ = ["VcsManager"]
 
 
-class VcsManager(object):
+class VcsManager:
     def __init__(self):
         self.backends = {}
 

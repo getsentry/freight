@@ -20,8 +20,8 @@ class GitVcs(Vcs):
     def remote_url(self):
         if self.url.startswith(("ssh:", "http:", "https:")):
             parsed = urlparse(self.url)
-            port = ":%s" % (parsed.port,) if parsed.port else ""
-            url = "%s://%s@%s/%s" % (
+            port = f":{parsed.port}" if parsed.port else ""
+            url = "{}://{}@{}/{}".format(
                 parsed.scheme,
                 parsed.username or self.username or "git",
                 parsed.hostname + port,
@@ -34,7 +34,7 @@ class GitVcs(Vcs):
     def run(self, cmd, **kwargs):
         cmd = [self.binary_path] + cmd
         try:
-            return super(GitVcs, self).run(cmd, capture=True, **kwargs)
+            return super().run(cmd, capture=True, **kwargs)
         except CommandError as e:
             if e.stderr and "unknown revision or path" in e.stderr:
                 raise UnknownRevision(

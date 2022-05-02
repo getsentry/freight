@@ -3,7 +3,7 @@ class ApiError(Exception):
         self.message = message
         self.name = name
         self.status_code = status_code
-        super(ApiError, self).__init__(message)
+        super().__init__(message)
 
 
 class CheckError(Exception):

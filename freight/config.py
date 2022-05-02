@@ -5,7 +5,6 @@ from urllib.parse import urlunsplit
 
 from flask_heroku import Heroku
 from flask_redis import FlaskRedis
-from flask_sslify import SSLify
 from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -124,10 +123,6 @@ def create_app(_read_config=True, **config):
 
     # Pull in environment variables from docker
     docker_init_app(app)
-
-    if "DYNO" in os.environ:
-        # XXX: the released version of flask-sslify does not support init_app
-        SSLify(app)
 
     # Set any remaining defaults that might not be present yet
     if not app.config.get("SQLALCHEMY_DATABASE_URI"):

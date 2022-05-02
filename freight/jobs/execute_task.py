@@ -161,7 +161,7 @@ class LogReporter(threading.Thread):
             self.save_chunk(result)
 
 
-class TaskRunner(object):
+class TaskRunner:
     def __init__(self, task, read_timeout=300, timeout=3600):
         self.task = task
         self.timeout = timeout

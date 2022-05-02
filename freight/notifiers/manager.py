@@ -3,7 +3,7 @@ __all__ = ["NotifierManager"]
 from freight.exceptions import InvalidNotifier
 
 
-class NotifierManager(object):
+class NotifierManager:
     def __init__(self):
         self.notifiers = {}
 

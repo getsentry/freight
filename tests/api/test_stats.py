@@ -10,12 +10,12 @@ class StatsBase(TestCase):
     def setUp(self):
         self.user = self.create_user()
         self.repo = self.create_repo()
-        super(StatsBase, self).setUp()
+        super().setUp()
 
 
 class StatsTest(StatsBase):
     def setUp(self):
-        super(StatsTest, self).setUp()
+        super().setUp()
 
         self.app_a = self.create_app(repository=self.repo, name="foo")
         self.app_b = self.create_app(repository=self.repo, name="bar")
