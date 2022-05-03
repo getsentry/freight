@@ -8,14 +8,6 @@ ENV PATH="/usr/src/app/bin:${PATH}:/opt/google-cloud-sdk/bin"
 # add our user and group first to make sure their IDs get assigned consistently
 RUN groupadd -r freight && useradd -r -m -g freight freight
 
-RUN mkdir -p /usr/src/app
-WORKDIR /usr/src/app
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        unzip \
-        zip \
-    && rm -rf /var/lib/apt/lists/*
-
 # grab gosu for easy step-down from root
 RUN set -x \
     && GOSU_VERSION=1.11 \
@@ -51,20 +43,22 @@ RUN set -x \
     && mv /tmp/sentry-cli /usr/local/bin
 
 RUN set -x \
-    && GCLOUD_VERSION=251.0.0 \
-    && GCLOUD_SHA256=727fa0beae4c15b4b821f6df2381fbed8b2277b77fd74ebc721bd483b49541b5 \
+    && GCLOUD_VERSION=382.0.0 \
+    && GCLOUD_SHA256=335e5a2b4099505372914acfccbb978cf9d4efd8047bda59f910c26daefd554e \
     && curl -sL -o gcloud.tgz "https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-sdk-${GCLOUD_VERSION}-linux-x86_64.tar.gz" \
     && echo "${GCLOUD_SHA256} *gcloud.tgz" | sha256sum --check --status \
     && tar -zxvf gcloud.tgz -C /opt \
     && rm gcloud.tgz
 
-COPY package.json /usr/src/app/
+WORKDIR /usr/src/app
+
+COPY package.json .
 RUN npm install && npm cache clear --force
 
-COPY requirements.txt /usr/src/app/
+COPY requirements.txt .
 RUN pip install -r requirements.txt
 
-COPY . /usr/src/app
+COPY . .
 RUN node_modules/.bin/webpack -p \
     && pip install -e .
 
@@ -72,7 +66,7 @@ ENV WORKSPACE_ROOT /workspace
 RUN mkdir -p $WORKSPACE_ROOT
 
 EXPOSE 5000
-VOLUME /workspace
+VOLUME $WORKSPACE_ROOT
 
 ENTRYPOINT ["/usr/src/app/docker-entrypoint.sh"]
 CMD ["web", "--no-debug", "--addr", "0.0.0.0:5000"]
