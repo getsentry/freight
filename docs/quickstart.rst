@@ -1,18 +1,11 @@
 Quickstart
 ==========
 
-The easiest way to get started is to run Freight on Heroku:
-
-.. image:: https://www.herokucdn.com/deploy/button.png
-  :alt: Deploy
-  :target: https://heroku.com/deploy
 
 Requirements
 ------------
 
 .. note:: Freight is designed to support behind-firewall installation. However, this guide does not yet cover all required configuration.
-
-If you're not using Heroku, you'll need to ensure a few server dependencies:
 
 - Redis
 - PostgreSQL
@@ -117,8 +110,6 @@ Support exists for reporting internal errors to an upstream `Sentry <https://get
 
 Bootstrap the Database
 ----------------------
-
-.. note:: If you're on Heroku, you can skip this step.
 
 If you haven't already, create a new database for Freight:
 

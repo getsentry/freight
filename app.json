@@ -5,7 +5,6 @@
   "logo": "https://raw.githubusercontent.com/getsentry/freight/master/static/img/freight-logo.png",
   "keywords": ["deploy"],
   "env": {
-    "BUILDPACK_URL": "https://github.com/heroku/heroku-buildpack-multi.git",
     "SECRET_KEY": {
       "description": "A secret key for verifying the integrity of signed cookies.",
       "generator": "secret"
@@ -39,9 +38,6 @@
       "description": "A private key to use when cloning repositories"
     }
   },
-  "buildpacks": [
-    {"url": "https://github.com/heroku/heroku-buildpack-multi.git"}
-  ],
   "formation": [
     {
       "process": "web",
@@ -55,7 +51,6 @@
     }
   ],
   "addons": [
-    "heroku-postgresql:hobby-dev",
     "rediscloud"
   ],
   "scripts": {

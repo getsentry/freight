@@ -3,7 +3,6 @@ import os
 import logging
 from urllib.parse import urlunsplit
 
-from flask_heroku import Heroku
 from flask_redis import FlaskRedis
 from flask_sqlalchemy import SQLAlchemy
 from raven.contrib.flask import Sentry
@@ -16,7 +15,6 @@ from freight.constants import PROJECT_ROOT
 
 api = ApiController(prefix="/api/0")
 db = SQLAlchemy(session_options={})
-heroku = Heroku()
 redis = FlaskRedis()
 sentry = Sentry(logging=True, level=logging.WARN)
 queue = Queue()
@@ -117,9 +115,6 @@ def create_app(_read_config=True, **config):
 
     # We don't support non-proxied installs
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
-
-    # Pull in Heroku configuration
-    heroku.init_app(app)
 
     # Pull in environment variables from docker
     docker_init_app(app)
