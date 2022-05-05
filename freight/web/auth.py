@@ -1,5 +1,3 @@
-import freight
-
 from flask import current_app, redirect, request, session, url_for
 from flask.views import MethodView
 from oauth2client.client import OAuth2WebServerFlow
@@ -26,7 +24,7 @@ def get_auth_flow(redirect_uri=None):
         client_secret=current_app.config["GOOGLE_CLIENT_SECRET"],
         scope="https://www.googleapis.com/auth/userinfo.email",
         redirect_uri=redirect_uri,
-        user_agent=f"freight/{freight.VERSION} (python {PYTHON_VERSION})",
+        user_agent=f"freight (python {PYTHON_VERSION})",
         auth_uri=auth_uri,
         token_uri=GOOGLE_TOKEN_URI,
         revoke_uri=GOOGLE_REVOKE_URI,
