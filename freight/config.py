@@ -1,13 +1,11 @@
 import sentry_sdk
 from sentry_sdk.integrations.flask import FlaskIntegration
-from freight import VERSION
 
 # Assumes SENTRY_DSN is set.
 sentry_sdk.init(
     integrations=[FlaskIntegration()],
     # Don't care about performance monitoring.
     traces_sample_rate=0.0,
-    release=VERSION,
 )
 
 
