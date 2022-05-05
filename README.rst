@@ -24,7 +24,7 @@ Current Features
 - Multiple applications. All configuration is unique per application
 - Per-environment deployments (i.e. different versions on staging and production)
 - Workspace management (i.e. whatever your deploy command is may be generating local artifacts, those should be cleaned up)
-- Support for at least Fabric-based (simple shell commands) and Heroku-based deploys
+- Support for at least Fabric-based (simple shell commands) deploys
 - API-accessible deploy logs
 - Hubot integration (starting deploys)
 - Slack integration (notifying when deploys start/finish/fail)
