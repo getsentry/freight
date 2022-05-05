@@ -1,11 +1,10 @@
 __all__ = ["build_session", "delete", "get", "post", "put"]
 
-import freight
 import requests
 
 from flask import current_app
 
-USER_AGENT = f"freight/{freight.VERSION} (https://github.com/getsentry/freight)"
+USER_AGENT = f"freight (https://github.com/getsentry/freight)"
 
 
 def build_session():
