@@ -1,3 +1,16 @@
+import sentry_sdk
+from sentry_sdk.integrations.flask import FlaskIntegration
+from freight import VERSION
+
+# Assumes SENTRY_DSN is set.
+sentry_sdk.init(
+    integrations=[FlaskIntegration()],
+    # Don't care about performance monitoring.
+    traces_sample_rate=0.0,
+    release=VERSION,
+)
+
+
 import flask
 import os
 import logging
@@ -6,7 +19,6 @@ from urllib.parse import urlunsplit
 from flask_heroku import Heroku
 from flask_redis import FlaskRedis
 from flask_sqlalchemy import SQLAlchemy
-from raven.contrib.flask import Sentry
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from freight.queue import Queue
@@ -18,7 +30,6 @@ api = ApiController(prefix="/api/0")
 db = SQLAlchemy(session_options={})
 heroku = Heroku()
 redis = FlaskRedis()
-sentry = Sentry(logging=True, level=logging.WARN)
 queue = Queue()
 
 
@@ -113,8 +124,6 @@ def create_app(_read_config=True, **config):
         "freight.jobs.send_pending_notifications": {"seconds": 1},
     }
 
-    app.config["SENTRY_INCLUDE_PATHS"] = ["freight"]
-
     # We don't support non-proxied installs
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
 
@@ -145,7 +154,6 @@ def create_app(_read_config=True, **config):
             app.config.from_pyfile(path, silent=True)
 
     configure_logging(app)
-    configure_sentry(app)
     configure_api(app)
     configure_redis(app)
     configure_queue(app)
@@ -208,20 +216,7 @@ def configure_redis(app):
 
 
 def configure_queue(app):
-    queue.init_app(app, db, sentry)
-
-
-def configure_sentry(app):
-    from flask import session
-
-    sentry.init_app(app)
-
-    @app.before_request
-    def capture_user(*args, **kwargs):
-        if "uid" in session:
-            sentry.client.user_context(
-                {"id": session["uid"], "email": session["email"]}
-            )
+    queue.init_app(app, db)
 
 
 def configure_sqlalchemy(app):

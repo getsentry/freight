@@ -1,9 +1,10 @@
+import importlib.metadata
 import os
 import subprocess
 
 try:
-    VERSION = __import__("pkg_resources").get_distribution("freight").version
-except Exception:
+    VERSION = importlib.metadata.version("freight")
+except importlib.metadata.PackageNotFoundError:
     VERSION = "unknown"
 
 
