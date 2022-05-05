@@ -1,4 +1,4 @@
-from flask import current_app
+import os
 
 from freight.api.base import ApiView
 
@@ -10,17 +10,15 @@ class ConfigApiView(ApiView):
         """
         Returns a configuration object
         """
-
-        if current_app.config["SENTRY_DSN"]:
-            parsed = urlparse(current_app.config["SENTRY_DSN"])
+        dsn = os.environ.get("SENTRY_DSN")
+        if dsn:
+            parsed = urlparse(dsn)
             dsn = "{}://{}@{}/{}".format(
                 parsed.scheme.rsplit("+", 1)[-1],
                 parsed.username,
                 parsed.hostname + (f":{parsed.port}" if parsed.port else ""),
                 parsed.path,
             )
-        else:
-            dsn = None
 
         return self.respond(
             {"SENTRY_PUBLIC_DSN": dsn, "VERSION": "0.0.0"}, status_code=201
