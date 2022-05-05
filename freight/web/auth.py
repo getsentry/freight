@@ -1,5 +1,3 @@
-import freight
-
 from flask import current_app, redirect, request, session, url_for
 from flask.views import MethodView
 from oauth2client.client import OAuth2WebServerFlow
