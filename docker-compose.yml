@@ -1,9 +1,9 @@
 redis:
-  image: redis
+  image: redis:3.2.9-alpine
   command: redis-server --appendonly yes
 
 postgres:
-  image: postgres
+  image: postgres:9.6.3
 
 web:
   build: .
@@ -11,14 +11,16 @@ web:
     - redis:redis
     - postgres:postgres
   ports:
-    - 5000:5000
-  env_file: .env
+    # 5000 is occupied on recent versions of MacOS, lol
+    - 12000:5000
+  env_file:
+    - .env
 
 worker:
   build: .
   links:
     - redis:redis
     - postgres:postgres
-  env_file: .env
   command: bin/worker --no-debug
-
+  env_file:
+    - .env
