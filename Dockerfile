@@ -42,6 +42,15 @@ RUN set -x \
     && chmod +x /tmp/sentry-cli \
     && mv /tmp/sentry-cli /usr/local/bin
 
+# Some builds, like Relay, rely on docker's cli for their sentry releases.
+RUN set -x \
+    && DOCKER_CLI_VERSION=20.10.16 \
+    && DOCKER_CLI_SHA256=96588db31509c2a3c89eb68107b9bb9a0e6b1c9b5791e5c18475680d5074b40f \
+    && curl -sL -o /usr/local/bin/docker "https://storage.googleapis.com/sentry-dev-infra-build-assets/docker-${DOCKER_CLI_VERSION}" \
+    && echo "${DOCKER_CLI_SHA256} /usr/local/bin/docker" | sha256sum --check --status \
+    && chmod +x /usr/local/bin/docker \
+    && docker -v
+
 RUN set -x \
     && GCLOUD_VERSION=382.0.0 \
     && GCLOUD_SHA256=335e5a2b4099505372914acfccbb978cf9d4efd8047bda59f910c26daefd554e \
