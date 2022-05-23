@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 import {formatDistanceToNowStrict} from 'date-fns';
+import PropTypes from 'prop-types';
 
 class TimeSince extends React.Component {
   static propTypes = {

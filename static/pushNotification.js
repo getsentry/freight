@@ -1,6 +1,6 @@
 function createNotification(message, url, options) {
   const notification = new Notification(message, options);
-  notification.onclick = function(event) {
+  notification.onclick = function (event) {
     event.preventDefault();
     window.open(url);
   };
@@ -24,7 +24,7 @@ function pushNotification(task, path) {
   };
 
   if (window.Notification && Notification.permission !== 'denied') {
-    Notification.requestPermission(function(permission) {
+    Notification.requestPermission(function (permission) {
       if (permission === 'granted') {
         createNotification(task.name, url, options);
       }

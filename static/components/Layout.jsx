@@ -1,9 +1,10 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 import {Link} from 'react-router';
+// eslint-disable-next-line no-restricted-imports
 import {init} from '@sentry/browser';
 
 import api from '../api';
+
 import Indicators from './Indicators';
 import LoadingIndicator from './LoadingIndicator';
 
@@ -104,8 +105,9 @@ class Layout extends React.Component {
                   pathname: '/deploy',
                   query: {app},
                 }}
-                className={`btn btn-sm btn-default ${(loading || error) &&
-                  'btn-disabled'}`}
+                className={`btn btn-sm btn-default ${
+                  (loading || error) && 'btn-disabled'
+                }`}
               >
                 Deploy
               </Link>

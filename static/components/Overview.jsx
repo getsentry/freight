@@ -1,15 +1,14 @@
-import PropTypes from 'prop-types';
 import React from 'react';
-
 import createReactClass from 'create-react-class';
+import PropTypes from 'prop-types';
 
 import api from '../api';
+import PollingMixin from '../mixins/polling';
+import pushNotification from '../pushNotification';
 
 import DeployChart from './DeployChart';
 import LoadingIndicator from './LoadingIndicator';
-import PollingMixin from '../mixins/polling';
 import TaskSummary from './TaskSummary';
-import pushNotification from '../pushNotification';
 
 const Overview = createReactClass({
   displayName: 'Overview',
@@ -36,7 +35,7 @@ const Overview = createReactClass({
     });
   },
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(_prevProps, prevState) {
     const previousTasks = {};
 
     prevState.deploys.forEach(task => {
@@ -68,11 +67,11 @@ const Overview = createReactClass({
   },
 
   deployInProgress(deploy) {
-    return deploy.status == 'in_progress';
+    return deploy.status === 'in_progress';
   },
 
   deployPending(deploy) {
-    return deploy.status == 'pending';
+    return deploy.status === 'pending';
   },
 
   render() {

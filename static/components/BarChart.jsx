@@ -1,6 +1,6 @@
-import {format, addMinutes, addSeconds} from 'date-fns';
-import PropTypes from 'prop-types';
 import React from 'react';
+import {addMinutes, addSeconds, format} from 'date-fns';
+import PropTypes from 'prop-types';
 
 import TooltipTrigger from './TooltipTrigger';
 
@@ -69,7 +69,7 @@ class BarChart extends React.Component {
   render() {
     const points = this.props.points;
     let maxval = 10;
-    points.forEach(function(point) {
+    points.forEach(function (point) {
       if (point.y > maxval) {
         maxval = point.y;
       }
@@ -93,7 +93,7 @@ class BarChart extends React.Component {
         timeLabelFunc = this.timeLabelAsRange.bind(this, interval);
     }
 
-    const children = points.map((point, pointIdx) => {
+    const children = points.map(point => {
       const pct = this.floatFormat((point.y / maxval) * 99, 2) + '%';
       const timeLabel = timeLabelFunc(point);
 

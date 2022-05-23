@@ -1,10 +1,11 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+// eslint-disable-next-line no-restricted-imports
 import {mount} from 'enzyme';
+import PropTypes from 'prop-types';
 
 import TaskSummary from '../components/TaskSummary.jsx';
 
-//TODO: figure out why snapshots are rendering null.
+// TODO: figure out why snapshots are rendering null.
 test('TaskSummary Snapshot', () => {
   const task = {
     app: {
@@ -39,5 +40,6 @@ test('TaskSummary Snapshot', () => {
   };
 
   const wrapper = mount(<TaskSummary task={task} />, context);
+  // eslint-disable-next-line sentry/no-to-match-snapshot
   expect(wrapper).toMatchSnapshot();
 });
