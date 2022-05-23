@@ -1,5 +1,4 @@
-Freight
--------
+# Freight
 
 **This project is a work in progress and is not yet intended to be
 production ready.**
@@ -17,8 +16,7 @@ It's not designed to replace something like Heroku, or other PaaS
 services, but rather to work *with* your existing processes, no matter
 what they are.
 
-Current Features
-================
+## Current Features
 
 - Works behind-firewall (no inbound traffic)
 - Multiple applications. All configuration is unique per application
@@ -32,26 +30,22 @@ Current Features
 - Integration with GitHub status checks (i.e. did Circle CI pass on sha XXX)
 - A GUI to get an overview of deploy status and history
 
-Roadmap
-=======
+## Roadmap
 
 What's coming up:
 
-V0
-~~
+### V0
 
 - Release state management (know what versions are active where, and provide a historical view)
 - Environment locking (i.e. prevent people from deploying to an environment)
 - Automatic deploys (i.e. by looking for VCS changes)
 - Actions within the GUI (deploy, cancel)
 
-V1
-~~
+### V1
 
 - Deploy queue (i.e. cramer queued sha XXX, armin queued sha YYY)
 
-V2 and Beyond
-~~~~~~~~~~~~~
+### V2 and Beyond
 
 **Machine-consistency service**
 
@@ -62,10 +56,9 @@ how to get app version). The service could also be aware of "how do I
 deploy a version" which could assist in pull-based deploys.
 
 
-Resources
-=========
+## Resources
 
-- `Documentation <https://freight.readthedocs.io>`_
-- `Bug Tracker <https://github.com/getsentry/freight/issues>`_
-- `Code <https://github.com/getsentry/freight>`_
-- `IRC <irc://irc.freenode.net/sentry>`_  (irc.freenode.net, #sentry)
+- [Documentation](https://freight.readthedocs.io)
+- [Bug Tracker](https://github.com/getsentry/freight/issues)
+- [Code](https://github.com/getsentry/freight)
+- [IRC](irc://irc.freenode.net/sentry)
