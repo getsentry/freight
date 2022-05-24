@@ -4,6 +4,7 @@ develop-javascript:
 	yarn install
 
 develop-python:
+	pip install --upgrade pip setuptools wheel
 	pip install -e ".[test,pre-commit]"
 
 mac-install-postgres-96:

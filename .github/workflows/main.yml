@@ -1,0 +1,68 @@
+name: build
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+
+    env:
+      # Configures freight
+      POSTGRES_ENV_POSTGRES_USER: postgres
+      POSTGRES_ENV_POSTGRES_PASSWORD: postgres_password
+      POSTGRES_ENV_POSTGRES_DB: test_freight
+      POSTGRES_PORT_5432_TCP_ADDR: 127.0.0.1
+
+      # Configures createdb command
+      PGHOST: 127.0.0.1
+      PGUSER: postgres
+      PGPASSWORD: postgres_password
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_ENV_POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_ENV_POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_ENV_POSTGRES_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: volta-cli/action@v1
+      - uses: actions/setup-python@v3
+        with:
+          python-version: '3.8.12'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          make develop-javascript
+          make develop-python
+
+      - name: Lint
+        run: |
+          pre-commit run --all-files
+          yarn eslint static/
+
+      - name: Test
+        run: make test
