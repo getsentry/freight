@@ -62,7 +62,7 @@ RUN set -x \
 WORKDIR /usr/src/app
 
 COPY package.json .
-RUN npm install && npm cache clear --force
+RUN yarn install && yarn cache clean --all
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt
