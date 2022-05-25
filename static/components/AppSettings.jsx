@@ -1,8 +1,8 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 
 import api from '../api';
 import IndicatorStore from '../stores/indicatorStore';
+
 import LoadingIndicator from './LoadingIndicator';
 
 class AppSettings extends React.Component {

@@ -1,8 +1,33 @@
-/*eslint-env node*/
+/* eslint-env node */
+/* eslint import/no-nodejs-modules:0 */
+
+const process = require('process');
+
+const isRelaxed = !!process.env.SENTRY_ESLINT_RELAXED;
+const isCi = !!process.env.CI;
+
+// Strict ruleset that runs on pre-commit and in local environments
+const strictRulesNotCi = {
+  'react-hooks/exhaustive-deps': ['error'],
+};
+
 module.exports = {
-  extends: ['sentry-app'],
+  extends: [isRelaxed ? 'sentry-app' : 'sentry-app/strict'],
   globals: {
+    require: false,
+    expect: false,
+    tick: true,
     jest: true,
   },
-  rules: {},
+
+  rules: {
+    ...(!isRelaxed && !isCi ? strictRulesNotCi : {}),
+  },
+
+  overrides: [
+    {
+      files: ['*.ts', '*.tsx'],
+      rules: {},
+    },
+  ],
 };

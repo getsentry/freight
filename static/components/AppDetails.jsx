@@ -1,12 +1,11 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 import createReactClass from 'create-react-class';
 
 import api from '../api';
+import PollingMixin from '../mixins/polling';
 
 import DeployChart from './DeployChart';
 import LoadingIndicator from './LoadingIndicator';
-import PollingMixin from '../mixins/polling';
 import TaskSummary from './TaskSummary';
 
 const AppDetails = createReactClass({
@@ -61,11 +60,11 @@ const AppDetails = createReactClass({
   },
 
   taskInProgress(task) {
-    return task.status == 'in_progress';
+    return task.status === 'in_progress';
   },
 
   taskPending(task) {
-    return task.status == 'pending';
+    return task.status === 'pending';
   },
 
   render() {

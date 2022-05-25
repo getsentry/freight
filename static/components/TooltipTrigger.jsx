@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
 import ReactDOMServer from 'react-dom/server';
+import PropTypes from 'prop-types';
 
 const React = require('react');
 
@@ -27,6 +27,7 @@ class TooltipTrigger extends React.Component {
 
   componentDidMount() {
     // These can be configured via options; this is just a demo
+    // eslint-disable-next-line react/no-find-dom-node
     $(ReactDOM.findDOMNode(this)).tooltip({
       // eslint-disable-line
       html: true,

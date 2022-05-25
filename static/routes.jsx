@@ -1,5 +1,5 @@
 import React from 'react';
-import {Route, IndexRoute} from 'react-router';
+import {IndexRoute, Route} from 'react-router';
 
 import AppDetails from './components/AppDetails';
 import AppSettings from './components/AppSettings';

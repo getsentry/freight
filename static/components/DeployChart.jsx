@@ -1,12 +1,11 @@
-import PropTypes from 'prop-types';
 import React from 'react';
-
 import createReactClass from 'create-react-class';
+import PropTypes from 'prop-types';
 
 import api from '../api';
+import PollingMixin from '../mixins/polling';
 
 import BarChart from './BarChart';
-import PollingMixin from '../mixins/polling';
 
 const DeployChart = createReactClass({
   displayName: 'DeployChart',

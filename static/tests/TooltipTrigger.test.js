@@ -1,4 +1,5 @@
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import {mount} from 'enzyme';
 
 import TooltipTrigger from '../components/TooltipTrigger.jsx';
@@ -15,6 +16,7 @@ describe('<TooltipTrigger />', () => {
     };
 
     const result = mount(<TooltipTrigger {...props}>{props.title}</TooltipTrigger>);
+    // eslint-disable-next-line sentry/no-to-match-snapshot
     expect(result).toMatchSnapshot();
   });
 });

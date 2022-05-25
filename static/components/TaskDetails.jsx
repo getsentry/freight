@@ -1,18 +1,19 @@
+import React from 'react';
 import {browserHistory} from 'react-router';
 import ansi_up from 'ansi_up';
 import createReactClass from 'create-react-class';
-import linkifyUrls from 'linkify-urls';
 import {format} from 'date-fns';
+import linkifyUrls from 'linkify-urls';
 import PropTypes from 'prop-types';
-import React from 'react';
 
 import api from '../api';
-import Duration from './Duration';
-import LoadingIndicator from './LoadingIndicator';
 import PollingMixin from '../mixins/polling';
-import TimeSince from './TimeSince';
 import pushNotification from '../pushNotification';
+
+import Duration from './Duration';
 import FaviconStatus from './FaviconStatus';
+import LoadingIndicator from './LoadingIndicator';
+import TimeSince from './TimeSince';
 
 class Progress extends React.Component {
   static propTypes = {
@@ -46,7 +47,7 @@ const TaskDetails = createReactClass({
     this.fetchData();
   },
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps() {
     const params = this.props.params;
     const task = this.state.task;
 
@@ -70,7 +71,7 @@ const TaskDetails = createReactClass({
     }
   },
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(_prevProps, prevState) {
     const task = this.state.task;
 
     if (!task) {
@@ -93,7 +94,7 @@ const TaskDetails = createReactClass({
 
     if (
       this.state.liveScroll &&
-      hash == '' &&
+      hash === '' &&
       prevState.logNextOffset !== this.state.logNextOffset
     ) {
       this.scrollLog();
@@ -108,13 +109,15 @@ const TaskDetails = createReactClass({
     }
   },
 
+  logRef: React.createRef(),
+
   fetchData() {
     if (this.logTimer) {
       window.clearTimeout(this.logTimer);
     }
 
-    if (this.refs.log) {
-      this.refs.log.innerHTML = '';
+    if (this.logRef.current) {
+      this.logRef.current.innerHTML = '';
     }
 
     api.request(this.getPollingUrl(), {
@@ -129,11 +132,11 @@ const TaskDetails = createReactClass({
     });
   },
 
-  onScroll(event) {
+  onScroll() {
     const scrollTop = document.body.scrollTop;
     if (scrollTop < this.lastScrollPos) {
       this.setState({liveScroll: false});
-    } else if (scrollTop + window.innerHeight == document.body.scrollHeight) {
+    } else if (scrollTop + window.innerHeight === document.body.scrollHeight) {
       this.setState({liveScroll: true});
     }
     this.lastScrollPos = scrollTop;
@@ -240,7 +243,7 @@ const TaskDetails = createReactClass({
         frag.appendChild(div);
       }
     }
-    this.refs.log.appendChild(frag);
+    this.logRef.current.appendChild(frag);
 
     this.centerHighlightedDiv();
 
@@ -388,7 +391,7 @@ const TaskDetails = createReactClass({
             ref: task.sha,
           },
           success: data => {
-            //workaround is referenced from here: https://github.com/ReactTraining/react-router/issues/1982
+            // workaround is referenced from here: https://github.com/ReactTraining/react-router/issues/1982
             browserHistory.push('/');
             browserHistory.push(
               `/deploys/${data.app.name}/${data.environment}/${data.number}`
@@ -461,7 +464,7 @@ const TaskDetails = createReactClass({
               <p>Loading log history.</p>
             </div>
           ) : (
-            <div ref="log" />
+            <div ref={this.logRef} />
           )}
           {!this.state.logLoading && inProgress && <div className="loading-icon" />}
         </div>
@@ -474,7 +477,7 @@ const TaskDetails = createReactClass({
               {task.ref}
             </div>
             <div className="meta">
-              {task.status == 'pending' && (
+              {task.status === 'pending' && (
                 <small>
                   <strong>QUEUED</strong> &mdash;{' '}
                 </small>

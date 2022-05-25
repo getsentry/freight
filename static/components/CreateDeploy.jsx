@@ -1,7 +1,7 @@
+import React from 'react';
 import {browserHistory} from 'react-router';
 import jQuery from 'jquery';
 import PropTypes from 'prop-types';
-import React from 'react';
 
 import api from '../api';
 

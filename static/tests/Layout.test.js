@@ -1,4 +1,5 @@
 import React from 'react';
+// eslint-disable-next-line no-restricted-imports
 import {mount} from 'enzyme';
 
 import Layout from '../components/Layout.jsx';
@@ -33,6 +34,7 @@ describe('<Layout />', () => {
         <TaskDetails params={{}} task={task} />
       </Layout>
     );
+    // eslint-disable-next-line sentry/no-to-match-snapshot
     expect(result).toMatchSnapshot();
   });
 });

@@ -1,7 +1,7 @@
-import {browserHistory} from 'react-router';
-import PropTypes from 'prop-types';
 import React from 'react';
+import {browserHistory} from 'react-router';
 import classnames from 'classnames';
+import PropTypes from 'prop-types';
 
 import Duration from './Duration';
 import TimeSince from './TimeSince';
@@ -32,7 +32,7 @@ class TaskSummary extends React.Component {
   };
 
   taskInProgress = task => {
-    return task.status == 'in_progress' || task.status == 'pending';
+    return task.status === 'in_progress' || task.status === 'pending';
   };
 
   getEstimatedProgress = task => {
@@ -105,7 +105,7 @@ class TaskSummary extends React.Component {
           {task.ref}
         </div>
         <div className="meta">
-          {task.status == 'pending' && (
+          {task.status === 'pending' && (
             <small>
               <strong>QUEUED</strong> &mdash;{' '}
             </small>
