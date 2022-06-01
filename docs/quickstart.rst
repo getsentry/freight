@@ -9,7 +9,7 @@ Requirements
 
 - Redis
 - PostgreSQL
-- Python 2.7
+- Python 3
 - Node.js
 
 Dependencies
