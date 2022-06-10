@@ -65,9 +65,7 @@ def create_app(_read_config=True, **config):
 
     app.config["FREIGHT_URL"] = os.environ.get("FREIGHT_URL", "").rstrip("/")
 
-    if "REDISCLOUD_URL" in os.environ:
-        app.config["REDIS_URL"] = os.environ["REDISCLOUD_URL"]
-    elif "REDIS_URL" in os.environ:
+    if "REDIS_URL" in os.environ:
         app.config["REDIS_URL"] = os.environ["REDIS_URL"]
 
     app.config["WORKSPACE_ROOT"] = os.environ.get("WORKSPACE_ROOT", "/tmp")
