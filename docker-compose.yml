@@ -1,24 +1,28 @@
-redis:
-  image: redis
-  command: redis-server --appendonly yes
+services:
+  redis:
+    image: redis:7.0.1-alpine
+    command: redis-server --appendonly yes
 
-postgres:
-  image: postgres
+  postgres:
+    image: postgres:14.4-alpine
+    environment:
+      # lol
+      - POSTGRES_HOST_AUTH_METHOD=trust
 
-web:
-  build: .
-  links:
-    - redis:redis
-    - postgres:postgres
-  ports:
-    - 5000:5000
-  env_file: .env
+  web:
+    build: .
+    links:
+      - redis:redis
+      - postgres:postgres
+    ports:
+      # right now, we just serve directly with Flask which has been sufficient
+      - 80:5000
+    env_file: .env
 
-worker:
-  build: .
-  links:
-    - redis:redis
-    - postgres:postgres
-  env_file: .env
-  command: bin/worker --no-debug
-
+  worker:
+    build: .
+    links:
+      - redis:redis
+      - postgres:postgres
+    env_file: .env
+    command: bin/worker --no-debug
