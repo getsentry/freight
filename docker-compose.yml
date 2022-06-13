@@ -18,6 +18,9 @@ services:
       # right now, we just serve directly with Flask which has been sufficient
       - 80:5000
     env_file: .env
+    volumes:
+      # /etc/freight/google-credentials.json must be chowned as "freight" with uid 2345
+      - /etc/freight/google-credentials.json:/home/freight/google-credentials.json
 
   worker:
     build: .
@@ -26,3 +29,6 @@ services:
       - postgres:postgres
     env_file: .env
     command: bin/worker --no-debug
+    volumes:
+      # /etc/freight/google-credentials.json must be chowned as "freight" with uid 2345
+      - /etc/freight/google-credentials.json:/home/freight/google-credentials.json

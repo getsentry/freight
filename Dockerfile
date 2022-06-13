@@ -6,7 +6,7 @@ ENV PYTHONUNBUFFERED 1
 ENV PATH="/usr/src/app/bin:${PATH}:/opt/google-cloud-sdk/bin"
 
 # add our user and group first to make sure their IDs get assigned consistently
-RUN groupadd -r freight && useradd -r -m -g freight freight
+RUN groupadd -r freight && useradd --uid=2345 -r -m -g freight freight
 
 # grab gosu for easy step-down from root
 RUN set -x \
@@ -70,6 +70,8 @@ RUN pip install -r requirements.txt
 COPY . .
 RUN node_modules/.bin/webpack -p \
     && pip install -e .
+
+COPY --chown=freight:freight config.json /home/freight/.docker/config.json
 
 ENV WORKSPACE_ROOT /workspace
 RUN mkdir -p $WORKSPACE_ROOT

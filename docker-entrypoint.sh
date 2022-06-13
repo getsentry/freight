@@ -9,17 +9,12 @@ case "$1" in
     ;;
 esac
 
-if [ "$DOCKER_CONFIG" ]; then
-    gosu freight bash -c 'mkdir -p ~/.docker'
-    gosu freight bash -c 'echo $DOCKER_CONFIG > ~/.docker/config.json'
-    gosu freight bash -c 'chmod 400 ~/.docker/config.json'
-    # Make sure we don't pass this along since it contains sensitive info
-    unset DOCKER_CONFIG
-fi
-
-if [ -f /etc/freight/auth-helpers.sh ]; then
-    . /etc/freight/auth-helpers.sh
-fi
+# set up GCP service account auth
+# this file must be chowned to freight and mounted to this location
+export GOOGLE_APPLICATION_CREDENTIALS=/home/freight/google-credentials.json
+email=$(grep 'client_email' "$GOOGLE_APPLICATION_CREDENTIALS" | sed -e "s/.*: \"//" | sed -e "s/\",//")
+gosu freight bash -c "gcloud auth activate-service-account ${email} --key-file=${GOOGLE_APPLICATION_CREDENTIALS} -q"
+unset email
 
 # Check if we're trying to execute a freight bin
 if [ -f "/usr/src/app/bin/$1" ]; then
