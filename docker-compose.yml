@@ -8,6 +8,7 @@ services:
     environment:
       # lol
       - POSTGRES_HOST_AUTH_METHOD=trust
+      - /etc/freight/postgres-data:/var/lib/postgresql/data
 
   web:
     build: .
