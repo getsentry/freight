@@ -27,7 +27,7 @@ And then install the JavaScript dependencies:
 
 .. code-block:: bash
 
-  npm install
+  yarn install
 
 
 Configuration
@@ -139,7 +139,7 @@ You should then be able to access the frontend: http://localhost:5000
 Alternatively, if you're looking to develop on the frontend stack as well, you can run:
 
 .. code-block:: bash
-  npm start
+  yarn start
 
 
 Creating an Application
