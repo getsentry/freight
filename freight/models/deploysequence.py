@@ -15,4 +15,4 @@ class DeploySequence(db.Model):
 
     @classmethod
     def get_clause(self, app_id, environment):
-        return select([func.next_deploy_number(app_id, environment)])
+        return select([func.next_deploy_number(app_id, environment)]).scalar_subquery()

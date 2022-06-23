@@ -8,6 +8,8 @@ services:
     environment:
       # lol
       - POSTGRES_HOST_AUTH_METHOD=trust
+      - /etc/freight/google-credentials.json:/etc/freight/google-credentials.json
+      - /etc/freight/workspace:/workspace
       - /etc/freight/postgres-data:/var/lib/postgresql/data
 
   web:
