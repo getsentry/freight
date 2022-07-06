@@ -266,8 +266,12 @@ def run_step(step: Dict[str, Any], context: PipelineContext) -> None:
 
     watchers = {
         "Shell": run_step_shell,
-        "KubernetesDeployment": partial(run_step_deployment, is_experimental_deploy=False),
-        "KubernetesExperimentalDeployment": partial(run_step_deployment, is_experimental_deploy=True),
+        "KubernetesDeployment": partial(
+            run_step_deployment, is_experimental_deploy=False
+        ),
+        "KubernetesExperimentalDeployment": partial(
+            run_step_deployment, is_experimental_deploy=True
+        ),
         "KubernetesStatefulSet": run_step_stateful_set,
         "KubernetesCronJob": run_step_cronjob,
         "KubernetesJob": run_step_job,
@@ -659,10 +663,7 @@ def run_step_cronjob(
 
 
 def rollout_status_deployment(
-    api: client.AppsV1Api,
-    name: str,
-    namespace: str,
-    is_experimental_deploy: bool
+    api: client.AppsV1Api, name: str, namespace: str, is_experimental_deploy: bool
 ) -> Tuple[str, bool]:
     # tbh this is mostly ported from Go into Python from:
     # https://github.com/kubernetes/kubernetes/blob/master/pkg/kubectl/rollout_status.go#L76-L92
@@ -678,7 +679,11 @@ def rollout_status_deployment(
     for condition in deployment.status.conditions or []:
         if condition.type == "Progressing":
             if condition.reason == "ProgressDeadlineExceeded":
-                return f"deployment {repr(name)} exceeded its progress deadline", is_experimental_deploy
+                # Experimental deploy will return True as success response for the deploy regardless of failure
+                return (
+                    f"deployment {repr(name)} exceeded its progress deadline",
+                    is_experimental_deploy,
+                )
 
     spec_replicas = deployment.spec.replicas
     status_replicas = deployment.status.replicas or 0
