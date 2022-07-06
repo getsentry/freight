@@ -72,10 +72,13 @@ class PipelineProvider(Provider):
         }
 
     def get_config(self, workspace, task) -> Dict[str, Any]:
-        options = [
-            Path(workspace.path) / ".freight.yml",
-            Path(workspace.path) / ".freight.yaml",
-        ]
+        try:
+            options = [Path(workspace.path) / task.provider_config["config_path"]]
+        except KeyError:
+            options = [
+                Path(workspace.path) / ".freight.yml",
+                Path(workspace.path) / ".freight.yaml",
+            ]
 
         extra_config: Dict[str, Any] = {}
         for option in options:
