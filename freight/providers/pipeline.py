@@ -257,6 +257,7 @@ def run_step(step: Dict[str, Any], context: PipelineContext) -> None:
     if step["kind"] not in (
         "Shell",
         "KubernetesDeployment",
+        "KubernetesExperimentalDeployment",
         "KubernetesStatefulSet",
         "KubernetesCronJob",
         "KubernetesJob",
@@ -265,7 +266,8 @@ def run_step(step: Dict[str, Any], context: PipelineContext) -> None:
 
     watchers = {
         "Shell": run_step_shell,
-        "KubernetesDeployment": run_step_deployment,
+        "KubernetesDeployment": partial(run_step_deployment, is_experimental_deploy=False),
+        "KubernetesExperimentalDeployment": partial(run_step_deployment, is_experimental_deploy=True),
         "KubernetesStatefulSet": run_step_stateful_set,
         "KubernetesCronJob": run_step_cronjob,
         "KubernetesJob": run_step_job,
@@ -294,7 +296,7 @@ def run_step(step: Dict[str, Any], context: PipelineContext) -> None:
 
 
 def run_step_deployment(
-    step: Dict[str, Any], context: PipelineContext
+    step: Dict[str, Any], context: PipelineContext, is_experimental_deploy: bool
 ) -> List[Tuple[Callable, Dict[str, str]]]:
     # Execute a Kubernetes Deployment
     context.workspace.log.info(f"Running Deployment: {repr(step)}")
@@ -368,6 +370,7 @@ def run_step_deployment(
                         api,
                         resp.metadata.name,
                         resp.metadata.namespace,
+                        is_experimental_deploy,
                     ),
                     {},  # empty state dict for this rollout
                 )
@@ -659,6 +662,7 @@ def rollout_status_deployment(
     api: client.AppsV1Api,
     name: str,
     namespace: str,
+    is_experimental_deploy: bool
 ) -> Tuple[str, bool]:
     # tbh this is mostly ported from Go into Python from:
     # https://github.com/kubernetes/kubernetes/blob/master/pkg/kubectl/rollout_status.go#L76-L92
@@ -674,7 +678,7 @@ def rollout_status_deployment(
     for condition in deployment.status.conditions or []:
         if condition.type == "Progressing":
             if condition.reason == "ProgressDeadlineExceeded":
-                return f"deployment {repr(name)} exceeded its progress deadline", False
+                return f"deployment {repr(name)} exceeded its progress deadline", is_experimental_deploy
 
     spec_replicas = deployment.spec.replicas
     status_replicas = deployment.status.replicas or 0
