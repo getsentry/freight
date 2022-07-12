@@ -134,7 +134,7 @@ At this point you should have a working installation. To test this, launch the w
 
   bin/web
 
-You should then be able to access the frontend: http://localhost:5000
+You should then be able to access the frontend: http://localhost:5001
 
 Alternatively, if you're looking to develop on the frontend stack as well, you can run:
 
@@ -151,7 +151,7 @@ With the webserver online, you should be able to access the API. The first thing
 
 .. code-block:: bash
 
-  curlish http://localhost:5000/api/0/apps/ \
+  curlish http://localhost:5001/api/0/apps/ \
       -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70' \
       -X POST \
       -J repository=git@github.com:my-organization/example.git \
@@ -191,7 +191,7 @@ Once we've configured our application we can create a new deploy:
 
 .. code-block:: bash
 
-  curlish http://localhost:5000/api/0/tasks/ \
+  curlish http://localhost:5001/api/0/tasks/ \
       -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70' \
       -X POST \
       -J app=example \
@@ -219,14 +219,14 @@ For example, to get the status of a deploy:
 
 .. code-block:: bash
 
-  curlish http://localhost:5000/api/0/tasks/1/ \
+  curlish http://localhost:5001/api/0/tasks/1/ \
       -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70'
 
 Additionally you can access the logs via the API:
 
 .. code-block:: bash
 
-    curlish http://localhost:5000/api/0/tasks/1/log/?offset=-1&limit=1000 \
+    curlish http://localhost:5001/api/0/tasks/1/log/?offset=-1&limit=1000 \
       -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70'
 
 
@@ -237,7 +237,7 @@ While Freight doesn't formally offer a first-class rollback control, you can tel
 
 .. code-block:: bash
 
-  curlish http://localhost:5000/api/0/tasks/ \
+  curlish http://localhost:5001/api/0/tasks/ \
       -H 'Authorization: Key 3e84744ab2714151b1db789df82b41c0021958fe4d77406e9c0947c34f5c5a70' \
       -X POST \
       -J app=example \
