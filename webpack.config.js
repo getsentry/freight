@@ -82,7 +82,7 @@ module.exports = {
       index: '/static/',
     },
     overlay: true,
-    port: 5000,
+    port: 5001,
     proxy: {
       '/api/*': {
         target: 'http://localhost:5002',
