@@ -1,4 +1,4 @@
-from freight.utils.imports import import_submodules
-
-
-import_submodules(locals(), __name__, __path__)
+from .check_queue import *  # NOQA
+from .delete_object import *  # NOQA
+from .execute_task import *  # NOQA
+from .send_pending_notifications import *  # NOQA
