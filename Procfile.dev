@@ -1,3 +1,0 @@
-web: bin/upgrade && PYTHONUNBUFFERED=1 bin/web --dev --addr=127.0.0.1:5000 --debug
-worker: bin/upgrade && PYTHONUNBUFFERED=1 bin/worker --dev --no-debug -n 4 -l ERROR
-static: node_modules/.bin/webpack -d --watch

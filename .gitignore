@@ -2,7 +2,6 @@
 .coverage
 .DS_Store
 .idea
-npm-debug.log
 *.db
 *.egg-info
 *.pyc
@@ -14,10 +13,7 @@ npm-debug.log
 /node_modules
 /dist
 /pip-wheel-metadata
-.vagrant
 .env
-venv/
 .venv/
-freight_venv
 __pycache__
 .mypy_cache/

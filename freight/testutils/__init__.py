@@ -1,4 +1,3 @@
-from freight.utils.imports import import_submodules
-
-
-import_submodules(locals(), __name__, __path__)
+from .cases import *  # NOQA
+from .client import *  # NOQA
+from .fixtures import *  # NOQA

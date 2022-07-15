@@ -1,4 +1,4 @@
-FROM python:3.8.12
+FROM python:3.8.13
 
 ENV PIP_NO_CACHE_DIR off
 ENV PIP_DISABLE_PIP_VERSION_CHECK on
@@ -62,7 +62,7 @@ RUN set -x \
 WORKDIR /usr/src/app
 
 COPY package.json .
-RUN npm install && npm cache clear --force
+RUN yarn install && yarn cache clean --all
 
 COPY requirements.txt .
 RUN pip install -r requirements.txt

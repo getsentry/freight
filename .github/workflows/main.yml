@@ -51,7 +51,7 @@ jobs:
       - uses: volta-cli/action@v1
       - uses: actions/setup-python@v3
         with:
-          python-version: '3.8.12'
+          python-version: '3.8.13'
           cache: 'pip'
 
       - name: Install dependencies
