@@ -39,6 +39,7 @@ def checks_are_passing(app, task, log):
         for check_id in set(pending_checks):
             check_config = checks_with_ids[check_id]
             check = checks.get(check_config["type"])
+            retries = int(check_config.get("retries", "0"))
             # Forced tasks still need to go through checks
             # to make sure none of them are required.
             if task.was_forced and not check.required:
@@ -59,6 +60,17 @@ def checks_are_passing(app, task, log):
                         announced_checks.add(check_config["type"])
 
                 except CheckError as e:
+                    if retries:
+                        retries -= 1
+                        log.info(
+                            INFO_CHECK_PENDING.format(
+                                check=check_config["type"],
+                                message=f"RETRY ({retries} left) due to error: {e}",
+                            )
+                        )
+                        announced_checks.add(check_config["type"])
+                        continue
+
                     log.error(
                         ERR_CHECK_FAILED.format(
                             check=check_config["type"], message=str(e)
