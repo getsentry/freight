@@ -21,7 +21,7 @@ class GitHubAppsContextCheck(Check):
             "repo": {"required": True},
         }
 
-    def check(self, app, sha, config):
+    def _check(self, app, sha, config, fatal=False):
         token = current_app.config["GITHUB_TOKEN"]
         if not token:
             raise CheckFailed("GITHUB_TOKEN is not set")
@@ -94,5 +94,12 @@ class GitHubAppsContextCheck(Check):
                 raise CheckFailed(ERR_CHECK.format(**check_run))
             contexts.remove(check_name)
 
-        if contexts:
+        if contexts and fatal:
             raise CheckFailed(ERR_MISSING_CONTEXT.format(next(iter(contexts))))
+
+    def check(self, app, sha, config):
+        retries = int(config.get("retries")) or 0
+        while retries:
+            retries -= 1
+            self._check(app, sha, config)
+        self._check(app, sha, config, fatal=True)
