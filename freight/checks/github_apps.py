@@ -95,4 +95,7 @@ class GitHubAppsContextCheck(Check):
             contexts.remove(check_name)
 
         if contexts:
-            raise CheckFailed(ERR_MISSING_CONTEXT.format(next(iter(contexts))))
+            # This is considered pending rather than fail because
+            # if a deploy is started too soon after a new sha lands,
+            # some checks might not have started yet and wouldn't be found.
+            raise CheckPending(ERR_MISSING_CONTEXT.format(next(iter(contexts))))
