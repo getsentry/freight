@@ -32,7 +32,7 @@ class AppUpdateTest(AppDetailsBase):
                 "provider": "shell",
                 "provider_config": '{"command": "/usr/bin/true", "timeout": 50}',
                 "notifiers": '[{"type": "slack", "config": {"webhook_url": "https://example.com"}},{"type": "datadog", "config": {"webhook_url": "https://example.com"}}]',
-                "checks": '[{"type": "github", "config": {"contexts": ["travisci"], "repo": "getsentry/freight"}}]',
+                "checks": '[{"type": "github-apps", "config": {"contexts": ["travisci"], "repo": "getsentry/freight"}}]',
                 "repository": "git@example.com:repo-name.git",
                 "environments": '{"staging": {"default_ref": "develop"}}',
             },
@@ -53,7 +53,7 @@ class AppUpdateTest(AppDetailsBase):
         ]
 
         assert len(deploy_config.checks) == 1
-        assert deploy_config.checks[0]["type"] == "github"
+        assert deploy_config.checks[0]["type"] == "github-apps"
         assert deploy_config.checks[0]["config"] == {
             "contexts": ["travisci"],
             "repo": "getsentry/freight",
@@ -112,7 +112,7 @@ class AppUpdateTest(AppDetailsBase):
 
     def test_invalid_check_config(self):
         resp = self.client.put(
-            self.path, data={"checks": '[{"type": "github", "config": {}}]'}
+            self.path, data={"checks": '[{"type": "github-apps", "config": {}}]'}
         )
         assert resp.status_code == 400
         data = json.loads(resp.data)
@@ -120,7 +120,7 @@ class AppUpdateTest(AppDetailsBase):
 
     def test_invalid_environments_type(self):
         resp = self.client.put(
-            self.path, data={"environments": '[{"type": "github", "config": {}}]'}
+            self.path, data={"environments": '[{"type": "github-apps", "config": {}}]'}
         )
         assert resp.status_code == 400
         data = json.loads(resp.data)
