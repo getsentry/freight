@@ -1,6 +1,6 @@
 import json
 
-from collections import MutableMapping
+from collections.abc import MutableMapping
 
 from sqlalchemy.ext.mutable import Mutable
 from sqlalchemy.types import TypeDecorator, Unicode
