@@ -53,7 +53,7 @@ class AppCreateTest(AppIndexBase):
                 "provider": "shell",
                 "provider_config": '{"command": "/usr/bin/true", "timeout": 50}',
                 "notifiers": '[{"type": "slack", "config": {"webhook_url": "https://example.com"}}]',
-                "checks": '[{"type": "github", "config": {"contexts": ["travisci"], "repo": "getsentry/freight"}}]',
+                "checks": '[{"type": "github-apps", "config": {"contexts": ["travisci"], "repo": "getsentry/freight"}}]',
                 "repository": "git@example.com:repo-name.git",
                 "environments": '{"staging": {"default_ref": "develop"}}',
             },
@@ -72,7 +72,7 @@ class AppCreateTest(AppIndexBase):
             {"type": "slack", "config": {"webhook_url": "https://example.com"}}
         ]
         assert len(deploy_config.checks) == 1
-        assert deploy_config.checks[0]["type"] == "github"
+        assert deploy_config.checks[0]["type"] == "github-apps"
         assert deploy_config.checks[0]["config"] == {
             "contexts": ["travisci"],
             "repo": "getsentry/freight",
@@ -161,7 +161,7 @@ class AppCreateTest(AppIndexBase):
                 "provider": "shell",
                 "provider_config": '{"command": "/usr/bin/true"}',
                 "repository": "git@example.com:repo-name.git",
-                "checks": '[{"type": "github", "config": {}}]',
+                "checks": '[{"type": "github-apps", "config": {}}]',
             },
         )
         assert resp.status_code == 400
@@ -176,7 +176,7 @@ class AppCreateTest(AppIndexBase):
                 "provider": "shell",
                 "provider_config": '{"command": "/usr/bin/true"}',
                 "repository": "git@example.com:repo-name.git",
-                "environments": '[{"type": "github", "config": {}}]',
+                "environments": '[{"type": "github-apps", "config": {}}]',
             },
         )
         assert resp.status_code == 400
