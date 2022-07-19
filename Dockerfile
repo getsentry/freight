@@ -1,18 +1,23 @@
 FROM python:3.8.13-slim-bullseye
 
+ARG VOLTA_VERSION=0.8.1
+ARG VOLTA_SHA256=e1a45f073580552318c206069e5bf0dd8cb9dcdc1bfeaecc5a96c48a5208dd7a
+ARG SENTRY_CLI_VERSION=1.69.1
+ARG SENTRY_CLI_SHA256=4bed363e76e853aa1855b228b73b1e13a6b71209ce699bb0a117f98d6cfd8962
+ARG DOCKER_CLI_VERSION=20.10.16
+ARG DOCKER_CLI_SHA256=96588db31509c2a3c89eb68107b9bb9a0e6b1c9b5791e5c18475680d5074b40f
+ARG GCLOUD_VERSION=382.0.0
+ARG GCLOUD_SHA256=335e5a2b4099505372914acfccbb978cf9d4efd8047bda59f910c26daefd554e
+
 ENV PIP_NO_CACHE_DIR=off \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PYTHONUNBUFFERED=1 \
     VOLTA_HOME=/.volta \
-    VOLTA_VERSION=0.8.1 \
-    VOLTA_SHA256=e1a45f073580552318c206069e5bf0dd8cb9dcdc1bfeaecc5a96c48a5208dd7a \
-    SENTRY_CLI_VERSION=1.69.1 \
-    SENTRY_CLI_SHA256=4bed363e76e853aa1855b228b73b1e13a6b71209ce699bb0a117f98d6cfd8962 \
-    DOCKER_CLI_VERSION=20.10.16 \
-    DOCKER_CLI_SHA256=96588db31509c2a3c89eb68107b9bb9a0e6b1c9b5791e5c18475680d5074b40f \
-    GCLOUD_VERSION=382.0.0 \
-    GCLOUD_SHA256=335e5a2b4099505372914acfccbb978cf9d4efd8047bda59f910c26daefd554e \
     PATH="/usr/src/app/bin:/opt/google-cloud-sdk/bin:/.volta/bin:${PATH}"
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # add our user and group first to make sure their IDs get assigned consistently
 RUN groupadd -r freight && useradd -r -m -g freight freight
@@ -38,7 +43,7 @@ RUN set -x \
 # Install the node and yarn versions in package.json via volta.
 COPY package.json .
 RUN set -x \
-    && curl -fsSL "https://github.com/volta-cli/volta/releases/download/v${VOLTA_VERSION}/volta-${VOLTA_VERSION}-linux-openssl-1.1.tar.gz" \
+    && curl -fsSL "https://storage.googleapis.com/sentry-dev-infra-build-assets/volta-${VOLTA_VERSION}-linux-openssl-1.1.tar.gz" \
     | tar -xz -C /usr/local/bin \
     && echo "$VOLTA_SHA256 /usr/local/bin/volta" | sha256sum --check --status \
     && volta -v \
