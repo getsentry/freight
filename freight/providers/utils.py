@@ -13,7 +13,7 @@ def parse_provider_config(type, config):
     all_options = {**instance.get_default_options(), **instance.get_options()}
 
     for key in config:
-        if not all_options.get(key):
+        if key not in all_options:
             raise ApiError(
                 message=f"You specified config key {key}, but it isn't recognized for the provider {type}.",
                 name="invalid_provider",
