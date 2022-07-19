@@ -43,12 +43,13 @@ RUN set -x \
 # Install the node and yarn versions in package.json via volta.
 COPY package.json .
 RUN set -x \
-    && curl -fsSL "https://storage.googleapis.com/sentry-dev-infra-build-assets/volta-${VOLTA_VERSION}-linux-openssl-1.1.tar.gz" \
-    | tar -xz -C /usr/local/bin \
-    && echo "$VOLTA_SHA256 /usr/local/bin/volta" | sha256sum --check --status \
+    && curl -sL -o /tmp/volta.tar.gz "https://storage.googleapis.com/sentry-dev-infra-build-assets/volta-${VOLTA_VERSION}-linux-openssl-1.1.tar.gz" \
+    && echo "$VOLTA_SHA256 /tmp/volta.tar.gz" | sha256sum --check --status \
+    && tar -xz -C /usr/local/bin < /tmp/volta.tar.gz \
     && volta -v \
     && node -v \
-    && yarn -v
+    && yarn -v \
+    && rm /tmp/volta.tar.gz
 
 # Install sentry-cli so the builds can register deploys, upload sourcemaps, etc.
 RUN set -x \
