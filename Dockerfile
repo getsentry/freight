@@ -19,6 +19,7 @@ ENV PIP_NO_CACHE_DIR=off \
 RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
         git \
+        openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
 # add our user and group first to make sure their IDs get assigned consistently
