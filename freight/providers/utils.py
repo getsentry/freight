@@ -1,5 +1,3 @@
-from itertools import chain
-
 from freight.exceptions import ApiError
 
 from . import manager
@@ -12,11 +10,16 @@ def parse_provider_config(type, config):
         raise ApiError(message=f"Invalid provider: {type}", name="invalid_provider")
 
     result = {}
-    all_options = chain(
-        list(instance.get_default_options().items()),
-        list(instance.get_options().items()),
-    )
-    for option, option_values in all_options:
+    all_options = {**instance.get_default_options(), **instance.get_options()}
+
+    for key in config:
+        if key not in all_options:
+            raise ApiError(
+                message=f"You specified config key {key}, but it isn't recognized for the provider {type}.",
+                name="invalid_provider",
+            )
+
+    for option, option_values in all_options.items():
         value = config.get(option)
         if value and option_values.get("type"):
             try:
