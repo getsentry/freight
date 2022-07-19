@@ -15,8 +15,10 @@ ENV PIP_NO_CACHE_DIR=off \
     VOLTA_HOME=/.volta \
     PATH="/usr/src/app/bin:/opt/google-cloud-sdk/bin:/.volta/bin:${PATH}"
 
+# git's needed for Freight runtime.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
+        git \
     && rm -rf /var/lib/apt/lists/*
 
 # add our user and group first to make sure their IDs get assigned consistently
