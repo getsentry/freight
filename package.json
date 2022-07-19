@@ -7,7 +7,6 @@
   },
   "scripts": {
     "test": "jest",
-    "postinstall": "npm run build",
     "build": "webpack --mode production",
     "start:ui": "webpack-dev-server",
     "start:api": "bin/web --addr localhost:5002 --debug",
