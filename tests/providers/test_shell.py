@@ -69,9 +69,15 @@ class ParseProviderConfigTest(ShellProviderBase):
         result = parse_provider_config("shell", {"command": "/usr/bin/true"})
         assert result["command"] == "/usr/bin/true"
 
+    def test_unused_key(self):
+        with pytest.raises(ApiError) as e:
+            parse_provider_config("shell", {"command": "/usr/bin/true", "foo": "bar"})
+        assert e.value.message == "You specified config key foo, but it isn't recognized for the provider shell."
+
     def test_requires_command(self):
-        with pytest.raises(ApiError):
+        with pytest.raises(ApiError) as e:
             parse_provider_config("shell", {})
+        assert e.value.message == 'Missing required option "command" for provider: shell'
 
     def test_valid_env(self):
         result = parse_provider_config(
@@ -80,5 +86,6 @@ class ParseProviderConfigTest(ShellProviderBase):
         assert result["env"] == {"FOO": "BAR"}
 
     def test_invalid_env(self):
-        with pytest.raises(ApiError):
+        with pytest.raises(ApiError) as e:
             parse_provider_config("shell", {"command": "/usr/bin/true", "env": "FOO"})
+        assert e.value.message == 'Option "env" is not a valid type for provider: shell'
