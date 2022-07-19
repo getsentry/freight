@@ -69,6 +69,7 @@ class PipelineProvider(Provider):
             "steps": {"required": False, "type": list},
             "kubernetes": {"required": False, "type": dict},
             "sentry": {"required": False, "type": dict},
+            "config_path": {"required": False, "type": str},
         }
 
     def get_config(self, workspace, task) -> Dict[str, Any]:
