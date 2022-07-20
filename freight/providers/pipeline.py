@@ -73,9 +73,12 @@ class PipelineProvider(Provider):
         }
 
     def get_config(self, workspace, task) -> Dict[str, Any]:
-        try:
-            options = [Path(workspace.path) / task.provider_config["config_path"]]
-        except KeyError:
+        # XXX: Can't rely on KeyError here, during validation Freight will write
+        #      a "null" value that later loads as None.
+        config_path = task.provider_config.get("config_path")
+        if config_path:
+            options = [Path(workspace.path) / config_path]
+        else:
             options = [
                 Path(workspace.path) / ".freight.yml",
                 Path(workspace.path) / ".freight.yaml",
