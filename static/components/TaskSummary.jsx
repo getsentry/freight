@@ -4,6 +4,7 @@ import classnames from 'classnames';
 import PropTypes from 'prop-types';
 
 import Duration from './Duration';
+import ShaLink from './ShaLink';
 import TimeSince from './TimeSince';
 
 class Progress extends React.Component {
@@ -70,9 +71,11 @@ class TaskSummary extends React.Component {
   };
 
   gotoTask = e => {
-    if (e) {
-      e.preventDefault();
+    if (e.target.hasAttribute('href')) {
+      return;
     }
+
+    e.preventDefault();
 
     const {app, environment, number} = this.props.task;
 
@@ -101,7 +104,7 @@ class TaskSummary extends React.Component {
         <Progress value={this.getEstimatedProgress(task)} />
         <h3>{task.name}</h3>
         <div className="ref">
-          <div className="sha">{task.sha.substr(0, 7)}</div>
+          <ShaLink sha={task.sha} url={task.sha_url} remote={task.remote} />
           {task.ref}
         </div>
         <div className="meta">

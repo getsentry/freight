@@ -50,11 +50,16 @@ exports[`TaskSummary Snapshot 1`] = `
     <div
       className="ref"
     >
-      <div
-        className="sha"
+      <ShaLink
+        sha="af56f6bc9843956c3ce92f9e7f9abb8c196340ee"
       >
-        af56f6b
-      </div>
+        <span
+          className="sha"
+        >
+           
+          af56f6b
+        </span>
+      </ShaLink>
       master
     </div>
     <div
