@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
 from sqlalchemy.sql import func
 
+from freight import vcsremote
 from freight.config import db
-from freight.models import App, Task, Deploy, TaskStatus, User
+from freight.models import App, Task, Deploy, TaskStatus, User, Repository
 
 from .base import Serializer
 from .manager import add, serialize
@@ -13,6 +14,13 @@ class DeploySerializer(Serializer):
     def get_attrs(self, item_list):
         apps = {
             a.id: a for a in App.query.filter(App.id.in_({i.app_id for i in item_list}))
+        }
+
+        repos = {
+            r.id: r
+            for r in Repository.query.filter(
+                Repository.id.in_({a.repository_id for a in apps.values()})
+            )
         }
 
         tasks = {
@@ -45,6 +53,7 @@ class DeploySerializer(Serializer):
 
             attrs[item] = {
                 "app": apps[item.app_id],
+                "repo": repos[apps[item.app_id].repository_id],
                 "task": tasks[item.task_id],
                 "user": user_map.get(tasks[item.task_id].user_id),
                 "estimatedDuration": estimatedDuration,
@@ -54,14 +63,19 @@ class DeploySerializer(Serializer):
     def serialize(self, item, attrs):
         app = attrs["app"]
         task = attrs["task"]
+        repo = attrs["repo"]
+
+        vcs_remote = vcsremote.get_by_repo(repo)
 
         return {
             "id": str(item.id),
             "name": f"{app.name}/{item.environment}#{item.number}",
             "app": {"id": str(app.id), "name": app.name},
+            "remote": {"name": vcs_remote.hostname, "url": vcs_remote.repo_url},
             "user": serialize(attrs["user"]),
             "environment": item.environment,
             "sha": task.sha,
+            "sha_url": vcs_remote.get_commit_url(task.sha),
             "ref": task.ref,
             "number": item.number,
             "status": task.status_label,
