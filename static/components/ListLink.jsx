@@ -1,9 +1,8 @@
-const PropTypes = require('prop-types');
-const React = require('react');
-const createReactClass = require('create-react-class');
-const Router = require('react-router');
-
-const classSet = require('classnames');
+import React from 'react';
+import {Link, Navigation} from 'react-router';
+import classSet from 'classnames';
+import createReactClass from 'create-react-class';
+import PropTypes from 'prop-types';
 
 const ListLink = createReactClass({
   displayName: 'ListLink',
@@ -20,7 +19,7 @@ const ListLink = createReactClass({
     router: PropTypes.object,
   },
 
-  mixins: [Router.Navigation],
+  mixins: [Navigation],
 
   getDefaultProps() {
     return {
@@ -45,7 +44,7 @@ const ListLink = createReactClass({
   render() {
     return (
       <li className={this.getClassName()}>
-        <Router.Link {...this.props}>{this.props.children}</Router.Link>
+        <Link {...this.props}>{this.props.children}</Link>
       </li>
     );
   },
