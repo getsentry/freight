@@ -1,6 +1,5 @@
 import React from 'react';
 import {browserHistory} from 'react-router';
-import jQuery from 'jquery';
 import PropTypes from 'prop-types';
 
 import api from '../api';
@@ -37,7 +36,7 @@ class CreateDeploy extends React.Component {
   }
 
   onChangeApplication = e => {
-    const val = jQuery(e.target).val();
+    const val = e.target.value;
     const envMap = val
       ? this.props.appList.filter(app => {
           return app.name === val;
@@ -54,7 +53,7 @@ class CreateDeploy extends React.Component {
   };
 
   onChangeEnvironment = e => {
-    const val = jQuery(e.target).val();
+    const val = e.target.value;
     const config = val ? this.state.envMap[val] || {} : {};
     this.setState({
       env: val,

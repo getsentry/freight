@@ -1,7 +1,6 @@
-/*eslint-env node*/
+/* eslint-env node */
 
 const path = require('path');
-const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -53,10 +52,6 @@ module.exports = {
       filename: 'styles.[chunkhash].css',
       chunkFilename: '[id].css',
       allChunks: true,
-    }),
-    new webpack.ProvidePlugin({
-      $: 'jquery',
-      jQuery: 'jquery',
     }),
   ],
   resolve: {
