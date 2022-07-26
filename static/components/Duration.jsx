@@ -1,5 +1,5 @@
-const PropTypes = require('prop-types');
-const React = require('react');
+import React from 'react';
+import PropTypes from 'prop-types';
 
 class Duration extends React.Component {
   static propTypes = {
