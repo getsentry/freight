@@ -34,7 +34,7 @@ const DeployChart = createReactClass({
 
   getPollingUrl() {
     const {app} = this.props;
-    return `/stats/${app ? `?app=${app}` : ''}`;
+    return `/deploy-stats/${app ? `?app=${app}` : ''}`;
   },
 
   pollingReceiveData(data) {
