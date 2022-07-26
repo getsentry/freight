@@ -5,7 +5,6 @@ import {init} from '@sentry/browser';
 
 import api from '../api';
 
-import Indicators from './Indicators';
 import LoadingIndicator from './LoadingIndicator';
 
 class Layout extends React.Component {
@@ -95,8 +94,6 @@ class Layout extends React.Component {
 
     return (
       <div>
-        <Indicators />
-
         <header>
           <div className="container">
             <div className="pull-right">

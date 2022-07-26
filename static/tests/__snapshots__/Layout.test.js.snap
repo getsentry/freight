@@ -5,9 +5,6 @@ exports[`<Layout /> should render <Layout /> 1`] = `
   params={Object {}}
 >
   <div>
-    <Indicators>
-      <div />
-    </Indicators>
     <header>
       <div
         className="container"
