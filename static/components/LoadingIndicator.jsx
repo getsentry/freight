@@ -2,31 +2,25 @@ import React from 'react';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 
-class LoadingIndicator extends React.Component {
-  static propTypes = {
-    global: PropTypes.bool,
-    mini: PropTypes.bool,
-  };
+function LoadingIndicator({className, children, global, mini}) {
+  const classes = classNames({
+    loading: true,
+    mini,
+    global,
+  });
 
-  shouldComponentUpdate() {
-    return false;
-  }
-
-  render() {
-    const className = classNames({
-      loading: true,
-      mini: this.props.mini,
-      global: this.props.global,
-    });
-
-    return (
-      <div className={classNames(this.props.className, className)}>
-        <div className="loading-mask" />
-        <div className="loading-indicator" />
-        <div className="loading-message">{this.props.children}</div>
-      </div>
-    );
-  }
+  return (
+    <div className={classNames(className, classes)}>
+      <div className="loading-mask" />
+      <div className="loading-indicator" />
+      <div className="loading-message">{children}</div>
+    </div>
+  );
 }
+
+LoadingIndicator.propTypes = {
+  global: PropTypes.bool,
+  mini: PropTypes.bool,
+};
 
 export default LoadingIndicator;

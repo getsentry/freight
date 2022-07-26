@@ -7,131 +7,122 @@ import Duration from './Duration';
 import ShaLink from './ShaLink';
 import TimeSince from './TimeSince';
 
-class Progress extends React.Component {
-  static propTypes = {
-    value: PropTypes.number.isRequired,
-  };
+function Progress({value}) {
+  return <span className="progress" style={{width: value + '%'}} />;
+}
 
-  render() {
-    return <span className="progress" style={{width: this.props.value + '%'}} />;
+Progress.propTypes = {
+  value: PropTypes.number.isRequired,
+};
+
+function getStatusLabel(task) {
+  switch (task.status) {
+    case 'cancelled':
+      return 'Cancelled';
+    case 'failed':
+      return 'Failed';
+    case 'finished':
+      return 'Finished';
+    case 'pending':
+      return 'Pending';
+    case 'in_progress':
+      return 'In progress';
+    default:
+      return 'Unknown';
   }
 }
 
-class TaskSummary extends React.Component {
-  static propTypes = {
-    task: PropTypes.shape({
-      app: PropTypes.shape({
-        name: PropTypes.string,
-      }),
-      environment: PropTypes.string,
-      number: PropTypes.number,
-    }),
-  };
+function getEstimatedProgress(task) {
+  if (task.dateFinished) {
+    return 100;
+  }
 
-  static contextTypes = {
-    router: PropTypes.object.isRequired,
-  };
+  const started = new Date(task.dateStarted).getTime();
+  if (!started) {
+    return 0;
+  }
 
-  taskInProgress = task => {
-    return task.status === 'in_progress' || task.status === 'pending';
-  };
+  const now = Math.max(new Date().getTime(), started);
+  return parseInt(
+    Math.min(((now - started) / 1000 / task.estimatedDuration) * 100, 95),
+    10
+  );
+}
 
-  getEstimatedProgress = task => {
-    if (task.dateFinished) {
-      return 100;
-    }
+function TaskSummary({task, className}) {
+  const taskInProgress = task.status === 'in_progress' || task.status === 'pending';
 
-    const started = new Date(task.dateStarted).getTime();
-    if (!started) {
-      return 0;
-    }
+  const gotoTask = React.useCallback(
+    e => {
+      if (e.target.hasAttribute('href')) {
+        return;
+      }
 
-    const now = Math.max(new Date().getTime(), started);
-    return parseInt(
-      Math.min(((now - started) / 1000 / task.estimatedDuration) * 100, 95),
-      10
-    );
-  };
+      e.preventDefault();
 
-  getStatusLabel = task => {
-    switch (task.status) {
-      case 'cancelled':
-        return 'Cancelled';
-      case 'failed':
-        return 'Failed';
-      case 'finished':
-        return 'Finished';
-      case 'pending':
-        return 'Pending';
-      case 'in_progress':
-        return 'In progress';
-      default:
-        return 'Unknown';
-    }
-  };
+      const {app, environment, number} = task;
 
-  gotoTask = e => {
-    if (e.target.hasAttribute('href')) {
-      return;
-    }
+      browserHistory.push(`/deploys/${app.name}/${environment}/${number}`);
+    },
+    [task]
+  );
 
-    e.preventDefault();
+  let classes = 'deploy';
 
-    const {app, environment, number} = this.props.task;
+  if (taskInProgress) {
+    classes += ' active';
+  } else {
+    classes += ' finished';
+  }
 
-    browserHistory.push(`/deploys/${app.name}/${environment}/${number}`);
-  };
+  if (task.status === 'failed') {
+    classes += ' failed';
+  } else if (task.status === 'cancelled') {
+    classes += ' cancelled';
+  }
 
-  render() {
-    const task = this.props.task;
-    let className = 'deploy';
-    if (this.taskInProgress(task)) {
-      className += ' active';
-    } else {
-      className += ' finished';
-    }
-    if (task.status === 'failed') {
-      className += ' failed';
-    } else if (task.status === 'cancelled') {
-      className += ' cancelled';
-    }
-
-    return (
-      <div
-        className={classnames(this.props.className, className)}
-        onClick={this.gotoTask}
-      >
-        <Progress value={this.getEstimatedProgress(task)} />
-        <h3>{task.name}</h3>
-        <div className="ref">
-          <ShaLink sha={task.sha} url={task.sha_url} remote={task.remote} />
-          {task.ref}
-        </div>
-        <div className="meta">
-          {task.status === 'pending' && (
-            <small>
-              <strong>QUEUED</strong> &mdash;{' '}
-            </small>
-          )}
-          {task.dateFinished ? (
-            <small>
-              {this.getStatusLabel(task)} <TimeSince date={task.dateFinished} /> &mdash;{' '}
-              <Duration seconds={task.duration} className="duration" />
-            </small>
-          ) : task.dateStarted ? (
-            <small>
-              Started <TimeSince date={task.dateStarted} />
-            </small>
-          ) : (
-            <small>
-              Created <TimeSince date={task.dateCreated} />
-            </small>
-          )}
-          <small> &mdash; by {task.user.name}</small>
-        </div>
+  return (
+    <div className={classnames(className, classes)} onClick={gotoTask}>
+      <Progress value={getEstimatedProgress(task)} />
+      <h3>{task.name}</h3>
+      <div className="ref">
+        <ShaLink sha={task.sha} url={task.sha_url} remote={task.remote} />
+        {task.ref}
       </div>
-    );
-  }
+      <div className="meta">
+        {task.status === 'pending' && (
+          <small>
+            <strong>QUEUED</strong> &mdash;{' '}
+          </small>
+        )}
+        {task.dateFinished ? (
+          <small>
+            {getStatusLabel(task)} <TimeSince date={task.dateFinished} /> &mdash;{' '}
+            <Duration seconds={task.duration} className="duration" />
+          </small>
+        ) : task.dateStarted ? (
+          <small>
+            Started <TimeSince date={task.dateStarted} />
+          </small>
+        ) : (
+          <small>
+            Created <TimeSince date={task.dateCreated} />
+          </small>
+        )}
+        <small> &mdash; by {task.user.name}</small>
+      </div>
+    </div>
+  );
 }
+
+TaskSummary.propTypes = {
+  task: PropTypes.shape({
+    app: PropTypes.shape({
+      name: PropTypes.string,
+    }),
+    environment: PropTypes.string,
+    number: PropTypes.number,
+  }),
+};
 
 export default TaskSummary;
