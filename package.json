@@ -49,6 +49,7 @@
     "linkify-urls": "^2.2.0",
     "mini-css-extract-plugin": "^0.5.0",
     "prop-types": "^15.7.2",
+    "query-string": "^7.1.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-router": "^3.2.1",

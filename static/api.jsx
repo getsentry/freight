@@ -1,45 +1,43 @@
-const jQuery = require('jquery');
+import * as qs from 'query-string';
 
+/**
+ * API client to make async fetch requests
+ */
 class Client {
-  constructor(options) {
-    if (typeof options === 'undefined') {
-      options = {};
-    }
-    this.baseUrl = options.baseUrl || '/api/0';
+  constructor(options = {}) {
+    this.baseUrl = options.baseUrl ?? '/api/0';
   }
 
-  request(path, options) {
-    const query = jQuery.param(options.query || '', true);
-    const method = options.method || (options.data ? 'POST' : 'GET');
-    let data = options.data;
-    let contentType;
+  async request(path, options = {}) {
+    const {data} = options;
+    const hasData = typeof data !== 'undefined';
 
-    if (typeof data !== 'undefined') {
-      data = JSON.stringify(data);
-      contentType = 'application/json';
-    } else {
-      contentType = undefined;
-    }
+    const method = options.method ?? (hasData ? 'POST' : 'GET');
+    const contentType = hasData ? 'application/json' : undefined;
+    const body = hasData ? JSON.stringify(data) : undefined;
 
-    let fullUrl = this.baseUrl + path;
+    const query = qs.stringify(options.query);
+
+    let url = `${this.baseUrl}${path}`;
     if (query) {
-      if (fullUrl.indexOf('?') !== -1) {
-        fullUrl += '&' + query;
-      } else {
-        fullUrl += '?' + query;
-      }
+      url += url.includes('?') ? `&${query}` : `?${query}`;
     }
 
-    jQuery.ajax({
-      url: fullUrl,
-      method,
-      data,
-      contentType,
-      success: options.success,
-      error: options.error,
-      complete: options.complete,
-    });
+    const headers = {'Content-Type': contentType};
+
+    try {
+      const result = await fetch(url, {method, body, headers});
+      const resultJson = await result.json();
+
+      options.success?.(resultJson);
+    } catch (error) {
+      options.error?.(error);
+    } finally {
+      options.complete?.();
+    }
   }
 }
 
-export default new Client();
+const api = new Client();
+
+export default api;
