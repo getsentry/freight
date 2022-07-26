@@ -2,8 +2,6 @@ import React from 'react';
 import {addMinutes, addSeconds, format} from 'date-fns';
 import PropTypes from 'prop-types';
 
-import TooltipTrigger from './TooltipTrigger';
-
 class BarChart extends React.Component {
   static propTypes = {
     height: PropTypes.string,
@@ -12,11 +10,9 @@ class BarChart extends React.Component {
       PropTypes.shape({
         x: PropTypes.number.isRequired,
         y: PropTypes.number.isRequired,
-        label: PropTypes.string,
       })
     ),
     placement: PropTypes.string,
-    label: PropTypes.string,
   };
 
   static defaultProps = {
@@ -97,23 +93,19 @@ class BarChart extends React.Component {
       const pct = this.floatFormat((point.y / maxval) * 99, 2) + '%';
       const timeLabel = timeLabelFunc(point);
 
-      let title = (
+      const tooltipText = (
         <div style={{minWidth: 100}}>
           {point.y} {this.props.label}
           <br />
           {timeLabel}
         </div>
       );
-      if (point.label) {
-        title += <div>({point.label})</div>;
-      }
 
       return (
-        <TooltipTrigger placement={this.props.placement} key={point.x} title={title}>
-          <a style={{width: pointWidth}}>
-            <span style={{height: pct}}>{point.y}</span>
-          </a>
-        </TooltipTrigger>
+        <div key={point.x} className="barchart-bar" style={{width: pointWidth}}>
+          <span style={{height: pct}}>{point.y}</span>
+          <div className="barchart-tooltip">{tooltipText}</div>
+        </div>
       );
     });
 
