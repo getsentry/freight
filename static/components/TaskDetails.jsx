@@ -15,15 +15,13 @@ import FaviconStatus from './FaviconStatus';
 import LoadingIndicator from './LoadingIndicator';
 import TimeSince from './TimeSince';
 
-class Progress extends React.Component {
-  static propTypes = {
-    value: PropTypes.number.isRequired,
-  };
-
-  render() {
-    return <span className="progress" style={{width: this.props.value + '%'}} />;
-  }
+function Progress({value}) {
+  return <span className="progress" style={{width: value + '%'}} />;
 }
+
+Progress.propTypes = {
+  value: PropTypes.number.isRequired,
+};
 
 const TaskDetails = createReactClass({
   displayName: 'TaskDetails',
