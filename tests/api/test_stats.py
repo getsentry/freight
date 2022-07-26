@@ -5,7 +5,7 @@ from freight.testutils import TestCase
 
 
 class StatsBase(TestCase):
-    path = "/api/0/stats/"
+    path = "/api/0/deploy-stats/"
 
     def setUp(self):
         self.user = self.create_user()

@@ -169,7 +169,7 @@ def configure_api(app):
     api.add_resource(AppIndexApiView, "/apps/")
     api.add_resource(AppDetailsApiView, "/apps/<app>/")
     api.add_resource(ConfigApiView, "/config/")
-    api.add_resource(StatsApiView, "/stats/")
+    api.add_resource(StatsApiView, "/deploy-stats/")
     api.add_resource(DeployIndexApiView, "/tasks/", endpoint="deploy-index-deprecated")
     api.add_resource(DeployIndexApiView, "/deploys/")
 
