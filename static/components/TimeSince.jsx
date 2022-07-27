@@ -1,39 +1,34 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import {formatDistanceToNowStrict} from 'date-fns';
 import PropTypes from 'prop-types';
 
-class TimeSince extends React.Component {
-  static propTypes = {
-    date: PropTypes.any.isRequired,
-  };
+const DELAY = 2600;
 
-  componentDidMount() {
-    const delay = 2600;
+function TimeSince({date}) {
+  const dateObject = React.useMemo(() => new Date(date), [date]);
 
-    this.ticker = setInterval(this.ensureValidity, delay);
-  }
+  const getRelativeDate = useCallback(
+    () => formatDistanceToNowStrict(dateObject, {addSuffix: true}),
+    [dateObject]
+  );
 
-  componentWillUnmount() {
-    if (this.ticker) {
-      clearInterval(this.ticker);
-      this.ticker = null;
-    }
-  }
+  const [relativeDate, setRelativeDate] = React.useState(getRelativeDate());
+  const tickerRef = React.useRef(undefined);
 
-  ensureValidity = () => {
-    // TODO(dcramer): this should ensure we actually *need* to update the value
-    this.forceUpdate();
-  };
+  React.useEffect(() => {
+    tickerRef.current = setInterval(() => setRelativeDate(getRelativeDate), DELAY);
 
-  render() {
-    const date = new Date(this.props.date);
+    return () => {
+      clearInterval(tickerRef.current);
+      tickerRef.current = undefined;
+    };
+  }, [getRelativeDate]);
 
-    return (
-      <time dateTime={date.toISOString()}>
-        {formatDistanceToNowStrict(date, {addSuffix: true})}
-      </time>
-    );
-  }
+  return <time dateTime={dateObject.toISOString()}>{relativeDate}</time>;
 }
+
+TimeSince.propTypes = {
+  date: PropTypes.any.isRequired,
+};
 
 export default TimeSince;
