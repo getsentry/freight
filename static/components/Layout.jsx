@@ -6,18 +6,14 @@ import {init} from '@sentry/browser';
 import api from 'app/api';
 import LoadingIndicator from 'app/components/LoadingIndicator';
 
-class Layout extends React.Component {
-  state = {
-    appList: null,
-    loading: true,
-    error: false,
-  };
+function Layout({params, children}) {
+  const {app} = params;
 
-  componentWillMount() {
-    this.fetchData();
-  }
+  const [appList, setAppList] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState(false);
 
-  fetchData = async () => {
+  const fetchData = React.useCallback(async () => {
     // try to fetch config first
     const configResp = await api.request('/config/');
     const config = await configResp.json();
@@ -46,70 +42,61 @@ class Layout extends React.Component {
 
     // Fetch apps
     const appsResp = await api.request('/apps/');
-    const appList = await appsResp.json();
 
     if (appsResp.ok) {
-      this.setState({loading: false, error: false, appList});
+      setAppList(await appsResp.json());
+      setError(false);
     } else {
       // eslint-disable-next-line no-console
       console.error('Error fetching /apps/');
-      this.setState({loading: false, error: true});
+      setError(true);
     }
-  };
 
-  render() {
-    const {app} = this.props.params;
-    const {loading, error, appList} = this.state;
+    setLoading(false);
+  }, []);
 
-    return (
-      <div>
-        <header>
-          <div className="container">
-            <div className="pull-right">
-              <Link
-                to={{
-                  pathname: '/deploy',
-                  query: {app},
-                }}
-                className={`btn btn-sm btn-default ${
-                  (loading || error) && 'btn-disabled'
-                }`}
-              >
-                Deploy
-              </Link>
+  React.useEffect(() => void fetchData(), [fetchData]);
+
+  return (
+    <div>
+      <header>
+        <div className="container">
+          <div className="pull-right">
+            <Link
+              to={{
+                pathname: '/deploy',
+                query: {app},
+              }}
+              className={`btn btn-sm btn-default ${(loading || error) && 'btn-disabled'}`}
+            >
+              Deploy
+            </Link>
+          </div>
+          <h1>
+            <Link to="/">Freight</Link>
+          </h1>
+          {app && (
+            <h2>
+              <Link to={`/${app}`}>{app}</Link>
+            </h2>
+          )}
+        </div>
+      </header>
+
+      <div className="body">
+        <div className="container">
+          {loading && (
+            <div style={{textAlign: 'center'}}>
+              <LoadingIndicator>
+                <p>Loading application data. Hold on to your pants!</p>
+              </LoadingIndicator>
             </div>
-            <h1>
-              <Link to="/">Freight</Link>
-            </h1>
-            {app && (
-              <h2>
-                <Link to={`/${app}`}>{app}</Link>
-              </h2>
-            )}
-          </div>
-        </header>
-
-        <div className="body">
-          <div className="container">
-            {loading && (
-              <div style={{textAlign: 'center'}}>
-                <LoadingIndicator>
-                  <p>Loading application data. Hold on to your pants!</p>
-                </LoadingIndicator>
-              </div>
-            )}
-
-            {!loading &&
-              (error
-                ? error
-                : React.cloneElement(this.props.children, {
-                    appList,
-                  }))}
-          </div>
+          )}
+          {!loading && (error ? error : React.cloneElement(children, {appList}))}
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 export default Layout;
