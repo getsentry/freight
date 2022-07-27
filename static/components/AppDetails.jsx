@@ -1,12 +1,11 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 
-import api from '../api';
-import PollingMixin from '../mixins/polling';
-
-import DeployChart from './DeployChart';
-import LoadingIndicator from './LoadingIndicator';
-import TaskSummary from './TaskSummary';
+import api from 'app/api';
+import DeployChart from 'app/components/DeployChart';
+import LoadingIndicator from 'app/components/LoadingIndicator';
+import TaskSummary from 'app/components/TaskSummary';
+import PollingMixin from 'app/mixins/polling';
 
 const AppDetails = createReactClass({
   displayName: 'AppDetails',

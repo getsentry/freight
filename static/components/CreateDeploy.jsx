@@ -2,7 +2,7 @@ import React from 'react';
 import {browserHistory} from 'react-router';
 import PropTypes from 'prop-types';
 
-import api from '../api';
+import api from 'app/api';
 
 class CreateDeploy extends React.Component {
   static propTypes = {

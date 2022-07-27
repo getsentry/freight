@@ -3,9 +3,8 @@ import {Link} from 'react-router';
 // eslint-disable-next-line no-restricted-imports
 import {init} from '@sentry/browser';
 
-import api from '../api';
-
-import LoadingIndicator from './LoadingIndicator';
+import api from 'app/api';
+import LoadingIndicator from 'app/components/LoadingIndicator';
 
 class Layout extends React.Component {
   state = {

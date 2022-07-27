@@ -3,9 +3,9 @@ import {browserHistory} from 'react-router';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 
-import Duration from './Duration';
-import ShaLink from './ShaLink';
-import TimeSince from './TimeSince';
+import Duration from 'app/components/Duration';
+import ShaLink from 'app/components/ShaLink';
+import TimeSince from 'app/components/TimeSince';
 
 function Progress({value}) {
   return <span className="progress" style={{width: value + '%'}} />;

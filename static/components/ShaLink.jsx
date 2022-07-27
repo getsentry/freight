@@ -1,6 +1,6 @@
 import React from 'react';
 
-import IconGithub from '../icons/IconGithub';
+import IconGithub from 'app/icons/IconGithub';
 
 function getRemoteIcon({name}) {
   if (name === 'github.com') {

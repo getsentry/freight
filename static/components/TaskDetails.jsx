@@ -6,14 +6,13 @@ import {format} from 'date-fns';
 import linkifyUrls from 'linkify-urls';
 import PropTypes from 'prop-types';
 
-import api from '../api';
-import PollingMixin from '../mixins/polling';
-import pushNotification from '../pushNotification';
-
-import Duration from './Duration';
-import FaviconStatus from './FaviconStatus';
-import LoadingIndicator from './LoadingIndicator';
-import TimeSince from './TimeSince';
+import api from 'app/api';
+import Duration from 'app/components/Duration';
+import FaviconStatus from 'app/components/FaviconStatus';
+import LoadingIndicator from 'app/components/LoadingIndicator';
+import TimeSince from 'app/components/TimeSince';
+import PollingMixin from 'app/mixins/polling';
+import pushNotification from 'app/pushNotification';
 
 function Progress({value}) {
   return <span className="progress" style={{width: value + '%'}} />;

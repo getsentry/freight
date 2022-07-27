@@ -2,7 +2,7 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import {shallow} from 'enzyme';
 
-import TimeSince from '../components/TimeSince.jsx';
+import TimeSince from 'app/components/TimeSince.jsx';
 
 test('TimeSince Snapshot', () => {
   jest.setSystemTime(new Date('2021-07-05'));
