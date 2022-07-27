@@ -74,30 +74,30 @@ class CreateDeploy extends React.Component {
       return;
     }
 
-    this.setState(
-      {
-        submitInProgress: true,
-      },
-      () => {
-        api.request('/deploys/', {
-          method: 'POST',
-          data: {
-            app: this.state.app,
-            env: this.state.env,
-            ref: this.state.ref,
-          },
-          success: data => {
-            this.gotoDeploy(data);
-          },
-          error: response => {
-            this.setState({
-              submitError: response.responseJSON.error,
-              submitInProgress: false,
-            });
-          },
+    const startDeploy = async () => {
+      const deployResp = await api.request('/deploys/', {
+        method: 'POST',
+        data: {
+          app: this.state.app,
+          env: this.state.env,
+          ref: this.state.ref,
+        },
+      });
+
+      const result = await deployResp.json();
+
+      if (deployResp.ok) {
+        this.gotoDeploy(result);
+      } else {
+        this.setState({
+          submitError: result.error,
+          submitInProgress: false,
         });
       }
-    );
+    };
+
+    // Ensure we don't double trigger a deploy by using the setState callback
+    this.setState({submitInProgress: true}, startDeploy);
   };
 
   gotoDeploy = deploy => {

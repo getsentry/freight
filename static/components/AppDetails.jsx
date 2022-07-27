@@ -21,28 +21,23 @@ const AppDetails = createReactClass({
     };
   },
 
-  componentWillMount() {
-    api.request(this.getAppUrl(), {
-      success: data => {
-        this.setState({
-          app: data,
-        });
-      },
-      error: err => {
-        const error =
-          err && err.status === 404
-            ? `Invalid application: ${this.props.params.app}`
-            : 'Error fetching data';
-        this.setState({error});
-      },
-    });
-    api.request(this.getPollingUrl(), {
-      success: data => {
-        this.setState({
-          tasks: data,
-        });
-      },
-    });
+  async componentWillMount() {
+    const appResp = await api.request(this.getAppUrl());
+
+    if (appResp.ok) {
+      const app = await appResp.json();
+      this.setState({app});
+    } else {
+      const error =
+        appResp.status === 404
+          ? `Invalid application: ${this.props.params.app}`
+          : 'Error fetching data';
+      this.setState({error});
+    }
+
+    const taskResp = await api.request(this.getPollingUrl());
+    const tasks = await taskResp.json();
+    this.setState({tasks});
   },
 
   getAppUrl() {

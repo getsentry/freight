@@ -3,37 +3,43 @@ import React from 'react';
 import {mount} from 'enzyme';
 
 import Layout from '../components/Layout.jsx';
-import TaskDetails from '../components/TaskDetails.jsx';
 
-describe('<Layout />', () => {
+function Content({appList}) {
+  return <div>app count: {appList.length}</div>;
+}
+
+describe('Layout', () => {
+  beforeEach(() => {
+    fetch.resetMocks();
+  });
+
   it('should render <Layout />', () => {
-    const task = [
-      {
-        task: {
-          status: 'finished',
-          app: {
-            id: '1',
-            name: 'freight',
-          },
-          number: 1108,
-          dateCreated: '2017-07-21T21:40:31.056181Z',
-          duration: 3.19,
-          dateFinished: '2017-07-21T21:40:36.546140Z',
-          id: '1115',
-          estimatedDuration: 3.19,
-          name: 'freight/production#1108',
-          environment: 'production',
-          dateStarted: '2017-07-21T21:40:33.358422Z',
-          ref: 'master',
-          sha: 'af008c78c235feae22f40bf76ed04747028fac6e',
-        },
-      },
-    ];
+    fetch.mockResponse(({url}) => {
+      let body = {};
+
+      if (url === '/api/0/config/') {
+        body = {};
+      }
+
+      if (url === '/api/0/config/') {
+        body = [];
+      }
+
+      return Promise.resolve({body: JSON.stringify(body)});
+    });
+
+    const params = {
+      app: 'freight',
+      env: 'production',
+      number: '1115',
+    };
+
     const result = mount(
-      <Layout params={{}}>
-        <TaskDetails params={{}} task={task} />
+      <Layout params={params}>
+        <Content />
       </Layout>
     );
+
     // eslint-disable-next-line sentry/no-to-match-snapshot
     expect(result).toMatchSnapshot();
   });
