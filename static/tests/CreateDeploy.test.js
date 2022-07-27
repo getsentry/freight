@@ -2,7 +2,7 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import {mount} from 'enzyme';
 
-import CreateDeploy from '../components/CreateDeploy.jsx';
+import CreateDeploy from 'app/components/CreateDeploy.jsx';
 
 test('CreateDeploy Snapshot', () => {
   const appList = [

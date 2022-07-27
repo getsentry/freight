@@ -71,7 +71,10 @@
     "testEnvironment": "jsdom",
     "modulePaths": [
       "<rootDir>/static/tests"
-    ]
+    ],
+    "moduleNameMapper": {
+      "^app/(.*)$": "<rootDir>/static/$1"
+    }
   },
   "devDependencies": {
     "@babel/plugin-transform-runtime": "^7.4.3",

@@ -3,7 +3,7 @@ import React from 'react';
 import {mount} from 'enzyme';
 import PropTypes from 'prop-types';
 
-import TaskSummary from '../components/TaskSummary.jsx';
+import TaskSummary from 'app/components/TaskSummary.jsx';
 
 // TODO: figure out why snapshots are rendering null.
 test('TaskSummary Snapshot', () => {

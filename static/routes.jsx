@@ -1,12 +1,12 @@
 import React from 'react';
 import {IndexRoute, Route} from 'react-router';
 
-import AppDetails from './components/AppDetails';
-import CreateDeploy from './components/CreateDeploy';
-import Layout from './components/Layout';
-import Overview from './components/Overview';
-import RouteNotFound from './components/RouteNotFound';
-import TaskDetails from './components/TaskDetails';
+import AppDetails from 'app/components/AppDetails';
+import CreateDeploy from 'app/components/CreateDeploy';
+import Layout from 'app/components/Layout';
+import Overview from 'app/components/Overview';
+import RouteNotFound from 'app/components/RouteNotFound';
+import TaskDetails from 'app/components/TaskDetails';
 
 const routes = () => {
   return (

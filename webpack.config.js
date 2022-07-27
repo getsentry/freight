@@ -1,3 +1,4 @@
+/* eslint-disable import/no-nodejs-modules */
 /* eslint-env node */
 
 const path = require('path');
@@ -45,7 +46,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: 'Freight',
       favicon: 'favicon.png',
-      template: path.join(__dirname + '/templates/index.html'),
+      template: path.join(__dirname, '/templates/index.html'),
     }),
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
@@ -57,6 +58,9 @@ module.exports = {
   resolve: {
     modules: ['node_modules'],
     extensions: ['.jsx', '.js', '.json'],
+    alias: {
+      app: path.join(__dirname, 'static'),
+    },
   },
   optimization: {
     splitChunks: {

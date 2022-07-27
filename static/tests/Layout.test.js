@@ -2,7 +2,7 @@ import React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import {mount} from 'enzyme';
 
-import Layout from '../components/Layout.jsx';
+import Layout from 'app/components/Layout.jsx';
 
 function Content({appList}) {
   return <div>app count: {appList.length}</div>;
