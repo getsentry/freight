@@ -15,7 +15,6 @@ exports[`DeployChart renders 1`] = `
   >
     <BarChart
       label="deploys"
-      placement="bottom"
       points={Array []}
     >
       <figure
