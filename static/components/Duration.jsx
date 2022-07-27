@@ -1,42 +1,36 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-class Duration extends React.Component {
-  static propTypes = {
-    seconds: PropTypes.number.isRequired,
-  };
+function Duration({className, seconds}) {
+  let duration;
+  let ms = seconds * 1000;
+  const neg = ms < 0 ? true : false;
 
-  getDuration = () => {
-    let result;
-    let value = this.props.seconds * 1000;
-    const neg = value < 0 ? true : false;
-
-    if (neg) {
-      value = -value;
-    }
-
-    if (value > 7200000) {
-      result = Math.round(value / 3600000) + ' hr';
-    } else if (value > 120000) {
-      result = Math.round(value / 60000) + ' min';
-    } else if (value > 10000) {
-      result = Math.round(value / 1000) + ' sec';
-    } else if (value > 1000) {
-      result = Math.round(value / 1000) + ' sec';
-    } else {
-      result = Math.round(value) + ' ms';
-    }
-
-    if (neg) {
-      result = '-' + result;
-    }
-
-    return result;
-  };
-
-  render() {
-    return <span className={this.props.className}>{this.getDuration()}</span>;
+  if (neg) {
+    ms = ms * -1;
   }
+
+  if (ms > 7200000) {
+    duration = Math.round(ms / 3600000) + ' hr';
+  } else if (ms > 120000) {
+    duration = Math.round(ms / 60000) + ' min';
+  } else if (ms > 10000) {
+    duration = Math.round(ms / 1000) + ' sec';
+  } else if (ms > 1000) {
+    duration = Math.round(ms / 1000) + ' sec';
+  } else {
+    duration = Math.round(ms) + ' ms';
+  }
+
+  if (neg) {
+    duration = `-${duration}`;
+  }
+
+  return <span className={className}>{duration}</span>;
 }
+
+Duration.propTypes = {
+  seconds: PropTypes.number.isRequired,
+};
 
 export default Duration;
