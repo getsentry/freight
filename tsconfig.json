@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "lib": ["ScriptHost", "ES2020"],
+    "allowJs": true,
+    "downlevelIteration": true,
+    "strict": true,
+    "strictPropertyInitialization": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "baseUrl": "./",
+    "paths": {"app/*": ["static/*"]}
+  }
+}
