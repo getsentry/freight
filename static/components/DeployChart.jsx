@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 
 import BarChart from 'app/components/BarChart';
 import usePolling from 'app/hooks/usePolling';

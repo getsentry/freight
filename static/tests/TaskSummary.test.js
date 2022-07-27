@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 // eslint-disable-next-line no-restricted-imports
 import {mount} from 'enzyme';
 import PropTypes from 'prop-types';
