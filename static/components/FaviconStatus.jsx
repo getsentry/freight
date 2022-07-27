@@ -27,6 +27,11 @@ class FaviconStatus extends React.Component {
 
   componentDidMount() {
     this.faviconElement = document.querySelector('link[rel*=icon]');
+
+    if (!this.faviconElement) {
+      return;
+    }
+
     this.originalFaviconUrl = this.faviconElement.href;
     this.originalTitle = document.title;
 
@@ -35,6 +40,10 @@ class FaviconStatus extends React.Component {
   }
 
   componentDidUpdate() {
+    if (!this.faviconElement) {
+      return;
+    }
+
     this.updateFavicon(this.props.progress / 100, this.props.status);
     this.updateTitle();
   }

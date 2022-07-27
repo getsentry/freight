@@ -21,15 +21,10 @@ const DeployChart = createReactClass({
     };
   },
 
-  componentWillMount() {
-    api.request(this.getPollingUrl(), {
-      success: data => {
-        this.setState({
-          points: this.dataToPoints(data),
-          loading: false,
-        });
-      },
-    });
+  async componentWillMount() {
+    const resp = await api.request(this.getPollingUrl());
+    const points = this.dataToPoints(await resp.json());
+    this.setState({loading: false, points});
   },
 
   getPollingUrl() {

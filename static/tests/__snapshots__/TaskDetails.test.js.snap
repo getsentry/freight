@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`TaskDetails Snapshot 1`] = `
+exports[`TaskDetails renders 1`] = `
 <TaskDetails
   params={
     Object {

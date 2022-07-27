@@ -109,7 +109,7 @@ const TaskDetails = createReactClass({
 
   logRef: React.createRef(),
 
-  fetchData() {
+  async fetchData() {
     if (this.logTimer) {
       window.clearTimeout(this.logTimer);
     }
@@ -118,16 +118,11 @@ const TaskDetails = createReactClass({
       this.logRef.current.innerHTML = '';
     }
 
-    api.request(this.getPollingUrl(), {
-      success: data => {
-        this.setState({
-          task: data,
-          loading: false,
-        });
+    const taskResp = await api.request(this.getPollingUrl());
+    const task = await taskResp.json();
+    this.setState({loading: false, task});
 
-        this.pollLog();
-      },
-    });
+    this.pollLog();
   },
 
   onScroll() {
@@ -297,67 +292,53 @@ const TaskDetails = createReactClass({
     );
   },
 
-  pollLog() {
+  async pollLog() {
     const task = this.state.task;
-    const url =
-      '/deploys/' +
-      task.app.name +
-      '/' +
-      task.environment +
-      '/' +
-      task.number +
-      '/log/?offset=' +
-      this.state.logNextOffset;
+    const url = `/deploys/${task.app.name}/${task.environment}/${task.number}/log/?offset=${this.state.logNextOffset}`;
 
     if (!task) {
       return;
     }
 
-    api.request(url, {
-      success: data => {
-        if (data.chunks.length > 0) {
-          this.setState({
-            logLoading: false,
-            logNextOffset: data.nextOffset,
-          });
-          this.updateBuildLog(data);
-        }
-        if (this.state.logLoading) {
-          this.setState({
-            logLoading: false,
-          });
-        }
-        if (this.taskInProgress(this.state.task)) {
-          this.logTimer = window.setTimeout(this.pollLog, 1000);
-        }
-      },
-      error: () => {
-        this.logTimer = window.setTimeout(this.pollLog, 10000);
-      },
-    });
+    const logResp = await api.request(url);
+
+    // Try again a little later if we don't have a 200
+    if (!logResp.ok) {
+      this.logTimer = window.setTimeout(this.pollLog, 10000);
+      return;
+    }
+
+    const log = await logResp.json();
+
+    if (log.chunks.length > 0) {
+      this.setState({logLoading: false, logNextOffset: log.nextOffset});
+      this.updateBuildLog(log);
+    }
+
+    if (this.state.logLoading) {
+      this.setState({logLoading: false});
+    }
+
+    if (this.taskInProgress(this.state.task)) {
+      this.logTimer = window.setTimeout(this.pollLog, 1000);
+    }
   },
 
-  cancelTask() {
+  async cancelTask() {
     const task = this.state.task;
+    const url = `/deploys/${task.app.name}/${task.environment}/${task.number}/`;
 
-    const url =
-      '/deploys/' + task.app.name + '/' + task.environment + '/' + task.number + '/';
-
-    api.request(url, {
+    const cancelResp = await api.request(url, {
       method: 'PUT',
-      data: {
-        status: 'cancelled',
-      },
-      success: data => {
-        this.setState({
-          task: data,
-        });
-      },
-      error: () => {
-        // eslint-disable-next-line
-        alert('Unable to cancel deploy.');
-      },
+      data: {status: 'cancelled'},
     });
+
+    if (cancelResp.ok) {
+      this.setState({task: await cancelResp.json()});
+    } else {
+      // eslint-disable-next-line no-alert
+      alert('Unable to cancel deploy.');
+    }
   },
 
   toggleLiveScroll() {
@@ -375,29 +356,26 @@ const TaskDetails = createReactClass({
       return;
     }
 
-    this.setState(
-      {
-        submitInProgress: true,
-      },
-      () => {
-        const task = this.state.task;
-        api.request('/deploys/', {
-          method: 'POST',
-          data: {
-            app: task.app.name,
-            env: task.environment,
-            ref: task.sha,
-          },
-          success: data => {
-            // workaround is referenced from here: https://github.com/ReactTraining/react-router/issues/1982
-            browserHistory.push('/');
-            browserHistory.push(
-              `/deploys/${data.app.name}/${data.environment}/${data.number}`
-            );
-          },
-        });
-      }
-    );
+    const triggerRedploy = async () => {
+      const task = this.state.task;
+
+      const deployResp = await api.request('/deploys/', {
+        method: 'POST',
+        data: {
+          app: task.app.name,
+          env: task.environment,
+          ref: task.sha,
+        },
+      });
+
+      const data = await deployResp.json();
+
+      // workaround is referenced from here: https://github.com/ReactTraining/react-router/issues/1982
+      browserHistory.push('/');
+      browserHistory.push(`/deploys/${data.app.name}/${data.environment}/${data.number}`);
+    };
+
+    this.setState({submitInProgress: true}, triggerRedploy);
   },
 
   getStatusLabel(task) {

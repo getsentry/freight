@@ -8,7 +8,7 @@ class Client {
     this.baseUrl = options.baseUrl ?? '/api/0';
   }
 
-  async request(path, options = {}) {
+  request(path, options = {}) {
     const {data} = options;
     const hasData = typeof data !== 'undefined';
 
@@ -25,16 +25,7 @@ class Client {
 
     const headers = {'Content-Type': contentType};
 
-    try {
-      const result = await fetch(url, {method, body, headers});
-      const resultJson = await result.json();
-
-      options.success?.(resultJson);
-    } catch (error) {
-      options.error?.(error);
-    } finally {
-      options.complete?.();
-    }
+    return fetch(url, {method, body, headers});
   }
 }
 

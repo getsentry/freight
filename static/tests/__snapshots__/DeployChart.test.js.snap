@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DeployChart Snapshot 1`] = `
+exports[`DeployChart renders 1`] = `
 <DeployChart
   params={
     Object {

@@ -18,73 +18,43 @@ class Layout extends React.Component {
     this.fetchData();
   }
 
-  fetchConfig = () => {
-    const error = new Error('Error fetching /config/');
-
-    return new Promise((resolve, reject) => {
-      api.request('/config/', {
-        success: resolve,
-        error: resp => {
-          error.resp = resp;
-          reject(error);
-        },
-      });
-    });
-  };
-
-  fetchApps = () => {
-    const error = new Error('Error fetching /apps/');
-
-    return new Promise((resolve, reject) => {
-      api.request('/apps/', {
-        success: resolve,
-        error: resp => {
-          error.resp = resp;
-          reject(error);
-        },
-      });
-    });
-  };
-
   fetchData = async () => {
     // try to fetch config first
-    try {
-      const config = await this.fetchConfig();
-      if (config?.SENTRY_PUBLIC_DSN) {
-        init({
-          dsn: config.SENTRY_PUBLIC_DSN,
-        });
-      }
-    } catch (err) {
-      console.error(err); // eslint-disable-line no-console
+    const configResp = await api.request('/config/');
+    const config = await configResp.json();
 
-      if (err?.resp?.status === 401) {
-        if (err?.resp?.responseJSON?.data?.next) {
-          window.location.assign(err.resp.responseJSON.data.next);
-        }
-        this.setState({
-          loading: false,
-          error: 'Not Authorized',
-        });
+    if (configResp.ok) {
+      if (config?.SENTRY_PUBLIC_DSN) {
+        init({dsn: config.SENTRY_PUBLIC_DSN});
       }
+    } else {
+      // eslint-disable-next-line no-console
+      console.error('Error fetching /config/');
+
+      if (configResp?.status !== 401) {
+        return;
+      }
+
+      // 401 requires authorization
+      if (config?.data?.next) {
+        window.location.assign(config.data.next);
+      }
+
+      this.setState({loading: false, error: 'Not Authorized'});
 
       return;
     }
 
-    try {
-      const appList = await this.fetchApps();
-      this.setState({
-        appList,
-        loading: false,
-        error: false,
-      });
-    } catch (err) {
-      console.error(err); // eslint-disable-line no-console
+    // Fetch apps
+    const appsResp = await api.request('/apps/');
+    const appList = await appsResp.json();
 
-      this.setState({
-        loading: false,
-        error: true,
-      });
+    if (appsResp.ok) {
+      this.setState({loading: false, error: false, appList});
+    } else {
+      // eslint-disable-next-line no-console
+      console.error('Error fetching /apps/');
+      this.setState({loading: false, error: true});
     }
   };
 

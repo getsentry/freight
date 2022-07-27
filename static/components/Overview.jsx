@@ -25,14 +25,11 @@ const Overview = createReactClass({
     };
   },
 
-  componentWillMount() {
-    api.request(this.getPollingUrl(), {
-      success: data => {
-        this.setState({
-          deploys: data,
-        });
-      },
-    });
+  async componentWillMount() {
+    const deploysResp = await api.request(this.getPollingUrl());
+    const deploys = await deploysResp.json();
+
+    this.setState({deploys});
   },
 
   componentDidUpdate(_prevProps, prevState) {

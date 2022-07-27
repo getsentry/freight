@@ -1,8 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<Layout /> should render <Layout /> 1`] = `
+exports[`Layout should render <Layout /> 1`] = `
 <Layout
-  params={Object {}}
+  params={
+    Object {
+      "app": "freight",
+      "env": "production",
+      "number": "1115",
+    }
+  }
 >
   <div>
     <header>
@@ -20,7 +26,7 @@ exports[`<Layout /> should render <Layout /> 1`] = `
               Object {
                 "pathname": "/deploy",
                 "query": Object {
-                  "app": undefined,
+                  "app": "freight",
                 },
               }
             }
@@ -48,6 +54,20 @@ exports[`<Layout /> should render <Layout /> 1`] = `
             </a>
           </Link>
         </h1>
+        <h2>
+          <Link
+            onlyActiveOnIndex={false}
+            style={Object {}}
+            to="/freight"
+          >
+            <a
+              onClick={[Function]}
+              style={Object {}}
+            >
+              freight
+            </a>
+          </Link>
+        </h2>
       </div>
     </header>
     <div
