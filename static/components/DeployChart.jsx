@@ -1,55 +1,23 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
-import PropTypes from 'prop-types';
 
-import api from 'app/api';
 import BarChart from 'app/components/BarChart';
-import PollingMixin from 'app/mixins/polling';
+import usePolling from 'app/hooks/usePolling';
 
-const DeployChart = createReactClass({
-  displayName: 'DeployChart',
-  propTypes: {
-    app: PropTypes.string,
-  },
-  mixins: [PollingMixin],
+function dataToPoints(data) {
+  return data.map(point => ({x: point[0], y: point[1]}));
+}
 
-  getInitialState() {
-    return {
-      loading: true,
-      points: [],
-    };
-  },
+function DeployChart({app}) {
+  const [data, setData] = React.useState([]);
 
-  async componentWillMount() {
-    const resp = await api.request(this.getPollingUrl());
-    const points = this.dataToPoints(await resp.json());
-    this.setState({loading: false, points});
-  },
+  const url = `/deploy-stats/${app ? `?app=${app}` : ''}`;
+  usePolling({url, handleRecieveData: setData});
 
-  getPollingUrl() {
-    const {app} = this.props;
-    return `/deploy-stats/${app ? `?app=${app}` : ''}`;
-  },
-
-  pollingReceiveData(data) {
-    this.setState({
-      points: this.dataToPoints(data),
-    });
-  },
-
-  dataToPoints(data) {
-    return data.map(point => {
-      return {x: point[0], y: point[1]};
-    });
-  },
-
-  render() {
-    return (
-      <div className="section">
-        <BarChart points={this.state.points} label="deploys" />
-      </div>
-    );
-  },
-});
+  return (
+    <div className="section">
+      <BarChart points={dataToPoints(data)} label="deploys" />
+    </div>
+  );
+}
 
 export default DeployChart;
