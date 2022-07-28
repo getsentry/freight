@@ -2,6 +2,7 @@ import * as React from 'react';
 import {browserHistory} from 'react-router';
 
 import api from 'app/api';
+import ExpectedChanges from 'app/components/ExpectedChanges';
 
 function gotoDeploy(deploy) {
   const {app, environment, number} = deploy;
@@ -121,6 +122,8 @@ function CreateDeploy({location, appList = []}) {
               value={ref}
             />
           </div>
+          <ExpectedChanges app={app} env={env} />
+
           <div className="submit-group">
             <button type="submit" className="btn btn-primary" disabled={submitInProgress}>
               Ship It!
