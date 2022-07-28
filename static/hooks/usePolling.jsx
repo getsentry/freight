@@ -30,19 +30,11 @@ function usePolling({url, handleRecieveData, pollingActive = true}) {
   const pollTimeoutRef = useRef(undefined);
 
   /**
-   * Cancels pending polling timeouts
-   */
-  const cancelPolling = useCallback(() => {
-    window.clearTimeout(pollTimeoutRef.current);
-    pollTimeoutRef.current = undefined;
-  }, []);
-
-  /**
-   * Beings the polling cycle
+   * Starts chain triggering the makeRequest
    */
   const triggerPolling = useCallback(async () => {
     if (!pollingActive) {
-      return cancelPolling;
+      return;
     }
 
     const wasSuccess = await makeRequest();
@@ -52,10 +44,17 @@ function usePolling({url, handleRecieveData, pollingActive = true}) {
       wasSuccess ? DEFAULT_DELAY : BACKOFF_DELAY
     );
 
-    return cancelPolling;
-  }, [makeRequest, cancelPolling, pollingActive]);
+    return;
+  }, [makeRequest, pollingActive]);
 
-  useEffect(() => void triggerPolling(), [triggerPolling]);
+  useEffect(() => {
+    triggerPolling();
+
+    return () => {
+      window.clearTimeout(pollTimeoutRef.current);
+      pollTimeoutRef.current = undefined;
+    };
+  }, [triggerPolling]);
 }
 
 export default usePolling;
