@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import * as React from 'react';
 import {formatDistanceToNowStrict} from 'date-fns';
 import PropTypes from 'prop-types';
 
@@ -7,7 +7,7 @@ const DELAY = 2600;
 function TimeSince({date}) {
   const dateObject = React.useMemo(() => new Date(date), [date]);
 
-  const getRelativeDate = useCallback(
+  const getRelativeDate = React.useCallback(
     () => formatDistanceToNowStrict(dateObject, {addSuffix: true}),
     [dateObject]
   );
