@@ -35,7 +35,8 @@ function Layout({params, children}) {
         window.location.assign(config.data.next);
       }
 
-      this.setState({loading: false, error: 'Not Authorized'});
+      setLoading(false);
+      setError('Not Authorized');
 
       return;
     }
