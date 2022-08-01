@@ -196,16 +196,17 @@ header {
   }
   margin-bottom: 20px;
 }
+
 .deploy-list {
-  padding-left: 0;
-  list-style: none;
-  > .deploy {
-    margin-bottom: 3px;
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
+
 .deploy {
   .clearfix();
-  padding: 15px;
+  color: @light;
+  padding: 8px 16px;
   background: @lessDark;
   border-radius: 4px;
   cursor: pointer;

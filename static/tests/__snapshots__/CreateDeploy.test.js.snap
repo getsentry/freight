@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`CreateDeploy Snapshot 1`] = `
+exports[`CreateDeploy Snapshot should render 1`] = `
 <CreateDeploy
   appList={
     Array [
@@ -92,6 +92,19 @@ exports[`CreateDeploy Snapshot 1`] = `
             value="master"
           />
         </div>
+        <ExpectedChanges
+          app="freight"
+          env="production"
+        >
+          <div>
+            <label>
+              Previous Deploy
+            </label>
+            <p>
+              Loading previous deploy info
+            </p>
+          </div>
+        </ExpectedChanges>
         <div
           className="submit-group"
         >
