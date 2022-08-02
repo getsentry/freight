@@ -165,6 +165,7 @@ def configure_api(app):
     from freight.api.deploy_details import DeployDetailsApiView
     from freight.api.deploy_index import DeployIndexApiView
     from freight.api.deploy_log import DeployLogApiView
+    from freight.api.remote_changes import RemoteChangesApiView
 
     api.add_resource(AppIndexApiView, "/apps/")
     api.add_resource(AppDetailsApiView, "/apps/<app>/")
@@ -195,6 +196,10 @@ def configure_api(app):
     )
     api.add_resource(
         DeployLogApiView, "/deploys/<app>/<env>/<number>/log/", endpoint="deploy-log"
+    )
+
+    api.add_resource(
+        RemoteChangesApiView, "/remote-changes/<app>/", endpoint="remote-chagnes"
     )
 
     # catchall should be the last resource
