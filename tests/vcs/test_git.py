@@ -37,7 +37,7 @@ class GitVcsTest(TestCase):
     def reset(self):
         check_call(f"rm -rf {self.root}", shell=True)
         check_call(f"mkdir -p {self.path} {self.remote_path}", shell=True)
-        check_call(f"git init {self.remote_path}", shell=True)
+        check_call(f"git init --initial-branch=master {self.remote_path}", shell=True)
         self._set_author("Foo Bar", "foo@example.com")
         check_call(
             f'cd {self.remote_path} && touch FOO && git add FOO && git commit -m "test\nlol\n"',
@@ -98,3 +98,20 @@ class GitVcsTest(TestCase):
         vcs.update()
         with pytest.raises(CommandError):
             vcs.get_sha("foo")
+
+    def test_get_sha_range(self):
+        vcs = self.get_vcs()
+        vcs.clone()
+        vcs.update()
+
+        shas = vcs.get_sha_range("master", "master^")
+        assert len(shas) == 2
+
+    def test_empty_get_sha_range(self):
+        vcs = self.get_vcs()
+        vcs.clone()
+        vcs.update()
+
+        shas = vcs.get_sha_range("master^", "master")
+
+        assert len(shas) == 0
