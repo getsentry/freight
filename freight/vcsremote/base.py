@@ -1,3 +1,6 @@
+from typing import List
+
+
 class VcsRemote:
     hostname: str
     """
@@ -18,5 +21,11 @@ class VcsRemote:
     def get_commit_url(self, commit: str) -> str:
         """
         Get the URL for a particular commit on the remote
+        """
+        raise NotImplementedError
+
+    def get_commits_info(self, shas: List[str]):
+        """
+        Retrieves detailed information from the remote for a list of commits.
         """
         raise NotImplementedError
