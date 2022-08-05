@@ -2,10 +2,12 @@
 
 set -e
 
-if [[ "$(id -u)" != 9010 ]] || [[ "$(id -un)" != build ]]; then
-    echo "Freight needs to be run as user build with uid 9010."
-    exit 1
-fi
+# Unfortunately we can't remove gosu, we need to start the container
+# as root to at least chown WORKSPACE_ROOT since on garbage, that is
+# owned by td-agent:root.
+# TODO(newfreight): everything that Freight volume mounts should
+# be owned by build user (uid 9010). Then we can remove gosu,
+# and straight up run as build.
 
 # Perform an upgrade before booting up web/worker processes.
 case "$1" in
@@ -22,10 +24,9 @@ fi
 # If so, we'll want to drop to running it as the build user (uid 9010).
 if [ -f "/usr/src/app/bin/$1" ]; then
     set -- tini -- "$@"
-    mkdir -p "$WORKSPACE_ROOT"
-    # ugh we actually need this,
-    # what's mounted to WORKSPACE_ROOT is td-agent:root on garbage. lol.
-    chown -R build "$WORKSPACE_ROOT"
+    if [ "$(id -u)" = '0' ]; then
+        mkdir -p "$WORKSPACE_ROOT"
+        chown -R build "$WORKSPACE_ROOT"
         set -- gosu build "$@"
     fi
 fi
