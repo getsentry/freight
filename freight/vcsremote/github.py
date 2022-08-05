@@ -32,11 +32,13 @@ def build_commit_query(repo_owner: str, repo_name: str, sha_list: List[str]):
         author {{
           email
           name
+          avatarUrl
         }}
         associatedPullRequests(first: 1) {{
           nodes {{
             title
             url
+            number
             labels(first: 10) {{
               nodes {{
                 name
