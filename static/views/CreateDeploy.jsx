@@ -1,9 +1,9 @@
 import * as React from 'react';
 import {browserHistory} from 'react-router';
 
-import api from 'app/api';
 import ExpectedChanges from 'app/components/ExpectedChanges';
 import TaskSummary from 'app/components/TaskSummary';
+import useApi from 'app/hooks/useApi';
 import useLastDeploy from 'app/hooks/useLastDeploay';
 import useRemoteChanges from 'app/hooks/useRemoteChanges';
 
@@ -13,6 +13,7 @@ function gotoDeploy(deploy) {
 }
 
 function CreateDeploy({location, appList = []}) {
+  const api = useApi();
   const firstApp = appList.length !== 0 ? appList[0] : null;
 
   const defaultApp = location.query?.app
@@ -66,7 +67,7 @@ function CreateDeploy({location, appList = []}) {
       setSubmitError(result.error);
       setSubmitInProgress(false);
     }
-  }, [app, env, ref]);
+  }, [api, app, env, ref]);
 
   /**
    * Handles creating a deploy

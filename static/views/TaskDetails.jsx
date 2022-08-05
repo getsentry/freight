@@ -6,7 +6,7 @@ import {format} from 'date-fns';
 import linkifyUrls from 'linkify-urls';
 import PropTypes from 'prop-types';
 
-import api from 'app/api';
+import Client from 'app/api';
 import FaviconStatus from 'app/components/FaviconStatus';
 import LoadingIndicator from 'app/components/LoadingIndicator';
 import TaskSummary from 'app/components/TaskSummary';
@@ -20,6 +20,11 @@ function Progress({value}) {
 Progress.propTypes = {
   value: PropTypes.number.isRequired,
 };
+
+// XXX(epurkhiser): Until this component is functional, we can't use the useApi
+// hook that will smartly cancel API requets, so we'll instantiate a module
+// local api client for now.
+const api = new Client();
 
 const TaskDetails = createReactClass({
   displayName: 'TaskDetails',
