@@ -18,11 +18,6 @@ email=$(grep client_email /etc/freight/google-credentials.json | sed -e "s/.*: \
 gcloud auth activate-service-account "$email" --key-file=/etc/freight/google-credentials.json -q
 unset email
 
-mkdir -p /home/build/.docker/
-chown build:build /home/build/.docker/
-cp /etc/freight/config.json /home/build/.docker/config.json
-chown build:build /home/build/.docker/config.json
-
 # TODO: try to chown this on the host.
 chown -R build:build "$WORKSPACE_ROOT"
 

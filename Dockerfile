@@ -27,6 +27,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # it's uid 9010.
 RUN groupadd -g 9010 build && useradd -r -g 9010 -u 9010 build
 
+# During runtime, Freight runs as the build user (stepped down to by gosu),
+# and its docker client needs to be able to read this file.
+COPY --chown=build:build ./docker/config.json /home/build/.docker/config.json
+
 # grab gosu for easy step-down from root
 RUN set -x \
     && GOSU_VERSION=1.11 \
