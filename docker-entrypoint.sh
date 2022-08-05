@@ -2,6 +2,11 @@
 
 set -e
 
+if [[ "$(id -u)" != 9010 ]] || [[ "$(id -un)" != build ]]; then
+    echo "Freight needs to be run as user build with uid 9010."
+    exit 1
+fi
+
 # Perform an upgrade before booting up web/worker processes.
 case "$1" in
     web|worker)
@@ -17,9 +22,10 @@ fi
 # If so, we'll want to drop to running it as the build user (uid 9010).
 if [ -f "/usr/src/app/bin/$1" ]; then
     set -- tini -- "$@"
-    if [ "$(id -u)" = '0' ]; then
-        mkdir -p "$WORKSPACE_ROOT"
-        chown -R build "$WORKSPACE_ROOT"
+    mkdir -p "$WORKSPACE_ROOT"
+    # ugh we actually need this,
+    # what's mounted to WORKSPACE_ROOT is td-agent:root on garbage. lol.
+    chown -R build "$WORKSPACE_ROOT"
         set -- gosu build "$@"
     fi
 fi
