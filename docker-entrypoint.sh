@@ -9,14 +9,6 @@ case "$1" in
     ;;
 esac
 
-if [ "$DOCKER_CONFIG" ]; then
-    gosu freight bash -c 'mkdir -p ~/.docker'
-    gosu freight bash -c 'echo $DOCKER_CONFIG > ~/.docker/config.json'
-    gosu freight bash -c 'chmod 400 ~/.docker/config.json'
-    # Make sure we don't pass this along since it contains sensitive info
-    unset DOCKER_CONFIG
-fi
-
 if [ -f /etc/freight/auth-helpers.sh ]; then
     . /etc/freight/auth-helpers.sh
 fi
