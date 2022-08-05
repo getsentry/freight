@@ -14,8 +14,23 @@ case "$1" in
     ;;
 esac
 
-if [ -f /etc/freight/auth-helpers.sh ]; then
-    . /etc/freight/auth-helpers.sh
-fi
+export GOOGLE_APPLICATION_CREDENTIALS=/home/freight/google-credentials.json
+
+# copy the file to someplace we can set permissions
+# REMINDER: this file MUST persist or periodic auth refresh WILL FAIL and revert to any auth it can find
+#    (e.g. garbage's instance credentials)
+cp /etc/freight/google-credentials.json ${GOOGLE_APPLICATION_CREDENTIALS}
+chown freight ${GOOGLE_APPLICATION_CREDENTIALS}
+
+email=$(cat ${GOOGLE_APPLICATION_CREDENTIALS} | grep client_email | sed -e "s/.*: \"//" | sed -e "s/\",//")
+
+gosu freight bash -c "gcloud auth activate-service-account ${email} --key-file=${GOOGLE_APPLICATION_CREDENTIALS} -q" # this sets up region/zone based on key file
+
+unset email
+
+mkdir -p /home/freight/.docker/
+chown freight:freight /home/freight/.docker/
+cp /etc/freight/config.json /home/freight/.docker/config.json
+chown freight:freight /home/freight/.docker/config.json
 
 exec tini "$@"
