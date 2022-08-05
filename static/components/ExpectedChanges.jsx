@@ -1,51 +1,77 @@
 import * as React from 'react';
 
-import api from 'app/api';
+import LoadingIndicator from './LoadingIndicator';
+import TimeSince from './TimeSince';
 
-import TaskSummary from './TaskSummary';
-
-function ExpectedChanges({app, env}) {
-  const [lastDeploy, setLastDeploy] = React.useState(undefined);
-
-  const fetchLastDeploy = React.useCallback(async () => {
-    const deploysResp = await api.request('/deploys/', {
-      query: {app, env, status: 'finished'},
-    });
-
-    if (deploysResp.ok) {
-      const deploys = await deploysResp.json();
-      setLastDeploy(deploys[0] ?? null);
-    }
-  }, [app, env]);
-
-  React.useEffect(() => void fetchLastDeploy(), [fetchLastDeploy]);
-
-  if (lastDeploy === undefined) {
+function ExpectedChanges({changes}) {
+  if (changes === undefined) {
     return (
-      <div>
-        <label>Previous Deploy</label>
-        <p>Loading previous deploy info</p>
+      <LoadingIndicator>Fetching changes.. This may take a moment.</LoadingIndicator>
+    );
+  }
+
+  if (changes === null) {
+    return (
+      <div className="alert alert-block alert-danger">
+        There was a problem fetching the list of changes.
       </div>
     );
   }
 
-  if (lastDeploy === null) {
-    return (
-      <div>
-        <label>Previous Deploy</label>
-        <p>
-          This will be the first deploy of {app}/{env}
-        </p>
+  const changeList = changes.map(commit => {
+    const resolvedCommit = commit.externalCommit ?? commit;
+
+    const title = resolvedCommit?.messageHeadline ?? '';
+    const titleWithoutPr = title.replace(/ \(#[0-9]+\)?$/g, '');
+
+    const pr =
+      resolvedCommit.associatedPullRequests.nodes.length > 0
+        ? resolvedCommit.associatedPullRequests.nodes[0]
+        : null;
+
+    const prLink = !pr ? null : (
+      <a href={pr.url} target="_blank" rel="noreferrer" className="change-link">
+        #{pr.number}
+      </a>
+    );
+
+    const author = (
+      <div className="change-author">
+        <img src={resolvedCommit.author.avatarUrl} /> {resolvedCommit.author.name}
       </div>
     );
+
+    const commitDate = <TimeSince date={commit.committedDate} />;
+
+    const labels = pr?.labels.nodes.map(label => (
+      <div
+        className="change-label"
+        style={{backgroundColor: `#${label.color}`}}
+        key={label.name}
+      >
+        {label.name}
+      </div>
+    ));
+
+    return (
+      <li key={resolvedCommit.sha}>
+        <div className="change-title">
+          {titleWithoutPr} ({prLink})
+        </div>
+        <div className="change-tags">
+          {author}
+          {commitDate}
+          {labels}
+        </div>
+      </li>
+    );
+  });
+
+  if (changeList.length === 0) {
+    return <p>Nothing to deploy!</p>;
   }
 
-  return (
-    <div>
-      <label>Previous Deploy</label>
-      <TaskSummary task={lastDeploy} />
-    </div>
-  );
+  return <ul className="remote-changes">{changeList}</ul>;
 }
 
 export default ExpectedChanges;

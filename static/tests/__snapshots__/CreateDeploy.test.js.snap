@@ -92,19 +92,30 @@ exports[`CreateDeploy Snapshot should render 1`] = `
             value="master"
           />
         </div>
-        <ExpectedChanges
-          app="freight"
-          env="production"
+        <div
+          className="form-group"
         >
-          <div>
-            <label>
-              Previous Deploy
-            </label>
+          <label>
+            Last Deploy
+          </label>
+          <p>
+            Loading previous deploy details
+          </p>
+        </div>
+        <div
+          className="form-group"
+        >
+          <label>
+            Changes Since
+          </label>
+          <ExpectedChanges
+            changes={Array []}
+          >
             <p>
-              Loading previous deploy info
+              Nothing to deploy!
             </p>
-          </div>
-        </ExpectedChanges>
+          </ExpectedChanges>
+        </div>
         <div
           className="submit-group"
         >

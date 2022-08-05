@@ -3,6 +3,9 @@ import {browserHistory} from 'react-router';
 
 import api from 'app/api';
 import ExpectedChanges from 'app/components/ExpectedChanges';
+import TaskSummary from 'app/components/TaskSummary';
+import useLastDeploy from 'app/hooks/useLastDeploay';
+import useRemoteChanges from 'app/hooks/useRemoteChanges';
 
 function gotoDeploy(deploy) {
   const {app, environment, number} = deploy;
@@ -41,6 +44,9 @@ function CreateDeploy({location, appList = []}) {
 
   const [submitError, setSubmitError] = React.useState(false);
   const [submitInProgress, setSubmitInProgress] = React.useState(false);
+
+  const lastDeploy = useLastDeploy({app, env});
+  const changes = useRemoteChanges({app, startRef: ref, endRef: lastDeploy?.sha});
 
   const startDeploy = React.useCallback(async () => {
     const deployResp = await api.request('/deploys/', {
@@ -122,7 +128,24 @@ function CreateDeploy({location, appList = []}) {
               value={ref}
             />
           </div>
-          <ExpectedChanges app={app} env={env} />
+
+          <div className="form-group">
+            <label>Last Deploy</label>
+            {lastDeploy === undefined ? (
+              <p>Loading previous deploy details</p>
+            ) : lastDeploy === null ? (
+              <p>
+                This will be the first deploy of {app}/{env}
+              </p>
+            ) : (
+              <TaskSummary task={lastDeploy} />
+            )}
+          </div>
+
+          <div className="form-group">
+            <label>Changes Since</label>
+            <ExpectedChanges changes={changes} />
+          </div>
 
           <div className="submit-group">
             <button type="submit" className="btn btn-primary" disabled={submitInProgress}>
