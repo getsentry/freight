@@ -1,124 +1,92 @@
 import * as React from 'react';
-import createReactClass from 'create-react-class';
 
 import api from 'app/api';
 import DeployChart from 'app/components/DeployChart';
 import LoadingIndicator from 'app/components/LoadingIndicator';
 import TaskSummary from 'app/components/TaskSummary';
-import PollingMixin from 'app/mixins/polling';
+import usePolling from 'app/hooks/usePolling';
 
-const AppDetails = createReactClass({
-  displayName: 'AppDetails',
+function AppDetails({params}) {
+  const [error, setError] = React.useState(false);
 
-  mixins: [PollingMixin],
+  const [app, setApp] = React.useState(null);
+  const [deploys, setDeploys] = React.useState(null);
 
-  getInitialState() {
-    return {
-      appId: this.props.params.app,
-      app: null,
-      tasks: null,
-    };
-  },
-
-  async componentWillMount() {
-    const appResp = await api.request(this.getAppUrl());
+  const loadApp = React.useCallback(async () => {
+    const appResp = await api.request(`/apps/${params.app}/`);
 
     if (appResp.ok) {
-      const app = await appResp.json();
-      this.setState({app});
+      setApp(await appResp.json());
     } else {
-      const error =
+      const errorMessage =
         appResp.status === 404
-          ? `Invalid application: ${this.props.params.app}`
+          ? `Invalid application: ${params.app}`
           : 'Error fetching data';
-      this.setState({error});
+      setError(errorMessage);
     }
+  }, [params.app]);
 
-    const taskResp = await api.request(this.getPollingUrl());
-    const tasks = await taskResp.json();
-    this.setState({tasks});
-  },
+  // Load app
+  React.useEffect(() => void loadApp(), [loadApp]);
 
-  getAppUrl() {
-    return '/apps/' + this.state.appId + '/';
-  },
+  // Poll for deploys
+  usePolling({url: `/deploys/?app=${params.app}`, handleRecieveData: setDeploys});
 
-  getPollingUrl() {
-    return '/tasks/?app=' + this.state.appId;
-  },
+  if (error) {
+    return <h2>{error}</h2>;
+  }
 
-  pollingReceiveData(data) {
-    this.setState({
-      tasks: data,
-    });
-  },
+  if (deploys === null || app === null) {
+    return <LoadingIndicator />;
+  }
 
-  taskInProgress(task) {
-    return task.status === 'in_progress';
-  },
+  const activeDeployNodes = [];
+  const pendingDeployNodes = [];
+  const previousDeployNodes = [];
 
-  taskPending(task) {
-    return task.status === 'pending';
-  },
-
-  render() {
-    if (this.state.error) {
-      return <h2>{this.state.error}</h2>;
+  deploys.forEach(deploy => {
+    const node = <TaskSummary key={deploy.id} task={deploy} />;
+    if (deploy.status === 'in_progress') {
+      activeDeployNodes.unshift(node);
+    } else if (deploy.status === 'pending') {
+      pendingDeployNodes.unshift(node);
+    } else {
+      previousDeployNodes.push(node);
     }
+  });
 
-    if (this.state.tasks === null || this.state.app === null) {
-      return <LoadingIndicator />;
-    }
-
-    const {app, tasks} = this.state;
-    const activeTaskNodes = [];
-    const pendingTaskNodes = [];
-    const previousTaskNodes = [];
-
-    tasks.forEach(task => {
-      const node = <TaskSummary key={task.id} task={task} />;
-      if (this.taskInProgress(task)) {
-        activeTaskNodes.unshift(node);
-      } else if (this.taskPending(task)) {
-        pendingTaskNodes.unshift(node);
-      } else {
-        previousTaskNodes.push(node);
-      }
-    });
-
-    return (
-      <div>
-        <div className="section">
-          <div className="section-header">
-            <h2>{app.name} - Active Deploys</h2>
-          </div>
-
-          {activeTaskNodes.length || pendingTaskNodes.length ? (
-            <div className="deploy-list">
-              {activeTaskNodes}
-              {pendingTaskNodes}
-            </div>
-          ) : (
-            <p>There are no active deploys.</p>
-          )}
+  return (
+    <div>
+      <div className="section">
+        <div className="section-header">
+          <h2>{app.name} - Active Deploys</h2>
         </div>
 
-        <div className="section">
-          <div className="section-header">
-            <h2>{app.name} - Deploy History</h2>
+        {activeDeployNodes.length || pendingDeployNodes.length ? (
+          <div className="deploy-list">
+            {activeDeployNodes}
+            {pendingDeployNodes}
           </div>
-
-          <DeployChart app={app.name} />
-
-          {previousTaskNodes.length ? (
-            <div className="deploy-list">{previousTaskNodes}</div>
-          ) : (
-            <p>There are no historical deploys.</p>
-          )}
-        </div>
+        ) : (
+          <p>There are no active deploys.</p>
+        )}
       </div>
-    );
-  },
-});
+
+      <div className="section">
+        <div className="section-header">
+          <h2>{app.name} - Deploy History</h2>
+        </div>
+
+        <DeployChart app={app.name} />
+
+        {previousDeployNodes.length ? (
+          <div className="deploy-list">{previousDeployNodes}</div>
+        ) : (
+          <p>There are no historical deploys.</p>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default AppDetails;
