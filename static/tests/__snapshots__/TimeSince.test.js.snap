@@ -3,6 +3,7 @@
 exports[`TimeSince Snapshot 1`] = `
 <time
   dateTime="2016-12-21T23:36:07.071Z"
+  title="2016-12-21T23:36:07.071Z"
 >
   5 years ago
 </time>

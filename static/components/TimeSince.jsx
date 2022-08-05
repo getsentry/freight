@@ -24,7 +24,13 @@ function TimeSince({date}) {
     };
   }, [getRelativeDate]);
 
-  return <time dateTime={dateObject.toISOString()}>{relativeDate}</time>;
+  const time = dateObject.toISOString();
+
+  return (
+    <time title={time} dateTime={time}>
+      {relativeDate}
+    </time>
+  );
 }
 
 TimeSince.propTypes = {
