@@ -25,6 +25,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # add our user and group first to make sure their IDs get assigned consistently
 RUN groupadd -r freight && useradd -r -m -g freight freight
 
+# This is the build user on cheffed and salted host machines
+# that would run the Freight container. Directories that we volume
+# mount when running Freight are owned by 9010:9010.
+# The Freight container is run with --user=9010:9010, but it needs to exist
+# in here for that to work.
+RUN groupadd -g 9010 && useradd -r -g 9010 -u 9010
+
 # grab gosu for easy step-down from root
 RUN set -x \
     && GOSU_VERSION=1.11 \
