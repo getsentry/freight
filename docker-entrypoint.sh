@@ -2,6 +2,11 @@
 
 set -e
 
+if [[ "$(id -u)" != 0 ]]; then
+    echo "Freight needs to be run as root user (we step down to build user before leaving the entrypoint)"
+    exit 1
+fi
+
 # Perform an upgrade before booting up web/worker processes.
 case "$1" in
     web|worker)
@@ -18,6 +23,7 @@ chown build:build /home/build/.docker/
 cp /etc/freight/config.json /home/build/.docker/config.json
 chown build:build /home/build/.docker/config.json
 
+# TODO: try to chown this on the host.
 chown -R build:build "$WORKSPACE_ROOT"
 
 exec tini gosu build "$@"

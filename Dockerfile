@@ -21,9 +21,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         git \
     && rm -rf /var/lib/apt/lists/*
 
-# This is the build user on cheffed and salted host machines
-# that the Freight container should be run with.
+# This is the build (uid 9010) user on cheffed and salted host machines.
 # Directories that we volume mount when running Freight are owned by 9010:9010 (build).
+# In the docker entrypoint we have gosu stepping down to build, so just make sure
+# it's uid 9010.
 RUN groupadd -g 9010 build && useradd -r -g 9010 -u 9010 build
 
 # grab gosu for easy step-down from root
