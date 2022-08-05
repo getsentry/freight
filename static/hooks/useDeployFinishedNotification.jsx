@@ -38,7 +38,7 @@ function useDeployFinishedNotification(deploys) {
 
   // Request permission for notifications
   useEffect(() => {
-    if (window.Notification && Notification.permission !== 'denied') {
+if (window.Notification?.permission !== 'denied') {
       Notification.requestPermission();
     }
   }, []);
