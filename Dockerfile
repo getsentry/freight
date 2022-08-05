@@ -26,6 +26,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Directories that we volume mount when running Freight are owned by 9010:9010 (build).
 RUN groupadd -g 9010 build && useradd -r -g 9010 -u 9010 build
 
+# grab gosu for easy step-down from root
+RUN set -x \
+    && GOSU_VERSION=1.11 \
+    && GOSU_SHA256=0b843df6d86e270c5b0f5cbd3c326a04e18f4b7f9b8457fa497b0454c4b138d7 \
+    && curl -sL -o /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/${GOSU_VERSION}/gosu-$(dpkg --print-architecture)" \
+    && echo "${GOSU_SHA256} /usr/local/bin/gosu" | sha256sum --check --status \
+    && chmod +x /usr/local/bin/gosu \
+    && gosu nobody true
+
 # grab tini for signal processing and zombie killing
 RUN set -x \
     && TINI_VERSION=0.18.0 \
