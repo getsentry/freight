@@ -24,7 +24,7 @@ function ShaLink({sha, url, remote}) {
   }
 
   return (
-    <a href={url} className="sha">
+    <a href={url} className="sha" target="_blank" rel="noreferrer">
       {shaNode}
     </a>
   );
