@@ -22,14 +22,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
-# add our user and group first to make sure their IDs get assigned consistently
-RUN groupadd -r freight && useradd -r -m -g freight freight
-
 # This is the build user on cheffed and salted host machines
-# that would run the Freight container. Directories that we volume
-# mount when running Freight are owned by 9010:9010 (build).
-# The Freight container is run with --user=9010:9010, but it needs to exist
-# in here for that to work.
+# that the Freight container should be run with.
+# Directories that we volume mount when running Freight are owned by 9010:9010 (build).
 RUN groupadd -g 9010 build && useradd -r -g 9010 -u 9010 build
 
 # grab gosu for easy step-down from root
