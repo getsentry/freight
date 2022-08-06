@@ -46,7 +46,11 @@ function CreateDeploy({location, appList = []}) {
   const [submitInProgress, setSubmitInProgress] = React.useState(false);
 
   const lastDeploy = useLastDeploy({app, env});
-  const changes = useRemoteChanges({app, startRef: ref, endRef: lastDeploy?.sha});
+
+  // gaurd against stale last deploys when changing apps
+  const lastDeploySha = lastDeploy?.app.name === app ? lastDeploy.sha : null;
+
+  const changes = useRemoteChanges({app, startRef: ref, endRef: lastDeploySha});
 
   const startDeploy = React.useCallback(async () => {
     const deployResp = await api.request('/deploys/', {
