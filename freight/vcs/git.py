@@ -63,13 +63,7 @@ class GitVcs(Vcs):
         return self.run(["rev-parse", ref])
 
     def get_sha_range(self, ref1, ref2):
-        # --boundary makes the list inclusive. Though we need to strip off the
-        # ending `-` that indicates the boundary commit.
-        shas = (
-            self.run(["rev-list", "--ancestry-path", "--boundary", f"{ref2}..{ref1}"])
-            .replace("-", "")
-            .split("\n")
-        )
+        shas = self.run(["rev-list", "--ancestry-path", f"{ref2}..{ref1}"]).split("\n")
 
         if shas[0] == "":
             return []
