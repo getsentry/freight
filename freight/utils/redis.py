@@ -13,6 +13,8 @@ def lock(conn, lock_key, timeout=3, expire=None, nowait=False):
     if expire is None:
         expire = timeout
 
+    current_app.logger.debug("Waiting for lock on %s", lock_key)
+
     delay = 0.01 + random() / 10
     attempt = 0
     max_attempts = timeout / delay
@@ -28,7 +30,7 @@ def lock(conn, lock_key, timeout=3, expire=None, nowait=False):
             sleep(delay)
             attempt += 1
 
-    current_app.logger.debug("Acquiring lock on %s", lock_key)
+    current_app.logger.debug("Aquired lock on %s", lock_key)
 
     if not got_lock:
         raise UnableToGetLock(f"Unable to fetch lock on {lock_key}")
