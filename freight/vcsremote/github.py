@@ -198,3 +198,22 @@ class GitHubVcsRemote(VcsRemote):
         # TODO Ensure order matches the shas list
 
         return list(commits_dict.values())
+
+    def get_sha_range(self, ref1, ref2):
+        token = current_app.config["GITHUB_TOKEN"]
+        headers = {
+            "Authorization": f"token {token}",
+        }
+
+        repo_owner, repo_name = self.repo_parts
+
+        # XXX(epurkhiser): There is no graphql equivalent of the compare API.
+        # Not a huge problem though, we can just use the REST API.
+        compare_resp = http.get(
+            f"https://api.github.com/repos/{repo_owner}/{repo_name}/compare/{ref2}...{ref1}",
+            headers=headers,
+        )
+
+        return list(
+            reversed([commit["sha"] for commit in compare_resp.json()["commits"]])
+        )

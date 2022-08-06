@@ -29,3 +29,9 @@ class VcsRemote:
         Retrieves detailed information from the remote for a list of commits.
         """
         raise NotImplementedError
+
+    def get_sha_range(self, ref1, ref2):
+        """
+        Given two refs, returna list of SHAs between and including the refs.
+        """
+        raise NotImplementedError
