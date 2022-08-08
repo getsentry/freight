@@ -105,7 +105,7 @@ class GitVcsTest(TestCase):
         vcs.update()
 
         shas = vcs.get_sha_range("master", "master^")
-        assert len(shas) == 2
+        assert len(shas) == 1
 
     def test_empty_get_sha_range(self):
         vcs = self.get_vcs()
