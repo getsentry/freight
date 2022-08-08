@@ -41,7 +41,7 @@ function ExpectedChanges({changes}) {
       </div>
     );
 
-    const commitDate = <TimeSince date={commit.committedDate} />;
+    const commitDate = <TimeSince date={resolvedCommit.committedDate} />;
 
     const labels = pr?.labels.nodes.map(label => (
       <div
