@@ -22,7 +22,7 @@ function ExpectedChanges({changes}) {
     const resolvedCommit = commit.externalCommit ?? commit;
 
     const title = resolvedCommit?.messageHeadline ?? '';
-    const titleWithoutPr = title.replace(/ \(#[0-9]+\)?$/g, '');
+    const titleWithoutPr = title.replace(/ \(#[0-9]+(\u2026|\))$/g, '');
 
     const pr =
       resolvedCommit.associatedPullRequests.nodes.length > 0
