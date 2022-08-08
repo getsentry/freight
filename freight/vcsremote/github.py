@@ -29,10 +29,14 @@ def build_commit_query(repo_owner: str, repo_name: str, sha_list: List[str]):
         oid
         committedDate
         messageHeadline
+        url
         author {{
           email
           name
           avatarUrl
+        }}
+        repository {{
+          nameWithOwner
         }}
         associatedPullRequests(first: 1) {{
           nodes {{
