@@ -30,7 +30,7 @@ def lock(conn, lock_key, timeout=3, expire=None, nowait=False):
             sleep(delay)
             attempt += 1
 
-    current_app.logger.debug("Aquired lock on %s", lock_key)
+    current_app.logger.debug("Acquired lock on %s", lock_key)
 
     if not got_lock:
         raise UnableToGetLock(f"Unable to fetch lock on {lock_key}")
