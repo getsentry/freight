@@ -356,59 +356,18 @@ header {
 }
 
 .deploy-details {
-  padding-top: 40px;
+  padding-top: 60px;
   padding-bottom: 30px;
   .deploy-header {
     z-index: 1000;
     background: @lessDark;
-    color: @light;
     position: fixed;
     left: 0;
     right: 0;
     top: 48px;
-    border-bottom: 1px solid @lessDark;
-    padding-top: 10px;
-    > .container {
-      height: 53px;
-      position: relative;
-    }
-    h3 {
-      font-size: 12pt;
-      margin: 0;
-      display: inline-block;
-    }
-    .ref {
-      float: right;
-      text-align: right;
-      .sha {
-        font-size: 12pt;
-        margin-bottom: 5px;
-      }
-    }
-    .meta {
-      display: block;
-      margin-top: 5px;
-    }
+    padding: 10px 0;
   }
-  &.finished .deploy-header .container {
-    padding-left: 32px;
-  }
-  &.finished .deploy-header .container h3:before {
-    content: '';
-    width: 8px;
-    border-radius: 4px;
-    position: absolute;
-    top: 0;
-    bottom: 12px;
-    left: 15px;
-    background: #3ed33e;
-  }
-  &.cancelled .deploy-header .container h3:before {
-    background-color: #7b7b7b;
-  }
-  &.failed .deploy-header .container h3:before {
-    background-color: #d33e3e;
-  }
+
   .deploy-footer {
     z-index: 1000;
     background: @dark;

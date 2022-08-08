@@ -7,10 +7,9 @@ import linkifyUrls from 'linkify-urls';
 import PropTypes from 'prop-types';
 
 import api from 'app/api';
-import Duration from 'app/components/Duration';
 import FaviconStatus from 'app/components/FaviconStatus';
 import LoadingIndicator from 'app/components/LoadingIndicator';
-import TimeSince from 'app/components/TimeSince';
+import TaskSummary from 'app/components/TaskSummary';
 import PollingMixin from 'app/mixins/polling';
 import pushNotification from 'app/pushNotification';
 
@@ -377,23 +376,6 @@ const TaskDetails = createReactClass({
     this.setState({submitInProgress: true}, triggerRedploy);
   },
 
-  getStatusLabel(task) {
-    switch (task.status) {
-      case 'cancelled':
-        return 'Cancelled';
-      case 'failed':
-        return 'Failed';
-      case 'finished':
-        return 'Finished';
-      case 'pending':
-        return 'Pending';
-      case 'in_progress':
-        return 'In progress';
-      default:
-        return 'Unknown';
-    }
-  },
-
   render() {
     if (this.state.loading) {
       return (
@@ -446,33 +428,7 @@ const TaskDetails = createReactClass({
 
         <div className="deploy-header">
           <div className="container">
-            <h3>{task.name}</h3>
-            <div className="ref">
-              <div className="sha">{task.sha.substr(0, 7)}</div>
-              {task.ref}
-            </div>
-            <div className="meta">
-              {task.status === 'pending' && (
-                <small>
-                  <strong>QUEUED</strong> &mdash;{' '}
-                </small>
-              )}
-              {task.dateFinished ? (
-                <small>
-                  {this.getStatusLabel(task)} <TimeSince date={task.dateFinished} />{' '}
-                  &mdash; <Duration seconds={task.duration} className="duration" />
-                </small>
-              ) : task.dateStarted ? (
-                <small>
-                  Started <TimeSince date={task.dateStarted} />
-                </small>
-              ) : (
-                <small>
-                  Created <TimeSince date={task.dateCreated} />
-                </small>
-              )}
-              <small> &mdash; by {task.user.name}</small>
-            </div>
+            <TaskSummary task={task} />
           </div>
         </div>
 
