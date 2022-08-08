@@ -11,7 +11,7 @@ function useRemoteChanges({app, startRef, endRef}) {
   const fetchRemoteChanges = useCallback(async () => {
     setChanges(undefined);
 
-    if (startRef === undefined || endRef === undefined) {
+    if (!startRef || !endRef) {
       setChanges([]);
       return;
     }
