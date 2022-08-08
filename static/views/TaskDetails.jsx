@@ -11,7 +11,7 @@ import FaviconStatus from 'app/components/FaviconStatus';
 import LoadingIndicator from 'app/components/LoadingIndicator';
 import TaskSummary from 'app/components/TaskSummary';
 import PollingMixin from 'app/mixins/polling';
-import pushNotification from 'app/pushNotification';
+import pushNotification from 'app/utils/pushNotification';
 
 function Progress({value}) {
   return <span className="progress" style={{width: value + '%'}} />;
