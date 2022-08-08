@@ -53,6 +53,19 @@ function ExpectedChanges({changes}) {
       </div>
     ));
 
+    const repo = resolvedCommit.repository;
+
+    const commitName = (
+      <a
+        href={resolvedCommit.url}
+        target="_blank"
+        rel="noreferrer"
+        className="change-commit"
+      >
+        {repo.nameWithOwner}@{resolvedCommit.oid.slice(0, 8)}
+      </a>
+    );
+
     return (
       <li key={resolvedCommit.sha}>
         <div className="change-title">
@@ -60,9 +73,10 @@ function ExpectedChanges({changes}) {
         </div>
         <div className="change-tags">
           {author}
+          {commitName}
           {commitDate}
-          {labels}
         </div>
+        {labels.length > 0 && <div className="change-tags">{labels}</div>}
       </li>
     );
   });

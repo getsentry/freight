@@ -310,10 +310,6 @@ header {
     margin-bottom: 4px;
   }
 
-  time {
-    color: lighten(@lessDark, 40%);
-  }
-
   .change-tags {
     display: flex;
     gap: 8px;
@@ -329,6 +325,10 @@ header {
       font-weight: 500;
     }
 
+    time {
+      color: lighten(@lessDark, 40%);
+    }
+
     .change-author img {
       width: 16px;
       height: 16px;
@@ -342,6 +342,10 @@ header {
       border-radius: 10px;
       height: 20px;
       line-height: 100%;
+    }
+
+    .change-commit {
+      color: @dark;
     }
   }
 }
