@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useRef} from 'react';
 
-import api from 'app/api';
+import useApi from 'app/hooks/useApi';
 
 /**
  * How long between polls
@@ -13,6 +13,8 @@ const DEFAULT_DELAY = 3000;
 const BACKOFF_DELAY = 10000;
 
 function usePolling({url, handleRecieveData, pollingActive = true}) {
+  const api = useApi();
+
   /**
    * Returns true if request was successful, false otherwise.
    */
@@ -25,7 +27,7 @@ function usePolling({url, handleRecieveData, pollingActive = true}) {
     }
 
     return pollResp.ok;
-  }, [url, handleRecieveData]);
+  }, [api, url, handleRecieveData]);
 
   const pollTimeoutRef = useRef(undefined);
 

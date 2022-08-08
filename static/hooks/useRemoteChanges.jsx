@@ -1,15 +1,17 @@
 import {useCallback, useEffect, useState} from 'react';
 
-import api from 'app/api';
+import useApi from 'app/hooks/useApi';
 
 /**
  * Fetches the expected changes for an app, given the start and end ref.
  */
 function useRemoteChanges({app, startRef, endRef}) {
+  const api = useApi();
   const [changes, setChanges] = useState(undefined);
 
   const fetchRemoteChanges = useCallback(async () => {
     setChanges(undefined);
+    api.clear();
 
     if (!startRef || !endRef) {
       setChanges([]);
@@ -25,7 +27,7 @@ function useRemoteChanges({app, startRef, endRef}) {
     } else {
       setChanges(null);
     }
-  }, [app, endRef, startRef]);
+  }, [api, app, endRef, startRef]);
 
   useEffect(() => void fetchRemoteChanges(), [fetchRemoteChanges]);
 

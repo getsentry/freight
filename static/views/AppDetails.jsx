@@ -1,12 +1,13 @@
 import * as React from 'react';
 
-import api from 'app/api';
 import DeployChart from 'app/components/DeployChart';
 import LoadingIndicator from 'app/components/LoadingIndicator';
 import TaskSummary from 'app/components/TaskSummary';
+import useApi from 'app/hooks/useApi';
 import usePolling from 'app/hooks/usePolling';
 
 function AppDetails({params}) {
+  const api = useApi();
   const [error, setError] = React.useState(false);
 
   const [app, setApp] = React.useState(null);
@@ -24,7 +25,7 @@ function AppDetails({params}) {
           : 'Error fetching data';
       setError(errorMessage);
     }
-  }, [params.app]);
+  }, [api, params.app]);
 
   // Load app
   React.useEffect(() => void loadApp(), [loadApp]);

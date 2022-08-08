@@ -3,10 +3,12 @@ import {Link} from 'react-router';
 // eslint-disable-next-line no-restricted-imports
 import {init} from '@sentry/browser';
 
-import api from 'app/api';
 import LoadingIndicator from 'app/components/LoadingIndicator';
+import useApi from 'app/hooks/useApi';
 
 function Layout({params, children}) {
+  const api = useApi();
+
   const {app} = params;
 
   const [appList, setAppList] = React.useState([]);
@@ -54,7 +56,7 @@ function Layout({params, children}) {
     }
 
     setLoading(false);
-  }, []);
+  }, [api]);
 
   React.useEffect(() => void fetchData(), [fetchData]);
 
