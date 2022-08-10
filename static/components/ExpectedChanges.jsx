@@ -43,15 +43,16 @@ function ExpectedChanges({changes}) {
 
     const commitDate = <TimeSince date={resolvedCommit.committedDate} />;
 
-    const labels = pr?.labels.nodes.map(label => (
-      <div
-        className="change-label"
-        style={{backgroundColor: `#${label.color}`}}
-        key={label.name}
-      >
-        {label.name}
-      </div>
-    ));
+    const labels =
+      pr?.labels.nodes.map(label => (
+        <div
+          className="change-label"
+          style={{backgroundColor: `#${label.color}`}}
+          key={label.name}
+        >
+          {label.name}
+        </div>
+      )) ?? [];
 
     const repo = resolvedCommit.repository;
 
