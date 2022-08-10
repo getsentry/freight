@@ -67,7 +67,7 @@ const TaskDetails = createReactClass({
           error: false,
           task: null,
         },
-        this.fetchData()
+        this.fetchData
       );
     }
   },
