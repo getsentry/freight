@@ -110,6 +110,7 @@ exports[`CreateDeploy Snapshot should render 1`] = `
           </label>
           <ExpectedChanges
             changes={Array []}
+            markedLabels={Array []}
           >
             <p>
               Nothing to deploy!

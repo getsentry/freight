@@ -1,9 +1,10 @@
 import * as React from 'react';
+import classnames from 'classnames';
 
 import LoadingIndicator from './LoadingIndicator';
 import TimeSince from './TimeSince';
 
-function ExpectedChanges({changes}) {
+function ExpectedChanges({changes, markedLabels}) {
   if (changes === undefined) {
     return (
       <LoadingIndicator>Fetching changes.. This may take a moment.</LoadingIndicator>
@@ -21,13 +22,20 @@ function ExpectedChanges({changes}) {
   const changeList = changes.map(commit => {
     const resolvedCommit = commit.externalCommit ?? commit;
 
-    const title = resolvedCommit?.messageHeadline ?? '';
-    const titleWithoutPr = title.replace(/ \(#[0-9]+(\u2026|\))$/g, '');
-
     const pr =
       resolvedCommit.associatedPullRequests.nodes.length > 0
         ? resolvedCommit.associatedPullRequests.nodes[0]
         : null;
+
+    const title = resolvedCommit?.messageHeadline ?? '';
+    const titleWithoutPr = title.replace(/ \(#[0-9]+(\u2026|\))$/g, '');
+
+    // PRs that contain any of the markedLabels get highlighted
+    const isMarked =
+      markedLabels.length === 0 ||
+      markedLabels.some(markLabel =>
+        pr?.labels.nodes.some(label => label.name === markLabel)
+      );
 
     const prLink = !pr ? null : (
       <a href={pr.url} target="_blank" rel="noreferrer" className="change-link">
@@ -68,7 +76,7 @@ function ExpectedChanges({changes}) {
     );
 
     return (
-      <li key={resolvedCommit.oid}>
+      <li key={resolvedCommit.oid} className={classnames({marked: isMarked})}>
         <div className="change-title">
           {titleWithoutPr} ({prLink})
         </div>
