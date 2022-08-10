@@ -433,16 +433,17 @@ header {
     position: relative;
     width: 100%;
     .line {
-      font-family: monospace, serif;
       font-size: 0.9em;
       white-space: pre-wrap;
       line-height: 20px;
       margin-right: 70px;
     }
-    .highLighted {
+
+    .highlighted {
       background-color: #1d0d38;
     }
-    .time {
+
+    time {
       width: 57px;
       height: 15px;
       display: inline-block;
@@ -458,10 +459,12 @@ header {
       vertical-align: middle;
       line-height: 17px;
       color: #ffffff;
-    }
-    .time:hover {
-      color: #ffffff;
-      background: lighten(@dark, 20%);
+      cursor: pointer;
+
+      &:hover {
+        color: #ffffff;
+        background: lighten(@dark, 20%);
+      }
     }
   }
 }
