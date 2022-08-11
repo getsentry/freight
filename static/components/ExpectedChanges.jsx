@@ -68,7 +68,7 @@ function ExpectedChanges({changes}) {
     );
 
     return (
-      <li key={resolvedCommit.sha}>
+      <li key={resolvedCommit.oid}>
         <div className="change-title">
           {titleWithoutPr} ({prLink})
         </div>
