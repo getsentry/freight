@@ -5,11 +5,11 @@ import classnames from 'classnames';
 import {format} from 'date-fns';
 import PropTypes from 'prop-types';
 
-import FaviconStatus from 'app/components/FaviconStatus';
 import LoadingIndicator from 'app/components/LoadingIndicator';
 import TaskSummary from 'app/components/TaskSummary';
 import useApi from 'app/hooks/useApi';
 import useDeployFinishedNotification from 'app/hooks/useDeployFinishedNotification';
+import useFaviconStatus from 'app/hooks/useFaviconStatus';
 import usePolling from 'app/hooks/usePolling';
 
 function Progress({value}) {
@@ -35,6 +35,10 @@ function getHighlightedLine() {
  * the task completes.
  */
 function getEstimatedProgress(task) {
+  if (!task) {
+    return 0;
+  }
+
   if (task.dateFinished) {
     return 100;
   }
@@ -66,9 +70,13 @@ function TaskDetails({params}) {
   const [task, setTask] = React.useState(null);
 
   const inProgress = ['in_progress', 'pending'].includes(task?.status);
+  const estimatedProgress = getEstimatedProgress(task);
 
   // Notify when the task completes
   useDeployFinishedNotification(task ? [task] : []);
+
+  // Update favicon based on task status
+  useFaviconStatus({status: task?.status, progress: estimatedProgress});
 
   const handleTaskResult = React.useCallback(data => {
     setTask(data);
@@ -166,8 +174,6 @@ function TaskDetails({params}) {
     );
   }
 
-  const estimatedProgress = getEstimatedProgress(task);
-
   const liveScrollClassName = classnames('btn btn-default btn-sm', {
     'btn-active': isLiveScroll,
   });
@@ -237,7 +243,6 @@ function TaskDetails({params}) {
             )}
           </div>
           <div className="deploy-progress">
-            <FaviconStatus status={task.status} progress={estimatedProgress} />
             <Progress value={estimatedProgress} />
           </div>
         </div>
