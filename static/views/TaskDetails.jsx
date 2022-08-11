@@ -1,9 +1,9 @@
 import * as React from 'react';
 import {browserHistory} from 'react-router';
-import ansi_up from 'ansi_up';
+import Ansi from 'ansi-to-react';
+import classnames from 'classnames';
 import createReactClass from 'create-react-class';
 import {format} from 'date-fns';
-import linkifyUrls from 'linkify-urls';
 import PropTypes from 'prop-types';
 
 import Client from 'app/api';
@@ -26,15 +26,47 @@ Progress.propTypes = {
 // local api client for now.
 const api = new Client();
 
+const LogLineItem = React.memo(({index, item, highlighted, setHighlightedLine}) => {
+  return (
+    <div className={classnames('line', {highlighted})}>
+      <Ansi>{item.text}</Ansi>
+      <time
+        dateTime={item.date}
+        onClick={() => {
+          const newLineNumber = highlighted ? null : index;
+
+          if (newLineNumber !== null) {
+            history.replaceState(null, null, `${window.location.pathname}#L${index}`);
+          } else {
+            history.replaceState(null, null, window.location.pathname);
+          }
+
+          setHighlightedLine(newLineNumber);
+        }}
+      >
+        {format(new Date(item.date), 'h:mm:ss aa')}
+      </time>
+    </div>
+  );
+});
+
+LogLineItem.displayName = 'LogLineItem';
+
 const TaskDetails = createReactClass({
   displayName: 'TaskDetails',
   mixins: [PollingMixin],
 
   getInitialState() {
+    const highlightedLineMatch = window.location.hash.match(/L(?<lineno>[0-9]+)/);
+    const lineNumber = Number(highlightedLineMatch?.groups.lineno);
+    const highlightedLine = !isNaN(lineNumber) ? lineNumber : null;
+
     return {
       loading: true,
       logLoading: true,
       task: null,
+      logItems: [],
+      highlightedLine,
       logNextOffset: 0,
       liveScroll: true,
       id: 0,
@@ -46,6 +78,10 @@ const TaskDetails = createReactClass({
     this.logTimer = null;
     window.addEventListener('scroll', this.onScroll, false);
     this.fetchData();
+
+    if (window.Notification && Notification.permission !== 'denied') {
+      Notification.requestPermission();
+    }
   },
 
   componentWillReceiveProps() {
@@ -144,130 +180,7 @@ const TaskDetails = createReactClass({
   },
 
   pollingReceiveData(data) {
-    this.setState({
-      task: data,
-    });
-  },
-
-  splitLogData(data) {
-    const text = data.chunks;
-    const objLength = data.chunks.length;
-
-    const obj = {
-      lines: [],
-      timeStamp: [],
-    };
-
-    for (let i = 0; i < objLength; i++) {
-      if (data.chunks[i] !== undefined) {
-        obj.lines = [...obj.lines, text[i].text.split(/\n/)];
-        obj.timeStamp = [...obj.timeStamp, data.chunks[i].date];
-      }
-    }
-    return obj;
-  },
-
-  highLightDiv(el) {
-    el.addEventListener('click', e => {
-      const div = document.getElementById(e.target.id);
-      const highlightedlines = document.getElementsByClassName('line highLighted');
-      this.stopRefresh(e, e.target.href);
-
-      if (div.className === 'line') {
-        div.className = 'line highLighted';
-      } else if (div.className === 'line highLighted') {
-        div.className = 'line';
-        this.stopRefresh(e, e.target.href);
-      }
-
-      for (let l = 0; l < highlightedlines.length; l++) {
-        if (highlightedlines[l].className === 'line highLighted') {
-          highlightedlines[l].className = 'line';
-          div.className = 'line highLighted';
-        } else {
-          div.className = 'line';
-        }
-      }
-    });
-  },
-
-  updateBuildLog(data) {
-    // add each additional new line
-    const logDataResults = this.splitLogData(data);
-    const frag = document.createDocumentFragment();
-    const lineItem = logDataResults.lines;
-    const hash = window.location.hash;
-
-    for (let j = 0; j < lineItem.length; j++) {
-      for (let k = 0; k < lineItem[j].length; k++) {
-        const div = document.createElement('div');
-        const time = document.createElement('a');
-
-        // TODO look into this
-        // eslint-disable-next-line
-        const idIncrement = this.state.id++;
-
-        div.className = 'line';
-        time.className = 'time';
-        div.id = 'L' + idIncrement;
-
-        const {environment, number} = this.state.task;
-        const {name} = this.state.task.app;
-
-        time.href = `/deploys/${name}/${environment}/${number}#${div.id}`;
-        time.id = div.id;
-
-        /***********************************************************************
-        This creates an eventlistener for each time element.
-        Fine for current average log size(8-15-17), but memory usuage will spike
-        for really big logs.
-        ***********************************************************************/
-        this.highLightDiv(time);
-
-        div.innerHTML = ansi_up.ansi_to_html(
-          linkifyUrls(lineItem[j][k], {
-            attributes: {
-              target: '_blank',
-              rel: 'noreferrer noopener',
-            },
-          })
-        );
-        const date = new Date(logDataResults.timeStamp[j]);
-        time.innerHTML = format(date, 'h:mm:ss aa');
-
-        div.appendChild(time);
-        frag.appendChild(div);
-      }
-    }
-    this.logRef.current.appendChild(frag);
-
-    this.centerHighlightedDiv();
-
-    if (this.state.liveScroll && hash === '') {
-      this.scrollLog();
-    }
-  },
-
-  centerHighlightedDiv() {
-    const hash = window.location.hash;
-
-    if (hash !== '') {
-      const divID = hash.replace(/[^\w\s]/g, '');
-      const div = document.getElementById(divID);
-
-      if (div) {
-        const top = div.offsetTop - window.innerHeight / 4;
-
-        div.scrollIntoView();
-        window.scrollTo(0, top);
-      }
-      div.className = 'line highLighted';
-    }
-  },
-
-  stopRefresh(event, timeId) {
-    event.preventDefault();
-    window.history.replaceState(null, null, `${timeId}`);
+    this.setState({task: data});
   },
 
   scrollLog() {
@@ -296,12 +209,13 @@ const TaskDetails = createReactClass({
   },
 
   async pollLog() {
-    const task = this.state.task;
-    const url = `/deploys/${task.app.name}/${task.environment}/${task.number}/log/?offset=${this.state.logNextOffset}`;
+    const {task} = this.state;
 
     if (!task) {
       return;
     }
+
+    const url = `/deploys/${task.app.name}/${task.environment}/${task.number}/log/?offset=${this.state.logNextOffset}`;
 
     const logResp = await api.request(url);
 
@@ -314,13 +228,20 @@ const TaskDetails = createReactClass({
     const log = await logResp.json();
 
     if (log.chunks.length > 0) {
-      this.setState({logLoading: false, logNextOffset: log.nextOffset});
-      this.updateBuildLog(log);
+      const newLogItems = log.chunks.flatMap(chunk =>
+        chunk.text
+          .split('\n')
+          .filter(line => line !== '')
+          .map(text => ({text, date: chunk.date}))
+      );
+
+      this.setState(lastState => ({
+        logNextOffset: log.nextOffset,
+        logItems: [...lastState.logItems, ...newLogItems],
+      }));
     }
 
-    if (this.state.logLoading) {
-      this.setState({logLoading: false});
-    }
+    this.setState({logLoading: false});
 
     if (this.taskInProgress(this.state.task)) {
       this.logTimer = window.setTimeout(this.pollLog, 1000);
@@ -346,9 +267,7 @@ const TaskDetails = createReactClass({
 
   toggleLiveScroll() {
     const liveScroll = !this.state.liveScroll;
-    this.setState({
-      liveScroll,
-    });
+    this.setState({liveScroll});
     if (liveScroll) {
       this.scrollLog();
     }
@@ -360,7 +279,7 @@ const TaskDetails = createReactClass({
     }
 
     const triggerRedploy = async () => {
-      const task = this.state.task;
+      const {task} = this.state;
 
       const deployResp = await api.request('/deploys/', {
         method: 'POST',
@@ -381,8 +300,22 @@ const TaskDetails = createReactClass({
     this.setState({submitInProgress: true}, triggerRedploy);
   },
 
+  setHighlightedLine: number => {
+    this.setState({highlightedLine: number});
+  },
+
   render() {
-    if (this.state.loading) {
+    const {
+      task,
+      loading,
+      liveScroll,
+      logLoading,
+      logItems,
+      highlightedLine,
+      submitInProgress,
+    } = this.state;
+
+    if (loading) {
       return (
         <div style={{textAlign: 'center'}}>
           <LoadingIndicator style={{marginBottom: 20}}>
@@ -392,43 +325,42 @@ const TaskDetails = createReactClass({
       );
     }
 
-    if (window.Notification && Notification.permission !== 'denied') {
-      Notification.requestPermission();
-    }
-
-    const task = this.state.task;
     const inProgress = this.taskInProgress(task);
     const estimatedProgress = this.getEstimatedProgress(task);
 
-    let liveScrollClassName = 'btn btn-default btn-sm';
-    if (this.state.liveScroll) {
-      liveScrollClassName += ' btn-active';
-    }
+    const liveScrollClassName = classnames('btn btn-default btn-sm', {
+      'btn-active': liveScroll,
+    });
 
-    let className = 'deploy-details';
-    if (inProgress) {
-      className += ' active';
-    } else {
-      className += ' finished';
-    }
-    if (task.status === 'failed') {
-      className += ' failed';
-    } else if (task.status === 'cancelled') {
-      className += ' cancelled';
-    }
+    const className = classnames('deploy-details', {
+      active: inProgress,
+      finished: !inProgress,
+      failed: task.status === 'failed',
+      cancelled: task.status === 'cancelled',
+    });
+
+    const logLines = logItems.map((item, i) => (
+      <LogLineItem
+        key={i}
+        index={i}
+        item={item}
+        highlighted={highlightedLine === i}
+        setHighlightedLine={this.setHighlightedLine}
+      />
+    ));
 
     return (
       <div className={className}>
         <div className="deploy-log">
-          {this.state.logLoading ? (
+          {logLoading ? (
             <div style={{textAlign: 'center'}}>
               <div className="loading" />
               <p>Loading log history.</p>
             </div>
           ) : (
-            <div ref={this.logRef} />
+            <div>{logLines}</div>
           )}
-          {!this.state.logLoading && inProgress && <div className="loading-icon" />}
+          {!logLoading && inProgress && <div className="loading-icon" />}
         </div>
 
         <div className="deploy-header">
@@ -446,14 +378,14 @@ const TaskDetails = createReactClass({
                     Cancel
                   </a>
                   <a className={liveScrollClassName} onClick={this.toggleLiveScroll}>
-                    <input type="checkbox" defaultChecked={this.state.liveScroll} />
+                    <input type="checkbox" defaultChecked={liveScroll} />
                     <span>Follow</span>
                   </a>
                 </span>
               ) : (
                 <a
                   className="btn btn-default btn-sm"
-                  disabled={this.state.submitInProgress}
+                  disabled={submitInProgress}
                   onClick={this.reDeploy}
                 >
                   Re-deploy
