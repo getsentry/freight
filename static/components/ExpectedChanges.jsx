@@ -77,15 +77,17 @@ function ExpectedChanges({changes, markedLabels}) {
 
     return (
       <li key={resolvedCommit.oid} className={classnames({marked: isMarked})}>
-        <div className="change-title">
-          {titleWithoutPr} ({prLink})
+        <div>
+          <div className="change-title">
+            {titleWithoutPr} ({prLink})
+          </div>
+          <div className="change-tags">
+            {author}
+            {commitName}
+            {commitDate}
+          </div>
+          {labels.length > 0 && <div className="change-tags">{labels}</div>}
         </div>
-        <div className="change-tags">
-          {author}
-          {commitName}
-          {commitDate}
-        </div>
-        {labels.length > 0 && <div className="change-tags">{labels}</div>}
       </li>
     );
   });
