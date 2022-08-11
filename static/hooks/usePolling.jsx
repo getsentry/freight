@@ -12,7 +12,22 @@ const DEFAULT_DELAY = 3000;
  */
 const BACKOFF_DELAY = 10000;
 
-function usePolling({url, handleRecieveData, pollingActive = true}) {
+/**
+ * Makes an API request with polling timeouts.
+ *
+ * handleRecieveData must be a stable reference, otherwise requests will be
+ * re-triggered on each render.
+ *
+ * If pollingActive is set to false, new API requests will not be made after
+ * the first is triggered (or any further when any parameter changes)
+ */
+function usePolling({
+  url,
+  handleRecieveData,
+  timeout = DEFAULT_DELAY,
+  backoffTimeout = BACKOFF_DELAY,
+  pollingActive = true,
+}) {
   const api = useApi();
 
   /**
@@ -31,32 +46,54 @@ function usePolling({url, handleRecieveData, pollingActive = true}) {
 
   const pollTimeoutRef = useRef(undefined);
 
-  /**
-   * Starts chain triggering the makeRequest
-   */
-  const triggerPolling = useCallback(async () => {
-    if (!pollingActive) {
-      return;
-    }
+  // XXX: Because the function which triggers makeRequest will recursively call
+  // itself via a setTimeout, we use a ref here to hold reference to the
+  // callback so it will correctly handle
+  //
+  // See: https://overreacted.io/making-setinterval-declarative-with-react-hooks/
+  const triggerRef = useRef(() => undefined);
 
+  const enqueNextTrigger = useCallback(
+    (wasSuccess = true) => {
+      pollTimeoutRef.current = window.setTimeout(
+        triggerRef.current,
+        wasSuccess ? timeout : backoffTimeout
+      );
+    },
+    [timeout, backoffTimeout]
+  );
+
+  const trigger = useCallback(async () => {
     const wasSuccess = await makeRequest();
 
-    pollTimeoutRef.current = window.setTimeout(
-      triggerPolling,
-      wasSuccess ? DEFAULT_DELAY : BACKOFF_DELAY
-    );
+    if (pollingActive) {
+      enqueNextTrigger(wasSuccess);
+    }
+  }, [makeRequest, pollingActive, enqueNextTrigger]);
 
-    return;
-  }, [makeRequest, pollingActive]);
+  triggerRef.current = trigger;
+
+  // Track if we've triggered the first request. After the first poll all
+  // triggers of the useEffect should put triggerPolling in a setTimeout.
+  const didFirstTrigger = useRef(false);
 
   useEffect(() => {
-    triggerPolling();
+    // First trigger happens immediately, otherwise if polling is active
+    // enqueue the next trigger
+    if (didFirstTrigger.current && pollingActive) {
+      enqueNextTrigger();
+    } else {
+      trigger();
+    }
+
+    didFirstTrigger.current = true;
 
     return () => {
+      api.clear();
       window.clearTimeout(pollTimeoutRef.current);
       pollTimeoutRef.current = undefined;
     };
-  }, [triggerPolling]);
+  }, [api, pollingActive, enqueNextTrigger, trigger]);
 }
 
 export default usePolling;
