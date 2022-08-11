@@ -17,7 +17,15 @@ class App(db.Model):
             "production": {
                 "default_ref": "master"
             }
-        }
+        },
+        # change_labels provides a way for the app to specify what remote PR
+        # labels should be used to filter / mark which changes are displayed in
+        # the commit list in the 'Create Deploy' UI.
+        #
+        # This is especially useful for apps where changes in the repo do not
+        # always map directly to a deployed application, and we want to only
+        # indicate that a subset of changes are going to be deployed.
+        "change_labels": ['Scope: Backend']
     }
     """
 
@@ -36,6 +44,10 @@ class App(db.Model):
     @property
     def environments(self):
         return self.data.get("environments", {})
+
+    @property
+    def change_labels(self):
+        return self.data.get("change_labels", [])
 
     @property
     def deploy_config(self):

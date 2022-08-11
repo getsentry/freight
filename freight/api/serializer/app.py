@@ -26,4 +26,5 @@ class AppSerializer(Serializer):
             "name": item.name,
             "environments": env_map,
             "repository": repo,
+            "changeLabels": item.change_labels,
         }
