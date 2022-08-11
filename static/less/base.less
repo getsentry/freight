@@ -281,6 +281,18 @@ header {
 
   li {
     position: relative;
+
+    &:not(.marked) > div {
+      opacity: 0.6;
+      transition: opacity 100ms;
+      overflow: hidden;
+      height: 22px;
+
+      &:hover {
+        opacity: 1;
+        height: 100%;
+      }
+    }
   }
 
   li::before {

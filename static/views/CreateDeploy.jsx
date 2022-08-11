@@ -24,11 +24,12 @@ function CreateDeploy({location, appList = []}) {
 
   const [app, setApp] = React.useState(defaultApp);
 
-  const envMap = React.useMemo(
-    () => appList.find(appObj => appObj.name === app)?.environments ?? {},
+  const appObj = React.useMemo(
+    () => appList.find(appEntry => appEntry.name === app),
     [app, appList]
   );
 
+  const envMap = React.useMemo(() => appObj?.environments ?? {}, [appObj]);
   const envList = React.useMemo(() => Object.keys(envMap), [envMap]);
 
   const [env, setEnv] = React.useState(envList?.[0] ?? null);
@@ -42,6 +43,8 @@ function CreateDeploy({location, appList = []}) {
     () => void setRef(envMap?.[env]?.defaultRef ?? 'master'),
     [env, envMap]
   );
+
+  const changeLabels = React.useMemo(() => appObj?.changeLabels ?? [], [appObj]);
 
   const [submitError, setSubmitError] = React.useState(false);
   const [submitInProgress, setSubmitInProgress] = React.useState(false);
@@ -149,7 +152,7 @@ function CreateDeploy({location, appList = []}) {
 
           <div className="form-group">
             <label>Changes Since</label>
-            <ExpectedChanges changes={changes} />
+            <ExpectedChanges changes={changes} markedLabels={changeLabels} />
           </div>
 
           <div className="submit-group">
