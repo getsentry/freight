@@ -1,4 +1,6 @@
-import api from 'app/api';
+import Client from 'app/api';
+
+const api = new Client();
 
 const PollingMixin = {
   getInitialState() {
