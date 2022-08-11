@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {browserHistory} from 'react-router';
+import {useLocation, useNavigate, useOutletContext} from 'react-router-dom';
 
 import ExpectedChanges from 'app/components/ExpectedChanges';
 import TaskSummary from 'app/components/TaskSummary';
@@ -8,12 +8,11 @@ import useLastDeploy from 'app/hooks/useLastDeploay';
 import useLocalStorage from 'app/hooks/useLocalStorage';
 import useRemoteChanges from 'app/hooks/useRemoteChanges';
 
-function gotoDeploy(deploy) {
-  const {app, environment, number} = deploy;
-  browserHistory.push(`/deploys/${app.name}/${environment}/${number}`);
-}
+function CreateDeploy() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const {appList} = useOutletContext();
 
-function CreateDeploy({location, appList = []}) {
   const api = useApi();
   const firstApp = appList.length !== 0 ? appList[0] : null;
 
@@ -64,12 +63,13 @@ function CreateDeploy({location, appList = []}) {
     const result = await deployResp.json();
 
     if (deployResp.ok) {
-      gotoDeploy(result);
+      const {app: nextApp, environment, number} = result;
+      navigate(`/deploys/${nextApp.name}/${environment}/${number}`);
     } else {
       setSubmitError(result.error);
       setSubmitInProgress(false);
     }
-  }, [api, app, env, ref]);
+  }, [api, app, env, ref, navigate]);
 
   /**
    * Handles creating a deploy

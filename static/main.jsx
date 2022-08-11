@@ -1,10 +1,10 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom';
-import {browserHistory, Router} from 'react-router';
+import {BrowserRouter} from 'react-router-dom';
 
 import routes from 'app/routes';
 
 ReactDOM.render(
-  React.createElement(Router, {history: browserHistory}, routes()),
+  React.createElement(BrowserRouter, {}, routes()),
   document.getElementById('app')
 );

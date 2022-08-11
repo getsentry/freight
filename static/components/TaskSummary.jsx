@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {browserHistory} from 'react-router';
+import {useNavigate} from 'react-router-dom';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 
@@ -50,6 +50,8 @@ function getEstimatedProgress(task) {
 }
 
 function TaskSummary({task, className}) {
+  const navigate = useNavigate();
+
   const taskInProgress = task.status === 'in_progress' || task.status === 'pending';
 
   const gotoTask = React.useCallback(
@@ -62,9 +64,9 @@ function TaskSummary({task, className}) {
 
       const {app, environment, number} = task;
 
-      browserHistory.push(`/deploys/${app.name}/${environment}/${number}`);
+      navigate(`/deploys/${app.name}/${environment}/${number}`);
     },
-    [task]
+    [task, navigate]
   );
 
   let classes = 'deploy';

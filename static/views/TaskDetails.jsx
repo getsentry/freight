@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {browserHistory} from 'react-router';
+import {useNavigate, useParams} from 'react-router-dom';
 import Ansi from 'ansi-to-react';
 import classnames from 'classnames';
 import {format} from 'date-fns';
@@ -59,8 +59,8 @@ function scrollToEnd() {
   window.scrollTo(0, document.body.scrollHeight);
 }
 
-function TaskDetails({params}) {
-  const {app, env, number} = params;
+function TaskDetails() {
+  const {app, env, number} = useParams();
 
   const api = useApi();
 
@@ -124,6 +124,8 @@ function TaskDetails({params}) {
 
   const [highlightedLine, setHighlightedLine] = React.useState(getHighlightedLine());
 
+  const navigate = useNavigate();
+
   const [redeployInProgress, setRedeployInProgress] = React.useState(false);
   const handleRedeploy = React.useCallback(async () => {
     if (redeployInProgress) {
@@ -143,10 +145,8 @@ function TaskDetails({params}) {
 
     const data = await deployResp.json();
 
-    // workaround is referenced from here: https://github.com/ReactTraining/react-router/issues/1982
-    browserHistory.push('/');
-    browserHistory.push(`/deploys/${data.app.name}/${data.environment}/${data.number}`);
-  }, [api, task, redeployInProgress]);
+    navigate(`/deploys/${data.app.name}/${data.environment}/${data.number}`);
+  }, [api, task, redeployInProgress, navigate]);
 
   const handleCancelTask = React.useCallback(async () => {
     const url = `/deploys/${app}/${env}/${number}/`;

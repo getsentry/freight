@@ -1,15 +1,14 @@
 import * as React from 'react';
-import {Link} from 'react-router';
+import {Link, Outlet, useParams} from 'react-router-dom';
 import {init} from '@sentry/react';
 import {BrowserTracing} from '@sentry/tracing';
 
 import LoadingIndicator from 'app/components/LoadingIndicator';
 import useApi from 'app/hooks/useApi';
 
-function Layout({params, children}) {
+function Layout() {
+  const {app} = useParams();
   const api = useApi();
-
-  const {app} = params;
 
   const [appList, setAppList] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
@@ -70,10 +69,7 @@ function Layout({params, children}) {
         <div className="container">
           <div className="pull-right">
             <Link
-              to={{
-                pathname: '/deploy',
-                query: {app},
-              }}
+              to={app ? `/deploy?app=${app}` : '/deploy/'}
               className={`btn btn-sm btn-default ${(loading || error) && 'btn-disabled'}`}
             >
               Deploy
@@ -99,7 +95,7 @@ function Layout({params, children}) {
               </LoadingIndicator>
             </div>
           )}
-          {!loading && (error ? error : React.cloneElement(children, {appList}))}
+          {!loading && (error ? error : <Outlet context={{appList}} />)}
         </div>
       </div>
     </div>

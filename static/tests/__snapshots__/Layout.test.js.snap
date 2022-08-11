@@ -20,54 +20,14 @@ exports[`Layout should render <Layout /> 1`] = `
         >
           <Link
             className="btn btn-sm btn-default btn-disabled"
-            onlyActiveOnIndex={false}
-            style={Object {}}
-            to={
-              Object {
-                "pathname": "/deploy",
-                "query": Object {
-                  "app": "freight",
-                },
-              }
-            }
-          >
-            <a
-              className="btn btn-sm btn-default btn-disabled"
-              onClick={[Function]}
-              style={Object {}}
-            >
-              Deploy
-            </a>
-          </Link>
+            to="/deploy/"
+          />
         </div>
         <h1>
           <Link
-            onlyActiveOnIndex={false}
-            style={Object {}}
             to="/"
-          >
-            <a
-              onClick={[Function]}
-              style={Object {}}
-            >
-              Freight
-            </a>
-          </Link>
+          />
         </h1>
-        <h2>
-          <Link
-            onlyActiveOnIndex={false}
-            style={Object {}}
-            to="/freight"
-          >
-            <a
-              onClick={[Function]}
-              style={Object {}}
-            >
-              freight
-            </a>
-          </Link>
-        </h2>
       </div>
     </header>
     <div
