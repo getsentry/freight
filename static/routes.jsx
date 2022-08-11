@@ -1,9 +1,9 @@
 import * as React from 'react';
 import {IndexRoute, Route} from 'react-router';
 
-import Layout from 'app/components/Layout';
 import AppDetails from 'app/views/AppDetails';
 import CreateDeploy from 'app/views/CreateDeploy';
+import Layout from 'app/views/Layout';
 import Overview from 'app/views/Overview';
 import RouteNotFound from 'app/views/RouteNotFound';
 import TaskDetails from 'app/views/TaskDetails';
