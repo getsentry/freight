@@ -4,6 +4,11 @@ import {mount} from 'enzyme';
 
 import Layout from 'app/views/Layout.jsx';
 
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  Link: () => null,
+}));
+
 function Content({appList}) {
   return <div>app count: {appList.length}</div>;
 }

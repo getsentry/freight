@@ -1,15 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`TaskDetails renders 1`] = `
-<TaskDetails
-  params={
-    Object {
-      "app": "freight",
-      "env": "production",
-      "number": "798",
-    }
-  }
->
+<TaskDetails>
   <div
     style={
       Object {

@@ -1,8 +1,15 @@
 import * as React from 'react';
+import ReactRouter from 'react-router-dom';
 // eslint-disable-next-line no-restricted-imports
 import {mount} from 'enzyme';
 
 import TaskDetails from 'app/views/TaskDetails.jsx';
+
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => null,
+  useParams: jest.fn(),
+}));
 
 describe('TaskDetails', () => {
   beforeEach(() => {
@@ -75,7 +82,10 @@ describe('TaskDetails', () => {
       env: 'production',
       number: '798',
     };
-    const wrapper = mount(<TaskDetails params={params} />);
+
+    jest.spyOn(ReactRouter, 'useParams').mockReturnValue(params);
+
+    const wrapper = mount(<TaskDetails />);
 
     // eslint-disable-next-line sentry/no-to-match-snapshot
     expect(wrapper).toMatchSnapshot();

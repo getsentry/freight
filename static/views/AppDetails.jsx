@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useParams} from 'react-router-dom';
 
 import DeployChart from 'app/components/DeployChart';
 import LoadingIndicator from 'app/components/LoadingIndicator';
@@ -6,7 +7,8 @@ import TaskSummary from 'app/components/TaskSummary';
 import useApi from 'app/hooks/useApi';
 import usePolling from 'app/hooks/usePolling';
 
-function AppDetails({params}) {
+function AppDetails() {
+  const params = useParams();
   const api = useApi();
   const [error, setError] = React.useState(false);
 
