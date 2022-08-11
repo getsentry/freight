@@ -25,7 +25,7 @@ class App(db.Model):
         # This is especially useful for apps where changes in the repo do not
         # always map directly to a deployed application, and we want to only
         # indicate that a subset of changes are going to be deployed.
-        "change_labels": ['Scope: Backend']
+        "change_labels": ["Scope: Backend"]
     }
     """
 
