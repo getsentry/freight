@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {Link} from 'react-router';
-// eslint-disable-next-line no-restricted-imports
-import {init} from '@sentry/browser';
+import {init} from '@sentry/react';
+import {BrowserTracing} from '@sentry/tracing';
 
 import LoadingIndicator from 'app/components/LoadingIndicator';
 import useApi from 'app/hooks/useApi';
@@ -22,7 +22,11 @@ function Layout({params, children}) {
 
     if (configResp.ok) {
       if (config?.SENTRY_PUBLIC_DSN) {
-        init({dsn: config.SENTRY_PUBLIC_DSN});
+        init({
+          dsn: config.SENTRY_PUBLIC_DSN,
+          integrations: [new BrowserTracing()],
+          tracesSampleRate: 1.0,
+        });
       }
     } else {
       // eslint-disable-next-line no-console
