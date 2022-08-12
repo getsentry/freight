@@ -84,8 +84,7 @@ COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY . .
-RUN node_modules/.bin/webpack -p \
-    && pip install -e .
+RUN yarn build && pip install -e .
 
 ENV WORKSPACE_ROOT /workspace
 RUN mkdir -p $WORKSPACE_ROOT
