@@ -3,14 +3,14 @@
 
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  context: __dirname + '/static',
+  mode: process.env.NODE_ENV ?? 'development',
+  context: path.join(__dirname, 'static'),
   entry: {
-    styles: './less/base.less',
     app: ['@babel/polyfill', './main'],
+    styles: './less/base.less',
   },
   module: {
     rules: [
@@ -31,14 +31,8 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, 'css-loader', 'style-loader'],
       },
       {
-        test: /favicon.png$/,
-        use: {
-          loader: 'file-loader',
-          options: {
-            publicPath: 'static',
-            outputPath: 'dist',
-          },
-        },
+        test: /favicon\.png$/,
+        type: 'asset/resource',
       },
     ],
   },
@@ -48,11 +42,9 @@ module.exports = {
       favicon: 'favicon.png',
       template: path.join(__dirname, '/templates/index.html'),
     }),
-    new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
       filename: 'styles.[chunkhash].css',
       chunkFilename: '[id].css',
-      allChunks: true,
     }),
   ],
   resolve: {
@@ -68,30 +60,26 @@ module.exports = {
     },
   },
   output: {
-    publicPath: '/static/',
     path: path.join(__dirname, 'dist'),
     filename: '[name].[chunkhash].js',
+    publicPath: '/static/',
+    clean: true,
   },
   devtool: 'source-map',
   devServer: {
-    contentBase: false,
-    compress: true,
-    // index: '/static/index.html',
-    historyApiFallback: {
-      index: '/static/',
-    },
-    overlay: true,
     port: 5001,
+    compress: true,
+    static: [path.join(__dirname, 'static')],
+    historyApiFallback: {
+      rewrites: [{from: /^\/.*$/, to: '/static/index.html'}],
+    },
+    client: {
+      overlay: true,
+    },
     proxy: {
-      '/api/*': {
-        target: 'http://localhost:5002',
-      },
-      '/auth/*': {
-        target: 'http://localhost:5002',
-      },
-      '/webhooks/*': {
-        target: 'http://localhost:5002',
-      },
+      '/api/*': 'http://localhost:5002',
+      '/auth/*': 'http://localhost:5002',
+      '/webhooks/*': 'http://localhost:5002',
     },
   },
 };
