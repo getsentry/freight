@@ -20,6 +20,10 @@ const BACKOFF_DELAY = 10000;
  *
  * If pollingActive is set to false, new API requests will not be made after
  * the first is triggered (or any further when any parameter changes)
+ *
+ * Use the `resetKey` parameter to cause the polling timeout to reset and
+ * trigger a new request immediately. This is useful if you want to change the
+ * polling URL and immediately trigger a new request.
  */
 function usePolling({
   url,
@@ -27,6 +31,7 @@ function usePolling({
   timeout = DEFAULT_DELAY,
   backoffTimeout = BACKOFF_DELAY,
   pollingActive = true,
+  resetkey = null,
 }) {
   const api = useApi();
 
@@ -75,18 +80,23 @@ function usePolling({
 
   // Track if we've triggered the first request. After the first poll all
   // triggers of the useEffect should put triggerPolling in a setTimeout.
-  const didFirstTrigger = useRef(false);
+  const triggerImmediate = useRef(false);
+
+  // Reset the triggerImmediate flag if the resetKey changes
+  useEffect(() => {
+    triggerImmediate.current = false;
+  }, [resetkey]);
 
   useEffect(() => {
     // First trigger happens immediately, otherwise if polling is active
     // enqueue the next trigger
-    if (didFirstTrigger.current && pollingActive) {
+    if (triggerImmediate.current && pollingActive) {
       enqueNextTrigger();
     } else {
       trigger();
     }
 
-    didFirstTrigger.current = true;
+    triggerImmediate.current = true;
 
     return () => {
       api.clear();
