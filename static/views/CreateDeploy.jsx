@@ -5,6 +5,7 @@ import ExpectedChanges from 'app/components/ExpectedChanges';
 import TaskSummary from 'app/components/TaskSummary';
 import useApi from 'app/hooks/useApi';
 import useLastDeploy from 'app/hooks/useLastDeploay';
+import useLocalStorage from 'app/hooks/useLocalStorage';
 import useRemoteChanges from 'app/hooks/useRemoteChanges';
 
 function gotoDeploy(deploy) {
@@ -16,11 +17,9 @@ function CreateDeploy({location, appList = []}) {
   const api = useApi();
   const firstApp = appList.length !== 0 ? appList[0] : null;
 
-  const defaultApp = location.query?.app
-    ? location.query.app
-    : firstApp
-    ? firstApp.name
-    : null;
+  const [lastApp, setLastApp] = useLocalStorage('lastApp', null);
+
+  const defaultApp = location.query?.app ?? lastApp ?? firstApp?.name ?? null;
 
   const [app, setApp] = React.useState(defaultApp);
 
@@ -107,7 +106,10 @@ function CreateDeploy({location, appList = []}) {
             <select
               className="form-control"
               value={app}
-              onChange={e => setApp(e.target.value)}
+              onChange={e => {
+                setApp(e.target.value);
+                setLastApp(e.target.value);
+              }}
             >
               {appList.map(a => (
                 <option key={a.name}>{a.name}</option>
