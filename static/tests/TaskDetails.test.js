@@ -9,6 +9,7 @@ jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => null,
   useParams: jest.fn(),
+  Link: () => null,
 }));
 
 describe('TaskDetails', () => {

@@ -45,7 +45,13 @@ exports[`TaskSummary Snapshot 1`] = `
       />
     </Progress>
     <h3>
-      freight/production
+      <Link
+        to="/freight"
+      />
+      /
+      production
+      #
+      791
     </h3>
     <div
       className="ref"
