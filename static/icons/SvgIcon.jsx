@@ -1,6 +1,6 @@
-import * as React from 'react';
+import {forwardRef} from 'react';
 
-export const SvgIcon = React.forwardRef(function SvgIcon(
+export const SvgIcon = forwardRef(function SvgIcon(
   {color = 'currentColor', size = '16px', viewBox = '0 0 16 16', ...props},
   ref
 ) {

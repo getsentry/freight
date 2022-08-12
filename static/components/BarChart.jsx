@@ -1,4 +1,3 @@
-import * as React from 'react';
 import {addMinutes, addSeconds, format} from 'date-fns';
 import PropTypes from 'prop-types';
 

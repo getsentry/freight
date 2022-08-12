@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {Fragment} from 'react';
 
 import IconGithub from 'app/icons/IconGithub';
 
@@ -14,9 +14,9 @@ function ShaLink({sha, url, remote}) {
   const icon = getRemoteIcon(remote ?? {});
 
   const shaNode = (
-    <React.Fragment>
+    <Fragment>
       {icon} {sha.substr(0, 7)}
-    </React.Fragment>
+    </Fragment>
   );
 
   if (!url) {

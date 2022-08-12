@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {useState} from 'react';
 
 import BarChart from 'app/components/BarChart';
 import usePolling from 'app/hooks/usePolling';
@@ -8,7 +8,7 @@ function dataToPoints(data) {
 }
 
 function DeployChart({app}) {
-  const [data, setData] = React.useState([]);
+  const [data, setData] = useState([]);
 
   const url = `/deploy-stats/${app ? `?app=${app}` : ''}`;
   usePolling({url, handleRecieveData: setData});
