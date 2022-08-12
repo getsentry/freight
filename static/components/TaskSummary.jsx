@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {useNavigate} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
 
@@ -86,7 +86,10 @@ function TaskSummary({task, className}) {
   return (
     <div className={classnames(className, classes)} onClick={gotoTask}>
       <Progress value={getEstimatedProgress(task)} />
-      <h3>{task.name}</h3>
+      <h3>
+        <Link to={`/${task.app.name}`}>{task.app.name}</Link>/{task.environment}#
+        {task.number}
+      </h3>
       <div className="ref">
         <ShaLink sha={task.sha} url={task.sha_url} remote={task.remote} />
         {task.ref}

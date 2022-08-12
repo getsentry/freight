@@ -8,6 +8,7 @@ import TaskSummary from 'app/components/TaskSummary.jsx';
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => null,
+  Link: () => null,
 }));
 
 // TODO: figure out why snapshots are rendering null.
