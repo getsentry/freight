@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useOutletContext, useParams} from 'react-router-dom';
 
 import DeployChart from 'app/components/DeployChart';
 import LoadingIndicator from 'app/components/LoadingIndicator';
@@ -7,11 +8,29 @@ import useDeployFinishedNotification from 'app/hooks/useDeployFinishedNotificati
 import usePolling from 'app/hooks/usePolling';
 
 function Overview() {
+  const params = useParams();
+
+  // If the app is specified look for it in the app list
+  const {appList} = useOutletContext();
+  const app = appList.find(a => a.name === params.app);
+
   const [deploys, setDeploys] = React.useState(null);
-  usePolling({url: '/deploys/', handleRecieveData: setDeploys});
+
+  usePolling({
+    url: app ? `/deploys/?app=${app.name}` : '/deploys/',
+    handleRecieveData: setDeploys,
+    resetkey: app?.name,
+  });
+
+  // Reset deploylist if app changes
+  React.useEffect(() => setDeploys(null), [app?.name]);
 
   // Trigger a notification when any deploy changes it's status to `finished`.
   useDeployFinishedNotification(deploys ?? []);
+
+  if (params.app !== undefined && !app) {
+    return <h2>Invalid app name</h2>;
+  }
 
   if (deploys === null) {
     return (
@@ -23,18 +42,18 @@ function Overview() {
     );
   }
 
-  const activedeployNodes = [];
-  const pendingdeployNodes = [];
-  const previousdeployNodes = [];
+  const activeDeploys = [];
+  const pendingDeploys = [];
+  const previousDeploys = [];
 
   deploys.forEach(deploy => {
     const node = <TaskSummary key={deploy.id} task={deploy} />;
     if (deploy.status === 'in_progress') {
-      activedeployNodes.unshift(node);
+      activeDeploys.unshift(node);
     } else if (deploy.status === 'pending') {
-      pendingdeployNodes.unshift(node);
+      pendingDeploys.unshift(node);
     } else {
-      previousdeployNodes.push(node);
+      previousDeploys.push(node);
     }
   });
 
@@ -44,10 +63,10 @@ function Overview() {
         <div className="section-header">
           <h2>Active Deploys</h2>
         </div>
-        {activedeployNodes.length || pendingdeployNodes.length ? (
+        {activeDeploys.length || pendingDeploys.length ? (
           <div className="deploy-list">
-            {activedeployNodes}
-            {pendingdeployNodes}
+            {activeDeploys}
+            {pendingDeploys}
           </div>
         ) : (
           <p>There are no active deploys.</p>
@@ -59,10 +78,10 @@ function Overview() {
           <h2>Deploy History</h2>
         </div>
 
-        <DeployChart />
+        <DeployChart app={app?.name} />
 
-        {previousdeployNodes.length ? (
-          <div className="deploy-list">{previousdeployNodes}</div>
+        {previousDeploys.length ? (
+          <div className="deploy-list">{previousDeploys}</div>
         ) : (
           <p>There are no historical deploys.</p>
         )}
