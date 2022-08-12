@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {useEffect, useState} from 'react';
 import {useOutletContext, useParams} from 'react-router-dom';
 
 import DeployChart from 'app/components/DeployChart';
@@ -14,7 +14,7 @@ function Overview() {
   const {appList} = useOutletContext();
   const app = appList.find(a => a.name === params.app);
 
-  const [deploys, setDeploys] = React.useState(null);
+  const [deploys, setDeploys] = useState(null);
 
   usePolling({
     url: app ? `/deploys/?app=${app.name}` : '/deploys/',
@@ -23,7 +23,7 @@ function Overview() {
   });
 
   // Reset deploylist if app changes
-  React.useEffect(() => setDeploys(null), [app?.name]);
+  useEffect(() => setDeploys(null), [app?.name]);
 
   // Trigger a notification when any deploy changes it's status to `finished`.
   useDeployFinishedNotification(deploys ?? []);

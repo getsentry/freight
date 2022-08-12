@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {memo, useCallback, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import Ansi from 'ansi-to-react';
 import classnames from 'classnames';
@@ -64,10 +64,10 @@ function TaskDetails() {
 
   const api = useApi();
 
-  const [isLiveScroll, setIsLiveScroll] = React.useState(true);
+  const [isLiveScroll, setIsLiveScroll] = useState(true);
 
-  const [taskLoading, setTaskLoading] = React.useState(true);
-  const [task, setTask] = React.useState(null);
+  const [taskLoading, setTaskLoading] = useState(true);
+  const [task, setTask] = useState(null);
 
   const inProgress = ['in_progress', 'pending'].includes(task?.status);
   const estimatedProgress = getEstimatedProgress(task);
@@ -78,7 +78,7 @@ function TaskDetails() {
   // Update favicon based on task status
   useFaviconStatus({status: task?.status, progress: estimatedProgress});
 
-  const handleTaskResult = React.useCallback(data => {
+  const handleTaskResult = useCallback(data => {
     setTask(data);
     setTaskLoading(false);
   }, []);
@@ -90,11 +90,11 @@ function TaskDetails() {
     pollingActive: inProgress,
   });
 
-  const [logLoading, setLogLoading] = React.useState(true);
-  const [logItems, setLogItems] = React.useState([]);
-  const [logOffset, setLogOffset] = React.useState(0);
+  const [logLoading, setLogLoading] = useState(true);
+  const [logItems, setLogItems] = useState([]);
+  const [logOffset, setLogOffset] = useState(0);
 
-  const handleLogResult = React.useCallback(
+  const handleLogResult = useCallback(
     data => {
       const newLogItems = data.chunks.flatMap(chunk =>
         chunk.text
@@ -122,12 +122,12 @@ function TaskDetails() {
     pollingActive: inProgress,
   });
 
-  const [highlightedLine, setHighlightedLine] = React.useState(getHighlightedLine());
+  const [highlightedLine, setHighlightedLine] = useState(getHighlightedLine());
 
   const navigate = useNavigate();
 
-  const [redeployInProgress, setRedeployInProgress] = React.useState(false);
-  const handleRedeploy = React.useCallback(async () => {
+  const [redeployInProgress, setRedeployInProgress] = useState(false);
+  const handleRedeploy = useCallback(async () => {
     if (redeployInProgress) {
       return;
     }
@@ -148,7 +148,7 @@ function TaskDetails() {
     navigate(`/deploys/${data.app.name}/${data.environment}/${data.number}`);
   }, [api, task, redeployInProgress, navigate]);
 
-  const handleCancelTask = React.useCallback(async () => {
+  const handleCancelTask = useCallback(async () => {
     const url = `/deploys/${app}/${env}/${number}/`;
 
     const cancelResp = await api.request(url, {
@@ -254,7 +254,7 @@ function TaskDetails() {
 // Memoize the LogLineItem since there will be a lot of them, so avoiding
 // re-renders will be helpful
 
-const LogLineItem = React.memo(({index, item, highlighted, setHighlightedLine}) => {
+const LogLineItem = memo(({index, item, highlighted, setHighlightedLine}) => {
   return (
     <div className={classnames('line', {highlighted})}>
       <Ansi>{item.text}</Ansi>

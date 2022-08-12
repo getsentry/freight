@@ -1,4 +1,3 @@
-import * as React from 'react';
 import ReactRouter from 'react-router-dom';
 // eslint-disable-next-line no-restricted-imports
 import {mount} from 'enzyme';

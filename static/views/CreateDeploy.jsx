@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 import {useLocation, useNavigate, useOutletContext} from 'react-router-dom';
 
 import ExpectedChanges from 'app/components/ExpectedChanges';
@@ -20,32 +20,29 @@ function CreateDeploy() {
 
   const defaultApp = location.query?.app ?? lastApp ?? firstApp?.name ?? null;
 
-  const [app, setApp] = React.useState(defaultApp);
+  const [app, setApp] = useState(defaultApp);
 
-  const appObj = React.useMemo(
+  const appObj = useMemo(
     () => appList.find(appEntry => appEntry.name === app),
     [app, appList]
   );
 
-  const envMap = React.useMemo(() => appObj?.environments ?? {}, [appObj]);
-  const envList = React.useMemo(() => Object.keys(envMap), [envMap]);
+  const envMap = useMemo(() => appObj?.environments ?? {}, [appObj]);
+  const envList = useMemo(() => Object.keys(envMap), [envMap]);
 
-  const [env, setEnv] = React.useState(envList?.[0] ?? null);
-  const [ref, setRef] = React.useState(envMap[env]?.defaultRef ?? 'master');
+  const [env, setEnv] = useState(envList?.[0] ?? null);
+  const [ref, setRef] = useState(envMap[env]?.defaultRef ?? 'master');
 
   // update environment when environment list changes
-  React.useEffect(() => void setEnv(envList?.[0] ?? null), [envList]);
+  useEffect(() => void setEnv(envList?.[0] ?? null), [envList]);
 
   // Update refs when app or env changes
-  React.useEffect(
-    () => void setRef(envMap?.[env]?.defaultRef ?? 'master'),
-    [env, envMap]
-  );
+  useEffect(() => void setRef(envMap?.[env]?.defaultRef ?? 'master'), [env, envMap]);
 
-  const changeLabels = React.useMemo(() => appObj?.changeLabels ?? [], [appObj]);
+  const changeLabels = useMemo(() => appObj?.changeLabels ?? [], [appObj]);
 
-  const [submitError, setSubmitError] = React.useState(false);
-  const [submitInProgress, setSubmitInProgress] = React.useState(false);
+  const [submitError, setSubmitError] = useState(false);
+  const [submitInProgress, setSubmitInProgress] = useState(false);
 
   const lastDeploy = useLastDeploy({app, env});
 
@@ -54,7 +51,7 @@ function CreateDeploy() {
 
   const changes = useRemoteChanges({app, startRef: ref, endRef: lastDeploySha});
 
-  const startDeploy = React.useCallback(async () => {
+  const startDeploy = useCallback(async () => {
     const deployResp = await api.request('/deploys/', {
       method: 'POST',
       data: {app, env, ref},
@@ -74,7 +71,7 @@ function CreateDeploy() {
   /**
    * Handles creating a deploy
    */
-  const handleSubmit = React.useCallback(
+  const handleSubmit = useCallback(
     e => {
       e.preventDefault();
 

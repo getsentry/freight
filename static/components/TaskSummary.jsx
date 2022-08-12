@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {useCallback} from 'react';
 import {Link, useNavigate} from 'react-router-dom';
 import classnames from 'classnames';
 import PropTypes from 'prop-types';
@@ -54,7 +54,7 @@ function TaskSummary({task, className}) {
 
   const taskInProgress = task.status === 'in_progress' || task.status === 'pending';
 
-  const gotoTask = React.useCallback(
+  const gotoTask = useCallback(
     e => {
       if (e.target.hasAttribute('href')) {
         return;

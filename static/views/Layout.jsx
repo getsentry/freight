@@ -1,4 +1,4 @@
-import * as React from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {Link, Outlet, useParams} from 'react-router-dom';
 import {init} from '@sentry/react';
 import {BrowserTracing} from '@sentry/tracing';
@@ -10,11 +10,11 @@ function Layout() {
   const {app} = useParams();
   const api = useApi();
 
-  const [appList, setAppList] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
-  const [error, setError] = React.useState(false);
+  const [appList, setAppList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  const fetchData = React.useCallback(async () => {
+  const fetchData = useCallback(async () => {
     // try to fetch config first
     const configResp = await api.request('/config/');
     const config = await configResp.json();
@@ -61,7 +61,7 @@ function Layout() {
     setLoading(false);
   }, [api]);
 
-  React.useEffect(() => void fetchData(), [fetchData]);
+  useEffect(() => void fetchData(), [fetchData]);
 
   return (
     <div>
