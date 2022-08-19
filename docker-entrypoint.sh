@@ -21,4 +21,4 @@ unset email
 # TODO: try to chown this on the host.
 chown -R build:build "$WORKSPACE_ROOT"
 
-exec tini gosu build "$@"
+exec tini -- gosu build "$@"
