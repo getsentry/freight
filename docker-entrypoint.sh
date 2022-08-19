@@ -2,33 +2,23 @@
 
 set -e
 
-# Perform an upgrade before booting up web/worker processes
+if [[ "$(id -u)" != 0 ]]; then
+    echo "Freight needs to be run as root user (we step down to build user before leaving the entrypoint)"
+    exit 1
+fi
+
+# Perform an upgrade before booting up web/worker processes.
 case "$1" in
     web|worker)
-        gosu freight upgrade
+        gosu build upgrade
     ;;
 esac
 
-if [ "$DOCKER_CONFIG" ]; then
-    gosu freight bash -c 'mkdir -p ~/.docker'
-    gosu freight bash -c 'echo $DOCKER_CONFIG > ~/.docker/config.json'
-    gosu freight bash -c 'chmod 400 ~/.docker/config.json'
-    # Make sure we don't pass this along since it contains sensitive info
-    unset DOCKER_CONFIG
-fi
+email=$(grep client_email /etc/freight/google-credentials.json | sed -e "s/.*: \"//" | sed -e "s/\",//")
+gcloud auth activate-service-account "$email" --key-file=/etc/freight/google-credentials.json -q
+unset email
 
-if [ -f /etc/freight/auth-helpers.sh ]; then
-    . /etc/freight/auth-helpers.sh
-fi
+# TODO: try to chown this on the host.
+chown -R build:build "$WORKSPACE_ROOT"
 
-# Check if we're trying to execute a freight bin
-if [ -f "/usr/src/app/bin/$1" ]; then
-    set -- tini -- "$@"
-    if [ "$(id -u)" = '0' ]; then
-        mkdir -p "$WORKSPACE_ROOT"
-        chown -R freight "$WORKSPACE_ROOT"
-        set -- gosu freight "$@"
-    fi
-fi
-
-exec "$@"
+exec tini gosu build "$@"
