@@ -228,7 +228,7 @@ def load_kube_credentials_gcloud(credentials: Dict[str, str]) -> ApiClient:
     # Try to pull credentials from gcloud, but first checking if there
     # is a context, using their auto generated naming scheme, to avoid
     # calling `gcloud` every time, if we've already authed before.
-    from subprocess import check_call, DEVNULL
+    from subprocess import run, CalledProcessError
 
     cluster = credentials["cluster"]
     project = credentials["project"]
@@ -241,21 +241,30 @@ def load_kube_credentials_gcloud(credentials: Dict[str, str]) -> ApiClient:
     except (ConfigException, FileNotFoundError):
         pass
 
-    check_call(
-        [
-            "gcloud",
-            "container",
-            "clusters",
-            "get-credentials",
-            cluster,
-            "--zone",
-            zone,
-            "--project",
-            project,
-        ],
-        stdout=DEVNULL,
-        stderr=DEVNULL,
-    )
+    try:
+        run(
+            (
+                "gcloud",
+                "container",
+                "clusters",
+                "get-credentials",
+                cluster,
+                "--zone",
+                zone,
+                "--project",
+                project,
+            ),
+            check=True,
+            capture_output=True,
+        )
+    except CalledProcessError as e:
+        raise AuthenticationError(f"""
+Failed to get cluster credentials.
+
+stdout: {e.stdout.decode()}
+
+stderr: {e.stderr.decode()}
+""")
 
     return new_client_from_config(context=context)
 
