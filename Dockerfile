@@ -16,9 +16,11 @@ ENV PIP_NO_CACHE_DIR=off \
     PATH="/usr/src/app/bin:/opt/google-cloud-sdk/bin:/.volta/bin:${PATH}"
 
 # git's needed for Freight runtime.
+# ssh is needed for ssh-connect, which is used by git for private repos.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
         git \
+        openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
 # This is the build (uid 9010) user on cheffed and salted host machines.
