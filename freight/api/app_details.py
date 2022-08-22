@@ -42,6 +42,7 @@ class AppDetailsApiView(ApiView):
     put_parser.add_argument("name")
     put_parser.add_argument("repository")
     put_parser.add_argument("provider")
+    put_parser.add_argument("lockedReason")
     put_parser.add_argument("providerConfig", type=json.loads)
     put_parser.add_argument("notifiers", type=json.loads)
     put_parser.add_argument("checks", type=json.loads)
@@ -94,6 +95,14 @@ class AppDetailsApiView(ApiView):
 
         if args.name:
             app.name = args.name
+
+        if args.lockedReason is not None:
+            reason = args.lockedReason
+            # XXX: False is used to clear the locked reason. The RequestParser
+            # will have coerced boolean False to a string.
+            if reason == "False":
+                reason = None
+            app.locked_reason = reason
 
         # TODO(dcramer): this needs to be a get_or_create pattern
         if args.repository:
