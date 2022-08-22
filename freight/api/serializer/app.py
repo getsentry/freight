@@ -27,4 +27,5 @@ class AppSerializer(Serializer):
             "environments": env_map,
             "repository": repo,
             "changeLabels": item.change_labels,
+            "lockedReason": item.locked_reason,
         }
