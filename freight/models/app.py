@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.schema import Index
 
 from freight.config import db
@@ -40,6 +40,7 @@ class App(db.Model):
     provider = Column(String(64))
     data = Column(JSONEncodedDict)
     date_created = Column(DateTime, default=datetime.utcnow, nullable=False)
+    locked_reason = Column(Text)
 
     @property
     def environments(self):
