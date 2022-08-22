@@ -30,7 +30,7 @@ class AppUpdateTest(AppDetailsBase):
             data={
                 "name": "foobar",
                 "provider": "shell",
-                "provider_config": '{"command": "/usr/bin/true", "timeout": 50}',
+                "providerConfig": '{"command": "/usr/bin/true", "timeout": 50}',
                 "notifiers": '[{"type": "slack", "config": {"webhook_url": "https://example.com"}},{"type": "datadog", "config": {"webhook_url": "https://example.com"}}]',
                 "checks": '[{"type": "github-apps", "config": {"contexts": ["travisci"], "repo": "getsentry/freight"}}]',
                 "repository": "git@example.com:repo-name.git",
@@ -81,7 +81,7 @@ class AppUpdateTest(AppDetailsBase):
 
     def test_invalid_provider_config(self):
         resp = self.client.put(
-            self.path, data={"provider": "shell", "provider_config": "{}"}
+            self.path, data={"provider": "shell", "providerConfig": "{}"}
         )
         assert resp.status_code == 400
         data = json.loads(resp.data)
