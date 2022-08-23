@@ -109,7 +109,9 @@ function CreateDeploy() {
               }}
             >
               {appList.map(a => (
-                <option key={a.name}>{a.name}</option>
+                <option value={a.name} key={a.name}>
+                  {a.name} {a.lockedReason && '[locked]'}
+                </option>
               ))}
             </select>
           </div>
@@ -155,7 +157,11 @@ function CreateDeploy() {
           </div>
 
           <div className="submit-group">
-            <button type="submit" className="btn btn-primary" disabled={submitInProgress}>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={submitInProgress || appObj.lockedReason !== null}
+            >
               Ship It!
             </button>
           </div>

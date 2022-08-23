@@ -16,11 +16,15 @@ exports[`Layout should render <Layout /> 1`] = `
         className="container"
       >
         <div
-          className="pull-right"
+          className="pull-right btn-toolbar"
         >
           <Link
             className="btn btn-sm btn-default btn-disabled"
             to="/deploy/"
+          />
+          <Link
+            className="btn btn-sm btn-warning btn-disabled"
+            to="/lock/"
           />
         </div>
         <h1>
