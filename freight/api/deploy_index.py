@@ -129,6 +129,9 @@ class DeployIndexApiView(ApiView):
         if not app:
             return self.error("Invalid app", name="invalid_resource", status_code=404)
 
+        if app.locked_reason is not None:
+            return self.error("App is currently locked for deploys", status_code=400)
+
         deploy_config = TaskConfig.query.filter(
             TaskConfig.app_id == app.id, TaskConfig.type == TaskConfigType.deploy
         ).first()
