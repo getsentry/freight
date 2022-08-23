@@ -14,8 +14,7 @@ function Layout() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
-  const fetchData = useCallback(async () => {
-    // try to fetch config first
+  const fetchConfig = useCallback(async () => {
     const configResp = await api.request('/config/');
     const config = await configResp.json();
 
@@ -45,8 +44,9 @@ function Layout() {
 
       return;
     }
+  }, [api]);
 
-    // Fetch apps
+  const fetchApps = useCallback(async () => {
     const appsResp = await api.request('/apps/');
 
     if (appsResp.ok) {
@@ -61,18 +61,29 @@ function Layout() {
     setLoading(false);
   }, [api]);
 
+  const fetchData = useCallback(async () => {
+    await fetchConfig();
+    await fetchApps();
+  }, [fetchConfig, fetchApps]);
+
   useEffect(() => void fetchData(), [fetchData]);
 
   return (
     <div>
       <header>
         <div className="container">
-          <div className="pull-right">
+          <div className="pull-right btn-toolbar">
             <Link
               to={app ? `/deploy?app=${app}` : '/deploy/'}
               className={`btn btn-sm btn-default ${(loading || error) && 'btn-disabled'}`}
             >
               Deploy
+            </Link>
+            <Link
+              to={app ? `/lock?app=${app}` : '/lock/'}
+              className={`btn btn-sm btn-warning ${(loading || error) && 'btn-disabled'}`}
+            >
+              Lock Deploys
             </Link>
           </div>
           <h1>
@@ -95,7 +106,7 @@ function Layout() {
               </LoadingIndicator>
             </div>
           )}
-          {!loading && (error ? error : <Outlet context={{appList}} />)}
+          {!loading && (error ? error : <Outlet context={{appList, fetchApps}} />)}
         </div>
       </div>
     </div>

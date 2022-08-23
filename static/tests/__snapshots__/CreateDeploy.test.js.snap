@@ -49,8 +49,10 @@ exports[`CreateDeploy Snapshot should render 1`] = `
           >
             <option
               key="freight"
+              value="freight"
             >
               freight
+               
             </option>
           </select>
         </div>
@@ -121,7 +123,7 @@ exports[`CreateDeploy Snapshot should render 1`] = `
         >
           <button
             className="btn btn-primary"
-            disabled={false}
+            disabled={true}
             type="submit"
           >
             Ship It!

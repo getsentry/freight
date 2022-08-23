@@ -1,5 +1,7 @@
 import {useEffect, useState} from 'react';
 import {useOutletContext, useParams} from 'react-router-dom';
+// eslint-disable-next-line no-restricted-imports
+import {marked} from 'marked';
 
 import DeployChart from 'app/components/DeployChart';
 import LoadingIndicator from 'app/components/LoadingIndicator';
@@ -57,9 +59,21 @@ function Overview() {
     }
   });
 
+  const lockedAlerts = appList
+    .filter(a => a.lockedReason !== null)
+    .map(a => (
+      <div key={a.name} className="locked-status alert alert-danger">
+        <div dangerouslySetInnerHTML={{__html: marked(a.lockedReason)}} />
+        <div>
+          <span className="label label-danger">{a.name} Locked</span>
+        </div>
+      </div>
+    ));
+
   return (
     <div>
       <div className="section">
+        {lockedAlerts}
         <div className="section-header">
           <h2>Active Deploys</h2>
         </div>
