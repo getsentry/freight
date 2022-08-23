@@ -258,13 +258,15 @@ def load_kube_credentials_gcloud(credentials: Dict[str, str]) -> ApiClient:
             capture_output=True,
         )
     except CalledProcessError as e:
-        raise AuthenticationError(f"""
+        raise AuthenticationError(
+            f"""
 Failed to get cluster credentials.
 
 stdout: {e.stdout.decode()}
 
 stderr: {e.stderr.decode()}
-""")
+"""
+        )
 
     return new_client_from_config(context=context)
 
