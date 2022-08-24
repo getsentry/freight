@@ -23,15 +23,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         openssh-client \
     && rm -rf /var/lib/apt/lists/*
 
-# This is the build (uid 9010) user on cheffed and salted host machines.
-# Directories that we volume mount when running Freight are owned by 9010:9010 (build).
-# In the docker entrypoint we have gosu stepping down to build, so just make sure
-# it's uid 9010.
-RUN groupadd -g 9010 build && useradd -r -g 9010 -u 9010 build
-
-# During runtime, Freight runs as the build user (stepped down to by gosu),
-# and its docker client needs to be able to read this file.
-COPY --chown=build:build ./docker/config.json /home/build/.docker/config.json
+# add our user and group first to make sure their IDs get assigned consistently
+RUN groupadd -r freight && useradd -r -m -g freight freight
 
 # grab gosu for easy step-down from root
 RUN set -x \
