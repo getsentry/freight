@@ -40,14 +40,24 @@ def upgrade():
         sa.Column("data", freight.db.types.json.JSONEncodedDict(), nullable=True),
     )
 
-    # Copy over the existing configs out of the App table and into TaskConfigs
-    for app in connection.execute(app_table.select()):
-        print(f"Migrating App id={app.id}")
+    apps = connection.execute(app_table.select())
 
-        op.bulk_insert(
-            taskconfig_table,
-            [{"app_id": app.id, "type": 0, "provider": app.provider, "data": app.data}],
-        )
+    # Copy over the existing configs out of the App table and into TaskConfigs
+    if apps is not None:
+        for app in apps:
+            print(f"Migrating App id={app.id}")
+
+            op.bulk_insert(
+                taskconfig_table,
+                [
+                    {
+                        "app_id": app.id,
+                        "type": 0,
+                        "provider": app.provider,
+                        "data": app.data,
+                    }
+                ],
+            )
 
 
 def downgrade():
