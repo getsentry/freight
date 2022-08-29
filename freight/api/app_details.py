@@ -42,7 +42,7 @@ class AppDetailsApiView(ApiView):
     put_parser.add_argument("name")
     put_parser.add_argument("repository")
     put_parser.add_argument("provider")
-    put_parser.add_argument("provider_config", type=json.loads)
+    put_parser.add_argument("providerConfig", type=json.loads)
     put_parser.add_argument("notifiers", type=json.loads)
     put_parser.add_argument("checks", type=json.loads)
     put_parser.add_argument("environments", type=json.loads)
@@ -67,14 +67,14 @@ class AppDetailsApiView(ApiView):
             db.session.add(deploy_config)
             db.session.flush()
 
-        if args.provider or args.provider_config:
+        if args.provider or args.providerConfig:
             if args.provider is not None:
                 provider = args.provider
             else:
                 provider = deploy_config.provider
 
-            if args.provider_config is not None:
-                provider_config = args.provider_config
+            if args.providerConfig is not None:
+                provider_config = args.providerConfig
             else:
                 provider_config = deploy_config.provider_config
 
