@@ -34,7 +34,7 @@ describe('TaskDetails', () => {
       dateFinished: '2022-07-26T22:27:35.756332Z',
     };
 
-    const logChunk = {
+    const logChunk1 = {
       nextOffset: 317,
       chunks: [
         {
@@ -48,6 +48,11 @@ describe('TaskDetails', () => {
       ],
     };
 
+    const logChunk2 = {
+      nextOffset: 317,
+      chunks: [],
+    };
+
     fetch.mockResponse(({url}) => {
       let body = {};
 
@@ -55,8 +60,11 @@ describe('TaskDetails', () => {
         body = task;
       }
 
-      if (url === '/api/0/deploys/freight/production/1793/log/?offset=0') {
-        body = logChunk;
+      if (url === '/api/0/deploys/freight/production/798/log/?offset=0') {
+        body = logChunk1;
+      }
+      if (url === '/api/0/deploys/freight/production/798/log/?offset=317') {
+        body = logChunk2;
       }
 
       return Promise.resolve({body: JSON.stringify(body)});
