@@ -11,7 +11,7 @@ PyYAML==6.0
 redis==3.2.1
 requests==2.27.1
 rq==1.0
-urllib3==1.25.11
+urllib3==1.26.5
 Werkzeug==0.15.6
 
 sentry-sdk[flask]==1.5.11
