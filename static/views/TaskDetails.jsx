@@ -1,5 +1,5 @@
-import {memo, useCallback, useState} from 'react';
-import {useNavigate, useParams} from 'react-router-dom';
+import {memo, useCallback, useMemo, useState} from 'react';
+import {useNavigate, useOutletContext, useParams} from 'react-router-dom';
 import Ansi from 'ansi-to-react';
 import classnames from 'classnames';
 import {format} from 'date-fns';
@@ -61,6 +61,12 @@ function scrollToEnd() {
 
 function TaskDetails() {
   const {app, env, number} = useParams();
+  const {appList} = useOutletContext();
+
+  const appObj = useMemo(
+    () => appList.find(appEntry => appEntry.name === app),
+    [app, appList]
+  );
 
   const api = useApi();
 
@@ -69,6 +75,7 @@ function TaskDetails() {
   const [taskLoading, setTaskLoading] = useState(true);
   const [task, setTask] = useState(null);
 
+  const isLocked = !!appObj.lockedReason;
   const inProgress = ['in_progress', 'pending'].includes(task?.status);
   const estimatedProgress = getEstimatedProgress(task);
 
@@ -235,7 +242,7 @@ function TaskDetails() {
             ) : (
               <a
                 className="btn btn-default btn-sm"
-                disabled={redeployInProgress}
+                disabled={redeployInProgress || isLocked}
                 onClick={handleRedeploy}
               >
                 Re-deploy

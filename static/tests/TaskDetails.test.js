@@ -8,6 +8,7 @@ jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => null,
   useParams: jest.fn(),
+  useOutletContext: jest.fn(),
   Link: () => null,
 }));
 
@@ -40,6 +41,24 @@ describe('TaskDetails', () => {
       dateStarted: '2022-07-26T22:25:45.520023Z',
       dateFinished: '2022-07-26T22:27:35.756332Z',
     };
+
+    const appList = [
+      {
+        environments: {
+          production: {
+            defaultRef: 'master',
+          },
+          staging: {
+            defaultRef: 'HEAD',
+          },
+        },
+        id: '1',
+        name: 'freight',
+        repository: 'https://github.com/getsentry/freight.git',
+      },
+    ];
+
+    jest.spyOn(ReactRouter, 'useOutletContext').mockReturnValue({appList});
 
     const logChunk1 = {
       nextOffset: 317,
