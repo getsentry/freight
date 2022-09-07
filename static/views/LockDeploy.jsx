@@ -67,7 +67,7 @@ function LockDeploy() {
             <span>{submitError}</span>
           </div>
         )}
-        <form onSubmit={undefined}>
+        <form>
           <div className="form-group">
             <label>Application</label>
             <select
@@ -95,7 +95,7 @@ function LockDeploy() {
 
           <div className="submit-group">
             <button
-              type="submit"
+              type="button"
               className="btn btn-primary"
               onClick={() => handleLockUpdate(reason)}
               disabled={submitInProgress}
@@ -104,7 +104,7 @@ function LockDeploy() {
             </button>
             {isLocked && (
               <button
-                type="submit"
+                type="button"
                 className="btn btn-success"
                 onClick={() => handleLockUpdate(false)}
                 disabled={submitInProgress}
