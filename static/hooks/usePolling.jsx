@@ -57,7 +57,15 @@ function usePolling({
   //
   // See: https://overreacted.io/making-setinterval-declarative-with-react-hooks/
   const triggerRef = useRef(() => undefined);
-  const mounted = useRef(true);
+  const mounted = useRef(false);
+
+  // Track mounted. Helps us ensure we don't keep polling once unmounted
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   const enqueNextTrigger = useCallback(
     (wasSuccess = true) => {
@@ -101,7 +109,6 @@ function usePolling({
 
     return () => {
       api.clear();
-      mounted.current = false;
       window.clearTimeout(pollTimeoutRef.current);
       pollTimeoutRef.current = undefined;
     };
