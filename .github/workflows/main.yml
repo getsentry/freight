@@ -48,7 +48,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: volta-cli/action@v1
+      - uses: getsentry/action-setup-volta@v1.1.0
       - uses: actions/setup-python@v3
         with:
           python-version: '3.8.13'
