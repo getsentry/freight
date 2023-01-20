@@ -120,7 +120,7 @@ def main(task_id, log):
         try:
             provider.execute(workspace, task)
         except Exception as exc:
-            current_app.logger.exception(str(exc))
+            current_app.logger.error(str(exc))
             task.status = TaskStatus.failed
         else:
             task.status = TaskStatus.finished
