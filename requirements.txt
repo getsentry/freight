@@ -18,3 +18,7 @@ sentry-sdk[flask]==1.5.11
 
 Jinja2==3.0.2
 itsdangerous==2.0.1
+
+# This is a sub-dependency of Flask-SQLAlchemy that has updated and breaks our
+# build.
+SQLAlchemy==1.4.46
