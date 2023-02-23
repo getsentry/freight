@@ -61,7 +61,6 @@ function Overview() {
 
   const lockedAlerts = appList
     .filter(a => a.lockedReason !== null)
-    .filter(a => params.app === undefined || a.name === params.app)
     .map(a => (
       <div key={a.name} className="locked-status alert alert-danger">
         <div dangerouslySetInnerHTML={{__html: marked(a.lockedReason)}} />
